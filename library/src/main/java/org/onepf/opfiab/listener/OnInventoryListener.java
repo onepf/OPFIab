@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-public interface Request {
+import org.onepf.opfiab.model.InventoryResponse;
 
-    int getId();
+public interface OnInventoryListener {
 
-    @NonNull
-    RequestType getType();
+    void onInventory(final @NonNull InventoryResponse inventoryResponse);
 }

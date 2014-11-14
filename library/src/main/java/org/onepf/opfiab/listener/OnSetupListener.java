@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.listener;
 
-public enum Result {
-    SUCCESS,
-    USER_CANCELED,
-    BILLING_UNAVAILABLE,
-    ITEM_UNAVAILABLE,
-    ITEM_ALREADY_OWNED,
-    SUBSCRIPTIONS_NOT_SUPPORTED,
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.SetupStatus;
+
+public interface OnSetupListener {
+
+    void onSetup(final @NonNull SetupStatus status, final @Nullable BillingProvider billingProvider);
 }

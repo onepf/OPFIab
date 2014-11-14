@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.fragment;
+package org.onepf.opfiab.android;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import org.onepf.opfiab.api.ManagedOPFIabHelper;
 
@@ -72,7 +73,9 @@ public class OPFIabFragment extends Fragment implements OPFIabHelperHolder{
     }
 
     @Override
-    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onActivityResult(final int requestCode, final int resultCode, final @Nullable Intent data) {
+        if (!implementation.onActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

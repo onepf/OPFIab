@@ -16,12 +16,8 @@
 
 package org.onepf.opfiab.model;
 
-import android.support.annotation.NonNull;
-
-public interface Request {
-
-    int getId();
-
-    @NonNull
-    RequestType getType();
+public enum SetupStatus {
+    SUCCESS,
+    FAILED,
+    PROVIDER_CHANGED,
 }

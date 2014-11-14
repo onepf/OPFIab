@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.listener;
 
-import android.support.annotation.NonNull;
 
-public interface Request {
-
-    int getId();
-
-    @NonNull
-    RequestType getType();
-}
+public interface BillingListener
+        extends OnSetupListener, OnPurchaseListener, OnSubscriptionListener, OnInventoryListener,
+                OnSkuInfoListener {}

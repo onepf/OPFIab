@@ -1,3 +1,4 @@
+apply plugin: 'idea'
 apply plugin: 'com.android.application'
 
 android {
@@ -5,7 +6,7 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        applicationId "org.onepf.myapplication"
+        applicationId "org.onepf.sample.trivialdrive"
         minSdkVersion 10
         targetSdkVersion 21
         versionCode 1

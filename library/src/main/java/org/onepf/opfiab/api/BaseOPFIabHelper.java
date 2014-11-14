@@ -18,11 +18,21 @@ package org.onepf.opfiab.api;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.Options;
+
 class BaseOPFIabHelper implements OPFIabHelper {
 
-    final @NonNull Options options;
+    @NonNull
+    final Options options;
 
-    BaseOPFIabHelper(@NonNull final Options options) {
+    @NonNull
+    final BillingListenerCompositor billingListenerCompositor;
+
+    BaseOPFIabHelper(final @NonNull Options options) {
         this.options = options;
+        this.billingListenerCompositor = new BillingListenerCompositor(
+                options.getBillingListener());
     }
+
+
 }

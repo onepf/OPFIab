@@ -19,13 +19,42 @@ package org.onepf.opfiab.broadcast;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.listener.GlobalListener;
+import org.onepf.opfiab.OPFUtils;
+import org.onepf.opfiab.listener.BillingListener;
 
-public class OPFIabBroadcastReceiver extends BroadcastReceiver implements GlobalListener{
+public class OPFIabBroadcastReceiver extends BroadcastReceiver {
+
+    @NonNull
+    protected final Handler handler = new Handler(Looper.getMainLooper());
+
+    @NonNull
+    protected final BillingListener billingListener;
+
+    public OPFIabBroadcastReceiver(final @NonNull BillingListener billingListener) {
+        this.billingListener = billingListener;
+    }
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
+        final Bundle extras = intent.getExtras();
+        if (OPFUtils.uiThread()) {
+            handle(extras);
+        } else {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    handle(extras);
+                }
+            });
+        }
+    }
+
+    protected void handle(final @NonNull Bundle bundle) {
 
     }
 }

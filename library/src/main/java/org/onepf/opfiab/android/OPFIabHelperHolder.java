@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.android;
 
 import android.support.annotation.NonNull;
 
-public interface Request {
+import org.onepf.opfiab.api.ManagedOPFIabHelper;
 
-    int getId();
-
-    @NonNull
-    RequestType getType();
+interface OPFIabHelperHolder {
+    void setOPFIabHelper(final @NonNull ManagedOPFIabHelper managedOPFIabHelper);
 }

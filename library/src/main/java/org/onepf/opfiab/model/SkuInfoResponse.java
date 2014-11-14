@@ -16,12 +16,13 @@
 
 package org.onepf.opfiab.model;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public interface Request {
+public class SkuInfoResponse extends Response{
 
-    int getId();
-
-    @NonNull
-    RequestType getType();
+    public SkuInfoResponse(
+            final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
+        super(id, data, status);
+    }
 }

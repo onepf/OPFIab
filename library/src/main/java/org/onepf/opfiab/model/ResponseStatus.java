@@ -16,12 +16,11 @@
 
 package org.onepf.opfiab.model;
 
-import android.support.annotation.NonNull;
-
-public interface Request {
-
-    int getId();
-
-    @NonNull
-    RequestType getType();
+public enum ResponseStatus {
+    SUCCESS,
+    USER_CANCELED,
+    BILLING_UNAVAILABLE,
+    ITEM_UNAVAILABLE,
+    ITEM_ALREADY_OWNED,
+    SUBSCRIPTIONS_NOT_SUPPORTED,
 }

@@ -16,11 +16,11 @@
 
 package org.onepf.opfiab.listener;
 
-public class GlobalListenerWrapper implements GlobalListener{
+import android.support.annotation.NonNull;
 
-    private final GlobalListener globalListener;
+import org.onepf.opfiab.model.PurchaseResponse;
 
-    GlobalListenerWrapper(final GlobalListener globalListener) {
-        this.globalListener = globalListener;
-    }
+public interface OnPurchaseListener {
+
+    void onPurchase(final @NonNull PurchaseResponse purchaseResponse);
 }

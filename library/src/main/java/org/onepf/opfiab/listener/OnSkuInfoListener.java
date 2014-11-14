@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-public interface Request {
+import org.onepf.opfiab.model.SkuInfoResponse;
 
-    int getId();
+public interface OnSkuInfoListener {
 
-    @NonNull
-    RequestType getType();
+    void onSkuInfo(final @NonNull SkuInfoResponse skuInfoResponse);
 }

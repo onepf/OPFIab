@@ -17,23 +17,34 @@
 package org.onepf.opfiab.model;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
-public class Response {
+abstract class Response {
 
-    private final long id;
+    private final int id;
 
+    @NonNull
     private final Bundle data;
 
-    Response(final long id, final Bundle data) {
+    @NonNull
+    private final ResponseStatus status;
+
+    Response(final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
         this.id = id;
         this.data = data;
+        this.status = status;
     }
 
-    long getId() {
+    public int getId() {
         return id;
     }
 
-    Bundle getData() {
+    public Bundle getData() {
         return data;
+    }
+
+    @NonNull
+    public ResponseStatus getStatus() {
+        return status;
     }
 }

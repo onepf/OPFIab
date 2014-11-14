@@ -14,33 +14,43 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.android;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class ManagedOPFIabHelper extends OPFIabHelperWrapper implements ManagedLifecycle {
+import org.onepf.opfiab.api.ManagedLifecycle;
+import org.onepf.opfiab.api.ManagedOPFIabHelper;
 
-    public ManagedOPFIabHelper(final OPFIabHelper opfIabHelper) {
-        super(opfIabHelper);
+class OPFIabFragmentImpl implements OPFIabHelperHolder, ManagedLifecycle {
+
+    @Nullable
+    private ManagedOPFIabHelper managedOPFIabHelper;
+
+    @Override
+    public void setOPFIabHelper(final @NonNull ManagedOPFIabHelper managedOPFIabHelper) {
+        this.managedOPFIabHelper = managedOPFIabHelper;
     }
 
+    @Override
     public void onCreate() {
 
     }
 
+    @Override
     public void onResume() {
 
     }
 
+    @Override
     public void onPause() {
 
     }
 
     @Override
-    public boolean onActivityResult(final int requestCode, final int resultCode,
-                                    final @Nullable Intent data) {
+    public boolean onActivityResult(
+            final int requestCode, final int resultCode, final @Nullable Intent data) {
         return false;
     }
 }

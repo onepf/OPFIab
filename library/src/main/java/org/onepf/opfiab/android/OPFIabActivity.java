@@ -14,43 +14,43 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.fragment;
+package org.onepf.opfiab.android;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.api.ManagedLifecycles;
 import org.onepf.opfiab.api.ManagedOPFIabHelper;
+import org.onepf.opfiab.api.OPFIab;
 
-class OPFIabFragmentImpl implements OPFIabHelperHolder, ManagedLifecycles {
+public class OPFIabActivity extends Activity {
 
-    @Nullable
-    private ManagedOPFIabHelper managedOPFIabHelper;
+    @NonNull
+    private final ManagedOPFIabHelper opfIabHelper = OPFIab.getManagedInstance();
 
     @Override
-    public void setOPFIabHelper(final @NonNull ManagedOPFIabHelper managedOPFIabHelper) {
-        this.managedOPFIabHelper = managedOPFIabHelper;
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        opfIabHelper.onCreate();
     }
 
     @Override
-    public void onCreate() {
-
+    protected void onResume() {
+        super.onResume();
+        opfIabHelper.onResume();
     }
 
     @Override
-    public void onResume() {
-
+    protected void onPause() {
+        super.onPause();
+        opfIabHelper.onPause();
     }
 
     @Override
-    public void onPause() {
-
-    }
-
-    @Override
-    public boolean onActivityResult(
-            final int requestCode, final int resultCode, final @NonNull Intent data) {
-        return false;
+    protected void onActivityResult(final int requestCode, final int resultCode,
+                                    final @Nullable Intent data) {
+        opfIabHelper.onActivityResult(requestCode, resultCode, data);
     }
 }

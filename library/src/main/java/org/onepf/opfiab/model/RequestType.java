@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.model;
 
-import java.io.Serializable;
+public enum RequestType {
 
-public final class Options implements Serializable {
+    PURCHASE,
+    SUBSCRIPTION,
+    INVENTORY,
+    SKU_INFO,
 }

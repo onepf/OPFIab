@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.fragment;
+package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.api.ManagedOPFIabHelper;
+import org.onepf.opfiab.model.SubscriptionResponse;
 
-interface OPFIabHelperHolder {
-    void setOPFIabHelper(final @NonNull ManagedOPFIabHelper managedOPFIabHelper);
+public interface OnSubscriptionListener {
+
+    void onSubscription(final @NonNull SubscriptionResponse subscriptionResponse);
 }

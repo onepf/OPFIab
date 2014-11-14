@@ -16,5 +16,13 @@
 
 package org.onepf.opfiab.billing;
 
+import android.support.annotation.NonNull;
+
 public interface BillingProviderInfo {
+
+    @NonNull
+    String getName();
+
+    @NonNull
+    String getPackage();
 }

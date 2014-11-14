@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.model;
 
-import org.onepf.opfiab.listener.GlobalListener;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 
-class GlobalListenerCompositor implements GlobalListener{
+public class PurchaseResponse extends Response {
 
-
-
+    public PurchaseResponse(
+            final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
+        super(id, data, status);
+    }
 }

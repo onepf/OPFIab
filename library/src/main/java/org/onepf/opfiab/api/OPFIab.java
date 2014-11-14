@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.*;
+import org.onepf.opfiab.model.Options;
 
 public final class OPFIab {
 
@@ -27,18 +28,25 @@ public final class OPFIab {
         throw new UnsupportedOperationException();
     }
 
+    @Nullable
+    private static OPFIabHelper instance;
 
-    private static @Nullable OPFIabHelper instance;
-
-    public static @NonNull OPFIabHelper getInstance() {
+    @NonNull
+    public static OPFIabHelper getInstance() {
         checkInit();
         //noinspection ConstantConditions
         return instance;
     }
 
-    public static @NonNull ManagedOPFIabHelper getManagedAwareInstance() {
+    @NonNull
+    public static ManagedOPFIabHelper getManagedInstance() {
         checkInit();
         return new ManagedOPFIabHelper(instance);
+    }
+
+    @NonNull
+    public static ActivityOPFIabHelper getActivityInstance() {
+        return new ActivityOPFIabHelper(getManagedInstance());
     }
 
     public static void init(final @NonNull Options options) {

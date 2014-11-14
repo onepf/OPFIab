@@ -17,9 +17,9 @@
 package org.onepf.opfiab.api;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-public interface ManagedLifecycles {
+public interface ManagedLifecycle {
 
     void onCreate();
 
@@ -27,5 +27,5 @@ public interface ManagedLifecycles {
 
     void onPause();
 
-    boolean onActivityResult(final int requestCode, final int resultCode, final @NonNull Intent data);
+    boolean onActivityResult(final int requestCode, final int resultCode, final @Nullable Intent data);
 }
