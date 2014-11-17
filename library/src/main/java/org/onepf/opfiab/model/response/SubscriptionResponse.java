@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.response;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public class PurchaseResponse extends Response {
+import org.onepf.opfiab.OPFIabAction;
+import org.onepf.opfiab.billing.ResponseStatus;
 
-    public PurchaseResponse(
-            final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
-        super(id, data, status);
+public class SubscriptionResponse extends Response {
+
+    public SubscriptionResponse(@NonNull final Bundle data, @NonNull final ResponseStatus status) {
+        super(OPFIabAction.SUBSCRIPTION, status, data);
     }
 }

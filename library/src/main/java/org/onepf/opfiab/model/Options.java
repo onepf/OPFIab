@@ -20,14 +20,12 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.listener.BillingListener;
 
-import java.io.Serializable;
-
-public final class Options implements Serializable {
+public final class Options {
 
     @Nullable
     final BillingListener billingListener;
 
-    public Options(final BillingListener billingListener) {
+    public Options(final @Nullable BillingListener billingListener) {
         this.billingListener = billingListener;
     }
 

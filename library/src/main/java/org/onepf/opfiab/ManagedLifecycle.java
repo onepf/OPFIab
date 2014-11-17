@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab;
 
-public class Sku {
+import android.content.Intent;
+import android.support.annotation.Nullable;
+
+public interface ManagedLifecycle {
+
+    void onCreate();
+
+    void onResume();
+
+    void onPause();
+
+    boolean onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data);
 }

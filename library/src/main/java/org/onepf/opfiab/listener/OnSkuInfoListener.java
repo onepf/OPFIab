@@ -18,9 +18,9 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.SkuInfoResponse;
+import org.onepf.opfiab.model.response.SkuInfoResponse;
 
 public interface OnSkuInfoListener {
 
-    void onSkuInfo(final @NonNull SkuInfoResponse skuInfoResponse);
+    void onSkuInfo(@NonNull final SkuInfoResponse skuInfoResponse);
 }

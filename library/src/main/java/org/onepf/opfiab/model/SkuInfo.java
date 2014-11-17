@@ -14,33 +14,34 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.model;
 
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-public class ManagedOPFIabHelper extends OPFIabHelperWrapper implements ManagedLifecycle {
+import org.onepf.opfiab.billing.SkuType;
 
-    public ManagedOPFIabHelper(final OPFIabHelper opfIabHelper) {
-        super(opfIabHelper);
+import java.io.Serializable;
+
+public class SkuInfo implements Serializable {
+
+    @NonNull
+    private final String sku;
+
+    @NonNull
+    private final SkuType skuType;
+
+    public SkuInfo(@NonNull final String sku, @NonNull final SkuType skuType) {
+        this.sku = sku;
+        this.skuType = skuType;
     }
 
-    public void onCreate() {
-
+    @NonNull
+    public String getSku() {
+        return sku;
     }
 
-    public void onResume() {
-
-    }
-
-    public void onPause() {
-
-    }
-
-    @Override
-    public boolean onActivityResult(final int requestCode, final int resultCode,
-                                    final @Nullable Intent data) {
-        return false;
+    @NonNull
+    public SkuType getSkuType() {
+        return skuType;
     }
 }

@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import org.onepf.opfiab.api.ManagedOPFIabHelper;
+import org.onepf.opfiab.ManagedOPFIabHelper;
 
 public class OPFIabSupportFragment extends Fragment implements OPFIabHelperHolder {
 
@@ -36,7 +36,7 @@ public class OPFIabSupportFragment extends Fragment implements OPFIabHelperHolde
     private final OPFIabFragmentImpl implementation = new OPFIabFragmentImpl();
 
     @Override
-    public void setOPFIabHelper(final @NonNull ManagedOPFIabHelper managedOPFIabHelper) {
+    public void setOPFIabHelper(@NonNull final ManagedOPFIabHelper managedOPFIabHelper) {
         implementation.setOPFIabHelper(managedOPFIabHelper);
     }
 
@@ -74,7 +74,7 @@ public class OPFIabSupportFragment extends Fragment implements OPFIabHelperHolde
     }
 
     @Override
-    public void onActivityResult(final int requestCode, final int resultCode, final @Nullable Intent data) {
+    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
         if (!implementation.onActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data);
         }

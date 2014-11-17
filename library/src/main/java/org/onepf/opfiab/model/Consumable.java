@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.model;
 
-public class OPFIabHelperWrapper implements OPFIabHelper {
+import android.support.annotation.NonNull;
 
-    private final OPFIabHelper opfIabHelper;
+import org.onepf.opfiab.billing.SkuType;
 
-    public OPFIabHelperWrapper(final OPFIabHelper opfIabHelper) {
-        this.opfIabHelper = opfIabHelper;
+public class Consumable extends SkuInfo {
+
+    public Consumable(@NonNull final String sku) {
+        super(sku, SkuType.CONSUMABLE);
     }
 }

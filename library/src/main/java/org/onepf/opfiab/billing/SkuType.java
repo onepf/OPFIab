@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.billing;
 
-import android.os.Bundle;
-import android.support.annotation.NonNull;
+public enum SkuType {
 
-public class InventoryResponse extends Response {
-
-    public InventoryResponse(
-            final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
-        super(id, data, status);
-    }
+    CONSUMABLE,
+    SUBSCRIPTION,
 }

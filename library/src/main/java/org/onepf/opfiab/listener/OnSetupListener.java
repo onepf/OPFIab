@@ -20,9 +20,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.SetupStatus;
+import org.onepf.opfiab.billing.SetupStatus;
 
 public interface OnSetupListener {
 
-    void onSetup(final @NonNull SetupStatus status, final @Nullable BillingProvider billingProvider);
+    void onSetup(@NonNull final SetupStatus status, @Nullable final BillingProvider billingProvider);
 }

@@ -16,8 +16,29 @@
 
 package org.onepf.opfiab.model;
 
-public enum SetupStatus {
-    SUCCESS,
-    FAILED,
-    PROVIDER_CHANGED,
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+public class BillingProviderInfo {
+
+    @NonNull
+    private final String name;
+
+    @Nullable
+    private final String packageName;
+
+    public BillingProviderInfo(@NonNull final String name, @Nullable final String packageName) {
+        this.name = name;
+        this.packageName = packageName;
+    }
+
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    @Nullable
+    public String getPackageName() {
+        return packageName;
+    }
 }

@@ -23,25 +23,26 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.OPFUtils;
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.billing.SetupStatus;
 import org.onepf.opfiab.listener.BillingListener;
+import org.onepf.opfiab.model.response.InventoryResponse;
+import org.onepf.opfiab.model.response.PurchaseResponse;
+import org.onepf.opfiab.model.response.SkuInfoResponse;
+import org.onepf.opfiab.model.response.SubscriptionResponse;
+import org.onepf.opfiab.util.OPFUtils;
 
-public class OPFIabBroadcastReceiver extends BroadcastReceiver {
+public class OPFIabReceiver extends BroadcastReceiver implements BillingListener{
 
     @NonNull
     protected final Handler handler = new Handler(Looper.getMainLooper());
 
-    @NonNull
-    protected final BillingListener billingListener;
-
-    public OPFIabBroadcastReceiver(final @NonNull BillingListener billingListener) {
-        this.billingListener = billingListener;
-    }
-
     @Override
     public void onReceive(final Context context, final Intent intent) {
         final Bundle extras = intent.getExtras();
+        // Ensure all intents are handled in UI thread.
         if (OPFUtils.uiThread()) {
             handle(extras);
         } else {
@@ -54,7 +55,23 @@ public class OPFIabBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    protected void handle(final @NonNull Bundle bundle) {
+    private void handle(@NonNull final Bundle bundle) {
 
     }
+
+    @Override
+    public void onSetup(@NonNull final SetupStatus status,
+                        @Nullable final BillingProvider billingProvider) {}
+
+    @Override
+    public void onInventory(@NonNull final InventoryResponse inventoryResponse) {}
+
+    @Override
+    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {}
+
+    @Override
+    public void onSkuInfo(@NonNull final SkuInfoResponse skuInfoResponse) {}
+
+    @Override
+    public void onSubscription(@NonNull final SubscriptionResponse subscriptionResponse) {}
 }

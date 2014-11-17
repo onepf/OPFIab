@@ -21,6 +21,7 @@
     <application>
         <activity
             android:name=".android.OPFIabActivity"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.NoDisplay"/>
     </application>
 </manifest>

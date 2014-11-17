@@ -17,15 +17,23 @@
 package org.onepf.opfiab.android;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.api.ManagedOPFIabHelper;
-import org.onepf.opfiab.api.OPFIab;
+import org.onepf.opfiab.ManagedOPFIabHelper;
+import org.onepf.opfiab.OPFIab;
 
 public class OPFIabActivity extends Activity {
+
+    @NonNull
+    public static Intent newIntent(@NonNull final Context context) {
+        final Intent intent = new Intent(context.getApplicationContext(), OPFIabActivity.class);
+        return intent;
+    }
+
 
     @NonNull
     private final ManagedOPFIabHelper opfIabHelper = OPFIab.getManagedInstance();
@@ -50,7 +58,7 @@ public class OPFIabActivity extends Activity {
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode,
-                                    final @Nullable Intent data) {
+                                    @Nullable final Intent data) {
         opfIabHelper.onActivityResult(requestCode, resultCode, data);
     }
 }

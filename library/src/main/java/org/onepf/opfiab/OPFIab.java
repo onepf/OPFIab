@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab;
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.*;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.Options;
+import org.onepf.opfiab.util.OPFUtils;
 
 public final class OPFIab {
 
@@ -28,40 +31,55 @@ public final class OPFIab {
         throw new UnsupportedOperationException();
     }
 
-    @Nullable
-    private static OPFIabHelper instance;
+    @NonNull
+    static BaseOPFIabHelper instance;
 
     @NonNull
     public static OPFIabHelper getInstance() {
         checkInit();
+        OPFUtils.checkThread(true);
         //noinspection ConstantConditions
         return instance;
     }
 
     @NonNull
     public static ManagedOPFIabHelper getManagedInstance() {
+        OPFUtils.checkThread(true);
         checkInit();
         return new ManagedOPFIabHelper(instance);
     }
 
     @NonNull
-    public static ActivityOPFIabHelper getActivityInstance() {
-        return new ActivityOPFIabHelper(getManagedInstance());
+    public static ActivityOPFIabHelper getActivityInstance(@NonNull final Activity activity) {
+        return new ActivityOPFIabHelper(getManagedInstance(), activity);
     }
 
-    public static void init(final @NonNull Options options) {
-        if (!OPFUtils.uiThread()) {
-            throw OPFUtils.wrongThreadException(true);
-        }
+    @Nullable
+    public static BillingProvider getCurrentProvider() {
+        checkInit();
+        return null;
+    }
+
+    public static void init(@NonNull final Context context, @NonNull final Options options) {
+        OPFUtils.checkThread(true);
+        //noinspection ConstantConditions
         if (instance != null) {
             throw new IllegalStateException("init() was already called.");
         }
-        instance = new BaseOPFIabHelper(options);
+        instance = new BaseOPFIabHelper(context, options);
+        OPFIabBroadcast.init(context);
     }
 
+    public static void setup() {
+
+    }
+
+
+
     private static void checkInit() {
+        //noinspection ConstantConditions
         if (instance == null) {
-            throw new IllegalStateException("You must call init() first.");
+            throw OPFUtils.notInitException();
         }
     }
 }

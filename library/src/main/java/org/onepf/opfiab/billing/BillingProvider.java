@@ -18,6 +18,8 @@ package org.onepf.opfiab.billing;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.BillingProviderInfo;
+
 public interface BillingProvider {
 
     @NonNull

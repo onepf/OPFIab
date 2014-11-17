@@ -18,9 +18,9 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.SubscriptionResponse;
+import org.onepf.opfiab.model.response.SubscriptionResponse;
 
 public interface OnSubscriptionListener {
 
-    void onSubscription(final @NonNull SubscriptionResponse subscriptionResponse);
+    void onSubscription(@NonNull final SubscriptionResponse subscriptionResponse);
 }

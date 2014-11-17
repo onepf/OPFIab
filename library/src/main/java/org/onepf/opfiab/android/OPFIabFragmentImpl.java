@@ -20,8 +20,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.api.ManagedLifecycle;
-import org.onepf.opfiab.api.ManagedOPFIabHelper;
+import org.onepf.opfiab.ManagedLifecycle;
+import org.onepf.opfiab.ManagedOPFIabHelper;
 
 class OPFIabFragmentImpl implements OPFIabHelperHolder, ManagedLifecycle {
 
@@ -29,7 +29,7 @@ class OPFIabFragmentImpl implements OPFIabHelperHolder, ManagedLifecycle {
     private ManagedOPFIabHelper managedOPFIabHelper;
 
     @Override
-    public void setOPFIabHelper(final @NonNull ManagedOPFIabHelper managedOPFIabHelper) {
+    public void setOPFIabHelper(@NonNull final ManagedOPFIabHelper managedOPFIabHelper) {
         this.managedOPFIabHelper = managedOPFIabHelper;
     }
 
@@ -50,7 +50,7 @@ class OPFIabFragmentImpl implements OPFIabHelperHolder, ManagedLifecycle {
 
     @Override
     public boolean onActivityResult(
-            final int requestCode, final int resultCode, final @Nullable Intent data) {
+            final int requestCode, final int resultCode, @Nullable final Intent data) {
         return false;
     }
 }

@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.model.response;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.Options;
+import org.onepf.opfiab.OPFIabAction;
+import org.onepf.opfiab.billing.ResponseStatus;
+import org.onepf.opfiab.model.Purchase;
 
-class BaseOPFIabHelper implements OPFIabHelper {
+public class PurchaseResponse extends Response {
 
-    @NonNull
-    final Options options;
-
-    @NonNull
-    final BillingListenerCompositor billingListenerCompositor;
-
-    BaseOPFIabHelper(final @NonNull Options options) {
-        this.options = options;
-        this.billingListenerCompositor = new BillingListenerCompositor(
-                options.getBillingListener());
+    public PurchaseResponse(@NonNull final Bundle data, @NonNull final ResponseStatus status) {
+        super(OPFIabAction.PURCHASE, status, data);
     }
 
-
+    @NonNull
+    public Purchase getPurchase() {
+        return null;
+    }
 }

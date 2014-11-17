@@ -14,12 +14,21 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab;
 
-public enum RequestType {
+public enum OPFIabAction {
+
+    REGISTER,
 
     PURCHASE,
     SUBSCRIPTION,
     INVENTORY,
-    SKU_INFO,
+    SKU_INFO,;
+
+    private final static String packageName = OPFIabAction.class.getPackage().getName();
+
+    @Override
+    public String toString() {
+        return packageName.concat(".").concat(name());
+    }
 }

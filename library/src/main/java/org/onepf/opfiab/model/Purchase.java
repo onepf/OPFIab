@@ -16,5 +16,21 @@
 
 package org.onepf.opfiab.model;
 
-public class Purchase {
+import android.support.annotation.NonNull;
+
+import java.io.Serializable;
+
+public class Purchase implements Serializable {
+
+    @NonNull
+    private final SkuInfo skuInfo;
+
+    public Purchase(@NonNull final SkuInfo skuInfo) {
+        this.skuInfo = skuInfo;
+    }
+
+    @NonNull
+    public SkuInfo getSkuInfo() {
+        return skuInfo;
+    }
 }

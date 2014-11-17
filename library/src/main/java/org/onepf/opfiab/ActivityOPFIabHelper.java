@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
 public class ActivityOPFIabHelper extends OPFIabHelperWrapper {
 
-    public ActivityOPFIabHelper(final @NonNull ManagedOPFIabHelper opfIabHelper) {
+    @NonNull
+    private final Activity activity;
+
+    public ActivityOPFIabHelper(@NonNull final ManagedOPFIabHelper opfIabHelper,
+                                @NonNull final Activity activity) {
         super(opfIabHelper);
+        this.activity = activity;
     }
 
+    @NonNull
+    public Activity getActivity() {
+        return activity;
+    }
 }

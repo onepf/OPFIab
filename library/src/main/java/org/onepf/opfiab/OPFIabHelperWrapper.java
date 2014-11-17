@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab;
 
-public interface OPFIabHelper {
+import android.support.annotation.NonNull;
+
+public class OPFIabHelperWrapper implements OPFIabHelper {
+
+    @NonNull
+    protected final OPFIabHelper opfIabHelper;
+
+    public OPFIabHelperWrapper(@NonNull final OPFIabHelper opfIabHelper) {
+        this.opfIabHelper = opfIabHelper;
+    }
 }

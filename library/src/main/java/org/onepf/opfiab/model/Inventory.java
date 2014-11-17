@@ -16,35 +16,22 @@
 
 package org.onepf.opfiab.model;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-abstract class Response {
+import java.io.Serializable;
+import java.util.List;
 
-    private final int id;
-
-    @NonNull
-    private final Bundle data;
+public class Inventory implements Serializable {
 
     @NonNull
-    private final ResponseStatus status;
+    final List<SkuInfo> skuInfos;
 
-    Response(final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
-        this.id = id;
-        this.data = data;
-        this.status = status;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public Bundle getData() {
-        return data;
+    public Inventory(@NonNull final List<SkuInfo> skuInfos) {
+        this.skuInfos = skuInfos;
     }
 
     @NonNull
-    public ResponseStatus getStatus() {
-        return status;
+    public List<SkuInfo> getSkuInfos() {
+        return skuInfos;
     }
 }

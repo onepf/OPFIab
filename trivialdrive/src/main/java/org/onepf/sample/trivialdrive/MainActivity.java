@@ -2,8 +2,11 @@ package org.onepf.sample.trivialdrive;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import org.onepf.opfiab.OPFIabAction;
 
 public class MainActivity extends ActionBarActivity {
 

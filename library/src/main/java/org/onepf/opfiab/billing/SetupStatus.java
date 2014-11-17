@@ -14,25 +14,10 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.billing;
 
-import android.os.Looper;
-import android.support.annotation.NonNull;
-
-public final class OPFUtils {
-
-    private OPFUtils() {
-        throw new UnsupportedOperationException();
-    }
-
-
-    public static boolean uiThread() {
-        return Looper.getMainLooper().getThread() == Thread.currentThread();
-    }
-
-    public static @NonNull RuntimeException wrongThreadException(final boolean mustBeMainThread) {
-        return new IllegalStateException(mustBeMainThread
-                ? "Must be called from UI thread."
-                : "Must not be called from UI thread.");
-    }
+public enum SetupStatus {
+    SUCCESS,
+    FAILED,
+    PROVIDER_CHANGED,
 }

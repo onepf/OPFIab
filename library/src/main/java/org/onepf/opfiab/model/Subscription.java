@@ -16,13 +16,13 @@
 
 package org.onepf.opfiab.model;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public class SubscriptionResponse extends Response {
+import org.onepf.opfiab.billing.SkuType;
 
-    public SubscriptionResponse(
-            final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
-        super(id, data, status);
+public class Subscription extends SkuInfo {
+
+    public Subscription(@NonNull final String sku) {
+        super(sku, SkuType.SUBSCRIPTION);
     }
 }

@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.billing;
 
-import android.content.Intent;
-import android.support.annotation.Nullable;
-
-public interface ManagedLifecycle {
-
-    void onCreate();
-
-    void onResume();
-
-    void onPause();
-
-    boolean onActivityResult(final int requestCode, final int resultCode, final @Nullable Intent data);
+public enum ResponseStatus {
+    SUCCESS,
+    USER_CANCELED,
+    BILLING_UNAVAILABLE,
+    ITEM_UNAVAILABLE,
+    ITEM_ALREADY_OWNED,
+    SUBSCRIPTIONS_NOT_SUPPORTED,
 }

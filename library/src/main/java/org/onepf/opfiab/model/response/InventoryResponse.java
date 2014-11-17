@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.response;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-public class SkuInfoResponse extends Response{
+import org.onepf.opfiab.OPFIabAction;
+import org.onepf.opfiab.billing.ResponseStatus;
+import org.onepf.opfiab.model.Inventory;
 
-    public SkuInfoResponse(
-            final int id, final @NonNull Bundle data, final @NonNull ResponseStatus status) {
-        super(id, data, status);
+public class InventoryResponse extends Response {
+
+    public InventoryResponse(@NonNull final Bundle data, @NonNull final ResponseStatus status) {
+        super(OPFIabAction.INVENTORY, status, data);
+    }
+
+    @NonNull
+    public Inventory getInventory() {
+        return null;
     }
 }
