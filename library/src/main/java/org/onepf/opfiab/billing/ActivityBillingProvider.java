@@ -18,27 +18,22 @@ package org.onepf.opfiab.billing;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Consumable;
 import org.onepf.opfiab.model.Subscription;
 
-public interface BillingProvider {
+@SuppressWarnings("NullableProblems")
+public interface ActivityBillingProvider extends BillingProvider {
 
-    @NonNull
-    BillingProviderInfo getInfo();
+    @Override
+    void consume(@NonNull final Activity activity, @NonNull final Consumable consumable);
 
-    @NonNull
-    BillingProviderConnection getConnection();
+    @Override
+    void subscribe(@NonNull final Activity activity, @NonNull final Subscription subscription);
 
-    void purchase(@NonNull final Activity activity, @NonNull final Consumable consumable);
+    @Override
+    void inventory(@NonNull final Activity activity);
 
-    void consume(@Nullable final Activity activity, @NonNull final Consumable consumable);
-
-    void subscribe(@Nullable final Activity activity, @NonNull final Subscription subscription);
-
-    void inventory(@Nullable final Activity activity);
-
-    void skuInfo(@Nullable final Activity activity, @NonNull final String sku);
+    @Override
+    void skuInfo(@NonNull final Activity activity, @NonNull final String sku);
 }

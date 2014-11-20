@@ -24,14 +24,14 @@ import java.util.List;
 public class Inventory implements Serializable {
 
     @NonNull
-    final List<SkuInfo> skuInfos;
+    final List<Purchase> skuInfos;
 
-    public Inventory(@NonNull final List<SkuInfo> skuInfos) {
+    public Inventory(@NonNull final List<Purchase> skuInfos) {
         this.skuInfos = skuInfos;
     }
 
     @NonNull
-    public List<SkuInfo> getSkuInfos() {
+    public List<Purchase> getSkuInfos() {
         return skuInfos;
     }
 }

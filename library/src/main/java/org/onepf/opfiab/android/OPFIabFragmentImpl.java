@@ -25,6 +25,8 @@ import org.onepf.opfiab.ManagedOPFIabHelper;
 
 class OPFIabFragmentImpl implements OPFIabHelperHolder, ManagedLifecycle {
 
+    final String FRAGMENT_TAG = "OPFIabFragment";
+
     @Nullable
     private ManagedOPFIabHelper managedOPFIabHelper;
 

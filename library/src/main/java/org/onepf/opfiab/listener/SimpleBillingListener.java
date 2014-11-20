@@ -21,21 +21,26 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.SetupStatus;
+import org.onepf.opfiab.model.response.ConsumeResponse;
 import org.onepf.opfiab.model.response.InventoryResponse;
 import org.onepf.opfiab.model.response.PurchaseResponse;
 import org.onepf.opfiab.model.response.SkuInfoResponse;
 import org.onepf.opfiab.model.response.SubscriptionResponse;
 
 public class SimpleBillingListener implements BillingListener {
+
     @Override
     public void onSetup(@NonNull final SetupStatus status,
                         @Nullable final BillingProvider billingProvider) {}
 
     @Override
-    public void onInventory(@NonNull final InventoryResponse inventoryResponse) {}
+    public void onConsume(@NonNull final ConsumeResponse consumeResponse) {}
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {}
+
+    @Override
+    public void onInventory(@NonNull final InventoryResponse inventoryResponse) {}
 
     @Override
     public void onSkuInfo(@NonNull final SkuInfoResponse skuInfoResponse) {}

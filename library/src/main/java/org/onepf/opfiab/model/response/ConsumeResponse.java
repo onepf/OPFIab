@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.model.response;
 
-public interface OPFIabHelper {
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.OPFIabAction;
+import org.onepf.opfiab.billing.ResponseStatus;
 
+public class ConsumeResponse extends Response {
+
+    public ConsumeResponse(@NonNull final ResponseStatus status,
+                           @NonNull final Bundle data) {
+        super(OPFIabAction.CONSUME, status, data);
+    }
 }

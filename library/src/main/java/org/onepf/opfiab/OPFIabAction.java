@@ -21,6 +21,7 @@ public enum OPFIabAction {
     REGISTER,
 
     PURCHASE,
+    CONSUME,
     SUBSCRIPTION,
     INVENTORY,
     SKU_INFO,;

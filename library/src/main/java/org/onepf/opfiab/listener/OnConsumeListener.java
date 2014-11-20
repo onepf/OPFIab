@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.listener;
 
-public interface OPFIabHelper {
+import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.response.ConsumeResponse;
 
+public interface OnConsumeListener {
+
+    void onConsume(@NonNull final ConsumeResponse consumeResponse);
 }

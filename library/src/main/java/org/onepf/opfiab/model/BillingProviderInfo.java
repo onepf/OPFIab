@@ -19,7 +19,9 @@ package org.onepf.opfiab.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class BillingProviderInfo {
+import java.io.Serializable;
+
+public class BillingProviderInfo implements Serializable{
 
     @NonNull
     private final String name;

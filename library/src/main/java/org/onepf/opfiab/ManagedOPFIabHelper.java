@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.listener.OnConsumeListener;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
@@ -51,6 +52,10 @@ public class ManagedOPFIabHelper extends OPFIabHelperWrapper implements ManagedL
     @NonNull
     final Set<OnSkuInfoListener> skuInfoListeners = Collections.synchronizedSet(
             new HashSet<OnSkuInfoListener>());
+
+    @NonNull
+    final Set<OnConsumeListener> consumeListeners = Collections.synchronizedSet(
+            new HashSet<OnConsumeListener>());
 
     @NonNull
     private final BillingListenerCompositor listenerCompositor = OPFIab.instance.billingListenerCompositor;

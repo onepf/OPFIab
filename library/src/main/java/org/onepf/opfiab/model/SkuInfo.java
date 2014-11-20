@@ -22,7 +22,7 @@ import org.onepf.opfiab.billing.SkuType;
 
 import java.io.Serializable;
 
-public class SkuInfo implements Serializable {
+public abstract class SkuInfo implements Serializable {
 
     @NonNull
     private final String sku;
@@ -30,7 +30,7 @@ public class SkuInfo implements Serializable {
     @NonNull
     private final SkuType skuType;
 
-    public SkuInfo(@NonNull final String sku, @NonNull final SkuType skuType) {
+    protected SkuInfo(@NonNull final String sku, @NonNull final SkuType skuType) {
         this.sku = sku;
         this.skuType = skuType;
     }

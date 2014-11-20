@@ -24,7 +24,7 @@ import org.onepf.opfiab.billing.ResponseStatus;
 
 import java.io.Serializable;
 
-abstract class Response implements Serializable {
+public abstract class Response implements Serializable {
 
     @NonNull
     private final OPFIabAction action;

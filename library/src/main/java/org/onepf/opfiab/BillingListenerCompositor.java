@@ -23,11 +23,13 @@ import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.SetupStatus;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerWrapper;
+import org.onepf.opfiab.listener.OnConsumeListener;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuInfoListener;
 import org.onepf.opfiab.listener.OnSubscriptionListener;
+import org.onepf.opfiab.model.response.ConsumeResponse;
 import org.onepf.opfiab.model.response.InventoryResponse;
 import org.onepf.opfiab.model.response.PurchaseResponse;
 import org.onepf.opfiab.model.response.SkuInfoResponse;
@@ -115,6 +117,18 @@ class BillingListenerCompositor extends BillingListenerWrapper {
                     Collections.unmodifiableCollection(helper.skuInfoListeners);
             for (final OnSkuInfoListener skuInfoListener : skuInfoListeners) {
                 skuInfoListener.onSkuInfo(skuInfoResponse);
+            }
+        }
+    }
+
+    @Override
+    public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
+        super.onConsume(consumeResponse);
+        for (final ManagedOPFIabHelper helper : helpers) {
+            final Collection<OnConsumeListener> consumeListeners =
+                    Collections.unmodifiableCollection(helper.consumeListeners);
+            for (final OnConsumeListener consumeListener : consumeListeners) {
+                consumeListener.onConsume(consumeResponse);
             }
         }
     }

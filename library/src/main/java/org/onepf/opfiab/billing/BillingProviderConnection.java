@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.billing;
 
-public interface OPFIabHelper {
-
-
+public interface BillingProviderConnection {
 }

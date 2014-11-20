@@ -21,9 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.ManagedOPFIabHelper;
+import org.onepf.opfiab.ActivityOPFIabHelper;
 import org.onepf.opfiab.OPFIab;
 
 public class OPFIabActivity extends Activity {
@@ -36,29 +35,11 @@ public class OPFIabActivity extends Activity {
 
 
     @NonNull
-    private final ManagedOPFIabHelper opfIabHelper = OPFIab.getManagedInstance();
+    private ActivityOPFIabHelper opfIabHelper;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        opfIabHelper.onCreate();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        opfIabHelper.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        opfIabHelper.onPause();
-    }
-
-    @Override
-    protected void onActivityResult(final int requestCode, final int resultCode,
-                                    @Nullable final Intent data) {
-        opfIabHelper.onActivityResult(requestCode, resultCode, data);
+        opfIabHelper = OPFIab.getActivityInstance(this);
     }
 }
