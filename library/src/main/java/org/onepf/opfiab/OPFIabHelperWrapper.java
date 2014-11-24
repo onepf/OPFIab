@@ -16,7 +16,12 @@
 
 package org.onepf.opfiab;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.onepf.opfiab.model.Consumable;
+import org.onepf.opfiab.model.Subscription;
 
 public class OPFIabHelperWrapper implements OPFIabHelper {
 
@@ -25,5 +30,34 @@ public class OPFIabHelperWrapper implements OPFIabHelper {
 
     public OPFIabHelperWrapper(@NonNull final OPFIabHelper opfIabHelper) {
         this.opfIabHelper = opfIabHelper;
+    }
+
+    @Override
+    public void purchase(@NonNull final Activity activity,
+                         @NonNull final Consumable consumable) {
+        opfIabHelper.purchase(activity, consumable);
+    }
+
+    @Override
+    public void consume(@Nullable final Activity activity,
+                        @NonNull final Consumable consumable) {
+        opfIabHelper.consume(activity, consumable);
+    }
+
+    @Override
+    public void subscribe(@Nullable final Activity activity,
+                          @NonNull final Subscription subscription) {
+        opfIabHelper.subscribe(activity, subscription);
+    }
+
+    @Override
+    public void inventory(@Nullable final Activity activity) {
+        opfIabHelper.inventory(activity);
+    }
+
+    @Override
+    public void skuInfo(@Nullable final Activity activity,
+                        @NonNull final String sku) {
+        opfIabHelper.skuInfo(activity, sku);
     }
 }

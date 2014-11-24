@@ -16,13 +16,17 @@
 
 package org.onepf.opfiab;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.broadcast.OPFIabGlobalReceiver;
+import org.onepf.opfiab.model.Consumable;
 import org.onepf.opfiab.model.Options;
+import org.onepf.opfiab.model.Subscription;
 
-class BaseOPFIabHelper implements OPFIabHelper {
+class BaseOPFIabHelper implements OPFIabHelper, StandaloneOPFIabHelper {
 
     @NonNull
     final Context context;
@@ -43,4 +47,54 @@ class BaseOPFIabHelper implements OPFIabHelper {
     }
 
 
+    @Override
+    public void purchase(@NonNull final Activity activity, @NonNull final Consumable consumable) {
+
+    }
+
+    @Override
+    public void consume(@Nullable final Activity activity, @NonNull final Consumable consumable) {
+
+    }
+
+    @Override
+    public void subscribe(@Nullable final Activity activity,
+                          @NonNull final Subscription subscription) {
+
+    }
+
+    @Override
+    public void inventory(@Nullable final Activity activity) {
+
+    }
+
+    @Override
+    public void skuInfo(@Nullable final Activity activity, @NonNull final String sku) {
+
+    }
+
+    @Override
+    public void purchase(@NonNull final Consumable consumable) {
+
+    }
+
+    @Override
+    public void consume(@NonNull final Consumable consumable) {
+
+    }
+
+    @Override
+    public void subscribe(@NonNull final Subscription subscription) {
+
+    }
+
+    @Override
+    public void inventory() {
+
+    }
+
+    @Override
+    public void skuInfo(@NonNull final String sku) {
+
+    }
 }

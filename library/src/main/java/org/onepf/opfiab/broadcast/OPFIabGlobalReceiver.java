@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.SetupStatus;
 import org.onepf.opfiab.listener.BillingListener;
+import org.onepf.opfiab.model.response.ConsumeResponse;
 import org.onepf.opfiab.model.response.InventoryResponse;
 import org.onepf.opfiab.model.response.PurchaseResponse;
 import org.onepf.opfiab.model.response.SkuInfoResponse;
@@ -60,5 +61,11 @@ public class OPFIabGlobalReceiver extends OPFIabReceiver {
     @Override
     public void onSkuInfo(@NonNull final SkuInfoResponse skuInfoResponse) {
         billingListener.onSkuInfo(skuInfoResponse);
+    }
+
+    @Override
+    public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
+        super.onConsume(consumeResponse);
+        billingListener.onConsume(consumeResponse);
     }
 }
