@@ -16,22 +16,22 @@
 
 package org.onepf.opfiab;
 
-import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.Consumable;
 import org.onepf.opfiab.model.Subscription;
 
-public interface OPFIabHelper {
+/**
+ * Created by rzhilich on 11/25/14.
+ */
+public interface StandaloneOPFIabHelper {
+    void purchase(@NonNull final Consumable consumable);
 
-    void purchase(@NonNull final Activity activity, @NonNull final Consumable consumable);
+    void consume(@NonNull final Consumable consumable);
 
-    void consume(@Nullable final Activity activity, @NonNull final Consumable consumable);
+    void subscribe(@NonNull final Subscription subscription);
 
-    void subscribe(@Nullable final Activity activity, @NonNull final Subscription subscription);
+    void inventory();
 
-    void inventory(@Nullable final Activity activity);
-
-    void skuInfo(@Nullable final Activity activity, @NonNull final String sku);
+    void skuInfo(@NonNull final String sku);
 }

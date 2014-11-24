@@ -21,7 +21,7 @@ import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
-import org.onepf.opfiab.broadcast.OPFIabGlobalReceiver;
+import org.onepf.opfiab.broadcast.OPFIabReceiver;
 import org.onepf.opfiab.util.OPFUtils;
 
 public class OPFIabBroadcast {
@@ -52,12 +52,12 @@ public class OPFIabBroadcast {
     }
 
 
-    public static void register(@NonNull final OPFIabGlobalReceiver receiver) {
+    public static void register(@NonNull final OPFIabReceiver receiver) {
         checkInit();
         localBroadcastManager.registerReceiver(receiver, INTENT_FILTER);
     }
 
-    public static void unregister(@NonNull final OPFIabGlobalReceiver receiver) {
+    public static void unregister(@NonNull final OPFIabReceiver receiver) {
         checkInit();
         localBroadcastManager.unregisterReceiver(receiver);
     }

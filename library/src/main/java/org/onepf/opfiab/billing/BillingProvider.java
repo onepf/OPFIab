@@ -20,11 +20,12 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.OPFIabHelper;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Consumable;
 import org.onepf.opfiab.model.Subscription;
 
-public interface BillingProvider {
+public interface BillingProvider extends OPFIabHelper{
 
     @NonNull
     BillingProviderInfo getInfo();
@@ -32,13 +33,18 @@ public interface BillingProvider {
     @NonNull
     BillingProviderConnection getConnection();
 
+    @Override
     void purchase(@NonNull final Activity activity, @NonNull final Consumable consumable);
 
+    @Override
     void consume(@Nullable final Activity activity, @NonNull final Consumable consumable);
 
+    @Override
     void subscribe(@Nullable final Activity activity, @NonNull final Subscription subscription);
 
+    @Override
     void inventory(@Nullable final Activity activity);
 
+    @Override
     void skuInfo(@Nullable final Activity activity, @NonNull final String sku);
 }
