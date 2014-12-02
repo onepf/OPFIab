@@ -18,8 +18,8 @@ package org.onepf.opfiab.android;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.ManagedOPFIabHelper;
+import org.onepf.opfiab.ManagedIabHelper;
 
 interface OPFIabHelperHolder {
-    void setOPFIabHelper(@NonNull final ManagedOPFIabHelper managedOPFIabHelper);
+    void setOPFIabHelper(@NonNull final ManagedIabHelper managedOPFIabHelper);
 }

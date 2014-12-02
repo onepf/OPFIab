@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 
-public class BillingProviderInfo implements Serializable{
+public class BillingProviderInfo implements Serializable {
 
     @NonNull
     private final String name;

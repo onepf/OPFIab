@@ -18,8 +18,6 @@ package org.onepf.opfiab.model;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.billing.SkuType;
-
 public class Subscription extends SkuInfo {
 
     public Subscription(@NonNull final String sku) {

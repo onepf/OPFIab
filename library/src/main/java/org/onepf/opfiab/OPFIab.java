@@ -21,9 +21,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.Options;
-import org.onepf.opfiab.util.OPFUtils;
+
+import de.greenrobot.event.EventBus;
 
 public final class OPFIab {
 
@@ -31,27 +31,43 @@ public final class OPFIab {
         throw new UnsupportedOperationException();
     }
 
-    @NonNull
-    static BaseOPFIabHelper instance;
+    private static BaseIabHelper baseIabHelper;
+
+    private static EventBus eventBus;
 
     @NonNull
-    public static OPFIabHelper getInstance() {
-        checkInit();
+    public static EventBus getEventBus() {
         OPFUtils.checkThread(true);
-        //noinspection ConstantConditions
-        return instance;
+        if (eventBus == null) {
+            eventBus = EventBus.builder()
+                    .eventInheritance(true)
+                    .build();
+        }
+        return eventBus;
     }
 
     @NonNull
-    public static ManagedOPFIabHelper getManagedInstance() {
-        OPFUtils.checkThread(true);
-        checkInit();
-        return new ManagedOPFIabHelper(instance);
+    static BaseIabHelper getBaseHelper() {
+        return baseIabHelper;
     }
 
     @NonNull
-    public static ActivityOPFIabHelper getActivityInstance(@NonNull final Activity activity) {
-        return new ActivityOPFIabHelper(getManagedInstance(), activity);
+    public static IabHelper getHelper() {
+        checkInit();
+        OPFUtils.checkThread(true);
+        return baseIabHelper;
+    }
+
+    @NonNull
+    public static ManagedIabHelper getManagedHelper() {
+        checkInit();
+        OPFUtils.checkThread(true);
+        return new ManagedIabHelper(baseIabHelper);
+    }
+
+    @NonNull
+    public static ActivityIabHelper getHelper(@NonNull final Activity activity) {
+        return new ActivityIabHelper(getManagedHelper(), activity);
     }
 
     @Nullable
@@ -62,23 +78,18 @@ public final class OPFIab {
 
     public static void init(@NonNull final Context context, @NonNull final Options options) {
         OPFUtils.checkThread(true);
-        //noinspection ConstantConditions
-        if (instance != null) {
+        if (baseIabHelper != null) {
             throw new IllegalStateException("init() was already called.");
         }
-        instance = new BaseOPFIabHelper(context, options);
-        OPFIabBroadcast.init(context);
+        baseIabHelper = new BaseIabHelper(context, options);
     }
 
     public static void setup() {
 
     }
 
-
-
     private static void checkInit() {
-        //noinspection ConstantConditions
-        if (instance == null) {
+        if (baseIabHelper == null) {
             throw OPFUtils.notInitException();
         }
     }

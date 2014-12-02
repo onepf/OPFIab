@@ -19,8 +19,8 @@ package org.onepf.opfiab.listener;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.billing.SetupStatus;
+import org.onepf.opfiab.BillingProvider;
+import org.onepf.opfiab.model.SetupStatus;
 
 public interface OnSetupListener {
 

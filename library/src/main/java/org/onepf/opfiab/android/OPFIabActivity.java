@@ -21,14 +21,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.ActivityOPFIabHelper;
+import org.onepf.opfiab.ActivityIabHelper;
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.OPFIabBroadcast;
-import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.billing.SetupStatus;
-import org.onepf.opfiab.broadcast.OPFIabReceiver;
 
 public class OPFIabActivity extends Activity {
 
@@ -40,11 +35,11 @@ public class OPFIabActivity extends Activity {
 
 
     @NonNull
-    private ActivityOPFIabHelper opfIabHelper;
+    private ActivityIabHelper opfIabHelper;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        opfIabHelper = OPFIab.getActivityInstance(this);
+        opfIabHelper = OPFIab.getHelper(this);
     }
 }

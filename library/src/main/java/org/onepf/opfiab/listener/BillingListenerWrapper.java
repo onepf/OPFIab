@@ -19,8 +19,8 @@ package org.onepf.opfiab.listener;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.billing.SetupStatus;
+import org.onepf.opfiab.BillingProvider;
+import org.onepf.opfiab.model.SetupStatus;
 import org.onepf.opfiab.model.response.ConsumeResponse;
 import org.onepf.opfiab.model.response.InventoryResponse;
 import org.onepf.opfiab.model.response.PurchaseResponse;
@@ -30,52 +30,52 @@ import org.onepf.opfiab.model.response.SubscriptionResponse;
 public class BillingListenerWrapper implements BillingListener {
 
     @Nullable
-    private final BillingListener globalListener;
+    private final BillingListener billingListener;
 
-    public BillingListenerWrapper(@Nullable final BillingListener globalListener) {
-        this.globalListener = globalListener;
+    public BillingListenerWrapper(@Nullable final BillingListener billingListener) {
+        this.billingListener = billingListener;
     }
 
     @Override
     public void onSetup(@NonNull final SetupStatus status,
                         @Nullable final BillingProvider billingProvider) {
-        if (globalListener != null) {
-            globalListener.onSetup(status, billingProvider);
+        if (billingListener != null) {
+            billingListener.onSetup(status, billingProvider);
         }
     }
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-        if (globalListener != null) {
-            globalListener.onPurchase(purchaseResponse);
+        if (billingListener != null) {
+            billingListener.onPurchase(purchaseResponse);
         }
     }
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
-        if (globalListener != null) {
-            globalListener.onConsume(consumeResponse);
+        if (billingListener != null) {
+            billingListener.onConsume(consumeResponse);
         }
     }
 
     @Override
-    public void onSubscription(@NonNull final SubscriptionResponse subscriptionResponse) {
-        if (globalListener != null) {
-            globalListener.onSubscription(subscriptionResponse);
+    public void onPurchase(@NonNull final SubscriptionResponse subscriptionResponse) {
+        if (billingListener != null) {
+            billingListener.onPurchase(subscriptionResponse);
         }
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        if (globalListener != null) {
-            globalListener.onInventory(inventoryResponse);
+        if (billingListener != null) {
+            billingListener.onInventory(inventoryResponse);
         }
     }
 
     @Override
     public void onSkuInfo(@NonNull final SkuInfoResponse skuInfoResponse) {
-        if (globalListener != null) {
-            globalListener.onSkuInfo(skuInfoResponse);
+        if (billingListener != null) {
+            billingListener.onSkuInfo(skuInfoResponse);
         }
     }
 }

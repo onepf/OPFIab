@@ -22,7 +22,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import org.onepf.opfiab.ManagedOPFIabHelper;
+import org.onepf.opfiab.ManagedIabHelper;
 
 public class OPFIabFragment extends Fragment implements OPFIabHelperHolder{
 
@@ -35,7 +35,7 @@ public class OPFIabFragment extends Fragment implements OPFIabHelperHolder{
     private final OPFIabFragmentImpl implementation = new OPFIabFragmentImpl();
 
     @Override
-    public void setOPFIabHelper(@NonNull final ManagedOPFIabHelper managedOPFIabHelper) {
+    public void setOPFIabHelper(@NonNull final ManagedIabHelper managedOPFIabHelper) {
         implementation.setOPFIabHelper(managedOPFIabHelper);
     }
 

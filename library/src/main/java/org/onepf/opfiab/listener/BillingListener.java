@@ -18,5 +18,5 @@ package org.onepf.opfiab.listener;
 
 
 public interface BillingListener
-        extends OnSetupListener, OnPurchaseListener, OnConsumeListener, OnSubscriptionListener,
-                OnInventoryListener, OnSkuInfoListener {}
+        extends OnSetupListener, OnPurchaseListener, OnConsumeListener, OnInventoryListener,
+                OnSkuInfoListener {}

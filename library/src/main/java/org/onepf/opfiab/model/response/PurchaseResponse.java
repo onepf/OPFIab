@@ -20,7 +20,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.OPFIabAction;
-import org.onepf.opfiab.billing.ResponseStatus;
+import org.onepf.opfiab.model.ResponseStatus;
 import org.onepf.opfiab.model.Purchase;
 
 public class PurchaseResponse extends Response {

@@ -18,8 +18,6 @@ package org.onepf.opfiab.model;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.billing.SkuType;
-
 import java.io.Serializable;
 
 public abstract class SkuInfo implements Serializable {

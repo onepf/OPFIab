@@ -21,17 +21,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.ManagedLifecycle;
-import org.onepf.opfiab.ManagedOPFIabHelper;
+import org.onepf.opfiab.ManagedIabHelper;
 
 class OPFIabFragmentImpl implements OPFIabHelperHolder, ManagedLifecycle {
 
-    final String FRAGMENT_TAG = "OPFIabFragment";
+    static final String FRAGMENT_TAG = "OPFIabFragment";
 
     @Nullable
-    private ManagedOPFIabHelper managedOPFIabHelper;
+    private ManagedIabHelper managedOPFIabHelper;
 
     @Override
-    public void setOPFIabHelper(@NonNull final ManagedOPFIabHelper managedOPFIabHelper) {
+    public void setOPFIabHelper(@NonNull final ManagedIabHelper managedOPFIabHelper) {
         this.managedOPFIabHelper = managedOPFIabHelper;
     }
 
