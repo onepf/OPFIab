@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.billing;
 
-import android.support.annotation.NonNull;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 
 import java.io.Serializable;
-import java.util.List;
 
-public class Inventory implements Serializable {
+/**
+ * Created by rzhilich on 12/3/14.
+ */
+class BillingModel implements Serializable {
 
-    @NonNull
-    final List<Purchase> skuInfos;
+    @Nullable
+    private final Bundle source;
 
-    public Inventory(@NonNull final List<Purchase> skuInfos) {
-        this.skuInfos = skuInfos;
+    BillingModel(@Nullable final Bundle source) {
+        this.source = source;
     }
 
-    @NonNull
-    public List<Purchase> getSkuInfos() {
-        return skuInfos;
+    @Nullable
+    public Bundle getSource() {
+        return source;
     }
 }

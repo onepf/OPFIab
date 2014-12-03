@@ -14,13 +14,31 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.billing;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-public class Consumable extends SkuInfo {
+import java.io.Serializable;
+import java.util.List;
 
-    public Consumable(@NonNull final String sku) {
-        super(sku, SkuType.CONSUMABLE);
+public class Inventory extends BillingModel{
+
+    @NonNull
+    final List<Purchase> purchases;
+
+    public Inventory(@NonNull final List<Purchase> purchases, @Nullable final Bundle source) {
+        super(source);
+        this.purchases = purchases;
+    }
+
+    public Inventory(@NonNull final List<Purchase> purchases) {
+        this(purchases, null);
+    }
+
+    @NonNull
+    public List<Purchase> getPurchases() {
+        return purchases;
     }
 }

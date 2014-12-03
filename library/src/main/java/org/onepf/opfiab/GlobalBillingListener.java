@@ -25,12 +25,12 @@ import org.onepf.opfiab.listener.OnConsumeListener;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.listener.OnSkuInfoListener;
-import org.onepf.opfiab.model.SetupStatus;
+import org.onepf.opfiab.listener.OnSkuDetailsListener;
+import org.onepf.opfiab.model.billing.SetupStatus;
 import org.onepf.opfiab.model.response.ConsumeResponse;
 import org.onepf.opfiab.model.response.InventoryResponse;
 import org.onepf.opfiab.model.response.PurchaseResponse;
-import org.onepf.opfiab.model.response.SkuInfoResponse;
+import org.onepf.opfiab.model.response.SkuDetailsResponse;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -94,13 +94,13 @@ class GlobalBillingListener extends BillingListenerWrapper {
     }
 
     @Override
-    public void onSkuInfo(@NonNull final SkuInfoResponse skuInfoResponse) {
-        super.onSkuInfo(skuInfoResponse);
+    public void onSkuInfo(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+        super.onSkuInfo(skuDetailsResponse);
         for (final ManagedIabHelper helper : helpers) {
-            final Collection<OnSkuInfoListener> skuInfoListeners =
+            final Collection<OnSkuDetailsListener> skuInfoListeners =
                     Collections.unmodifiableCollection(helper.skuInfoListeners);
-            for (final OnSkuInfoListener skuInfoListener : skuInfoListeners) {
-                skuInfoListener.onSkuInfo(skuInfoResponse);
+            for (final OnSkuDetailsListener skuInfoListener : skuInfoListeners) {
+                skuInfoListener.onSkuInfo(skuDetailsResponse);
             }
         }
     }

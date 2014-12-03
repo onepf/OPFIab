@@ -16,15 +16,31 @@
 
 package org.onepf.opfiab.android;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import org.onepf.opfiab.ManagedIabHelper;
 
-public class OPFIabFragment extends Fragment implements OPFIabHelperHolder{
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
+
+import de.greenrobot.event.EventBus;
+
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.ATTACH;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DESTROY;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DETACH;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.PAUSE;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.RESUME;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.START;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
+
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public class OPFIabFragment extends Fragment {
 
     @NonNull
     public static OPFIabFragment newInstance() {
@@ -32,12 +48,7 @@ public class OPFIabFragment extends Fragment implements OPFIabHelperHolder{
     }
 
     @NonNull
-    private final OPFIabFragmentImpl implementation = new OPFIabFragmentImpl();
-
-    @Override
-    public void setOPFIabHelper(@NonNull final ManagedIabHelper managedOPFIabHelper) {
-        implementation.setOPFIabHelper(managedOPFIabHelper);
-    }
+    protected final EventBus eventBus = OPFIab.getEventBus();
 
     public OPFIabFragment() {
         // Required empty public constructor
@@ -47,35 +58,54 @@ public class OPFIabFragment extends Fragment implements OPFIabHelperHolder{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        implementation.onCreate();
+        eventBus.post(new FragmentLifecycleEvent(CREATE, this));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        eventBus.post(new FragmentLifecycleEvent(ATTACH, this));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        eventBus.post(new FragmentLifecycleEvent(START, this));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        implementation.onResume();
+        eventBus.post(new FragmentLifecycleEvent(RESUME, this));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        implementation.onPause();
+        eventBus.post(new FragmentLifecycleEvent(PAUSE, this));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        eventBus.post(new FragmentLifecycleEvent(STOP, this));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        eventBus.post(new FragmentLifecycleEvent(DETACH, this));
     }
 
     @Override
-    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
-        if (!implementation.onActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+    public void onDestroy() {
+        super.onDestroy();
+        eventBus.post(new FragmentLifecycleEvent(DESTROY, this));
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        eventBus.post(new ActivityResultEvent(getActivity(), requestCode, resultCode, data));
     }
 }

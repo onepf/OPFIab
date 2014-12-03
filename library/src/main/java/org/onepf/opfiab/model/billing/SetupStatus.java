@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.billing;
 
 public enum SetupStatus {
+
     SUCCESS,
     FAILED,
     PROVIDER_CHANGED,

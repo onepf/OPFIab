@@ -20,12 +20,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.BillingProvider;
-import org.onepf.opfiab.model.SetupStatus;
+import org.onepf.opfiab.model.billing.SetupStatus;
 import org.onepf.opfiab.model.response.ConsumeResponse;
 import org.onepf.opfiab.model.response.InventoryResponse;
 import org.onepf.opfiab.model.response.PurchaseResponse;
-import org.onepf.opfiab.model.response.SkuInfoResponse;
-import org.onepf.opfiab.model.response.SubscriptionResponse;
+import org.onepf.opfiab.model.response.SkuDetailsResponse;
 
 public class BillingListenerWrapper implements BillingListener {
 
@@ -59,13 +58,6 @@ public class BillingListenerWrapper implements BillingListener {
     }
 
     @Override
-    public void onPurchase(@NonNull final SubscriptionResponse subscriptionResponse) {
-        if (billingListener != null) {
-            billingListener.onPurchase(subscriptionResponse);
-        }
-    }
-
-    @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         if (billingListener != null) {
             billingListener.onInventory(inventoryResponse);
@@ -73,9 +65,9 @@ public class BillingListenerWrapper implements BillingListener {
     }
 
     @Override
-    public void onSkuInfo(@NonNull final SkuInfoResponse skuInfoResponse) {
+    public void onSkuInfo(@NonNull final SkuDetailsResponse skuDetailsResponse) {
         if (billingListener != null) {
-            billingListener.onSkuInfo(skuInfoResponse);
+            billingListener.onSkuInfo(skuDetailsResponse);
         }
     }
 }

@@ -14,27 +14,31 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.model.billing;
 
-import android.app.Activity;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.Consumable;
-import org.onepf.opfiab.model.Subscription;
+import java.io.Serializable;
 
-@SuppressWarnings("NullableProblems")
-public interface ActivityBillingProvider extends BillingProvider {
+public abstract class Purchase extends BillingModel {
 
-    @Override
-    void consume(@NonNull final Activity activity, @NonNull final Consumable consumable);
+    @NonNull
+    private final SkuDetails skuDetails;
 
-    @Override
-    void purchase(@NonNull final Activity activity,
-                  @NonNull final Subscription subscription);
+    Purchase(@NonNull final SkuDetails skuDetails, @Nullable final Bundle source) {
+        super(source);
+        this.skuDetails = skuDetails;
+    }
 
-    @Override
-    void inventory(@NonNull final Activity activity);
+    @NonNull
+    public SkuDetails getSkuDetails() {
+        return skuDetails;
+    }
 
-    @Override
-    void skuInfo(@NonNull final Activity activity, @NonNull final String sku);
+    @NonNull
+    public SkuDetails.Type getType() {
+        return skuDetails.getType();
+    }
 }

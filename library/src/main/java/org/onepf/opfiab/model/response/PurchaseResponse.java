@@ -16,21 +16,22 @@
 
 package org.onepf.opfiab.model.response;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.OPFIabAction;
-import org.onepf.opfiab.model.ResponseStatus;
-import org.onepf.opfiab.model.Purchase;
+import org.onepf.opfiab.model.billing.Purchase;
 
-public class PurchaseResponse extends Response {
+public abstract class PurchaseResponse extends Response {
 
-    public PurchaseResponse(@NonNull final Bundle data, @NonNull final ResponseStatus status) {
-        super(OPFIabAction.PURCHASE, status, data);
+    @NonNull
+    private final Purchase purchase;
+
+    public PurchaseResponse(@NonNull final Status status, @NonNull final Purchase purchase) {
+        super(Type.PURCHASE, status);
+        this.purchase = purchase;
     }
 
     @NonNull
     public Purchase getPurchase() {
-        return null;
+        return purchase;
     }
 }

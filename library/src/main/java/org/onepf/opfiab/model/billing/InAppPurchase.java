@@ -14,23 +14,32 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.billing;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import java.io.Serializable;
-
-public class Purchase implements Serializable {
+/**
+ * Created by rzhilich on 12/3/14.
+ */
+public class InAppPurchase extends Purchase {
 
     @NonNull
-    private final SkuInfo skuInfo;
+    private final InAppDetails inAppDetails;
 
-    public Purchase(@NonNull final SkuInfo skuInfo) {
-        this.skuInfo = skuInfo;
+    public InAppPurchase(@NonNull final InAppDetails inAppDetails, @Nullable final Bundle source) {
+        super(inAppDetails, source);
+        this.inAppDetails = inAppDetails;
+    }
+
+    public InAppPurchase(@NonNull final InAppDetails inAppDetails) {
+        this(inAppDetails, null);
     }
 
     @NonNull
-    public SkuInfo getSkuInfo() {
-        return skuInfo;
+    @Override
+    public InAppDetails getSkuDetails() {
+        return inAppDetails;
     }
 }

@@ -16,16 +16,22 @@
 
 package org.onepf.opfiab.model.response;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.OPFIabAction;
-import org.onepf.opfiab.model.ResponseStatus;
+import org.onepf.opfiab.model.billing.InAppDetails;
 
 public class ConsumeResponse extends Response {
 
-    public ConsumeResponse(@NonNull final ResponseStatus status,
-                           @NonNull final Bundle data) {
-        super(OPFIabAction.CONSUME, status, data);
+    @NonNull
+    private final InAppDetails inAppDetails;
+
+    public ConsumeResponse(@NonNull final Status status, @NonNull final InAppDetails inAppDetails) {
+        super(Type.CONSUME, status);
+        this.inAppDetails = inAppDetails;
+    }
+
+    @NonNull
+    public InAppDetails getInAppDetails() {
+        return inAppDetails;
     }
 }

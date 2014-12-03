@@ -16,21 +16,22 @@
 
 package org.onepf.opfiab.model.response;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.OPFIabAction;
-import org.onepf.opfiab.model.ResponseStatus;
-import org.onepf.opfiab.model.Inventory;
+import org.onepf.opfiab.model.billing.Inventory;
 
 public class InventoryResponse extends Response {
 
-    public InventoryResponse(@NonNull final Bundle data, @NonNull final ResponseStatus status) {
-        super(OPFIabAction.INVENTORY, status, data);
+    @NonNull
+    private final Inventory inventory;
+
+    public InventoryResponse(@NonNull final Status status, @NonNull final Inventory inventory) {
+        super(Type.INVENTORY, status);
+        this.inventory = inventory;
     }
 
     @NonNull
     public Inventory getInventory() {
-        return null;
+        return inventory;
     }
 }

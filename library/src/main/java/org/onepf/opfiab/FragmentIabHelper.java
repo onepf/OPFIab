@@ -26,7 +26,7 @@ import org.onepf.opfiab.listener.OnConsumeListener;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.listener.OnSkuInfoListener;
+import org.onepf.opfiab.listener.OnSkuDetailsListener;
 
 public class FragmentIabHelper extends IabHelperWrapper {
 
@@ -66,7 +66,7 @@ public class FragmentIabHelper extends IabHelperWrapper {
     }
 
     public void addSkuInfoListener(
-            @NonNull final OnSkuInfoListener skuInfoListener) {
+            @NonNull final OnSkuDetailsListener skuInfoListener) {
         managedIabHelper.addSkuInfoListener(skuInfoListener);
     }
 

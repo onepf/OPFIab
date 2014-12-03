@@ -19,7 +19,7 @@ package org.onepf.opfiab;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-public final class OPFUtils {
+final class OPFUtils {
 
     private OPFUtils() {
         throw new UnsupportedOperationException();

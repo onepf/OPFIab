@@ -14,32 +14,26 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.event;
 
+import android.app.Fragment;
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
-
-public abstract class SkuInfo implements Serializable {
-
-    @NonNull
-    private final String sku;
+/**
+ * Created by rzhilich on 12/3/14.
+ */
+public class FragmentLifecycleEvent extends LifecycleEvent {
 
     @NonNull
-    private final SkuType skuType;
+    private final Fragment fragment;
 
-    protected SkuInfo(@NonNull final String sku, @NonNull final SkuType skuType) {
-        this.sku = sku;
-        this.skuType = skuType;
+    public FragmentLifecycleEvent(@NonNull final Type type, @NonNull final Fragment fragment) {
+        super(type);
+        this.fragment = fragment;
     }
 
     @NonNull
-    public String getSku() {
-        return sku;
-    }
-
-    @NonNull
-    public SkuType getSkuType() {
-        return skuType;
+    public Fragment getFragment() {
+        return fragment;
     }
 }

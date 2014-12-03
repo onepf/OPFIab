@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.listener;
 
-public enum ResponseStatus {
-    SUCCESS,
-    USER_CANCELED,
-    BILLING_UNAVAILABLE,
-    ITEM_UNAVAILABLE,
-    ITEM_ALREADY_OWNED,
-    SUBSCRIPTIONS_NOT_SUPPORTED,
+import android.support.annotation.NonNull;
+
+import org.onepf.opfiab.model.response.SkuDetailsResponse;
+
+public interface OnSkuDetailsListener {
+
+    void onSkuInfo(@NonNull final SkuDetailsResponse skuDetailsResponse);
 }

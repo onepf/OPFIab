@@ -23,7 +23,7 @@ import org.onepf.opfiab.listener.OnConsumeListener;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.listener.OnSkuInfoListener;
+import org.onepf.opfiab.listener.OnSkuDetailsListener;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -45,8 +45,8 @@ public class ManagedIabHelper extends IabHelperWrapper {
             new HashSet<OnInventoryListener>());
 
     @NonNull
-    final Set<OnSkuInfoListener> skuInfoListeners = Collections.synchronizedSet(
-            new HashSet<OnSkuInfoListener>());
+    final Set<OnSkuDetailsListener> skuInfoListeners = Collections.synchronizedSet(
+            new HashSet<OnSkuDetailsListener>());
 
     @NonNull
     final Set<OnConsumeListener> consumeListeners = Collections.synchronizedSet(
@@ -72,7 +72,7 @@ public class ManagedIabHelper extends IabHelperWrapper {
         inventoryListeners.add(inventoryListener);
     }
 
-    public void addSkuInfoListener(@NonNull final OnSkuInfoListener skuInfoListener) {
+    public void addSkuInfoListener(@NonNull final OnSkuDetailsListener skuInfoListener) {
         skuInfoListeners.add(skuInfoListener);
     }
 

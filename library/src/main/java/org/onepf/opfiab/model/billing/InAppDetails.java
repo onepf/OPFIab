@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.response;
+package org.onepf.opfiab.model.billing;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.OPFIabAction;
-import org.onepf.opfiab.model.ResponseStatus;
-import org.onepf.opfiab.model.SkuInfo;
+public class InAppDetails extends SkuDetails {
 
-import java.util.List;
-
-public class SkuInfoResponse extends Response{
-
-    public SkuInfoResponse(@NonNull final Bundle data, @NonNull final ResponseStatus status) {
-        super(OPFIabAction.SKU_INFO, status, data);
+    public InAppDetails(@NonNull final String sku, @Nullable final Bundle source) {
+        super(Type.IN_APP, sku, source);
     }
 
-    @NonNull
-    public List<SkuInfo> getSkuInfo() {
-        return null;
+    public InAppDetails(@NonNull final String sku) {
+        this(sku, null);
     }
 }

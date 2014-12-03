@@ -14,12 +14,34 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.android;
+package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.ManagedIabHelper;
+/**
+ * Created by rzhilich on 12/3/14.
+ */
+public class LifecycleEvent {
+    public static enum Type {
+        CREATE,
+        ATTACH,
+        START,
+        RESUME,
+        PAUSE,
+        STOP,
+        DETACH,
+        DESTROY,
+    }
 
-interface OPFIabHelperHolder {
-    void setOPFIabHelper(@NonNull final ManagedIabHelper managedOPFIabHelper);
+    @NonNull
+    private final Type type;
+
+    public LifecycleEvent(@NonNull final Type type) {
+        this.type = type;
+    }
+
+    @NonNull
+    public Type getType() {
+        return type;
+    }
 }

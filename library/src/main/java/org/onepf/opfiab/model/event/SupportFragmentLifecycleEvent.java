@@ -14,10 +14,27 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.event;
 
-public enum SkuType {
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 
-    CONSUMABLE,
-    SUBSCRIPTION,
+/**
+ * Created by rzhilich on 12/3/14.
+ */
+public class SupportFragmentLifecycleEvent extends LifecycleEvent {
+
+    @NonNull
+    private final Fragment fragment;
+
+    public SupportFragmentLifecycleEvent(
+            @NonNull final Type type, @NonNull final Fragment fragment) {
+        super(type);
+        this.fragment = fragment;
+    }
+
+    @NonNull
+    public Fragment getFragment() {
+        return fragment;
+    }
 }

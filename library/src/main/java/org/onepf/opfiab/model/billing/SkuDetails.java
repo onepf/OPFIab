@@ -14,17 +14,40 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.response;
+package org.onepf.opfiab.model.billing;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.OPFIabAction;
-import org.onepf.opfiab.model.ResponseStatus;
+public abstract class SkuDetails extends BillingModel {
 
-public class SubscriptionResponse extends Response {
+    public static enum Type {
 
-    public SubscriptionResponse(@NonNull final Bundle data, @NonNull final ResponseStatus status) {
-        super(OPFIabAction.SUBSCRIPTION, status, data);
+        IN_APP,
+        SUBSCRIPTION,
+    }
+
+    @NonNull
+    private final String sku;
+
+    @NonNull
+    private final Type type;
+
+    SkuDetails(@NonNull final Type type, @NonNull final String sku,
+                         @Nullable final Bundle source) {
+        super(source);
+        this.type = type;
+        this.sku = sku;
+    }
+
+    @NonNull
+    public String getSku() {
+        return sku;
+    }
+
+    @NonNull
+    public Type getType() {
+        return type;
     }
 }

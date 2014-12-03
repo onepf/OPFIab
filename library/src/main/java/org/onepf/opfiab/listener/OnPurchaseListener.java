@@ -19,11 +19,8 @@ package org.onepf.opfiab.listener;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.response.PurchaseResponse;
-import org.onepf.opfiab.model.response.SubscriptionResponse;
 
 public interface OnPurchaseListener {
 
     void onPurchase(@NonNull final PurchaseResponse purchaseResponse);
-
-    void onPurchase(@NonNull final SubscriptionResponse subscriptionResponse);
 }

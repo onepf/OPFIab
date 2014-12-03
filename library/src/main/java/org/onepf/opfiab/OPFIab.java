@@ -35,6 +35,8 @@ public final class OPFIab {
 
     private static EventBus eventBus;
 
+    static final String FRAGMENT_TAG = "OPFIabFragment";
+
     @NonNull
     public static EventBus getEventBus() {
         OPFUtils.checkThread(true);

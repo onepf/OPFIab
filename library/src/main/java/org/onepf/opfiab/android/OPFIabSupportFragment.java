@@ -20,25 +20,33 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
-import org.onepf.opfiab.ManagedIabHelper;
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
-public class OPFIabSupportFragment extends Fragment implements OPFIabHelperHolder {
+import de.greenrobot.event.EventBus;
+
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.ATTACH;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DESTROY;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DETACH;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.PAUSE;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.RESUME;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.START;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
+
+public class OPFIabSupportFragment extends Fragment {
 
     @NonNull
     public static OPFIabFragment newInstance() {
         return new OPFIabFragment();
     }
 
-    @NonNull
-    private final OPFIabFragmentImpl implementation = new OPFIabFragmentImpl();
 
-    @Override
-    public void setOPFIabHelper(@NonNull final ManagedIabHelper managedOPFIabHelper) {
-        implementation.setOPFIabHelper(managedOPFIabHelper);
-    }
+    @NonNull
+    protected final EventBus eventBus = OPFIab.getEventBus();
 
     public OPFIabSupportFragment() {
         // Required empty public constructor
@@ -48,35 +56,54 @@ public class OPFIabSupportFragment extends Fragment implements OPFIabHelperHolde
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        implementation.onCreate();
+        eventBus.post(new SupportFragmentLifecycleEvent(CREATE, this));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        eventBus.post(new SupportFragmentLifecycleEvent(ATTACH, this));
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        eventBus.post(new SupportFragmentLifecycleEvent(START, this));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        implementation.onResume();
+        eventBus.post(new SupportFragmentLifecycleEvent(RESUME, this));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        implementation.onPause();
+        eventBus.post(new SupportFragmentLifecycleEvent(PAUSE, this));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        eventBus.post(new SupportFragmentLifecycleEvent(STOP, this));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        eventBus.post(new SupportFragmentLifecycleEvent(DETACH, this));
     }
 
     @Override
-    public void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
-        if (!implementation.onActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+    public void onDestroy() {
+        super.onDestroy();
+        eventBus.post(new SupportFragmentLifecycleEvent(DESTROY, this));
+    }
+
+    @Override
+    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        eventBus.post(new ActivityResultEvent(getActivity(), requestCode, resultCode, data));
     }
 }

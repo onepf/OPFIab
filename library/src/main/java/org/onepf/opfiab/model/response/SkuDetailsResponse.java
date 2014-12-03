@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.opfiab.model.response;
 
 import android.support.annotation.NonNull;
 
-public class Subscription extends SkuInfo {
+import org.onepf.opfiab.model.billing.SkuDetails;
 
-    public Subscription(@NonNull final String sku) {
-        super(sku, SkuType.SUBSCRIPTION);
+import java.util.List;
+
+public class SkuDetailsResponse extends Response {
+
+    @NonNull
+    private final List<SkuDetails> skusDetails;
+
+    public SkuDetailsResponse(@NonNull final Status status,
+                              @NonNull final List<SkuDetails> skusDetails) {
+        super(Type.SKU_INFO, status);
+        this.skusDetails = skusDetails;
+    }
+
+    @NonNull
+    public List<SkuDetails> getSkusDetails() {
+        return skusDetails;
     }
 }

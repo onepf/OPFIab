@@ -21,8 +21,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.Consumable;
-import org.onepf.opfiab.model.Subscription;
+import org.onepf.opfiab.model.billing.InAppDetails;
+import org.onepf.opfiab.model.billing.SubscriptionDetails;
 
 import java.util.Collection;
 
@@ -31,12 +31,12 @@ import java.util.Collection;
  */
 interface BillingBase {
 
-    void purchase(@NonNull final Activity activity, @NonNull final Consumable consumable);
+    void purchase(@NonNull final Activity activity, @NonNull final InAppDetails inAppDetails);
 
     void purchase(@Nullable final Activity activity,
-                  @NonNull final Subscription subscription);
+                  @NonNull final SubscriptionDetails subscriptionDetails);
 
-    void consume(@NonNull final Consumable consumable);
+    void consume(@NonNull final InAppDetails inAppDetails);
 
     void inventory();
 

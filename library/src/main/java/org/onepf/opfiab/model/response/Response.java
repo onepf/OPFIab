@@ -16,45 +16,49 @@
 
 package org.onepf.opfiab.model.response;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-
-import org.onepf.opfiab.OPFIabAction;
-import org.onepf.opfiab.model.ResponseStatus;
+import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 
 public abstract class Response implements Serializable {
 
-    @NonNull
-    private final OPFIabAction action;
+    public static enum Type {
+        CONSUME,
+        INVENTORY,
+        PURCHASE,
+        SKU_INFO,
+    }
+
+    public enum Status {
+        SUCCESS,
+        USER_CANCELED,
+        BILLING_UNAVAILABLE,
+        ITEM_UNAVAILABLE,
+        ITEM_ALREADY_OWNED,
+        SUBSCRIPTIONS_NOT_SUPPORTED,
+    }
+
 
     @NonNull
-    private final Bundle data;
+    private final Type type;
 
     @NonNull
-    private final ResponseStatus status;
+    private final Status status;
 
-    Response(@NonNull final OPFIabAction action,
-             @NonNull final ResponseStatus status,
-             @NonNull final Bundle data) {
-        this.action = action;
+    Response(@NonNull final Type type,
+             @NonNull final Status status) {
+        this.type = type;
         this.status = status;
-        this.data = data;
     }
 
     @NonNull
-    public OPFIabAction getAction() {
-        return action;
+    public Type getType() {
+        return type;
     }
 
     @NonNull
-    public Bundle getData() {
-        return data;
-    }
-
-    @NonNull
-    public ResponseStatus getStatus() {
+    public Status getStatus() {
         return status;
     }
 }

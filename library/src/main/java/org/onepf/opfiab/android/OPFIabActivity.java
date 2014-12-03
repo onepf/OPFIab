@@ -19,27 +19,115 @@ package org.onepf.opfiab.android;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.ActivityIabHelper;
 import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
+import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.greenrobot.event.EventBus;
+
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DESTROY;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.PAUSE;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.RESUME;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.START;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
 
 public class OPFIabActivity extends Activity {
 
-    @NonNull
-    public static Intent newIntent(@NonNull final Context context) {
-        final Intent intent = new Intent(context.getApplicationContext(), OPFIabActivity.class);
-        return intent;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OPFIabActivity.class);
+
+    private static final int FINISH_DELAY = 3000;
+
+    public static void start(@NonNull final Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final Intent intent = new Intent(applicationContext, OPFIabActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        applicationContext.startActivity(intent);
     }
 
 
     @NonNull
-    private ActivityIabHelper opfIabHelper;
+    protected final EventBus eventBus = OPFIab.getEventBus();
+
+    @NonNull
+    protected final Handler handler = new Handler(Looper.getMainLooper());
+
+    @NonNull
+    private final Runnable finishTask = new Runnable() {
+        @Override
+        public void run() {
+            LOGGER.error("OPFIabActivity wasn't utilised! Finishing...");
+            finish();
+        }
+    };
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        opfIabHelper = OPFIab.getHelper(this);
+        handler.postDelayed(finishTask, FINISH_DELAY);
+        eventBus.post(new ActivityLifecycleEvent(CREATE, this));
+    }
+
+    @Override
+    public void startActivityForResult(final Intent intent, final int requestCode) {
+        handler.removeCallbacks(finishTask);
+        super.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void startIntentSenderForResult(final IntentSender intent, final int requestCode,
+                                           final Intent fillInIntent, final int flagsMask,
+                                           final int flagsValues,
+                                           final int extraFlags)
+            throws IntentSender.SendIntentException {
+        handler.removeCallbacks(finishTask);
+        super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
+                                         extraFlags);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        eventBus.post(new ActivityLifecycleEvent(START, this));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        eventBus.post(new ActivityLifecycleEvent(RESUME, this));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        eventBus.post(new ActivityLifecycleEvent(PAUSE, this));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        eventBus.post(new ActivityLifecycleEvent(STOP, this));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        eventBus.post(new ActivityLifecycleEvent(DESTROY, this));
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode,
+                                    final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        eventBus.post(new ActivityResultEvent(this, requestCode, resultCode, data));
+        finish();
     }
 }
