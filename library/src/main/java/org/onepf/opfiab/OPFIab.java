@@ -72,6 +72,17 @@ public final class OPFIab {
         return new ActivityIabHelper(getManagedHelper(), activity);
     }
 
+    @NonNull
+    public static FragmentIabHelper getHelper(@NonNull final android.app.Fragment fragment) {
+        return new FragmentIabHelper(getManagedHelper(), fragment);
+    }
+
+    @NonNull
+    public static SupportFragmentIabHelper getHelper(
+            @NonNull final android.support.v4.app.Fragment fragment) {
+        return new SupportFragmentIabHelper(getManagedHelper(), fragment);
+    }
+
     @Nullable
     public static BillingProvider getCurrentProvider() {
         checkInit();

@@ -55,33 +55,27 @@ public class FragmentIabHelper extends IabHelperWrapper {
         throw new UnsupportedOperationException();
     }
 
-    public void addBillingListener(
-            @NonNull final BillingListener billingListener) {
+    public void addBillingListener(@NonNull final BillingListener billingListener) {
         managedIabHelper.addBillingListener(billingListener);
     }
 
-    public void addConsumeListener(
-            @NonNull final OnConsumeListener consumeListener) {
+    public void addConsumeListener(@NonNull final OnConsumeListener consumeListener) {
         managedIabHelper.addConsumeListener(consumeListener);
     }
 
-    public void addSkuInfoListener(
-            @NonNull final OnSkuDetailsListener skuInfoListener) {
+    public void addSkuInfoListener(@NonNull final OnSkuDetailsListener skuInfoListener) {
         managedIabHelper.addSkuInfoListener(skuInfoListener);
     }
 
-    public void addInventoryListener(
-            @NonNull final OnInventoryListener inventoryListener) {
+    public void addInventoryListener(@NonNull final OnInventoryListener inventoryListener) {
         managedIabHelper.addInventoryListener(inventoryListener);
     }
 
-    public void addPurchaseListener(
-            @NonNull final OnPurchaseListener purchaseListener) {
+    public void addPurchaseListener(@NonNull final OnPurchaseListener purchaseListener) {
         managedIabHelper.addPurchaseListener(purchaseListener);
     }
 
-    public void addSetupListener(
-            @NonNull final OnSetupListener setupListener) {
+    public void addSetupListener(@NonNull final OnSetupListener setupListener) {
         managedIabHelper.addSetupListener(setupListener);
     }
 }

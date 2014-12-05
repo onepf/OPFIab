@@ -17,7 +17,6 @@
 package org.onepf.opfiab.model.response;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 
@@ -32,6 +31,7 @@ public abstract class Response implements Serializable {
 
     public enum Status {
         SUCCESS,
+        IN_PROGRESS,
         USER_CANCELED,
         BILLING_UNAVAILABLE,
         ITEM_UNAVAILABLE,

@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.response;
+package org.onepf.opfiab.model.billing;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.model.billing.SkusDetails;
-
+import java.util.Collections;
 import java.util.List;
 
-public class SkuDetailsResponse extends Response {
+/**
+ * Created by rzhilich on 12/5/14.
+ */
+public class SkusDetails extends BillingModel {
 
     @NonNull
-    private final SkusDetails skusDetails;
+    private final List<SkuDetails> detailsList;
 
-    public SkuDetailsResponse(@NonNull final Status status,
-                              @NonNull final SkusDetails skusDetails) {
-        super(Type.SKU_INFO, status);
-        this.skusDetails = skusDetails;
+    public SkusDetails(@NonNull final List<SkuDetails> detailsList, @Nullable final Bundle source) {
+        super(source);
+        this.detailsList = Collections.unmodifiableList(detailsList);
     }
 
     @NonNull
-    public SkusDetails getSkusDetails() {
-        return skusDetails;
+    public List<SkuDetails> getDetailsList() {
+        return detailsList;
     }
 }
