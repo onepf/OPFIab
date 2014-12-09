@@ -41,7 +41,7 @@ OPFIab
   - [ ] Samsung
     - [ ] Abstract activity-dependant BilingProvider implementation.
   - [ ] Fortumo
-    - [ ] #3
+    - [ ] Subscriptions [#3](https://github.com/onepf/OPFIab/issues/3)
 - [ ] Sample project
   - [ ] Trivial Drive
   - [ ] Google migration sample.
