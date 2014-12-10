@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,20 +16,18 @@
 
 package org.onepf.opfiab.model.billing;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class Inventory extends BillingModel{
+public class Inventory extends BillingModel {
 
     @NonNull
     final List<Purchase> purchases;
 
-    public Inventory(@NonNull final List<Purchase> purchases, @Nullable final Bundle source) {
-        super(source);
+    public Inventory(@NonNull final List<Purchase> purchases, @Nullable final String json) {
+        super(json);
         this.purchases = purchases;
     }
 

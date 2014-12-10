@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,22 +21,24 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.billing.InAppDetails;
+import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.EntitlementDetails;
 import org.onepf.opfiab.model.billing.SubscriptionDetails;
 
 import java.util.Collection;
 
-/**
- * Created by rzhilich on 12/2/14.
- */
 interface BillingBase {
 
-    void purchase(@NonNull final Activity activity, @NonNull final InAppDetails inAppDetails);
+    void purchase(@NonNull final Activity activity,
+                  @NonNull final ConsumableDetails consumableDetails);
 
-    void purchase(@Nullable final Activity activity,
+    void purchase(@NonNull final Activity activity,
                   @NonNull final SubscriptionDetails subscriptionDetails);
 
-    void consume(@NonNull final InAppDetails inAppDetails);
+    void purchase(@NonNull final Activity activity,
+                  @NonNull final EntitlementDetails entitlementDetails);
+
+    void consume(@NonNull final ConsumableDetails consumableDetails);
 
     void inventory();
 

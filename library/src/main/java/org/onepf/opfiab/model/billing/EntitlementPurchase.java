@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.listener;
+package org.onepf.opfiab.model.billing;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.response.ConsumeResponse;
+public class EntitlementPurchase extends Purchase {
 
-public interface OnConsumeListener {
-
-    void onConsume(@NonNull final ConsumeResponse consumeResponse);
+    public EntitlementPurchase(@NonNull final EntitlementDetails entitlementDetails,
+                               @Nullable final String json) {
+        super(entitlementDetails, json);
+    }
 }

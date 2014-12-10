@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,8 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.billing.InAppDetails;
+import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.EntitlementDetails;
 import org.onepf.opfiab.model.billing.SubscriptionDetails;
 
 import java.util.Collection;
@@ -37,19 +38,24 @@ class IabHelperWrapper extends IabHelper {
 
     @Override
     public void purchase(@NonNull final Activity activity,
-                         @NonNull final InAppDetails inAppDetails) {
-        iabHelper.purchase(activity, inAppDetails);
+                         @NonNull final ConsumableDetails consumableDetails) {
+        iabHelper.purchase(activity, consumableDetails);
     }
 
     @Override
-    public void purchase(@Nullable final Activity activity,
+    public void purchase(@NonNull final Activity activity,
                          @NonNull final SubscriptionDetails subscriptionDetails) {
         iabHelper.purchase(activity, subscriptionDetails);
     }
 
     @Override
-    public void consume(@NonNull final InAppDetails inAppDetails) {
-        iabHelper.consume(inAppDetails);
+    public void purchase(@NonNull final Activity activity,
+                         @NonNull final EntitlementDetails entitlementDetails) {
+    }
+
+    @Override
+    public void consume(@NonNull final ConsumableDetails consumableDetails) {
+        iabHelper.consume(consumableDetails);
     }
 
     @Override

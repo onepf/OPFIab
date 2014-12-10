@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,17 +16,27 @@
 
 package org.onepf.opfiab.model.billing;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class InAppDetails extends SkuDetails {
+public class ConsumablePurchase extends Purchase {
 
-    public InAppDetails(@NonNull final String sku, @Nullable final Bundle source) {
-        super(Type.IN_APP, sku, source);
+    @NonNull
+    private final ConsumableDetails consumableDetails;
+
+    public ConsumablePurchase(@NonNull final ConsumableDetails consumableDetails,
+                              @Nullable final String json) {
+        super(consumableDetails, json);
+        this.consumableDetails = consumableDetails;
     }
 
-    public InAppDetails(@NonNull final String sku) {
-        this(sku, null);
+    public ConsumablePurchase(@NonNull final ConsumableDetails consumableDetails) {
+        this(consumableDetails, null);
+    }
+
+    @NonNull
+    @Override
+    public ConsumableDetails getSkuDetails() {
+        return consumableDetails;
     }
 }

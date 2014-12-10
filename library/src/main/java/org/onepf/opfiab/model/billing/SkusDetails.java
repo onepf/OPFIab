@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,23 +16,19 @@
 
 package org.onepf.opfiab.model.billing;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by rzhilich on 12/5/14.
- */
 public class SkusDetails extends BillingModel {
 
     @NonNull
     private final List<SkuDetails> detailsList;
 
-    public SkusDetails(@NonNull final List<SkuDetails> detailsList, @Nullable final Bundle source) {
-        super(source);
+    public SkusDetails(@NonNull final List<SkuDetails> detailsList, @Nullable final String json) {
+        super(json);
         this.detailsList = Collections.unmodifiableList(detailsList);
     }
 

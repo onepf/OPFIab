@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,29 +22,34 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.billing.InAppDetails;
-import org.onepf.opfiab.model.Options;
+import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.EntitlementDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SubscriptionDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
 class BaseIabHelper extends IabHelper {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseIabHelper.class);
+
     @NonNull
     private final Context context;
 
     @NonNull
-    private final Options options;
+    private final Configuration configuration;
 
     @NonNull
     private final GlobalBillingListener globalBillingListener;
 
-    BaseIabHelper(@NonNull final Context context, @NonNull final Options options) {
+    BaseIabHelper(@NonNull final Context context, @NonNull final Configuration configuration) {
         this.context = context.getApplicationContext();
-        this.options = options;
+        this.configuration = configuration;
         this.globalBillingListener = new GlobalBillingListener(
-                options.getBillingListener());
-
+                configuration.getBillingListener());
     }
 
     void unsubscribe(@NonNull final ManagedIabHelper managedOPFIabHelper) {
@@ -55,19 +60,31 @@ class BaseIabHelper extends IabHelper {
         globalBillingListener.subscribe(managedOPFIabHelper);
     }
 
-    @Override
-    public void purchase(@NonNull final Activity activity, @NonNull final InAppDetails inAppDetails) {
+    protected void purchase(@NonNull final Activity activity,
+                            @NonNull final SkuDetails skuDetails) {
 
     }
 
     @Override
-    public void purchase(@Nullable final Activity activity,
-                         @NonNull final SubscriptionDetails subscriptionDetails) {
-
+    public final void purchase(@NonNull final Activity activity,
+                               @NonNull final ConsumableDetails consumableDetails) {
+        purchase(activity, (SkuDetails) consumableDetails);
     }
 
     @Override
-    public void consume(@NonNull final InAppDetails inAppDetails) {
+    public final void purchase(@NonNull final Activity activity,
+                               @NonNull final SubscriptionDetails subscriptionDetails) {
+        purchase(activity, (SkuDetails) subscriptionDetails);
+    }
+
+    @Override
+    public final void purchase(@NonNull final Activity activity,
+                               @NonNull final EntitlementDetails entitlementDetails) {
+        purchase(activity, (SkuDetails) entitlementDetails);
+    }
+
+    @Override
+    public void consume(@NonNull final ConsumableDetails consumableDetails) {
 
     }
 

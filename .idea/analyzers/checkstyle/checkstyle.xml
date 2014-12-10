@@ -130,7 +130,7 @@
         <module name="HiddenField">
             <property name="ignoreConstructorParameter" value="true" />
             <property name="ignoreSetter" value="true" />
-            <property name="severity" value="warning" />
+            <property name="severity" value="ignore" />
         </module>
         <module name="IllegalInstantiation" />
         <module name="InnerAssignment" />

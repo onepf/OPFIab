@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * 	http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,17 +30,17 @@ public class SimpleBillingListener implements BillingListener {
 
     @Override
     public void onSetup(@NonNull final SetupStatus status,
-                        @Nullable final BillingProvider billingProvider) {}
+                        @Nullable final BillingProvider billingProvider) { }
 
     @Override
-    public void onConsume(@NonNull final ConsumeResponse consumeResponse) {}
+    public void onConsume(@NonNull final ConsumeResponse consumeResponse) { }
 
     @Override
-    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {}
+    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) { }
 
     @Override
-    public void onInventory(@NonNull final InventoryResponse inventoryResponse) {}
+    public void onInventory(@NonNull final InventoryResponse inventoryResponse) { }
 
     @Override
-    public void onSkuInfo(@NonNull final SkuDetailsResponse skuDetailsResponse) {}
+    public void onSkuInfo(@NonNull final SkuDetailsResponse skuDetailsResponse) { }
 }
