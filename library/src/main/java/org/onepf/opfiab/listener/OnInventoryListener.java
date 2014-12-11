@@ -18,7 +18,7 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.response.InventoryResponse;
+import org.onepf.opfiab.model.event.response.InventoryResponse;
 
 public interface OnInventoryListener {
 

@@ -26,45 +26,97 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.billing.SetupStatus;
-import org.onepf.opfiab.model.response.ConsumeResponse;
-import org.onepf.opfiab.model.response.InventoryResponse;
-import org.onepf.opfiab.model.response.PurchaseResponse;
-import org.onepf.opfiab.model.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.SetupEvent;
+import org.onepf.opfiab.model.event.response.ConsumeResponse;
+import org.onepf.opfiab.model.event.response.InventoryResponse;
+import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.event.response.Response;
+import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 class GlobalBillingListener extends BillingListenerWrapper {
 
     @NonNull
-    private Set<ManagedIabHelper> helpers = new HashSet<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalBillingListener.class);
+
+    @NonNull
+    private static final Set<Reference<ManagedIabHelper>> HELPERS_REFS = new HashSet<>();
+
+    static void subscribe(@NonNull final ManagedIabHelper managedIabHelper) {
+        OPFUtils.checkThread(true);
+        HELPERS_REFS.add(new WeakReference<ManagedIabHelper>(managedIabHelper));
+    }
+
+    static void unsubscribe(@NonNull final ManagedIabHelper managedIabHelper) {
+        OPFUtils.checkThread(true);
+        for (final Reference<ManagedIabHelper> helperReference : HELPERS_REFS) {
+            final ManagedIabHelper helper = helperReference.get();
+            if (managedIabHelper == helper) {
+                // Since we immediately break after this modification, it shouldn't interfere with Iterator
+                HELPERS_REFS.remove(helperReference);
+                break;
+            }
+        }
+    }
+
+    private static List<ManagedIabHelper> helpersList() {
+        final List<ManagedIabHelper> helpersList = new ArrayList<>();
+        for (final Reference<ManagedIabHelper> helperReference : HELPERS_REFS) {
+            final ManagedIabHelper helper;
+            if ((helper = helperReference.get()) != null) {
+                helpersList.add(helper);
+            }
+        }
+        return Collections.unmodifiableList(helpersList);
+    }
+
 
     GlobalBillingListener(@Nullable final BillingListener billingListener) {
         super(billingListener);
+        OPFIab.getEventBus().register(this);
     }
 
-    void subscribe(@NonNull final ManagedIabHelper managedOPFIabHelper) {
-        OPFUtils.checkThread(true);
-        helpers.add(managedOPFIabHelper);
+    public void onEventMainThread(@NonNull final SetupEvent setupEvent) {
+        onSetup(setupEvent);
     }
 
-    void unsubscribe(@NonNull final ManagedIabHelper managedOPFIabHelper) {
-        OPFUtils.checkThread(true);
-        helpers.remove(managedOPFIabHelper);
+    public void onEventMainThread(@NonNull final Response response) {
+        switch (response.getType()) {
+            case PURCHASE:
+                onPurchase((PurchaseResponse) response);
+                break;
+            case CONSUME:
+                onConsume((ConsumeResponse) response);
+                break;
+            case INVENTORY:
+                onInventory((InventoryResponse) response);
+                break;
+            case SKU_INFO:
+                onSkuInfo((SkuDetailsResponse) response);
+                break;
+            default:
+                LOGGER.error("Unknown Response event: ", response);
+        }
     }
 
     @Override
-    public void onSetup(@NonNull final SetupStatus status,
-                        @Nullable final BillingProvider billingProvider) {
-        super.onSetup(status, billingProvider);
-        for (final ManagedIabHelper helper : helpers) {
+    public void onSetup(@NonNull final SetupEvent setupEvent) {
+        super.onSetup(setupEvent);
+        for (final ManagedIabHelper helper : helpersList()) {
             final Collection<OnSetupListener> setupListeners =
-                    Collections.unmodifiableCollection(helper.setupListeners);
+                    new ArrayList<>(helper.setupListeners);
             for (final OnSetupListener setupListener : setupListeners) {
-                setupListener.onSetup(status, billingProvider);
+                setupListener.onSetup(setupEvent);
             }
         }
     }
@@ -72,9 +124,9 @@ class GlobalBillingListener extends BillingListenerWrapper {
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
         super.onPurchase(purchaseResponse);
-        for (final ManagedIabHelper helper : helpers) {
+        for (final ManagedIabHelper helper : helpersList()) {
             final Collection<OnPurchaseListener> purchaseListeners =
-                    Collections.unmodifiableCollection(helper.purchaseListeners);
+                    new ArrayList<>(helper.purchaseListeners);
             for (final OnPurchaseListener purchaseListener : purchaseListeners) {
                 purchaseListener.onPurchase(purchaseResponse);
             }
@@ -84,9 +136,9 @@ class GlobalBillingListener extends BillingListenerWrapper {
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         super.onInventory(inventoryResponse);
-        for (final ManagedIabHelper helper : helpers) {
+        for (final ManagedIabHelper helper : helpersList()) {
             final Collection<OnInventoryListener> inventoryListeners =
-                    Collections.unmodifiableCollection(helper.inventoryListeners);
+                    new ArrayList<>(helper.inventoryListeners);
             for (final OnInventoryListener inventoryListener : inventoryListeners) {
                 inventoryListener.onInventory(inventoryResponse);
             }
@@ -96,9 +148,9 @@ class GlobalBillingListener extends BillingListenerWrapper {
     @Override
     public void onSkuInfo(@NonNull final SkuDetailsResponse skuDetailsResponse) {
         super.onSkuInfo(skuDetailsResponse);
-        for (final ManagedIabHelper helper : helpers) {
+        for (final ManagedIabHelper helper : helpersList()) {
             final Collection<OnSkuDetailsListener> skuInfoListeners =
-                    Collections.unmodifiableCollection(helper.skuInfoListeners);
+                    new ArrayList<>(helper.skuInfoListeners);
             for (final OnSkuDetailsListener skuInfoListener : skuInfoListeners) {
                 skuInfoListener.onSkuInfo(skuDetailsResponse);
             }
@@ -108,9 +160,9 @@ class GlobalBillingListener extends BillingListenerWrapper {
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
         super.onConsume(consumeResponse);
-        for (final ManagedIabHelper helper : helpers) {
+        for (final ManagedIabHelper helper : helpersList()) {
             final Collection<OnConsumeListener> consumeListeners =
-                    Collections.unmodifiableCollection(helper.consumeListeners);
+                    new ArrayList<>(helper.consumeListeners);
             for (final OnConsumeListener consumeListener : consumeListeners) {
                 consumeListener.onConsume(consumeResponse);
             }

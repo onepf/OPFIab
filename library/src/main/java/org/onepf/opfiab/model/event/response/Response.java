@@ -14,24 +14,35 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.response;
+package org.onepf.opfiab.model.event.response;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.BillingEvent;
 
-public abstract class PurchaseResponse extends Response {
+public abstract class Response extends BillingEvent {
 
-    @NonNull
-    private final Purchase purchase;
-
-    public PurchaseResponse(@NonNull final Status status, @NonNull final Purchase purchase) {
-        super(Type.PURCHASE, status);
-        this.purchase = purchase;
+    public enum Status {
+        SUCCESS,
+        PENDING,
+        USER_CANCELED,
+        BILLING_UNAVAILABLE,
+        ITEM_UNAVAILABLE,
+        ITEM_ALREADY_OWNED,
+        SUBSCRIPTIONS_NOT_SUPPORTED,
     }
 
     @NonNull
-    public Purchase getPurchase() {
-        return purchase;
+    private final Status status;
+
+    protected Response(@NonNull final Type type,
+             @NonNull final Status status) {
+        super(type);
+        this.status = status;
+    }
+
+    @NonNull
+    public Status getStatus() {
+        return status;
     }
 }

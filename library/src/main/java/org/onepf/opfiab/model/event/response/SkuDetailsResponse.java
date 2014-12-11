@@ -14,13 +14,25 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.listener;
+package org.onepf.opfiab.model.event.response;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.billing.SkusDetails;
 
-public interface OnPurchaseListener {
+public class SkuDetailsResponse extends Response {
 
-    void onPurchase(@NonNull final PurchaseResponse purchaseResponse);
+    @NonNull
+    private final SkusDetails skusDetails;
+
+    public SkuDetailsResponse(@NonNull final Status status,
+                              @NonNull final SkusDetails skusDetails) {
+        super(Type.SKU_INFO, status);
+        this.skusDetails = skusDetails;
+    }
+
+    @NonNull
+    public SkusDetails getSkusDetails() {
+        return skusDetails;
+    }
 }

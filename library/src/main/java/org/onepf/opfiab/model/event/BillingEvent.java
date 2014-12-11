@@ -14,51 +14,33 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.response;
+package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
-public abstract class Response implements Serializable {
+public class BillingEvent implements Serializable {
 
     public static enum Type {
+        SETUP,
+
         CONSUME,
         PURCHASE,
         SKU_INFO,
         INVENTORY,
     }
 
-    public enum Status {
-        SUCCESS,
-        PENDING,
-        USER_CANCELED,
-        BILLING_UNAVAILABLE,
-        ITEM_UNAVAILABLE,
-        ITEM_ALREADY_OWNED,
-        SUBSCRIPTIONS_NOT_SUPPORTED,
-    }
-
 
     @NonNull
     private final Type type;
 
-    @NonNull
-    private final Status status;
-
-    Response(@NonNull final Type type,
-             @NonNull final Status status) {
+    protected BillingEvent(@NonNull final Type type) {
         this.type = type;
-        this.status = status;
     }
 
     @NonNull
     public Type getType() {
         return type;
-    }
-
-    @NonNull
-    public Status getStatus() {
-        return status;
     }
 }

@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.listener;
+package org.onepf.opfiab.model.event.response;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.billing.Inventory;
 
-public interface OnPurchaseListener {
+public class InventoryResponse extends Response {
 
-    void onPurchase(@NonNull final PurchaseResponse purchaseResponse);
+    @NonNull
+    private final Inventory inventory;
+
+    public InventoryResponse(@NonNull final Status status, @NonNull final Inventory inventory) {
+        super(Type.INVENTORY, status);
+        this.inventory = inventory;
+    }
+
+    @NonNull
+    public Inventory getInventory() {
+        return inventory;
+    }
 }

@@ -19,12 +19,11 @@ package org.onepf.opfiab.listener;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.BillingProvider;
-import org.onepf.opfiab.model.billing.SetupStatus;
-import org.onepf.opfiab.model.response.ConsumeResponse;
-import org.onepf.opfiab.model.response.InventoryResponse;
-import org.onepf.opfiab.model.response.PurchaseResponse;
-import org.onepf.opfiab.model.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.SetupEvent;
+import org.onepf.opfiab.model.event.response.ConsumeResponse;
+import org.onepf.opfiab.model.event.response.InventoryResponse;
+import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 
 public class BillingListenerWrapper implements BillingListener {
 
@@ -36,10 +35,9 @@ public class BillingListenerWrapper implements BillingListener {
     }
 
     @Override
-    public void onSetup(@NonNull final SetupStatus status,
-                        @Nullable final BillingProvider billingProvider) {
+    public void onSetup(@NonNull final SetupEvent setupEvent) {
         if (billingListener != null) {
-            billingListener.onSetup(status, billingProvider);
+            billingListener.onSetup(setupEvent);
         }
     }
 

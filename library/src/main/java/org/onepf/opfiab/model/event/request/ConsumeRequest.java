@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.response;
+package org.onepf.opfiab.model.event.request;
 
-import android.support.annotation.NonNull;
+public class ConsumeRequest extends Request {
 
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-
-public class ConsumeResponse extends Response {
-
-    @NonNull
-    private final ConsumableDetails consumableDetails;
-
-    public ConsumeResponse(@NonNull final Status status, @NonNull final ConsumableDetails consumableDetails) {
-        super(Type.CONSUME, status);
-        this.consumableDetails = consumableDetails;
-    }
-
-    @NonNull
-    public ConsumableDetails getConsumableDetails() {
-        return consumableDetails;
+    public ConsumeRequest() {
+        super(Type.CONSUME);
     }
 }

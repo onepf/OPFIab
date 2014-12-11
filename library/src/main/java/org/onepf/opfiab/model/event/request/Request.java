@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.listener;
+package org.onepf.opfiab.model.event.request;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.event.BillingEvent;
 
-public interface OnPurchaseListener {
+public abstract class Request extends BillingEvent {
 
-    void onPurchase(@NonNull final PurchaseResponse purchaseResponse);
+    protected Request(@NonNull final Type type) {
+        super(type);
+    }
 }

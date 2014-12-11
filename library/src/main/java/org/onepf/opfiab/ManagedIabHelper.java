@@ -89,10 +89,10 @@ public class ManagedIabHelper extends IabHelperWrapper {
     }
 
     public void subscribe() {
-        baseIabHelper.subscribe(this);
+        GlobalBillingListener.subscribe(this);
     }
 
     public void unsubscribe() {
-        baseIabHelper.unsubscribe(this);
+        GlobalBillingListener.unsubscribe(this);
     }
 }

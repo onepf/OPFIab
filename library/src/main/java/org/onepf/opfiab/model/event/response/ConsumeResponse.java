@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.response;
+package org.onepf.opfiab.model.event.response;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.billing.Inventory;
+import org.onepf.opfiab.model.billing.ConsumableDetails;
 
-public class InventoryResponse extends Response {
+public class ConsumeResponse extends Response {
 
     @NonNull
-    private final Inventory inventory;
+    private final ConsumableDetails consumableDetails;
 
-    public InventoryResponse(@NonNull final Status status, @NonNull final Inventory inventory) {
-        super(Type.INVENTORY, status);
-        this.inventory = inventory;
+    public ConsumeResponse(@NonNull final Status status, @NonNull final ConsumableDetails consumableDetails) {
+        super(Type.CONSUME, status);
+        this.consumableDetails = consumableDetails;
     }
 
     @NonNull
-    public Inventory getInventory() {
-        return inventory;
+    public ConsumableDetails getConsumableDetails() {
+        return consumableDetails;
     }
 }

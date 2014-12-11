@@ -10,7 +10,7 @@ OPFIab
     - [ ] Public listeners.
     - [ ] Configuration.
   - [ ] Solid internal architecture.
-    - [ ] Event based internal communication.
+    - [x] Event based internal communication.
     - [ ] Request handling.
     - [ ] Response handling.
   - [ ] [BillingProvider](https://github.com/onepf/OPFIab/blob/master/library/src/main/java/org/onepf/opfiab/BillingProvider.java)

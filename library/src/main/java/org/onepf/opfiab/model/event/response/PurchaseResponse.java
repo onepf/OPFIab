@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.billing;
+package org.onepf.opfiab.model.event.response;
 
-public enum SetupStatus {
+import android.support.annotation.NonNull;
 
-    SUCCESS,
-    FAILED,
-    PROVIDER_CHANGED,
+import org.onepf.opfiab.model.billing.Purchase;
+
+public abstract class PurchaseResponse extends Response {
+
+    @NonNull
+    private final Purchase purchase;
+
+    public PurchaseResponse(@NonNull final Status status, @NonNull final Purchase purchase) {
+        super(Type.PURCHASE, status);
+        this.purchase = purchase;
+    }
+
+    @NonNull
+    public Purchase getPurchase() {
+        return purchase;
+    }
 }

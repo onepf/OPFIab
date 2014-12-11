@@ -52,14 +52,6 @@ class BaseIabHelper extends IabHelper {
                 configuration.getBillingListener());
     }
 
-    void unsubscribe(@NonNull final ManagedIabHelper managedOPFIabHelper) {
-        globalBillingListener.unsubscribe(managedOPFIabHelper);
-    }
-
-    void subscribe(@NonNull final ManagedIabHelper managedOPFIabHelper) {
-        globalBillingListener.subscribe(managedOPFIabHelper);
-    }
-
     protected void purchase(@NonNull final Activity activity,
                             @NonNull final SkuDetails skuDetails) {
 

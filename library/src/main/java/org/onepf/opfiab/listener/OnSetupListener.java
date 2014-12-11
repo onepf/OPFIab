@@ -17,12 +17,10 @@
 package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.BillingProvider;
-import org.onepf.opfiab.model.billing.SetupStatus;
+import org.onepf.opfiab.model.event.SetupEvent;
 
 public interface OnSetupListener {
 
-    void onSetup(@NonNull final SetupStatus status, @Nullable final BillingProvider billingProvider);
+    void onSetup(@NonNull final SetupEvent setupEvent);
 }
