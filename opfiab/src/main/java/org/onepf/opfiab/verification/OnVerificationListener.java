@@ -14,5 +14,11 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.verification;
+
+import android.support.annotation.NonNull;
+
+public interface OnVerificationListener {
+
+    void onVerification(@NonNull final VerificationResult verificationResult);
+}

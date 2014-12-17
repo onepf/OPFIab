@@ -14,5 +14,25 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.model.event.response;
+
+import android.support.annotation.NonNull;
+
+import org.onepf.opfiab.model.billing.SkusDetails;
+
+public class SkuDetailsResponse extends Response {
+
+    @NonNull
+    private final SkusDetails skusDetails;
+
+    public SkuDetailsResponse(@NonNull final Status status,
+                              @NonNull final SkusDetails skusDetails) {
+        super(Type.SKU_DETAILS, status);
+        this.skusDetails = skusDetails;
+    }
+
+    @NonNull
+    public SkusDetails getSkusDetails() {
+        return skusDetails;
+    }
+}

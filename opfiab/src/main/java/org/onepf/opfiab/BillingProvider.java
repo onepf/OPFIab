@@ -14,5 +14,18 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab;
+
+import android.support.annotation.NonNull;
+
+import org.onepf.opfiab.billing.connection.BillingProviderConnection;
+import org.onepf.opfiab.model.BillingProviderInfo;
+
+public interface BillingProvider extends BillingBase {
+
+    @NonNull
+    BillingProviderInfo getInfo();
+
+    @NonNull
+    BillingProviderConnection getConnection();
+}

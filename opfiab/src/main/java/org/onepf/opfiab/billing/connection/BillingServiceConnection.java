@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.billing.connection;
+
+public class BillingServiceConnection implements BillingProviderConnection {
+}

@@ -14,5 +14,13 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.listener;
+
+import android.support.annotation.NonNull;
+
+import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+
+public interface OnSkuDetailsListener {
+
+    void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse);
+}

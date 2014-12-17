@@ -14,5 +14,33 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.model.event;
+
+import android.support.annotation.NonNull;
+
+import java.io.Serializable;
+
+public class BillingEvent implements Serializable {
+
+    public static enum Type {
+        SETUP,
+
+        CONSUME,
+        PURCHASE,
+        SKU_DETAILS,
+        INVENTORY,
+    }
+
+
+    @NonNull
+    private final Type type;
+
+    protected BillingEvent(@NonNull final Type type) {
+        this.type = type;
+    }
+
+    @NonNull
+    public Type getType() {
+        return type;
+    }
+}

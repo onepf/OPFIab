@@ -1,0 +1,71 @@
+/*
+ * Copyright 2012-2014 One Platform Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'idea'
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion 10
+        targetSdkVersion 21
+        versionCode 1
+        versionName "0.1-SNAPSHOT"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        abortOnError true
+        checkAllWarnings true
+        warningsAsErrors true
+        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
+    }
+}
+
+apply plugin: 'android-checkstyle'
+androidCheckstyle {
+    abortOnError true
+    config  rootProject.file('.idea/analyzers/checkstyle/checkstyle.xml')
+}
+
+apply plugin: 'android-pmd'
+androidPmd {
+    abortOnError false
+    config rootProject.file('.idea/analyzers/pmd/ruleset.xml')
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:support-annotations:21.0.0'
+    //noinspection GradleDependency,GradleCompatible
+    compile 'com.android.support:support-v4:13.0.0'
+    compile 'org.slf4j:slf4j-android:1.7.9'
+    compile 'com.google.code.findbugs:annotations:3.0.0'
+    compile 'de.greenrobot:eventbus:2.4.0'
+}

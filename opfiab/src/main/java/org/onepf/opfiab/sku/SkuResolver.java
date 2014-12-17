@@ -14,5 +14,22 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.sku;
+
+import android.support.annotation.NonNull;
+
+public interface SkuResolver {
+
+    @NonNull
+    SkuResolver STUB = new SkuResolver() {
+        @NonNull
+        @Override
+        public String resolve(@NonNull final String sku) {
+            return sku;
+        }
+    };
+
+
+    @NonNull
+    String resolve(@NonNull final String sku);
+}

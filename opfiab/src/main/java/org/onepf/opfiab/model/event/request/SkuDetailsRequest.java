@@ -14,5 +14,25 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.model.event.request;
+
+import android.support.annotation.NonNull;
+
+import java.util.Collection;
+import java.util.Collections;
+
+public class SkuDetailsRequest extends Request {
+
+    @NonNull
+    private final Collection<String> skus;
+
+    public SkuDetailsRequest(@NonNull final Collection<String> skus) {
+        super(Type.SKU_DETAILS);
+        this.skus = skus;
+    }
+
+    @NonNull
+    public Collection<String> getSkus() {
+        return Collections.unmodifiableCollection(skus);
+    }
+}

@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/OPFIab.iml" filepath="$PROJECT_DIR$/OPFIab.iml" />
-      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
-      <module fileurl="file://$PROJECT_DIR$/trivialdrive/trivialdrive.iml" filepath="$PROJECT_DIR$/trivialdrive/trivialdrive.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opfiab/opfiab.iml" filepath="$PROJECT_DIR$/opfiab/opfiab.iml" />
+      <module fileurl="file://$PROJECT_DIR$/samples/trivialdrive/trivialdrive.iml" filepath="$PROJECT_DIR$/samples/trivialdrive/trivialdrive.iml" />
     </modules>
   </component>
 </project>

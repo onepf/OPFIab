@@ -14,5 +14,24 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.model.event.request;
+
+import android.support.annotation.NonNull;
+
+import org.onepf.opfiab.model.billing.ConsumableDetails;
+
+public class ConsumeRequest extends Request {
+
+    @NonNull
+    private final ConsumableDetails consumableDetails;
+
+    public ConsumeRequest(@NonNull final ConsumableDetails consumableDetails) {
+        super(Type.CONSUME);
+        this.consumableDetails = consumableDetails;
+    }
+
+    @NonNull
+    public ConsumableDetails getConsumableDetails() {
+        return consumableDetails;
+    }
+}

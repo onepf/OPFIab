@@ -133,7 +133,9 @@
             <property name="severity" value="ignore" />
         </module>
         <module name="IllegalInstantiation" />
-        <module name="InnerAssignment" />
+        <module name="InnerAssignment" >
+            <property name="severity" value="ignore" />
+        </module>
         <module name="MagicNumber">
             <property name="severity" value="info" />
             <property name="ignoreNumbers" value="-1, 0, 1, 2, 10, 60, 100, 256, 1000" />

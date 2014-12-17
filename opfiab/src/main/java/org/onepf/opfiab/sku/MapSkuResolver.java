@@ -14,5 +14,26 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab.sku;
+
+import android.support.annotation.NonNull;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class MapSkuResolver extends HashMap<String, String> implements SkuResolver {
+
+    public MapSkuResolver() {
+    }
+
+    public MapSkuResolver(final Map<? extends String, ? extends String> map) {
+        super(map);
+    }
+
+    @NonNull
+    @Override
+    public String resolve(@NonNull final String sku) {
+        return containsKey(sku) ? get(sku) : sku;
+    }
+}

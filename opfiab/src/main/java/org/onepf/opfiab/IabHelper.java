@@ -14,5 +14,20 @@
  * limitations under the License.
  */
 
-include ':library'
-include ':samples:trivialdrive'
+package org.onepf.opfiab;
+
+import android.support.annotation.NonNull;
+
+import java.util.Arrays;
+
+import de.greenrobot.event.EventBus;
+
+public abstract class IabHelper implements BillingBase {
+
+    @NonNull
+    protected final EventBus eventBus = OPFIab.getEventBus();
+
+    public final void skuDetails(@NonNull final String... skus) {
+        skuDetails(Arrays.asList(skus));
+    }
+}
