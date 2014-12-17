@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" external.system.module.group="OPFIab" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../.." external.system.id="GRADLE" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":opfiab" />
+        <option name="GRADLE_PROJECT_PATH" value=":opfiab-providers:google" />
       </configuration>
     </facet>
     <facet type="android" name="Android">
@@ -84,12 +84,14 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="support-v4-13.0.0" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.9" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-19.0.1" level="project" />
     <orderEntry type="library" exported="" name="eventbus-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-4.3.23" level="project" />
     <orderEntry type="library" exported="" name="slf4j-android-1.7.9" level="project" />
     <orderEntry type="library" exported="" name="annotations-3.0.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.0" level="project" />
+    <orderEntry type="module" module-name="opfiab" exported="" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">

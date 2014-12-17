@@ -98,17 +98,17 @@ public abstract class BaseBillingProvider implements BillingProvider {
     public abstract static class Builder {
 
         @NonNull
-        private PurchaseVerifier purchaseVerifier = PurchaseVerifier.STUB;
+        protected PurchaseVerifier purchaseVerifier = PurchaseVerifier.STUB;
 
         @NonNull
-        private SkuResolver skuResolver = SkuResolver.STUB;
+        protected SkuResolver skuResolver = SkuResolver.STUB;
 
-        public Builder setPurchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
+        public <T extends PurchaseVerifier> Builder purchaseVerifier(@NonNull final T purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;
             return this;
         }
 
-        public Builder setSkuResolver(@NonNull final SkuResolver skuResolver) {
+        public Builder skuResolver(@NonNull final SkuResolver skuResolver) {
             this.skuResolver = skuResolver;
             return this;
         }

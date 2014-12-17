@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-include ':opfiab'
+package org.onepf.sample.trivialdrive;
 
-include ':opfiab-providers:google'
-include ':opfiab-providers:amazon'
+import android.app.Application;
 
-include ':samples:trivialdrive'
+import org.onepf.opfiab.google.GoogleBillingProvider;
+import org.onepf.opfiab.google.GooglePurchaseVerifier;
+import org.onepf.opfiab.verification.PurchaseVerifier;
+
+public class MyApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        final GoogleBillingProvider.Builder builder = new GoogleBillingProvider.Builder();
+        builder.purchaseVerifier(PurchaseVerifier.STUB);
+        builder.purchaseVerifier(new GooglePurchaseVerifier(""));
+    }
+}
