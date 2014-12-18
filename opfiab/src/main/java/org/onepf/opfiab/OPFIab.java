@@ -55,7 +55,7 @@ public final class OPFIab {
             builder.eventInheritance(true);
             //TODO executorService
             //        builder.executorService()
-            return builder.build();
+            eventBus = builder.build();
         }
         return eventBus;
     }
