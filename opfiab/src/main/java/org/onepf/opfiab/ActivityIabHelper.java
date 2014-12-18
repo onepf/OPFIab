@@ -18,26 +18,21 @@ package org.onepf.opfiab;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.android.OPFIabSupportFragment;
-import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.listener.OnConsumeListener;
-import org.onepf.opfiab.listener.OnInventoryListener;
-import org.onepf.opfiab.listener.OnPurchaseListener;
-import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.listener.OnSkuDetailsListener;
+import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.EntitlementDetails;
+import org.onepf.opfiab.model.billing.SubscriptionDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
 import static org.onepf.opfiab.OPFIab.FRAGMENT_TAG;
 
-public class ActivityIabHelper extends IabHelperWrapper {
+public class ActivityIabHelper extends SelfManagedIabHelper {
 
     @NonNull
     private final Object eventHandler = new Object() {
@@ -66,8 +61,8 @@ public class ActivityIabHelper extends IabHelperWrapper {
                     managedIabHelper.subscribe();
                     break;
                 case DETACH:
-                    managedIabHelper.unsubscribe();
                     dispose();
+                    managedIabHelper.unsubscribe();
                     break;
             }
         }
@@ -99,6 +94,7 @@ public class ActivityIabHelper extends IabHelperWrapper {
                     .add(fragment, FRAGMENT_TAG)
                     .commit();
         }
+        //TODO check attach\detach condition. Use sticky?
         this.opfFragment = fragment;
     }
 
@@ -122,55 +118,23 @@ public class ActivityIabHelper extends IabHelperWrapper {
         this.opfFragment = fragment;
     }
 
-    @NonNull
-    public Activity getActivity() {
-        return activity;
+    @Override
+    public void purchase(@NonNull final ConsumableDetails consumableDetails) {
+        managedIabHelper.purchase(activity, consumableDetails);
     }
 
     @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode,
-                                 @Nullable final Intent data) {
-        throw new UnsupportedOperationException();
+    public void purchase(@NonNull final SubscriptionDetails subscriptionDetails) {
+        managedIabHelper.purchase(activity, subscriptionDetails);
     }
 
-    public void addSetupListener(
-            @NonNull final OnSetupListener setupListener) {
-        managedIabHelper.addSetupListener(setupListener);
+    @Override
+    public void purchase(@NonNull final EntitlementDetails entitlementDetails) {
+        managedIabHelper.purchase(activity, entitlementDetails);
     }
 
-    public void addPurchaseListener(
-            @NonNull final OnPurchaseListener purchaseListener) {
-        managedIabHelper.addPurchaseListener(purchaseListener);
-    }
-
-    public void addInventoryListener(
-            @NonNull final OnInventoryListener inventoryListener) {
-        managedIabHelper.addInventoryListener(inventoryListener);
-    }
-
-    public void addSkuInfoListener(
-            @NonNull final OnSkuDetailsListener skuInfoListener) {
-        managedIabHelper.addSkuInfoListener(skuInfoListener);
-    }
-
-    public void addConsumeListener(
-            @NonNull final OnConsumeListener consumeListener) {
-        managedIabHelper.addConsumeListener(consumeListener);
-    }
-
-    public void addBillingListener(
-            @NonNull final BillingListener billingListener) {
-        managedIabHelper.addBillingListener(billingListener);
-    }
-
+    @Override
     protected void dispose() {
         eventBus.unregister(eventHandler);
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        dispose();
     }
 }

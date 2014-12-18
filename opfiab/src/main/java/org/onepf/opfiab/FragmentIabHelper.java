@@ -18,25 +18,21 @@ package org.onepf.opfiab;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.android.OPFIabFragment;
-import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.listener.OnConsumeListener;
-import org.onepf.opfiab.listener.OnInventoryListener;
-import org.onepf.opfiab.listener.OnPurchaseListener;
-import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.listener.OnSkuDetailsListener;
+import org.onepf.opfiab.android.OPFIabSupportFragment;
+import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.EntitlementDetails;
+import org.onepf.opfiab.model.billing.SubscriptionDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
+import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
 import static org.onepf.opfiab.OPFIab.FRAGMENT_TAG;
 
-public class FragmentIabHelper extends IabHelperWrapper {
+public class FragmentIabHelper extends SelfManagedIabHelper {
 
     @NonNull
     private final Object eventHandler = new Object() {
@@ -55,26 +51,45 @@ public class FragmentIabHelper extends IabHelperWrapper {
                     break;
             }
         }
+
+        public void onEvent(@NonNull final SupportFragmentLifecycleEvent event) {
+            if (opfFragment != event.getFragment()) {
+                return;
+            }
+            switch (event.getType()) {
+                case ATTACH:
+                    managedIabHelper.subscribe();
+                    break;
+                case DETACH:
+                    managedIabHelper.unsubscribe();
+                    dispose();
+                    break;
+            }
+        }
     };
 
-    @NonNull
-    private final Fragment fragment;
+    @Nullable
+    private final android.app.Fragment fragment;
+
+    @Nullable
+    private final android.support.v4.app.Fragment supportFragment;
 
     @NonNull
     private final ManagedIabHelper managedIabHelper;
 
     @NonNull
-    private final Fragment opfFragment;
+    private final Object opfFragment;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
-                             @NonNull final Fragment fragment) {
+    FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
+                      @NonNull final android.app.Fragment fragment) {
         super(managedIabHelper);
         this.managedIabHelper = managedIabHelper;
         this.fragment = fragment;
+        this.supportFragment = null;
 
-        Fragment opfFragment;
-        final FragmentManager fragmentManager = fragment.getChildFragmentManager();
+        android.app.Fragment opfFragment;
+        final android.app.FragmentManager fragmentManager = fragment.getChildFragmentManager();
         if ((opfFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
             opfFragment = OPFIabFragment.newInstance();
             fragmentManager.executePendingTransactions();
@@ -85,49 +100,55 @@ public class FragmentIabHelper extends IabHelperWrapper {
         this.opfFragment = opfFragment;
     }
 
-    @NonNull
-    public Fragment getFragment() {
-        return fragment;
+    FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
+                      @NonNull final android.support.v4.app.Fragment supportFragment) {
+        super(managedIabHelper);
+        this.managedIabHelper = managedIabHelper;
+        this.fragment = null;
+        this.supportFragment = supportFragment;
+
+        android.support.v4.app.Fragment opfFragment;
+        final android.support.v4.app.FragmentManager fragmentManager = supportFragment.getChildFragmentManager();
+        if ((opfFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
+            opfFragment = OPFIabSupportFragment.newInstance();
+            fragmentManager.executePendingTransactions();
+            fragmentManager.beginTransaction()
+                    .add(opfFragment, FRAGMENT_TAG)
+                    .commit();
+        }
+        this.opfFragment = opfFragment;
     }
 
     @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode,
-                                 @Nullable final Intent data) {
-        throw new UnsupportedOperationException();
+    public void purchase(@NonNull final ConsumableDetails consumableDetails) {
+        managedIabHelper.purchase(getActivity(), consumableDetails);
     }
 
-    public void addBillingListener(@NonNull final BillingListener billingListener) {
-        managedIabHelper.addBillingListener(billingListener);
+    @Override
+    public void purchase(@NonNull final SubscriptionDetails subscriptionDetails) {
+        managedIabHelper.purchase(getActivity(), subscriptionDetails);
     }
 
-    public void addConsumeListener(@NonNull final OnConsumeListener consumeListener) {
-        managedIabHelper.addConsumeListener(consumeListener);
-    }
-
-    public void addSkuInfoListener(@NonNull final OnSkuDetailsListener skuInfoListener) {
-        managedIabHelper.addSkuInfoListener(skuInfoListener);
-    }
-
-    public void addInventoryListener(@NonNull final OnInventoryListener inventoryListener) {
-        managedIabHelper.addInventoryListener(inventoryListener);
-    }
-
-    public void addPurchaseListener(@NonNull final OnPurchaseListener purchaseListener) {
-        managedIabHelper.addPurchaseListener(purchaseListener);
-    }
-
-    public void addSetupListener(@NonNull final OnSetupListener setupListener) {
-        managedIabHelper.addSetupListener(setupListener);
+    @Override
+    public void purchase(@NonNull final EntitlementDetails entitlementDetails) {
+        managedIabHelper.purchase(getActivity(), entitlementDetails);
     }
 
     protected void dispose() {
         eventBus.unregister(eventHandler);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        dispose();
+    @NonNull
+    private Activity getActivity() {
+        Activity activity = null;
+        if (fragment != null) {
+            activity = fragment.getActivity();
+        } else if (supportFragment != null) {
+            activity = supportFragment.getActivity();
+        }
+        if (activity == null) {
+            throw new IllegalStateException("Fragment already detached!");
+        }
+        return activity;
     }
 }

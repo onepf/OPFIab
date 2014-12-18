@@ -18,9 +18,7 @@ package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
-
-public class BillingEvent implements Serializable {
+public class BillingEvent {
 
     public static enum Type {
         SETUP,

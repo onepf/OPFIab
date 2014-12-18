@@ -83,25 +83,25 @@ public final class OPFIab {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @NonNull
-    public static ActivityIabHelper getHelper(@NonNull final Activity activity) {
+    public static SelfManagedIabHelper getHelper(@NonNull final Activity activity) {
         return new ActivityIabHelper(getManagedHelper(), activity);
     }
 
     @NonNull
-    public static ActivityIabHelper getHelper(@NonNull final FragmentActivity fragmentActivity) {
+    public static SelfManagedIabHelper getHelper(@NonNull final FragmentActivity fragmentActivity) {
         return new ActivityIabHelper(getManagedHelper(), fragmentActivity);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @NonNull
-    public static FragmentIabHelper getHelper(@NonNull final android.app.Fragment fragment) {
+    public static SelfManagedIabHelper getHelper(@NonNull final android.app.Fragment fragment) {
         return new FragmentIabHelper(getManagedHelper(), fragment);
     }
 
     @NonNull
-    public static SupportFragmentIabHelper getHelper(
+    public static SelfManagedIabHelper getHelper(
             @NonNull final android.support.v4.app.Fragment fragment) {
-        return new SupportFragmentIabHelper(getManagedHelper(), fragment);
+        return new FragmentIabHelper(getManagedHelper(), fragment);
     }
 
     @Nullable

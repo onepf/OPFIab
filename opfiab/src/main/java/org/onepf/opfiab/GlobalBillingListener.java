@@ -30,6 +30,8 @@ import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 class GlobalBillingListener extends BillingListenerWrapper {
 
     @NonNull
@@ -45,6 +47,7 @@ class GlobalBillingListener extends BillingListenerWrapper {
         onSetup(setupEvent);
     }
 
+    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     public void onEventMainThread(@NonNull final Response response) {
         switch (response.getType()) {
             case PURCHASE:
