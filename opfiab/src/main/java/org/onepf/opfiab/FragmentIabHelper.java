@@ -51,6 +51,7 @@ public class FragmentIabHelper extends IabHelperWrapper {
                     break;
                 case DETACH:
                     managedIabHelper.unsubscribe();
+                    dispose();
                     break;
             }
         }
@@ -120,7 +121,7 @@ public class FragmentIabHelper extends IabHelperWrapper {
         managedIabHelper.addSetupListener(setupListener);
     }
 
-    public void dispose() {
+    protected void dispose() {
         eventBus.unregister(eventHandler);
     }
 

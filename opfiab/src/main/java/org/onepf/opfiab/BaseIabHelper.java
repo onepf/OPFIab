@@ -41,6 +41,7 @@ class BaseIabHelper extends IabHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseIabHelper.class);
 
+
     @NonNull
     private final Context context;
 
@@ -77,7 +78,7 @@ class BaseIabHelper extends IabHelper {
     }
 
     private void purchase(@NonNull final Activity activity,
-                            @NonNull final SkuDetails skuDetails) {
+                          @NonNull final SkuDetails skuDetails) {
         eventBus.post(new PurchaseRequest(activity, skuDetails));
     }
 

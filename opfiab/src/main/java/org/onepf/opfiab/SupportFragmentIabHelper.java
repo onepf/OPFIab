@@ -49,6 +49,7 @@ public class SupportFragmentIabHelper extends IabHelperWrapper {
                     break;
                 case DETACH:
                     managedIabHelper.unsubscribe();
+                    dispose();
                     break;
             }
         }
@@ -118,7 +119,7 @@ public class SupportFragmentIabHelper extends IabHelperWrapper {
         managedIabHelper.addSetupListener(setupListener);
     }
 
-    public void dispose() {
+    protected void dispose() {
         eventBus.unregister(eventHandler);
     }
 

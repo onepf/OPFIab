@@ -52,6 +52,7 @@ public class ActivityIabHelper extends IabHelperWrapper {
                     break;
                 case DETACH:
                     managedIabHelper.unsubscribe();
+                    dispose();
                     break;
             }
         }
@@ -66,6 +67,7 @@ public class ActivityIabHelper extends IabHelperWrapper {
                     break;
                 case DETACH:
                     managedIabHelper.unsubscribe();
+                    dispose();
                     break;
             }
         }
@@ -162,7 +164,7 @@ public class ActivityIabHelper extends IabHelperWrapper {
         managedIabHelper.addBillingListener(billingListener);
     }
 
-    public void dispose() {
+    protected void dispose() {
         eventBus.unregister(eventHandler);
     }
 

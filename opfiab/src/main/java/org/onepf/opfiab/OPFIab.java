@@ -35,16 +35,28 @@ public final class OPFIab {
         throw new UnsupportedOperationException();
     }
 
+
+    static final String FRAGMENT_TAG = "OPFIabFragment";
+
     private static BaseIabHelper baseIabHelper;
 
     private static EventBus eventBus;
 
-    static final String FRAGMENT_TAG = "OPFIabFragment";
+    private static Configuration configuration;
 
     @NonNull
     public static EventBus getEventBus() {
-        checkInit();
         OPFUtils.checkThread(true);
+        if (configuration == null) {
+            throw OPFUtils.notInitException();
+        }
+        if (eventBus == null) {
+            final EventBusBuilder builder = EventBus.builder();
+            builder.eventInheritance(true);
+            //TODO executorService
+            //        builder.executorService()
+            return builder.build();
+        }
         return eventBus;
     }
 
@@ -104,20 +116,12 @@ public final class OPFIab {
         if (baseIabHelper != null) {
             throw new IllegalStateException("init() was already called.");
         }
-        eventBus = createEventBus(configuration);
+        OPFIab.configuration = configuration;
         baseIabHelper = new BaseIabHelper(context, configuration);
     }
 
     public static void setup() {
 
-    }
-
-    private static EventBus createEventBus(@NonNull final Configuration configuration) {
-        final EventBusBuilder builder = EventBus.builder();
-        builder.eventInheritance(true);
-        //TODO executorService
-        //        builder.executorService()
-        return builder.build();
     }
 
     private static void checkInit() {
