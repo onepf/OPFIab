@@ -35,6 +35,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 // TODO: think about filter for listeners.
 public class ManagedIabHelper extends IabHelperWrapper {
 
@@ -47,6 +49,7 @@ public class ManagedIabHelper extends IabHelperWrapper {
             }
         }
 
+        @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
         public void onEventMainThread(@NonNull final Response event) {
             switch (event.getType()) {
                 case CONSUME:

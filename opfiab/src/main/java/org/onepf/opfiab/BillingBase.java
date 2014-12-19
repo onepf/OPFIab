@@ -22,21 +22,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 
 import java.util.Collection;
 
 interface BillingBase {
 
     void purchase(@NonNull final Activity activity,
-                  @NonNull final ConsumableDetails consumableDetails);
-
-    void purchase(@NonNull final Activity activity,
-                  @NonNull final SubscriptionDetails subscriptionDetails);
-
-    void purchase(@NonNull final Activity activity,
-                  @NonNull final EntitlementDetails entitlementDetails);
+                  @NonNull final SkuDetails skuDetails);
 
     void consume(@NonNull final ConsumableDetails consumableDetails);
 

@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.billing;
 
-import android.support.annotation.NonNull;
-
-import org.onepf.opfiab.billing.BillingProviderConnection;
-import org.onepf.opfiab.model.BillingProviderInfo;
-
-public interface BillingProvider extends BillingBase {
-
-    @NonNull
-    BillingProviderInfo getInfo();
-
-    @NonNull
-    BillingProviderConnection getConnection();
+public class BillingServiceConnection implements BillingProviderConnection {
 }

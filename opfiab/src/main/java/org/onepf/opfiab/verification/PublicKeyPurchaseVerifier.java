@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.google;
+package org.onepf.opfiab.verification;
 
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.verification.OnVerificationListener;
-import org.onepf.opfiab.verification.PurchaseVerifier;
-import org.onepf.opfiab.verification.VerificationResult;
 
-public class GooglePurchaseVerifier implements PurchaseVerifier {
+public class PublicKeyPurchaseVerifier implements PurchaseVerifier {
 
     @NonNull
-    private final String privateKey;
+    private final String publicKey;
 
-    public GooglePurchaseVerifier(@NonNull final String privateKey) {
-        this.privateKey = privateKey;
+    public PublicKeyPurchaseVerifier(@NonNull final String publicKey) {
+        this.publicKey = publicKey;
     }
 
     @Override

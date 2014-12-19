@@ -22,19 +22,32 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.BaseBillingProvider;
-import org.onepf.opfiab.billing.connection.BillingProviderConnection;
+import org.onepf.opfiab.billing.BillingProviderConnection;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
 import java.util.Collection;
 
 public class GoogleBillingProvider extends BaseBillingProvider {
 
-    public GoogleBillingProvider(
+    @NonNull
+    private static final String NAME = "Google";
+
+    @NonNull
+    private static final String PACKAGE_NAME = "com.google.play";
+
+
+    @NonNull
+    private final GoogleConnection connection = new GoogleConnection();
+
+    @NonNull
+    private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
+
+    protected GoogleBillingProvider(
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
         super(purchaseVerifier, skuResolver);
@@ -43,30 +56,22 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     @NonNull
     @Override
     public BillingProviderInfo getInfo() {
-        return null;
+        return info;
     }
 
     @NonNull
     @Override
     public BillingProviderConnection getConnection() {
-        return null;
+        return connection;
     }
 
     @Override
     public void purchase(@NonNull final Activity activity,
-                         @NonNull final ConsumableDetails consumableDetails) {
-
+                         @NonNull final SkuDetails consumableDetails) {
     }
 
     @Override
-    public void purchase(@NonNull final Activity activity,
-                         @NonNull final SubscriptionDetails subscriptionDetails) {
-
-    }
-
-    @Override
-    public void purchase(@NonNull final Activity activity,
-                         @NonNull final EntitlementDetails entitlementDetails) {
+    public void skuDetails(@NonNull final Collection<String> skus) {
 
     }
 
@@ -77,11 +82,6 @@ public class GoogleBillingProvider extends BaseBillingProvider {
 
     @Override
     public void inventory() {
-
-    }
-
-    @Override
-    public void skuDetails(@NonNull final Collection<String> skus) {
 
     }
 
@@ -99,9 +99,16 @@ public class GoogleBillingProvider extends BaseBillingProvider {
             return new GoogleBillingProvider(purchaseVerifier, skuResolver);
         }
 
-        public <T extends GooglePurchaseVerifier> BaseBillingProvider.Builder purchaseVerifier(
-                @NonNull final T purchaseVerifier) {
-            return super.purchaseVerifier(purchaseVerifier);
+        public Builder purchaseVerifier(
+                @NonNull final PublicKeyPurchaseVerifier purchaseVerifier) {
+            super.purchaseVerifier(purchaseVerifier);
+            return this;
+        }
+
+        @Override
+        public Builder skuResolver(@NonNull final SkuResolver skuResolver) {
+            super.skuResolver(skuResolver);
+            return this;
         }
     }
 }

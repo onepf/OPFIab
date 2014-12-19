@@ -27,9 +27,7 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 
 public abstract class SelfManagedIabHelper extends IabHelperWrapper {
 
@@ -48,11 +46,7 @@ public abstract class SelfManagedIabHelper extends IabHelperWrapper {
         throw new UnsupportedOperationException();
     }
 
-    public abstract void purchase(@NonNull final ConsumableDetails consumableDetails);
-
-    public abstract void purchase(@NonNull final SubscriptionDetails subscriptionDetails);
-
-    public abstract void purchase(@NonNull final EntitlementDetails entitlementDetails);
+    public abstract void purchase(@NonNull final SkuDetails skuDetails);
 
     public void addSetupListener(
             @NonNull final OnSetupListener setupListener) {

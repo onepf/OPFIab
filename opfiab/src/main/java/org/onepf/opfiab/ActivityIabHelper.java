@@ -24,9 +24,7 @@ import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.android.OPFIabSupportFragment;
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
@@ -119,18 +117,8 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
     }
 
     @Override
-    public void purchase(@NonNull final ConsumableDetails consumableDetails) {
-        managedIabHelper.purchase(activity, consumableDetails);
-    }
-
-    @Override
-    public void purchase(@NonNull final SubscriptionDetails subscriptionDetails) {
-        managedIabHelper.purchase(activity, subscriptionDetails);
-    }
-
-    @Override
-    public void purchase(@NonNull final EntitlementDetails entitlementDetails) {
-        managedIabHelper.purchase(activity, entitlementDetails);
+    public void purchase(@NonNull final SkuDetails skuDetails) {
+        managedIabHelper.purchase(activity, skuDetails);
     }
 
     @Override

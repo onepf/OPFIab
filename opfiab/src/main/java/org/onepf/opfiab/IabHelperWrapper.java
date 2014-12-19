@@ -22,8 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 
 import java.util.Collection;
 
@@ -38,20 +37,8 @@ class IabHelperWrapper extends IabHelper {
 
     @Override
     public void purchase(@NonNull final Activity activity,
-                         @NonNull final ConsumableDetails consumableDetails) {
-        iabHelper.purchase(activity, consumableDetails);
-    }
-
-    @Override
-    public void purchase(@NonNull final Activity activity,
-                         @NonNull final SubscriptionDetails subscriptionDetails) {
-        iabHelper.purchase(activity, subscriptionDetails);
-    }
-
-    @Override
-    public void purchase(@NonNull final Activity activity,
-                         @NonNull final EntitlementDetails entitlementDetails) {
-        iabHelper.purchase(activity, entitlementDetails);
+                         @NonNull final SkuDetails skuDetails) {
+        iabHelper.purchase(activity, skuDetails);
     }
 
     @Override

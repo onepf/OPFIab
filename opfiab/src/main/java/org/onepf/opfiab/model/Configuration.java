@@ -16,17 +16,32 @@
 
 package org.onepf.opfiab.model;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+
 public final class Configuration {
+
+    @NonNull
+    private final Collection<BillingProvider> providers;
 
     @Nullable
     private final BillingListener billingListener;
 
-    protected Configuration(@Nullable final BillingListener billingListener) {
+    protected Configuration(@NonNull final Collection<BillingProvider> providers,
+                            @Nullable final BillingListener billingListener) {
+        this.providers = providers;
         this.billingListener = billingListener;
+    }
+
+    @NonNull
+    public Collection<BillingProvider> getProviders() {
+        return providers;
     }
 
     @Nullable
@@ -36,8 +51,16 @@ public final class Configuration {
 
     public static class Builder {
 
+        @NonNull
+        private final Collection<BillingProvider> providers = new LinkedHashSet<>();
+
         @Nullable
         private BillingListener billingListener;
+
+        public Builder addBillingProvider(@NonNull final BillingProvider provider) {
+            providers.add(provider);
+            return this;
+        }
 
         public Builder setBillingListener(@Nullable final BillingListener billingListener) {
             this.billingListener = billingListener;
@@ -45,7 +68,7 @@ public final class Configuration {
         }
 
         public Configuration build() {
-            return new Configuration(billingListener);
+            return new Configuration(providers, billingListener);
         }
     }
 }

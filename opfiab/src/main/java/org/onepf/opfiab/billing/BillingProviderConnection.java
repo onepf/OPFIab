@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.billing.connection;
+package org.onepf.opfiab.billing;
 
-public class BillingServiceConnection implements BillingProviderConnection {
+public interface BillingProviderConnection {
 }

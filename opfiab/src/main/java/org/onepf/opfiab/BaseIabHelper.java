@@ -24,9 +24,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
 import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.request.ConsumeRequest;
 import org.onepf.opfiab.model.event.request.InventoryRequest;
@@ -60,25 +58,8 @@ class BaseIabHelper extends IabHelper {
 
     //TODO lazy initialization queue
     @Override
-    public final void purchase(@NonNull final Activity activity,
-                               @NonNull final ConsumableDetails consumableDetails) {
-        purchase(activity, (SkuDetails) consumableDetails);
-    }
-
-    @Override
-    public final void purchase(@NonNull final Activity activity,
-                               @NonNull final SubscriptionDetails subscriptionDetails) {
-        purchase(activity, (SkuDetails) subscriptionDetails);
-    }
-
-    @Override
-    public final void purchase(@NonNull final Activity activity,
-                               @NonNull final EntitlementDetails entitlementDetails) {
-        purchase(activity, (SkuDetails) entitlementDetails);
-    }
-
-    private void purchase(@NonNull final Activity activity,
-                          @NonNull final SkuDetails skuDetails) {
+    public void purchase(@NonNull final Activity activity,
+                         @NonNull final SkuDetails skuDetails) {
         eventBus.post(new PurchaseRequest(activity, skuDetails));
     }
 

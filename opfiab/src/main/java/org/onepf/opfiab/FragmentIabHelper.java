@@ -24,9 +24,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.android.OPFIabSupportFragment;
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
@@ -120,31 +118,22 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
     }
 
     @Override
-    public void purchase(@NonNull final ConsumableDetails consumableDetails) {
-        managedIabHelper.purchase(getActivity(), consumableDetails);
-    }
-
-    @Override
-    public void purchase(@NonNull final SubscriptionDetails subscriptionDetails) {
-        managedIabHelper.purchase(getActivity(), subscriptionDetails);
-    }
-
-    @Override
-    public void purchase(@NonNull final EntitlementDetails entitlementDetails) {
-        managedIabHelper.purchase(getActivity(), entitlementDetails);
+    public void purchase(@NonNull final SkuDetails skuDetails) {
+        managedIabHelper.purchase(getActivity(), skuDetails);
     }
 
     protected void dispose() {
         eventBus.unregister(eventHandler);
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @NonNull
     private Activity getActivity() {
         Activity activity = null;
-        if (fragment != null) {
-            activity = fragment.getActivity();
-        } else if (supportFragment != null) {
+        if (supportFragment != null) {
             activity = supportFragment.getActivity();
+        } else if (fragment != null) {
+            activity = fragment.getActivity();
         }
         if (activity == null) {
             throw new IllegalStateException("Fragment already detached!");

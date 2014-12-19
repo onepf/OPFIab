@@ -34,6 +34,8 @@ import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public abstract class BaseBillingProvider implements BillingProvider {
 
     @NonNull
@@ -61,6 +63,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
         onActivityResult(activity, requestCode, resultCode, data);
     }
 
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     private void handleRequest(@NonNull final Request request) {
         switch (request.getType()) {
             case CONSUME:
@@ -71,28 +74,44 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
                 final Activity activity = purchaseRequest.getActivity();
                 final SkuDetails skuDetails = purchaseRequest.getSkuDetails();
-                switch (skuDetails.getType()) {
-                    case CONSUMABLE:
-                        purchase(activity, (ConsumableDetails) skuDetails);
-                        break;
-                    case ENTITLEMENT:
-                        purchase(activity, (EntitlementDetails) skuDetails);
-                        break;
-                    case SUBSCRIPTION:
-                        purchase(activity, (SubscriptionDetails) skuDetails);
-                        break;
-                }
+                purchase(activity, skuDetails);
             case SKU_DETAILS:
                 final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
                 skuDetails(skuDetailsRequest.getSkus());
                 break;
             case INVENTORY:
                 @SuppressWarnings("UnusedDeclaration")
+                @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
                 final InventoryRequest inventoryRequest = (InventoryRequest) request;
                 inventory();
                 break;
         }
     }
+
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
+    @Override
+    public void purchase(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
+        switch (skuDetails.getType()) {
+            case CONSUMABLE:
+                purchase(activity, (ConsumableDetails) skuDetails);
+                break;
+            case ENTITLEMENT:
+                purchase(activity, (EntitlementDetails) skuDetails);
+                break;
+            case SUBSCRIPTION:
+                purchase(activity, (SubscriptionDetails) skuDetails);
+                break;
+        }
+    }
+
+    public void purchase(@NonNull final Activity activity,
+                         @NonNull final ConsumableDetails skuDetails) { }
+
+    public void purchase(@NonNull final Activity activity,
+                         @NonNull final EntitlementDetails skuDetails) { }
+
+    public void purchase(@NonNull final Activity activity,
+                         @NonNull final SubscriptionDetails skuDetails) { }
 
 
     public abstract static class Builder {
@@ -103,12 +122,12 @@ public abstract class BaseBillingProvider implements BillingProvider {
         @NonNull
         protected SkuResolver skuResolver = SkuResolver.STUB;
 
-        public <T extends PurchaseVerifier> Builder purchaseVerifier(@NonNull final T purchaseVerifier) {
+        protected Builder purchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;
             return this;
         }
 
-        public Builder skuResolver(@NonNull final SkuResolver skuResolver) {
+        protected Builder skuResolver(@NonNull final SkuResolver skuResolver) {
             this.skuResolver = skuResolver;
             return this;
         }

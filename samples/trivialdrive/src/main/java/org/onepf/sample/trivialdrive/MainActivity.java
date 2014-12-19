@@ -21,11 +21,17 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.SelfManagedIabHelper;
+
 public class MainActivity extends ActionBarActivity {
+
+    private SelfManagedIabHelper iabHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        iabHelper = OPFIab.getHelper(this);
         setContentView(R.layout.activity_main);
     }
 

@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.billing.connection;
+package org.onepf.opfiab.google;
 
-public interface BillingProviderConnection {
+import org.onepf.opfiab.billing.BillingServiceConnection;
+
+public class GoogleConnection extends BillingServiceConnection {
+
+
 }
