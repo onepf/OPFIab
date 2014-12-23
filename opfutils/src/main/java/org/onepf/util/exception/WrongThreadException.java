@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-include ':opfiab'
-include ':opfutils'
+package org.onepf.util.exception;
 
-include ':opfiab-providers:google'
-include ':opfiab-providers:amazon'
+public class WrongThreadException extends IllegalStateException {
 
-include ':samples:trivialdrive'
+    private final boolean mainThreadExpected;
+
+    public WrongThreadException(final boolean mainThreadExpected) {
+        super(mainThreadExpected
+                      ? "Must be called from main thread."
+                      : "Must not be called from main thread.");
+        this.mainThreadExpected = mainThreadExpected;
+    }
+
+    public boolean isMainThreadExpected() {
+        return mainThreadExpected;
+    }
+}

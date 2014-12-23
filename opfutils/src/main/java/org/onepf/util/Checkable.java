@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-include ':opfiab'
-include ':opfutils'
+package org.onepf.util;
 
-include ':opfiab-providers:google'
-include ':opfiab-providers:amazon'
+public interface Checkable {
 
-include ':samples:trivialdrive'
+    boolean check();
+}

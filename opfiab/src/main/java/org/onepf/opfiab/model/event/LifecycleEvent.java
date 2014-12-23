@@ -18,9 +18,6 @@ package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
-/**
- * Created by rzhilich on 12/3/14.
- */
 public class LifecycleEvent {
     public static enum Type {
         CREATE,

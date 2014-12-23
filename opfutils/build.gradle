@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-include ':opfiab'
-include ':opfutils'
+apply plugin: 'java'
 
-include ':opfiab-providers:google'
-include ':opfiab-providers:amazon'
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 
-include ':samples:trivialdrive'
+    compile 'com.google.android:android:2.3.3'
+}

@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-include ':opfiab'
-include ':opfutils'
+package org.onepf.util.exception;
 
-include ':opfiab-providers:google'
-include ':opfiab-providers:amazon'
+public class InitException extends IllegalStateException {
 
-include ':samples:trivialdrive'
+    private final boolean notInit;
+
+    public InitException(final boolean notInit) {
+        super(notInit
+                      ? "You must call init() first."
+                      : "init() was already called.");
+        this.notInit = notInit;
+    }
+}

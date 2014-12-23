@@ -63,7 +63,8 @@ public abstract class BaseBillingProvider implements BillingProvider {
         onActivityResult(activity, requestCode, resultCode, data);
     }
 
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
+    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST", "DLS_DEAD_LOCAL_STORE"})
+    @SuppressWarnings("ConstantConditions")
     private void handleRequest(@NonNull final Request request) {
         switch (request.getType()) {
             case CONSUME:
@@ -81,7 +82,6 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 break;
             case INVENTORY:
                 @SuppressWarnings("UnusedDeclaration")
-                @SuppressFBWarnings("DLS_DEAD_LOCAL_STORE")
                 final InventoryRequest inventoryRequest = (InventoryRequest) request;
                 inventory();
                 break;
