@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.billing;
+package org.onepf.opfiab;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.BillingProvider;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
 import org.onepf.opfiab.model.billing.EntitlementDetails;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -31,12 +30,17 @@ import org.onepf.opfiab.model.event.request.InventoryRequest;
 import org.onepf.opfiab.model.event.request.PurchaseRequest;
 import org.onepf.opfiab.model.event.request.Request;
 import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
+import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
+import de.greenrobot.event.EventBus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public abstract class BaseBillingProvider implements BillingProvider {
+
+    @NonNull
+    private final EventBus eventBus = OPFIab.getEventBus();
 
     @NonNull
     private final PurchaseVerifier purchaseVerifier;
@@ -86,6 +90,10 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 inventory();
                 break;
         }
+    }
+
+    protected final void postResponse(@NonNull final Response response) {
+        eventBus.post(response);
     }
 
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")

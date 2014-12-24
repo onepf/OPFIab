@@ -21,7 +21,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.billing.BaseBillingProvider;
+import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingProviderConnection;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.ConsumableDetails;

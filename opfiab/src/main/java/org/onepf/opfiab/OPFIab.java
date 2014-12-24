@@ -25,8 +25,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.util.Checkable;
-import org.onepf.util.OPFChecks;
+import org.onepf.opfutils.Checkable;
+import org.onepf.opfutils.OPFChecks;
 
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.EventBusBuilder;
@@ -46,7 +46,7 @@ public final class OPFIab {
 
     private static Configuration configuration;
 
-    private static final Checkable OPFIAB_INIT = new Checkable() {
+    private static final Checkable CHECK_INIT = new Checkable() {
         @Override
         public boolean check() {
             return baseIabHelper == null;
@@ -70,7 +70,7 @@ public final class OPFIab {
     @NonNull
     static BaseIabHelper getBaseHelper() {
         OPFChecks.checkThread(true);
-        OPFChecks.checkInit(OPFIAB_INIT, true);
+        OPFChecks.checkInit(CHECK_INIT, true);
         return baseIabHelper;
     }
 
@@ -110,14 +110,14 @@ public final class OPFIab {
     @Nullable
     public static BillingProvider getCurrentProvider() {
         OPFChecks.checkThread(true);
-        OPFChecks.checkInit(OPFIAB_INIT, true);
+        OPFChecks.checkInit(CHECK_INIT, true);
         return null;
     }
 
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
-        OPFChecks.checkInit(OPFIAB_INIT, false);
+        OPFChecks.checkInit(CHECK_INIT, false);
         OPFIab.configuration = configuration;
         baseIabHelper = new BaseIabHelper(context, configuration);
     }

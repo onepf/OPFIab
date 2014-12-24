@@ -15,7 +15,6 @@
  */
 
 include ':opfiab'
-include ':opfutils'
 
 include ':opfiab-providers:google'
 include ':opfiab-providers:amazon'

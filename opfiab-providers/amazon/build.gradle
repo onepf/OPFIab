@@ -15,6 +15,7 @@
  */
 
 apply plugin: 'idea'
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 
 android {
@@ -47,17 +48,17 @@ android {
     }
 }
 
-apply plugin: 'android-checkstyle'
-androidCheckstyle {
-    abortOnError true
-    config rootProject.file('.idea/analyzers/checkstyle/checkstyle.xml')
-}
-
-apply plugin: 'android-pmd'
-androidPmd {
-    abortOnError false
-    config rootProject.file('.idea/analyzers/pmd/ruleset.xml')
-}
+//apply plugin: 'android-checkstyle'
+//androidCheckstyle {
+//    abortOnError true
+//    config rootProject.file('.idea/analyzers/checkstyle/checkstyle.xml')
+//}
+//
+//apply plugin: 'android-pmd'
+//androidPmd {
+//    abortOnError false
+//    config rootProject.file('.idea/analyzers/pmd/ruleset.xml')
+//}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
