@@ -20,7 +20,7 @@
 
     <application>
         <activity
-            android:name=".android.OPFIabActivity"
+            android:name=".OPFIabActivity"
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.NoDisplay"/>
     </application>

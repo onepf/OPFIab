@@ -36,6 +36,11 @@ class IabHelperWrapper extends IabHelper {
     }
 
     @Override
+    public void setup() {
+        iabHelper.setup();
+    }
+
+    @Override
     public void purchase(@NonNull final Activity activity,
                          @NonNull final SkuDetails skuDetails) {
         iabHelper.purchase(activity, skuDetails);

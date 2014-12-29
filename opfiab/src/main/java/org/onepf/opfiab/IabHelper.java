@@ -30,4 +30,6 @@ public abstract class IabHelper implements BillingBase {
     public final void skuDetails(@NonNull final String... skus) {
         skuDetails(Arrays.asList(skus));
     }
+
+    public abstract void setup();
 }

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
-class BaseIabHelper extends IabHelper {
+final class BaseIabHelper extends IabHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseIabHelper.class);
 
@@ -54,6 +54,11 @@ class BaseIabHelper extends IabHelper {
         this.configuration = configuration;
         this.globalBillingListener = new GlobalBillingListener(
                 configuration.getBillingListener());
+    }
+
+    @Override
+    public void setup() {
+        //TODO
     }
 
     //TODO lazy initialization queue

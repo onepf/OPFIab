@@ -37,7 +37,7 @@ import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-// TODO: think about filter for listeners.
+//TODO: think about filter for listeners.
 public class ManagedIabHelper extends IabHelperWrapper {
 
     @NonNull

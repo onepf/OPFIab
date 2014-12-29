@@ -77,12 +77,4 @@ public abstract class SelfManagedIabHelper extends IabHelperWrapper {
             @NonNull final BillingListener billingListener) {
         managedIabHelper.addBillingListener(billingListener);
     }
-
-    protected void dispose() { }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        dispose();
-    }
 }

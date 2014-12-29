@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.android;
+package org.onepf.opfiab;
 
 import android.app.Activity;
 import android.content.Context;
@@ -25,7 +25,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.slf4j.Logger;
@@ -42,9 +41,9 @@ import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
 
 public class OPFIabActivity extends Activity {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OPFIabActivity.class);
-
     protected static final int FINISH_DELAY = 3000;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OPFIabActivity.class);
 
     public static void start(@NonNull final Context context) {
         final Context applicationContext = context.getApplicationContext();

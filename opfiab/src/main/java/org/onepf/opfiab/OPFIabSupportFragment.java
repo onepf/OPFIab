@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.android;
+package org.onepf.opfiab;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 
-import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 

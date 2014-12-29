@@ -22,16 +22,16 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.android.OPFIabFragment;
-import org.onepf.opfiab.android.OPFIabSupportFragment;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
 import static org.onepf.opfiab.OPFIab.FRAGMENT_TAG;
+import static org.onepf.opfiab.model.event.LifecycleEvent.Type;
 
 public class FragmentIabHelper extends SelfManagedIabHelper {
 
+    @SuppressWarnings("FieldCanBeLocal")
     @NonNull
     private final Object eventHandler = new Object() {
 
@@ -39,29 +39,23 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
             if (opfFragment != event.getFragment()) {
                 return;
             }
-            switch (event.getType()) {
-                case ATTACH:
-                    managedIabHelper.subscribe();
-                    break;
-                case DETACH:
-                    managedIabHelper.unsubscribe();
-                    dispose();
-                    break;
-            }
+            handleLifecycle(event.getType());
         }
 
         public void onEvent(@NonNull final SupportFragmentLifecycleEvent event) {
             if (opfFragment != event.getFragment()) {
                 return;
             }
-            switch (event.getType()) {
-                case ATTACH:
-                    managedIabHelper.subscribe();
-                    break;
-                case DETACH:
-                    managedIabHelper.unsubscribe();
-                    dispose();
-                    break;
+            handleLifecycle(event.getType());
+        }
+
+        private void handleLifecycle(@NonNull final Type type) {
+            if (type == Type.ATTACH) {
+                managedIabHelper.subscribe();
+            } else if (type == Type.DETACH) {
+                managedIabHelper.unsubscribe();
+            } else if (type == Type.DESTROY) {
+                eventBus.unregister(this);
             }
         }
     };
@@ -76,15 +70,22 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
     private final ManagedIabHelper managedIabHelper;
 
     @NonNull
-    private final Object opfFragment;
+    private Object opfFragment;
+
+    private FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
+                              @Nullable final android.app.Fragment fragment,
+                              @Nullable final android.support.v4.app.Fragment supportFragment) {
+        super(managedIabHelper);
+        this.managedIabHelper = managedIabHelper;
+        this.fragment = fragment;
+        this.supportFragment = supportFragment;
+        eventBus.register(eventHandler);
+    }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                       @NonNull final android.app.Fragment fragment) {
-        super(managedIabHelper);
-        this.managedIabHelper = managedIabHelper;
-        this.fragment = fragment;
-        this.supportFragment = null;
+        this(managedIabHelper, fragment, null);
 
         android.app.Fragment opfFragment;
         final android.app.FragmentManager fragmentManager = fragment.getChildFragmentManager();
@@ -100,10 +101,7 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
 
     FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                       @NonNull final android.support.v4.app.Fragment supportFragment) {
-        super(managedIabHelper);
-        this.managedIabHelper = managedIabHelper;
-        this.fragment = null;
-        this.supportFragment = supportFragment;
+        this(managedIabHelper, null, supportFragment);
 
         android.support.v4.app.Fragment opfFragment;
         final android.support.v4.app.FragmentManager fragmentManager = supportFragment.getChildFragmentManager();
@@ -120,10 +118,6 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
     @Override
     public void purchase(@NonNull final SkuDetails skuDetails) {
         managedIabHelper.purchase(getActivity(), skuDetails);
-    }
-
-    protected void dispose() {
-        eventBus.unregister(eventHandler);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

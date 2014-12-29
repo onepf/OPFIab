@@ -28,6 +28,8 @@ import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfutils.Checkable;
 import org.onepf.opfutils.OPFChecks;
 
+import java.util.concurrent.ExecutorService;
+
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.EventBusBuilder;
 
@@ -54,14 +56,14 @@ public final class OPFIab {
     };
 
     @NonNull
-    public static EventBus getEventBus() {
-        OPFChecks.checkThread(true);
-        //TODO cyclic dependency
+    static EventBus getEventBus() {
         if (eventBus == null) {
             final EventBusBuilder builder = EventBus.builder();
             builder.eventInheritance(true);
-            //TODO executorService
-            //        builder.executorService()
+            final ExecutorService executorService;
+            if ((executorService = configuration.getExecutorService()) != null) {
+                builder.executorService(executorService);
+            }
             eventBus = builder.build();
         }
         return eventBus;
@@ -120,9 +122,5 @@ public final class OPFIab {
         OPFChecks.checkInit(CHECK_INIT, false);
         OPFIab.configuration = configuration;
         baseIabHelper = new BaseIabHelper(context, configuration);
-    }
-
-    public static void setup() {
-
     }
 }

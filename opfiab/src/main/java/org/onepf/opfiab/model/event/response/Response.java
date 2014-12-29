@@ -23,6 +23,7 @@ import org.onepf.opfiab.model.event.BillingEvent;
 public abstract class Response extends BillingEvent {
 
     public enum Status {
+
         SUCCESS,
         PENDING,
         USER_CANCELED,
@@ -36,7 +37,7 @@ public abstract class Response extends BillingEvent {
     private final Status status;
 
     protected Response(@NonNull final Type type,
-             @NonNull final Status status) {
+                       @NonNull final Status status) {
         super(type);
         this.status = status;
     }
