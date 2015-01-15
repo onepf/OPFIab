@@ -16,5 +16,6 @@
 
 package org.onepf.opfiab.billing;
 
-public class BillingServiceConnection implements BillingProviderConnection {
+public abstract class ServiceBillingController implements BillingController {
+
 }

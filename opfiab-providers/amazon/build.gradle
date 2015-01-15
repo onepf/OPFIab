@@ -48,18 +48,10 @@ android {
     }
 }
 
-//apply plugin: 'android-checkstyle'
-//androidCheckstyle {
-//    abortOnError true
-//    config rootProject.file('.idea/analyzers/checkstyle/checkstyle.xml')
-//}
-//
-//apply plugin: 'android-pmd'
-//androidPmd {
-//    abortOnError false
-//    config rootProject.file('.idea/analyzers/pmd/ruleset.xml')
-//}
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    provided 'com.amazon:in-app-purchasing:2.0.1'
+
+    compile project(':opfiab')
 }

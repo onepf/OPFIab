@@ -41,7 +41,7 @@ final class BaseIabHelper extends IabHelper {
 
 
     @NonNull
-    private final Context context;
+    private final Context context = OPFIab.getContext();
 
     @NonNull
     private final Configuration configuration;
@@ -49,8 +49,7 @@ final class BaseIabHelper extends IabHelper {
     @NonNull
     private final GlobalBillingListener globalBillingListener;
 
-    BaseIabHelper(@NonNull final Context context, @NonNull final Configuration configuration) {
-        this.context = context.getApplicationContext();
+    BaseIabHelper(@NonNull final Configuration configuration) {
         this.configuration = configuration;
         this.globalBillingListener = new GlobalBillingListener(
                 configuration.getBillingListener());

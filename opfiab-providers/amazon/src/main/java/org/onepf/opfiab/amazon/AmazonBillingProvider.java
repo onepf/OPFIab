@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.google;
+package org.onepf.opfiab.amazon;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -24,26 +24,23 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.sku.SkuResolver;
-import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
 import java.util.Collection;
 
-public class GoogleBillingProvider extends BaseBillingProvider {
+public class AmazonBillingProvider extends BaseBillingProvider {
 
     @NonNull
-    private static final String NAME = "Google";
+    private static final String NAME = "Amazon";
 
     @NonNull
-    private static final String PACKAGE_NAME = "com.google.play";
+    private static final String PACKAGE_NAME = "com.amazon.venezia";
 
 
-    @NonNull
-    private final GoogleBillingController controller = new GoogleBillingController();
+    private final AmazonBillingController controller = new AmazonBillingController();
 
-    protected GoogleBillingProvider(
+    protected AmazonBillingProvider(
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
         super(purchaseVerifier, skuResolver);
@@ -55,7 +52,7 @@ public class GoogleBillingProvider extends BaseBillingProvider {
         return NAME;
     }
 
-    @NonNull
+    @Nullable
     @Override
     public String getPackageName() {
         return PACKAGE_NAME;
@@ -65,16 +62,6 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     @Override
     public BillingController getController() {
         return controller;
-    }
-
-    @Override
-    public void purchase(@NonNull final Activity activity,
-                         @NonNull final SkuDetails consumableDetails) {
-    }
-
-    @Override
-    public void skuDetails(@NonNull final Collection<String> skus) {
-
     }
 
     @Override
@@ -88,29 +75,13 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     }
 
     @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode, @Nullable final Intent data) {
+    public void skuDetails(@NonNull final Collection<String> skus) {
 
     }
 
+    @Override
+    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
+                                 final int resultCode, @Nullable final Intent data) {
 
-    public static class Builder extends BaseBillingProvider.Builder {
-
-        @Override
-        public GoogleBillingProvider build() {
-            return new GoogleBillingProvider(purchaseVerifier, skuResolver);
-        }
-
-        public Builder purchaseVerifier(
-                @NonNull final PublicKeyPurchaseVerifier purchaseVerifier) {
-            super.purchaseVerifier(purchaseVerifier);
-            return this;
-        }
-
-        @Override
-        public Builder skuResolver(@NonNull final SkuResolver skuResolver) {
-            super.skuResolver(skuResolver);
-            return this;
-        }
     }
 }

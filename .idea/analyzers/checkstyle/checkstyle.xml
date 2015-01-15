@@ -34,6 +34,8 @@
 
     <module name="TreeWalker">
 
+        <module name="FileContentsHolder"/>
+
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
         <module name="JavadocMethod">
@@ -178,16 +180,5 @@
 
     </module>
 
-    <!-- Enable suppression comments -->
-    <module name="SuppressionCommentFilter">
-        <property name="offCommentFormat" value="CHECKSTYLE IGNORE\s+(\S+)" />
-        <property name="onCommentFormat" value="CHECKSTYLE END IGNORE\s+(\S+)" />
-        <property name="checkFormat" value="$1" />
-    </module>
-    <module name="SuppressWithNearbyCommentFilter">
-        <property name="commentFormat" value="SUPPRESS CHECKSTYLE (\w+)" />
-        <property name="checkFormat" value="$1" />
-        <property name="influenceFormat" value="1" />
-    </module>
-
+    <module name="SuppressionCommentFilter"/>
 </module>

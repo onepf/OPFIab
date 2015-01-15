@@ -16,9 +16,12 @@
 
 package org.onepf.opfiab.google;
 
-import org.onepf.opfiab.billing.BillingServiceConnection;
+import org.onepf.opfiab.billing.ServiceBillingController;
 
-public class GoogleConnection extends BillingServiceConnection {
+public class GoogleBillingController extends ServiceBillingController {
 
-
+    @Override
+    public boolean isBillingSupported() {
+        return false;
+    }
 }

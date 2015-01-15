@@ -16,16 +16,28 @@
 
 package org.onepf.opfiab;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.billing.BillingProviderConnection;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.billing.BillingController;
 
 public interface BillingProvider extends BillingBase {
 
     @NonNull
-    BillingProviderInfo getInfo();
+    String getName();
+
+    @Nullable
+    String getPackageName();
 
     @NonNull
-    BillingProviderConnection getConnection();
+    BillingController getController();
+
+    boolean isAvailable();
+
+    @Nullable
+    Intent getStorePageIntent();
+
+    @Nullable
+    Intent getRateItIntent();
 }

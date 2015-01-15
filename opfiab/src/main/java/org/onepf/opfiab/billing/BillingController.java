@@ -16,5 +16,7 @@
 
 package org.onepf.opfiab.billing;
 
-public interface BillingProviderConnection {
+public interface BillingController {
+
+    boolean isBillingSupported();
 }

@@ -27,6 +27,7 @@ public class SetupEvent extends BillingEvent {
 
         SUCCESS,
         FAILED,
+        UNAUTHORISED,
         PROVIDER_CHANGED,
     }
 

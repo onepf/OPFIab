@@ -49,18 +49,6 @@ android {
     }
 }
 
-//apply plugin: 'android-checkstyle'
-//androidCheckstyle {
-//    abortOnError true
-//    config  rootProject.file('.idea/analyzers/checkstyle/checkstyle.xml')
-//}
-//
-//apply plugin: 'android-pmd'
-//androidPmd {
-//    abortOnError false
-//    config rootProject.file('.idea/analyzers/pmd/ruleset.xml')
-//}
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //noinspection GradleDependency

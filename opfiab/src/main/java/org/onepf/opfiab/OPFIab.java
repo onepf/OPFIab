@@ -46,6 +46,8 @@ public final class OPFIab {
 
     private static EventBus eventBus;
 
+    private static Context context;
+
     private static Configuration configuration;
 
     private static final Checkable CHECK_INIT = new Checkable() {
@@ -74,6 +76,11 @@ public final class OPFIab {
         OPFChecks.checkThread(true);
         OPFChecks.checkInit(CHECK_INIT, true);
         return baseIabHelper;
+    }
+
+    @NonNull
+    public static Context getContext() {
+        return context;
     }
 
     @NonNull
@@ -120,7 +127,8 @@ public final class OPFIab {
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
         OPFChecks.checkInit(CHECK_INIT, false);
+        OPFIab.context = context.getApplicationContext();
         OPFIab.configuration = configuration;
-        baseIabHelper = new BaseIabHelper(context, configuration);
+        baseIabHelper = new BaseIabHelper(configuration);
     }
 }
