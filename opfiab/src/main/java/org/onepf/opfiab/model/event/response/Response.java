@@ -31,6 +31,7 @@ public abstract class Response extends BillingEvent {
         ITEM_UNAVAILABLE,
         ITEM_ALREADY_OWNED,
         SUBSCRIPTIONS_NOT_SUPPORTED,
+        UNAUTHORISED,
     }
 
     @NonNull

@@ -16,11 +16,14 @@
 
 package org.onepf.opfiab.amazon;
 
+import android.support.annotation.Nullable;
+
 import com.amazon.device.iap.PurchasingListener;
 import com.amazon.device.iap.PurchasingService;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.PurchaseResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
+import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
 import org.onepf.opfiab.OPFIab;
@@ -28,27 +31,61 @@ import org.onepf.opfiab.billing.BillingController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.CountDownLatch;
-
 public class AmazonBillingController implements BillingController, PurchasingListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmazonBillingController.class);
 
 
-    private volatile CountDownLatch userDataLatch;
+    //    @NonNull
+    //    private final Lock userDataLock = new ReentrantLock();
+    //    @Nullable
+    //    private volatile Condition userDataReady;
+    @Nullable
+    private volatile UserData userData;
 
     public AmazonBillingController() {
         PurchasingService.registerListener(OPFIab.getContext(), this);
     }
 
-    @Override
-    public boolean isBillingSupported() {
-        return true;
-    }
+    //    public UserData getUserData() {
+    //        userDataLock.lock();
+    //        try {
+    //            if (userDataReady == null) {
+    //                userDataReady = userDataLock.newCondition();
+    //                PurchasingService.getUserData();
+    //            }
+    //            while (userDataReady != null) {
+    //                userDataReady.await();
+    //            }
+    //            return userData;
+    //        } catch (InterruptedException exception) {
+    //            LOGGER.error("UserData request interrupted.", exception);
+    //            return null;
+    //        } finally {
+    //            userDataLock.unlock();
+    //        }
+    //    }
+    //
+    //    private final Runnable userDataRunnable = new Runnable() {
+    //        @Override
+    //        public void run() {
+    //            try {
+    //                if (userDataLock.tryLock()) {
+    //                    userDataReady.signalAll();
+    //                    userDataReady = null;
+    //                } else {
+    //                    OPFUtils.post(this);
+    //                }
+    //            } finally {
+    //                userDataLock.unlock();
+    //            }
+    //        }
+    //    };
 
     @Override
     public void onUserDataResponse(final UserDataResponse userDataResponse) {
-
+        //        userData = userDataResponse.getUserData();
+        //        userDataRunnable.run();
     }
 
     @Override
@@ -66,6 +103,15 @@ public class AmazonBillingController implements BillingController, PurchasingLis
 
     }
 
+    @Override
+    public boolean isBillingSupported() {
+        return true;
+    }
+
+    @Override
+    public boolean isAuthorised() {
+        return false;
+    }
 
 
 }

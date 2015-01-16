@@ -19,4 +19,6 @@ package org.onepf.opfiab.billing;
 public interface BillingController {
 
     boolean isBillingSupported();
+
+    boolean isAuthorised();
 }

@@ -80,7 +80,16 @@ public final class OPFIab {
 
     @NonNull
     public static Context getContext() {
+        OPFChecks.checkThread(true);
+        OPFChecks.checkInit(CHECK_INIT, true);
         return context;
+    }
+
+    @NonNull
+    public static Configuration getConfiguration() {
+        OPFChecks.checkThread(true);
+        OPFChecks.checkInit(CHECK_INIT, true);
+        return configuration;
     }
 
     @NonNull
@@ -129,6 +138,6 @@ public final class OPFIab {
         OPFChecks.checkInit(CHECK_INIT, false);
         OPFIab.context = context.getApplicationContext();
         OPFIab.configuration = configuration;
-        baseIabHelper = new BaseIabHelper(configuration);
+        baseIabHelper = new BaseIabHelper();
     }
 }
