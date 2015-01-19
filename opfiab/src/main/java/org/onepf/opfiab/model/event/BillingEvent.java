@@ -18,7 +18,11 @@ package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
+import java.util.Random;
+
 public class BillingEvent {
+
+    private static final Random RANDOM = new Random();
 
     public static enum Type {
         SETUP,
@@ -30,6 +34,8 @@ public class BillingEvent {
     }
 
 
+    private final int id = RANDOM.nextInt();
+
     @NonNull
     private final Type type;
 
@@ -37,8 +43,35 @@ public class BillingEvent {
         this.type = type;
     }
 
+    public int getId() {
+        return id;
+    }
+
     @NonNull
     public Type getType() {
         return type;
     }
+
+    //CHECKSTYLE:OFF
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BillingEvent)) return false;
+
+        final BillingEvent that = (BillingEvent) o;
+
+        if (id != that.id) return false;
+        //noinspection RedundantIfStatement
+        if (type != that.type) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + type.hashCode();
+        return result;
+    }
+    //CHECKSTYLE:ON
 }

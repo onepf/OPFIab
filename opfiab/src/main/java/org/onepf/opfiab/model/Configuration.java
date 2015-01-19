@@ -25,7 +25,6 @@ import org.onepf.opfiab.listener.BillingListener;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.concurrent.ExecutorService;
 
 public final class Configuration {
 
@@ -35,15 +34,14 @@ public final class Configuration {
     @Nullable
     private final BillingListener billingListener;
 
-    @Nullable
-    private final ExecutorService executorService;
+    private final boolean skipUnauthorised;
 
-    protected Configuration(@NonNull final Collection<BillingProvider> providers,
-                            @Nullable final BillingListener billingListener,
-                            @Nullable final ExecutorService executorService) {
+    private Configuration(@NonNull final Collection<BillingProvider> providers,
+                          @Nullable final BillingListener billingListener,
+                          final boolean skipUnauthorised) {
         this.providers = Collections.unmodifiableCollection(providers);
         this.billingListener = billingListener;
-        this.executorService = executorService;
+        this.skipUnauthorised = skipUnauthorised;
     }
 
     @NonNull
@@ -56,9 +54,8 @@ public final class Configuration {
         return billingListener;
     }
 
-    @Nullable
-    public ExecutorService getExecutorService() {
-        return executorService;
+    public boolean isSkipUnauthorised() {
+        return skipUnauthorised;
     }
 
     public static class Builder {
@@ -69,8 +66,7 @@ public final class Configuration {
         @Nullable
         private BillingListener billingListener;
 
-        @Nullable
-        private ExecutorService executorService;
+        private boolean skipUnauthorised = false;
 
         public Builder addBillingProvider(@NonNull final BillingProvider provider) {
             providers.add(provider);
@@ -82,13 +78,12 @@ public final class Configuration {
             return this;
         }
 
-        public Builder setExecutorService(@Nullable final ExecutorService executorService) {
-            this.executorService = executorService;
-            return this;
+        public void setSkipUnauthorised(final boolean skipUnauthorised) {
+            this.skipUnauthorised = skipUnauthorised;
         }
 
         public Configuration build() {
-            return new Configuration(providers, billingListener, executorService);
+            return new Configuration(providers, billingListener, skipUnauthorised);
         }
     }
 }

@@ -59,7 +59,7 @@ final class BaseIabHelper extends IabHelper {
         //TODO
     }
 
-    //TODO lazy initialization queue
+    //TODO ID based pending request queue
     @Override
     public void purchase(@NonNull final Activity activity,
                          @NonNull final SkuDetails skuDetails) {

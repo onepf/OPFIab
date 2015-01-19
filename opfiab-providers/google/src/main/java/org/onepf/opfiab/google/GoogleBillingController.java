@@ -21,6 +21,11 @@ import org.onepf.opfiab.billing.ServiceBillingController;
 public class GoogleBillingController extends ServiceBillingController {
 
     @Override
+    public boolean isAuthorised() {
+        return true;
+    }
+
+    @Override
     public boolean isBillingSupported() {
         return false;
     }

@@ -28,7 +28,7 @@ import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfutils.Checkable;
 import org.onepf.opfutils.OPFChecks;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.EventBusBuilder;
@@ -59,13 +59,12 @@ public final class OPFIab {
 
     @NonNull
     static EventBus getEventBus() {
+        OPFChecks.checkThread(true);
+        OPFChecks.checkInit(CHECK_INIT, true);
         if (eventBus == null) {
             final EventBusBuilder builder = EventBus.builder();
             builder.eventInheritance(true);
-            final ExecutorService executorService;
-            if ((executorService = configuration.getExecutorService()) != null) {
-                builder.executorService(executorService);
-            }
+            builder.executorService(Executors.newSingleThreadExecutor());
             eventBus = builder.build();
         }
         return eventBus;

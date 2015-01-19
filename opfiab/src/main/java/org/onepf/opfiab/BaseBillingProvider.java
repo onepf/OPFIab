@@ -135,6 +135,10 @@ public abstract class BaseBillingProvider implements BillingProvider {
                          @NonNull final SubscriptionDetails skuDetails) { }
 
     @Override
+    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
+                                 final int resultCode, @Nullable final Intent data) { }
+
+    @Override
     public boolean isAvailable() {
         if (packageName == null) {
             throw new UnsupportedOperationException(

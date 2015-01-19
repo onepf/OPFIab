@@ -17,13 +17,13 @@
 package org.onepf.opfiab.amazon;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
@@ -65,6 +65,11 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     @Override
+    public void purchase(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
+
+    }
+
+    @Override
     public void consume(@NonNull final ConsumableDetails consumableDetails) {
 
     }
@@ -76,12 +81,6 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
     @Override
     public void skuDetails(@NonNull final Collection<String> skus) {
-
-    }
-
-    @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode, @Nullable final Intent data) {
 
     }
 }
