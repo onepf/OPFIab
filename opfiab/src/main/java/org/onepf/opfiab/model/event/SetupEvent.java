@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.BillingProvider;
 
-public class SetupEvent extends BillingEvent {
+public class SetupEvent {
 
     public static enum SetupStatus {
 
@@ -40,7 +40,6 @@ public class SetupEvent extends BillingEvent {
 
     public SetupEvent(@NonNull final SetupStatus setupStatus,
                       @Nullable final BillingProvider billingProvider) {
-        super(Type.SETUP);
         this.setupStatus = setupStatus;
         this.billingProvider = billingProvider;
     }

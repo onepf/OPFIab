@@ -19,6 +19,7 @@ package org.onepf.opfiab.model.event.response;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.BillingEvent;
+import org.onepf.opfiab.model.event.request.Request;
 
 public abstract class Response extends BillingEvent {
 
@@ -32,15 +33,30 @@ public abstract class Response extends BillingEvent {
         ITEM_ALREADY_OWNED,
         SUBSCRIPTIONS_NOT_SUPPORTED,
         UNAUTHORISED,
+        UNKNOWN_ERROR,
     }
 
     @NonNull
     private final Status status;
 
-    protected Response(@NonNull final Type type,
+    @NonNull
+    private final Request request;
+
+    protected Response(@NonNull final Request request,
                        @NonNull final Status status) {
-        super(type);
+        super(request.getType());
+        this.request = request;
         this.status = status;
+    }
+
+    @NonNull
+    public Request getRequest() {
+        return request;
+    }
+
+    @Override
+    public int getId() {
+        return request.getId();
     }
 
     @NonNull

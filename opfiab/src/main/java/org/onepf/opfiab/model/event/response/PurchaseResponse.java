@@ -17,21 +17,31 @@
 package org.onepf.opfiab.model.event.response;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.request.PurchaseRequest;
 
-public abstract class PurchaseResponse extends Response {
+public class PurchaseResponse extends Response {
 
-    @NonNull
+    @Nullable
     private final Purchase purchase;
 
-    public PurchaseResponse(@NonNull final Status status, @NonNull final Purchase purchase) {
-        super(Type.PURCHASE, status);
+    public PurchaseResponse(@NonNull final PurchaseRequest request,
+                            @NonNull final Status status,
+                            @Nullable final Purchase purchase) {
+        super(request, status);
         this.purchase = purchase;
     }
 
-    @NonNull
+    @Nullable
     public Purchase getPurchase() {
         return purchase;
+    }
+
+    @NonNull
+    @Override
+    public PurchaseRequest getRequest() {
+        return (PurchaseRequest) super.getRequest();
     }
 }

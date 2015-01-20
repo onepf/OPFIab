@@ -22,7 +22,8 @@ import android.text.TextUtils;
 
 import com.amazon.device.iap.PurchasingListener;
 import com.amazon.device.iap.PurchasingService;
-import com.amazon.device.iap.model.Product;
+import com.amazon.device.iap.internal.model.PurchaseUpdatesResponseBuilder;
+import com.amazon.device.iap.model.FulfillmentResult;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.PurchaseResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
@@ -37,9 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -53,15 +52,14 @@ final class AmazonBillingController implements BillingController {
 
     @Nullable
     private volatile UserData userData;
-
-    @Nullable
-    private volatile Map<String, Product> productData;
-
-    @Nullable
-    private volatile List<Receipt> purchaseUpdates;
-
-    @Nullable
-    private volatile Receipt purchase;
+    @NonNull
+    private volatile ProductDataResponse productData;
+    @NonNull
+    private volatile PurchaseResponse purchase;
+    @NonNull
+    private volatile PurchaseUpdatesResponse purchaseUpdates;
+    @NonNull
+    private volatile List<Receipt> receipts;
 
     public AmazonBillingController() {
         PurchasingService.registerListener(OPFIab.getContext(), new Listener());
@@ -93,31 +91,33 @@ final class AmazonBillingController implements BillingController {
         return userData;
     }
 
-    @Nullable
-    Map<String, Product> getProductData(@NonNull final Set<String> skus) {
+    @NonNull
+    ProductDataResponse getProductData(@NonNull final Set<String> skus) {
         checkState();
-        productData = new HashMap<>();
         PurchasingService.getProductData(skus);
         semaphore.acquireUninterruptibly();
         return productData;
     }
 
-    @Nullable
-    List<Receipt> getPurchaseUpdates() {
+    @NonNull
+    PurchaseUpdatesResponse getPurchaseUpdates() {
         checkState();
-        purchaseUpdates = new ArrayList<>();
+        receipts = new ArrayList<>();
         PurchasingService.getPurchaseUpdates(true);
         semaphore.acquireUninterruptibly();
         return purchaseUpdates;
     }
 
-    @Nullable
-    Receipt getPurchase(@NonNull final String sku) {
+    @NonNull
+    PurchaseResponse getPurchase(@NonNull final String sku) {
         checkState();
-        purchase = null;
         PurchasingService.purchase(sku);
         semaphore.acquireUninterruptibly();
         return purchase;
+    }
+
+    void consume(@NonNull final String sku) {
+        PurchasingService.notifyFulfillment(sku, FulfillmentResult.FULFILLED);
     }
 
     private final class Listener implements PurchasingListener {
@@ -140,67 +140,34 @@ final class AmazonBillingController implements BillingController {
 
         @Override
         public void onProductDataResponse(@NonNull final ProductDataResponse productDataResponse) {
-            final ProductDataResponse.RequestStatus requestStatus;
-            switch (requestStatus = productDataResponse.getRequestStatus()) {
-                case SUCCESSFUL:
-                    //noinspection ConstantConditions
-                    productData.putAll(productDataResponse.getProductData());
-                    final Collection<String> unavailableSkus = productDataResponse.getUnavailableSkus();
-                    for (final String sku : unavailableSkus) {
-                        //noinspection ConstantConditions
-                        productData.put(sku, null);
-                    }
-                    break;
-                case FAILED:
-                case NOT_SUPPORTED:
-                    productData = null;
-                    LOGGER.error("Product data request failed.", requestStatus,
-                                 productDataResponse);
-                    break;
-            }
+            productData = productDataResponse;
             semaphore.release();
         }
 
         @Override
         public void onPurchaseResponse(@NonNull final PurchaseResponse purchaseResponse) {
-            final PurchaseResponse.RequestStatus requestStatus;
-            //TODO handle all response codes. Manually construct receipt.
-            switch (requestStatus = purchaseResponse.getRequestStatus()) {
-                case SUCCESSFUL:
-                    purchase = purchaseResponse.getReceipt();
-                    break;
-                case INVALID_SKU:
-                    break;
-                case ALREADY_PURCHASED:
-                    break;
-                case FAILED:
-                case NOT_SUPPORTED:
-                    purchase = null;
-                    LOGGER.error("Purchase request failed.", requestStatus, purchaseResponse);
-                    break;
-            }
+            purchase = purchaseResponse;
             semaphore.release();
         }
 
         @Override
         public void onPurchaseUpdatesResponse(
                 @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-            final PurchaseUpdatesResponse.RequestStatus requestStatus;
-            switch (requestStatus = purchaseUpdatesResponse.getRequestStatus()) {
-                case SUCCESSFUL:
-                    //noinspection ConstantConditions
-                    purchaseUpdates.addAll(purchaseUpdatesResponse.getReceipts());
-                    if (purchaseUpdatesResponse.hasMore()) {
-                        PurchasingService.getPurchaseUpdates(true);
-                        return;
-                    }
-                    break;
-                case FAILED:
-                case NOT_SUPPORTED:
-                    purchaseUpdates = null;
-                    LOGGER.error("Purchase updates request failed.", requestStatus,
-                                 purchaseUpdatesResponse);
-                    break;
+            if (purchaseUpdatesResponse.getRequestStatus() == PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL) {
+                receipts.addAll(purchaseUpdatesResponse.getReceipts());
+                if (purchaseUpdatesResponse.hasMore()) {
+                    PurchasingService.getPurchaseUpdates(true);
+                    return;
+                }
+                purchaseUpdates = new PurchaseUpdatesResponseBuilder()
+                        .setReceipts(receipts)
+                        .setHasMore(purchaseUpdatesResponse.hasMore())
+                        .setRequestId(purchaseUpdatesResponse.getRequestId())
+                        .setRequestStatus(purchaseUpdatesResponse.getRequestStatus())
+                        .setUserData(purchaseUpdatesResponse.getUserData())
+                        .build();
+            } else {
+                purchaseUpdates = purchaseUpdatesResponse;
             }
             semaphore.release();
         }

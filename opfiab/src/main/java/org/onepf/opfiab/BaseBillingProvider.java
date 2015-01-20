@@ -21,18 +21,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.onepf.opfiab.model.billing.ConsumableDetails;
 import org.onepf.opfiab.model.billing.EntitlementDetails;
+import org.onepf.opfiab.model.billing.Inventory;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
+import org.onepf.opfiab.model.billing.SkusDetails;
 import org.onepf.opfiab.model.billing.SubscriptionDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.request.ConsumeRequest;
 import org.onepf.opfiab.model.event.request.InventoryRequest;
 import org.onepf.opfiab.model.event.request.PurchaseRequest;
 import org.onepf.opfiab.model.event.request.Request;
 import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
+import org.onepf.opfiab.model.event.response.ConsumeResponse;
+import org.onepf.opfiab.model.event.response.InventoryResponse;
+import org.onepf.opfiab.model.event.response.PurchaseResponse;
 import org.onepf.opfiab.model.event.response.Response;
+import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFUtils;
@@ -43,6 +52,16 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public abstract class BaseBillingProvider implements BillingProvider {
 
     @NonNull
+    protected final Context context = OPFIab.getContext();
+
+    @NonNull
+    protected final PurchaseVerifier purchaseVerifier;
+
+    @NonNull
+    protected final SkuResolver skuResolver;
+
+
+    @NonNull
     private final EventBus eventBus = OPFIab.getEventBus();
 
     @NonNull
@@ -51,14 +70,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
     @Nullable
     private final String packageName = getPackageName();
 
-    @NonNull
-    private final PurchaseVerifier purchaseVerifier;
-
-    @NonNull
-    private final SkuResolver skuResolver;
-
-    @NonNull
-    protected final Context context = OPFIab.getContext();
+    private Request pendingRequest;
 
     protected BaseBillingProvider(
             @NonNull final PurchaseVerifier purchaseVerifier,
@@ -81,7 +93,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST", "DLS_DEAD_LOCAL_STORE"})
     @SuppressWarnings("ConstantConditions")
-    private void handleRequest(@NonNull final Request request) {
+    protected void handleRequest(@NonNull final Request request) {
         switch (request.getType()) {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) request;
@@ -101,11 +113,65 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 final InventoryRequest inventoryRequest = (InventoryRequest) request;
                 inventory();
                 break;
+            default:
+                return;
         }
+        pendingRequest = request;
     }
 
-    protected final void postResponse(@NonNull final Response response) {
+    protected void postResponse(@NonNull final Response response) {
         eventBus.post(response);
+        pendingRequest = null;
+    }
+
+    protected void postResponse(@NonNull final Response.Status status) {
+        final Response response;
+        final BillingEvent.Type type = pendingRequest.getType();
+        switch (type) {
+            case CONSUME:
+                final ConsumeRequest consumeRequest = (ConsumeRequest) pendingRequest;
+                response = new ConsumeResponse(consumeRequest, status, null);
+                break;
+            case PURCHASE:
+                final PurchaseRequest purchaseRequest = (PurchaseRequest) pendingRequest;
+                response = new PurchaseResponse(purchaseRequest, status, null);
+                break;
+            case SKU_DETAILS:
+                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) pendingRequest;
+                response = new SkuDetailsResponse(skuDetailsRequest, status, null);
+                break;
+            case INVENTORY:
+                final InventoryRequest inventoryRequest = (InventoryRequest) pendingRequest;
+                response = new InventoryResponse(inventoryRequest, status, null);
+                break;
+            default:
+                throw new IllegalStateException("Unknown request type: " + type);
+        }
+        postResponse(response);
+    }
+
+    protected void postResponse(@NonNull final Response.Status status,
+                                @NonNull final SkusDetails skusDetails) {
+        final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) pendingRequest;
+        postResponse(new SkuDetailsResponse(skuDetailsRequest, status, skusDetails));
+    }
+
+    protected void postResponse(@NonNull final Response.Status status,
+                                @NonNull final Inventory inventory) {
+        final InventoryRequest inventoryRequest = (InventoryRequest) pendingRequest;
+        postResponse(new InventoryResponse(inventoryRequest, status, inventory));
+    }
+
+    protected void postResponse(@NonNull final Response.Status status,
+                                @NonNull final Purchase purchase) {
+        final PurchaseRequest purchaseRequest = (PurchaseRequest) pendingRequest;
+        postResponse(new PurchaseResponse(purchaseRequest, status, purchase));
+    }
+
+    protected void postResponse(@NonNull final Response.Status status,
+                                @NonNull final ConsumableDetails consumableDetails) {
+        final ConsumeRequest consumeRequest = (ConsumeRequest) pendingRequest;
+        postResponse(new ConsumeResponse(consumeRequest, status, consumableDetails));
     }
 
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
@@ -140,7 +206,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     @Override
     public boolean isAvailable() {
-        if (packageName == null) {
+        if (TextUtils.isEmpty(packageName)) {
             throw new UnsupportedOperationException(
                     "You must override this method for packageless Billing Providers.");
         }

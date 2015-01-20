@@ -17,21 +17,31 @@
 package org.onepf.opfiab.model.event.response;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.event.request.ConsumeRequest;
 
 public class ConsumeResponse extends Response {
 
-    @NonNull
+    @Nullable
     private final ConsumableDetails consumableDetails;
 
-    public ConsumeResponse(@NonNull final Status status, @NonNull final ConsumableDetails consumableDetails) {
-        super(Type.CONSUME, status);
+    public ConsumeResponse(@NonNull final ConsumeRequest request,
+                           @NonNull final Status status,
+                           @Nullable final ConsumableDetails consumableDetails) {
+        super(request, status);
         this.consumableDetails = consumableDetails;
     }
 
-    @NonNull
+    @Nullable
     public ConsumableDetails getConsumableDetails() {
         return consumableDetails;
+    }
+
+    @NonNull
+    @Override
+    public ConsumeRequest getRequest() {
+        return (ConsumeRequest) super.getRequest();
     }
 }
