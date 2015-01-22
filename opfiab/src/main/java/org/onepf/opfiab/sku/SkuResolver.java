@@ -27,9 +27,18 @@ public interface SkuResolver {
         public String resolve(@NonNull final String sku) {
             return sku;
         }
+
+        @NonNull
+        @Override
+        public String revert(@NonNull final String resolvedSku) {
+            return resolvedSku;
+        }
     };
 
 
     @NonNull
     String resolve(@NonNull final String sku);
+
+    @NonNull
+    String revert(@NonNull final String resolvedSku);
 }

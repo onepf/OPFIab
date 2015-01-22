@@ -22,18 +22,50 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MapSkuResolver extends HashMap<String, String> implements SkuResolver {
+public class MapSkuResolver implements SkuResolver {
+
+    @NonNull
+    protected final Map<String, String> direct = new HashMap<>();
+    @NonNull
+    protected final Map<String, String> reverse = new HashMap<>();
 
     public MapSkuResolver() {
     }
 
-    public MapSkuResolver(final Map<? extends String, ? extends String> map) {
-        super(map);
+    public MapSkuResolver(@NonNull final Map<String, String> map) {
+        this();
+        add(map);
+    }
+
+    public void add(@NonNull final Map<String, String> map) {
+        direct.putAll(map);
+        for (final String key : map.keySet()) {
+            final String value = map.get(key);
+            if (value == null) {
+                throw new IllegalArgumentException("Mapped sku can't be null.");
+            }
+            reverse.put(value, key);
+        }
+    }
+
+    public void add(@NonNull final String sku, @NonNull final String resolvedSku) {
+        direct.put(sku, resolvedSku);
+        reverse.put(resolvedSku, sku);
     }
 
     @NonNull
     @Override
     public String resolve(@NonNull final String sku) {
-        return containsKey(sku) ? get(sku) : sku;
+        return direct.containsKey(sku)
+                ? direct.get(sku)
+                : STUB.resolve(sku);
+    }
+
+    @NonNull
+    @Override
+    public String revert(@NonNull final String resolvedSku) {
+        return reverse.containsKey(resolvedSku)
+                ? reverse.get(resolvedSku)
+                : STUB.revert(resolvedSku);
     }
 }
