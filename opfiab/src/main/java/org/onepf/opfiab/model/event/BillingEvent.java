@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 public abstract class BillingEvent {
 
     public static enum Type {
-        SETUP,
 
         CONSUME,
         PURCHASE,
