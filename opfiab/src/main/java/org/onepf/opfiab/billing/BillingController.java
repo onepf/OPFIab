@@ -16,10 +16,20 @@
 
 package org.onepf.opfiab.billing;
 
-import net.jcip.annotations.ThreadSafe;
-
-@ThreadSafe
 public interface BillingController {
+
+    BillingController STUB = new BillingController() {
+
+        @Override
+        public boolean isBillingSupported() {
+            return true;
+        }
+
+        @Override
+        public boolean isAuthorised() {
+            return true;
+        }
+    };
 
     boolean isBillingSupported();
 
