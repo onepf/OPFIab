@@ -93,7 +93,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST", "DLS_DEAD_LOCAL_STORE"})
     @SuppressWarnings("ConstantConditions")
-    protected void handleRequest(@NonNull final Request request) {
+    protected final void handleRequest(@NonNull final Request request) {
         switch (request.getType()) {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) request;
@@ -109,17 +109,15 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 skuDetails(skuDetailsRequest.getSkus());
                 break;
             case INVENTORY:
-                @SuppressWarnings("UnusedDeclaration")
-                final InventoryRequest inventoryRequest = (InventoryRequest) request;
                 inventory();
                 break;
             default:
-                return;
+                throw new IllegalStateException("Unknown billing event.");
         }
         pendingRequest = request;
     }
 
-    protected void postResponse(@NonNull final Response response) {
+    protected final void postResponse(@NonNull final Response response) {
         eventBus.post(response);
         pendingRequest = null;
     }
@@ -221,7 +219,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     @Nullable
     @Override
-    public Intent getRateItIntent() {
+    public Intent getRateIntent() {
         return null;
     }
 
@@ -235,8 +233,9 @@ public abstract class BaseBillingProvider implements BillingProvider {
         final BaseBillingProvider that = (BaseBillingProvider) o;
 
         if (!name.equals(that.name)) return false;
-        if (packageName != null ? !packageName.equals(that.packageName) : that.packageName != null)
+        if (packageName != null ? !packageName.equals(that.packageName) : that.packageName != null) {
             return false;
+        }
 
         return true;
     }

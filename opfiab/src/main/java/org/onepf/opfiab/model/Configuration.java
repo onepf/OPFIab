@@ -54,7 +54,7 @@ public final class Configuration {
         return billingListener;
     }
 
-    public boolean isSkipUnauthorised() {
+    public boolean skipUnauthorised() {
         return skipUnauthorised;
     }
 

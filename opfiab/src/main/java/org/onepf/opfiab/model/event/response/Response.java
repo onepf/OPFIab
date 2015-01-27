@@ -21,12 +21,19 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.request.Request;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.onepf.opfiab.model.event.response.Response.Status.PENDING;
+import static org.onepf.opfiab.model.event.response.Response.Status.SUCCESS;
+
 public abstract class Response extends BillingEvent {
 
-    public enum Status {
+    public static enum Status {
 
         SUCCESS,
         PENDING,
+        BUSY,
         USER_CANCELED,
         BILLING_UNAVAILABLE,
         ITEM_UNAVAILABLE,
@@ -35,6 +42,9 @@ public abstract class Response extends BillingEvent {
         UNAUTHORISED,
         UNKNOWN_ERROR,
     }
+
+    private static final Collection<Status> SUCCESSFUL = Arrays.asList(SUCCESS, PENDING);
+
 
     @NonNull
     private final Status status;
@@ -49,18 +59,22 @@ public abstract class Response extends BillingEvent {
         this.status = status;
     }
 
-    @NonNull
-    public Request getRequest() {
-        return request;
-    }
-
     @Override
     public int getId() {
         return request.getId();
     }
 
     @NonNull
+    public Request getRequest() {
+        return request;
+    }
+
+    @NonNull
     public Status getStatus() {
         return status;
+    }
+
+    public boolean isSuccessful() {
+        return SUCCESSFUL.contains(getStatus());
     }
 }

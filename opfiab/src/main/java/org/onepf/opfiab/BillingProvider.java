@@ -39,5 +39,5 @@ public interface BillingProvider extends BillingBase {
     Intent getStorePageIntent();
 
     @Nullable
-    Intent getRateItIntent();
+    Intent getRateIntent();
 }

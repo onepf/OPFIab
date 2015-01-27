@@ -20,37 +20,54 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.BillingProvider;
+import org.onepf.opfiab.OPFIab;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.onepf.opfiab.model.event.SetupEvent.Status.PROVIDER_CHANGED;
+import static org.onepf.opfiab.model.event.SetupEvent.Status.SUCCESS;
+import static org.onepf.opfiab.model.event.SetupEvent.Status.UNAUTHORISED;
 
 public class SetupEvent {
 
-    public static enum SetupStatus {
+    public static enum Status {
 
         SUCCESS,
-        FAILED,
-        UNAUTHORISED,
         PROVIDER_CHANGED,
+        UNAUTHORISED,
+        FAILED,
     }
 
+    private static final Collection<Status> SUCCESSFUL = OPFIab.getConfiguration().skipUnauthorised()
+            ? Arrays.asList(SUCCESS, PROVIDER_CHANGED)
+            : Arrays.asList(SUCCESS, PROVIDER_CHANGED, UNAUTHORISED);
+
+
     @NonNull
-    private final SetupStatus setupStatus;
+    private final Status status;
 
     @Nullable
     private final BillingProvider billingProvider;
 
 
-    public SetupEvent(@NonNull final SetupStatus setupStatus,
+    public SetupEvent(@NonNull final Status status,
                       @Nullable final BillingProvider billingProvider) {
-        this.setupStatus = setupStatus;
+        this.status = status;
         this.billingProvider = billingProvider;
-    }
-
-    @NonNull
-    public SetupStatus getSetupStatus() {
-        return setupStatus;
     }
 
     @Nullable
     public BillingProvider getBillingProvider() {
         return billingProvider;
+    }
+
+    @NonNull
+    public Status getStatus() {
+        return status;
+    }
+
+    public boolean isSuccessful() {
+        return SUCCESSFUL.contains(getStatus());
     }
 }
