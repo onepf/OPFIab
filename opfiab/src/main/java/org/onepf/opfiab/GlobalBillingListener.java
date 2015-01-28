@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerWrapper;
 import org.onepf.opfiab.model.event.SetupEvent;
+import org.onepf.opfiab.model.event.request.Request;
 import org.onepf.opfiab.model.event.response.ConsumeResponse;
 import org.onepf.opfiab.model.event.response.InventoryResponse;
 import org.onepf.opfiab.model.event.response.PurchaseResponse;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-class GlobalBillingListener extends BillingListenerWrapper {
+final class GlobalBillingListener extends BillingListenerWrapper {
 
     @NonNull
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalBillingListener.class);
@@ -49,6 +50,7 @@ class GlobalBillingListener extends BillingListenerWrapper {
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     public void onEventMainThread(@NonNull final Response response) {
+        onResponse(response);
         switch (response.getType()) {
             case PURCHASE:
                 onPurchase((PurchaseResponse) response);
@@ -62,8 +64,10 @@ class GlobalBillingListener extends BillingListenerWrapper {
             case SKU_DETAILS:
                 onSkuDetails((SkuDetailsResponse) response);
                 break;
-            default:
-                LOGGER.error("Unknown Response event: ", response);
         }
+    }
+
+    public void onEventMainThread(@NonNull final Request request) {
+        onRequest(request);
     }
 }

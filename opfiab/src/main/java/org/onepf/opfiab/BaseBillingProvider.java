@@ -143,8 +143,6 @@ public abstract class BaseBillingProvider implements BillingProvider {
             case INVENTORY:
                 inventory();
                 break;
-            default:
-                throw new IllegalStateException("Unknown billing event.");
         }
     }
 
@@ -177,7 +175,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 response = new InventoryResponse(inventoryRequest, status, null);
                 break;
             default:
-                throw new IllegalArgumentException("Unknown request type: " + type);
+                throw new IllegalStateException();
         }
         postResponse(response);
     }

@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.model.Configuration;
@@ -124,13 +123,6 @@ public final class OPFIab {
         return new FragmentIabHelper(getManagedHelper(), fragment);
     }
 
-    @Nullable
-    public static BillingProvider getCurrentProvider() {
-        OPFChecks.checkThread(true);
-        OPFChecks.checkInit(CHECK_INIT, true);
-        return null;
-    }
-
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
@@ -138,5 +130,11 @@ public final class OPFIab {
         OPFIab.context = context.getApplicationContext();
         OPFIab.configuration = configuration;
         baseIabHelper = new BaseIabHelper();
+    }
+
+    public static void setup() {
+        OPFChecks.checkThread(true);
+        OPFChecks.checkInit(CHECK_INIT, true);
+        getBaseHelper().setup();
     }
 }

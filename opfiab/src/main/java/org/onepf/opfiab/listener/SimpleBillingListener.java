@@ -19,15 +19,23 @@ package org.onepf.opfiab.listener;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.SetupEvent;
+import org.onepf.opfiab.model.event.request.Request;
 import org.onepf.opfiab.model.event.response.ConsumeResponse;
 import org.onepf.opfiab.model.event.response.InventoryResponse;
 import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 
 public class SimpleBillingListener implements BillingListener {
 
     @Override
     public void onSetup(@NonNull final SetupEvent setupEvent) { }
+
+    @Override
+    public void onRequest(@NonNull final Request request) { }
+
+    @Override
+    public void onResponse(@NonNull final Response response) { }
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) { }

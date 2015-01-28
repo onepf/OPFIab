@@ -54,12 +54,10 @@ final class BaseIabHelper extends IabHelper {
                 configuration.getBillingListener());
     }
 
-    @Override
-    public void setup() {
+    void setup() {
         //TODO
     }
 
-    //TODO ID based pending request queue
     @Override
     public void purchase(@NonNull final Activity activity,
                          @NonNull final SkuDetails skuDetails) {
