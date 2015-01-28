@@ -21,6 +21,7 @@
     <application>
         <activity
             android:name=".OPFIabActivity"
+            android:configChanges="fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.NoDisplay"/>
     </application>
