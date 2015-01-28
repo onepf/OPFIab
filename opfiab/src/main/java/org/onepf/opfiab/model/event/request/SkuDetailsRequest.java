@@ -18,21 +18,23 @@ package org.onepf.opfiab.model.event.request;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class SkuDetailsRequest extends Request {
 
     @NonNull
-    private final Collection<String> skus;
+    private final ArrayList<String> skus;
 
     public SkuDetailsRequest(@NonNull final Collection<String> skus) {
         super(Type.SKU_DETAILS);
-        this.skus = skus;
+        this.skus = new ArrayList<>(skus);
     }
 
     @NonNull
-    public Collection<String> getSkus() {
-        return Collections.unmodifiableCollection(skus);
+    public List<String> getSkus() {
+        return Collections.unmodifiableList(skus);
     }
 }

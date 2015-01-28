@@ -59,11 +59,6 @@ public abstract class Response extends BillingEvent {
         this.status = status;
     }
 
-    @Override
-    public int getId() {
-        return request.getId();
-    }
-
     @NonNull
     public Request getRequest() {
         return request;

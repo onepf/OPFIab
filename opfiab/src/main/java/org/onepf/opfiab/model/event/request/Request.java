@@ -20,22 +20,9 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.BillingEvent;
 
-import java.util.Random;
-
 public abstract class Request extends BillingEvent {
-
-    private static final Random RANDOM = new Random();
-
-
-    private final int id;
 
     protected Request(@NonNull final Type type) {
         super(type);
-        id = RANDOM.nextInt();
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 }

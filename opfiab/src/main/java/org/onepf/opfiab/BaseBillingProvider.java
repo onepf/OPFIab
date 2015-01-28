@@ -44,33 +44,64 @@ import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfutils.Checkable;
+import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.greenrobot.event.EventBus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public abstract class BaseBillingProvider implements BillingProvider {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseBillingProvider.class);
+
+    private static final String KEY_REQUEST = "request";
+    private static final OPFPreferences PREFERENCES = new OPFPreferences(OPFIab.getContext());
+    //TODO fail quietly?
+    private static final Checkable CHECK_REQUEST = new Checkable() {
+        @Override
+        public boolean check() {
+            return getPendingRequest() == null;
+        }
+    };
+    @Nullable
+    private static Request pendingRequest;
+
+    @Nullable
+    public static Request getPendingRequest() {
+        if (pendingRequest == null && PREFERENCES.contains(KEY_REQUEST)) {
+            pendingRequest = BillingEvent.fromJson(PREFERENCES.getString(KEY_REQUEST, ""),
+                                                   Request.class);
+        }
+        return pendingRequest;
+    }
+
+    public static void setPendingRequest(@Nullable final Request pendingRequest) {
+        BaseBillingProvider.pendingRequest = pendingRequest;
+        if (pendingRequest == null) {
+            PREFERENCES.remove(KEY_REQUEST);
+        } else {
+            PREFERENCES.put(KEY_REQUEST, pendingRequest.toJson());
+        }
+    }
+
+
     @NonNull
     protected final Context context = OPFIab.getContext();
-
     @NonNull
     protected final PurchaseVerifier purchaseVerifier;
-
     @NonNull
     protected final SkuResolver skuResolver;
 
-
     @NonNull
     private final EventBus eventBus = OPFIab.getEventBus();
-
     @NonNull
     private final String name = getName();
-
     @Nullable
     private final String packageName = getPackageName();
-
-    private Request pendingRequest;
 
     protected BaseBillingProvider(
             @NonNull final PurchaseVerifier purchaseVerifier,
@@ -80,10 +111,11 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     public final void onEventAsync(@NonNull final Request event) {
+        setPendingRequest(event);
         handleRequest(event);
     }
 
-    public final void onEvent(@NonNull final ActivityResultEvent event) {
+    public final void onEventAsync(@NonNull final ActivityResultEvent event) {
         final Activity activity = event.getActivity();
         final int requestCode = event.getRequestCode();
         final int resultCode = event.getResultCode();
@@ -114,61 +146,71 @@ public abstract class BaseBillingProvider implements BillingProvider {
             default:
                 throw new IllegalStateException("Unknown billing event.");
         }
-        pendingRequest = request;
     }
 
     protected final void postResponse(@NonNull final Response response) {
+        setPendingRequest(null);
         eventBus.post(response);
-        pendingRequest = null;
     }
 
     protected void postResponse(@NonNull final Response.Status status) {
         final Response response;
-        final BillingEvent.Type type = pendingRequest.getType();
+        OPFChecks.checkInit(CHECK_REQUEST, false);
+        final Request request = getPendingRequest();
+        //noinspection ConstantConditions
+        final BillingEvent.Type type = request.getType();
         switch (type) {
             case CONSUME:
-                final ConsumeRequest consumeRequest = (ConsumeRequest) pendingRequest;
+                final ConsumeRequest consumeRequest = (ConsumeRequest) request;
                 response = new ConsumeResponse(consumeRequest, status, null);
                 break;
             case PURCHASE:
-                final PurchaseRequest purchaseRequest = (PurchaseRequest) pendingRequest;
+                final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
                 response = new PurchaseResponse(purchaseRequest, status, null);
                 break;
             case SKU_DETAILS:
-                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) pendingRequest;
+                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
                 response = new SkuDetailsResponse(skuDetailsRequest, status, null);
                 break;
             case INVENTORY:
-                final InventoryRequest inventoryRequest = (InventoryRequest) pendingRequest;
+                final InventoryRequest inventoryRequest = (InventoryRequest) request;
                 response = new InventoryResponse(inventoryRequest, status, null);
                 break;
             default:
-                throw new IllegalStateException("Unknown request type: " + type);
+                throw new IllegalArgumentException("Unknown request type: " + type);
         }
         postResponse(response);
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final SkusDetails skusDetails) {
-        final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) pendingRequest;
+        OPFChecks.checkInit(CHECK_REQUEST, false);
+        final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) getPendingRequest();
+        //noinspection ConstantConditions
         postResponse(new SkuDetailsResponse(skuDetailsRequest, status, skusDetails));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Inventory inventory) {
-        final InventoryRequest inventoryRequest = (InventoryRequest) pendingRequest;
+        OPFChecks.checkInit(CHECK_REQUEST, false);
+        final InventoryRequest inventoryRequest = (InventoryRequest) getPendingRequest();
+        //noinspection ConstantConditions
         postResponse(new InventoryResponse(inventoryRequest, status, inventory));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Purchase purchase) {
-        final PurchaseRequest purchaseRequest = (PurchaseRequest) pendingRequest;
+        OPFChecks.checkInit(CHECK_REQUEST, false);
+        final PurchaseRequest purchaseRequest = (PurchaseRequest) getPendingRequest();
+        //noinspection ConstantConditions
         postResponse(new PurchaseResponse(purchaseRequest, status, purchase));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final ConsumableDetails consumableDetails) {
-        final ConsumeRequest consumeRequest = (ConsumeRequest) pendingRequest;
+        OPFChecks.checkInit(CHECK_REQUEST, false);
+        final ConsumeRequest consumeRequest = (ConsumeRequest) getPendingRequest();
+        //noinspection ConstantConditions
         postResponse(new ConsumeResponse(consumeRequest, status, consumableDetails));
     }
 
@@ -233,7 +275,8 @@ public abstract class BaseBillingProvider implements BillingProvider {
         final BaseBillingProvider that = (BaseBillingProvider) o;
 
         if (!name.equals(that.name)) return false;
-        if (packageName != null ? !packageName.equals(that.packageName) : that.packageName != null) {
+        if (packageName != null ? !packageName.equals(
+                that.packageName) : that.packageName != null) {
             return false;
         }
 

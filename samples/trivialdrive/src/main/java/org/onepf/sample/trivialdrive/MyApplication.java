@@ -21,13 +21,10 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.BillingProvider;
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.google.GoogleBillingProvider;
+import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.listener.SimpleBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupEvent;
-import org.onepf.opfiab.sku.MapSkuResolver;
-import org.onepf.opfiab.sku.SkuResolver;
-import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,24 +38,22 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        final PublicKeyPurchaseVerifier googlePurchaseVerifier =
-                new PublicKeyPurchaseVerifier("public key");
-        final SkuResolver googleSkuResolver = new MapSkuResolver();
-        final GoogleBillingProvider.Builder googleBuilder = new GoogleBillingProvider.Builder();
-        googleBuilder.purchaseVerifier(googlePurchaseVerifier);
-        googleBuilder.skuResolver(googleSkuResolver);
-        final BillingProvider googleBillingProvider = googleBuilder.build();
-
         final Configuration configuration = new Configuration.Builder()
-                .addBillingProvider(googleBillingProvider)
+                .addBillingProvider(createAmazonBillingProvider())
                 .setBillingListener(new SimpleBillingListener() {
                     @Override
                     public void onSetup(@NonNull final SetupEvent setupEvent) {
                         super.onSetup(setupEvent);
+                        LOGGER.debug("Setup event: ", setupEvent);
                     }
                 })
                 .build();
 
         OPFIab.init(this, configuration);
+    }
+
+    private BillingProvider createAmazonBillingProvider() {
+        return new AmazonBillingProvider.Builder()
+                .build();
     }
 }

@@ -18,7 +18,18 @@ package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
-public abstract class BillingEvent {
+import com.google.gson.Gson;
+
+import java.io.Serializable;
+
+public abstract class BillingEvent implements Serializable {
+
+    private static final Gson GSON = new Gson();
+
+    public static <T extends BillingEvent> T fromJson(@NonNull final String json,
+                                                      @NonNull final Class<T> clazz) {
+        return GSON.fromJson(json, clazz);
+    }
 
     public static enum Type {
 
@@ -36,10 +47,13 @@ public abstract class BillingEvent {
         this.type = type;
     }
 
-    public abstract int getId();
-
     @NonNull
     public Type getType() {
         return type;
+    }
+
+    @NonNull
+    public String toJson() {
+        return GSON.toJson(this);
     }
 }

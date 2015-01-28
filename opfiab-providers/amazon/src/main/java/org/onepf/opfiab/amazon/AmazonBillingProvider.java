@@ -140,4 +140,13 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         controller.consume(resolvedSku);
         postResponse(SUCCESS, consumableDetails);
     }
+
+
+    public static class Builder extends BaseBillingProvider.Builder {
+
+        @Override
+        public BaseBillingProvider build() {
+            return new AmazonBillingProvider(purchaseVerifier, skuResolver);
+        }
+    }
 }

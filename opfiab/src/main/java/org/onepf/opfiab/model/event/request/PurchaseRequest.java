@@ -18,26 +18,30 @@ package org.onepf.opfiab.model.event.request;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.billing.SkuDetails;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
+
 public class PurchaseRequest extends Request {
 
-    @NonNull
-    private final Activity activity;
+    @Nullable
+    private final transient Reference<Activity> activityReference;
 
     @NonNull
     private final SkuDetails skuDetails;
 
     public PurchaseRequest(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
         super(Type.PURCHASE);
-        this.activity = activity;
+        this.activityReference = new WeakReference<Activity>(activity);
         this.skuDetails = skuDetails;
     }
 
-    @NonNull
+    @Nullable
     public Activity getActivity() {
-        return activity;
+        return activityReference == null ? null : activityReference.get();
     }
 
     @NonNull
