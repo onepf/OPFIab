@@ -17,21 +17,51 @@
 package org.onepf.sample.trivialdrive;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.SelfManagedIabHelper;
+import org.onepf.opfiab.listener.OnPurchaseListener;
+import org.onepf.opfiab.listener.OnSetupListener;
+import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.event.SetupEvent;
+import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainActivity extends ActionBarActivity {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MainActivity.class);
+
+
+    @NonNull
     private SelfManagedIabHelper iabHelper;
+
+    private final OnSetupListener setupListener = new OnSetupListener() {
+        @Override
+        public void onSetup(@NonNull final SetupEvent setupEvent) {
+            if (setupEvent.isSuccessful()) {
+                iabHelper.purchase(new ConsumableDetails("org.onepf.sample.trivialdrive.sku_gas"));
+            }
+        }
+    };
+
+    private final OnPurchaseListener purchaseListener = new OnPurchaseListener() {
+        @Override
+        public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+            LOGGER.debug("", purchaseResponse);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         iabHelper = OPFIab.getHelper(this);
+        iabHelper.addSetupListener(setupListener);
+        OPFIab.setup();
         setContentView(R.layout.activity_main);
     }
 

@@ -54,18 +54,18 @@ public final class OPFIab {
     private static final Checkable CHECK_INIT = new Checkable() {
         @Override
         public boolean check() {
-            return baseIabHelper == null;
+            return baseIabHelper != null;
         }
     };
 
     @NonNull
     static EventBus getEventBus() {
         OPFChecks.checkThread(true);
-        OPFChecks.checkInit(CHECK_INIT, true);
         if (eventBus == null) {
             final EventBusBuilder builder = EventBus.builder();
             builder.eventInheritance(true);
             builder.executorService(Executors.newSingleThreadExecutor());
+            builder.throwSubscriberException(true);
             eventBus = builder.build();
         }
         return eventBus;
@@ -81,14 +81,18 @@ public final class OPFIab {
     @NonNull
     public static Context getContext() {
         OPFChecks.checkThread(true);
-        OPFChecks.checkInit(CHECK_INIT, true);
+        if (context == null) {
+            throw new IllegalStateException();
+        }
         return context;
     }
 
     @NonNull
     public static Configuration getConfiguration() {
         OPFChecks.checkThread(true);
-        OPFChecks.checkInit(CHECK_INIT, true);
+        if (configuration == null) {
+            throw new IllegalStateException();
+        }
         return configuration;
     }
 

@@ -33,7 +33,7 @@ import static org.onepf.opfiab.model.event.response.Response.Status.BILLING_UNAV
 final class DummyBillingProvider extends BaseBillingProvider {
 
     public DummyBillingProvider() {
-        super(null, null);
+        super(null, null, null);
     }
 
     @NonNull

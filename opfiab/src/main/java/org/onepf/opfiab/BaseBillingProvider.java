@@ -25,12 +25,10 @@ import android.text.TextUtils;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.EntitlementDetails;
 import org.onepf.opfiab.model.billing.Inventory;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkusDetails;
-import org.onepf.opfiab.model.billing.SubscriptionDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.request.ConsumeRequest;
@@ -45,8 +43,6 @@ import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
-import org.onepf.opfutils.Checkable;
-import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 import org.slf4j.Logger;
@@ -60,57 +56,61 @@ public abstract class BaseBillingProvider implements BillingProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseBillingProvider.class);
 
     private static final String KEY_REQUEST = "request";
-    private static final OPFPreferences PREFERENCES = new OPFPreferences(OPFIab.getContext());
-    //TODO fail quietly?
-    private static final Checkable CHECK_REQUEST = new Checkable() {
-        @Override
-        public boolean check() {
-            return getPendingRequest() == null;
-        }
-    };
+    @Nullable
+    private static OPFPreferences preferences;
     @Nullable
     private static Request pendingRequest;
 
+    @NonNull
+    static OPFPreferences getPreferences(@NonNull final Context context) {
+        if (preferences == null) {
+            preferences = new OPFPreferences(context);
+        }
+        return preferences;
+    }
+
     @Nullable
-    public static Request getPendingRequest() {
-        if (pendingRequest == null && PREFERENCES.contains(KEY_REQUEST)) {
-            pendingRequest = BillingEvent.fromJson(PREFERENCES.getString(KEY_REQUEST, ""),
+    static Request getPendingRequest(@NonNull final Context context) {
+        final OPFPreferences preferences = getPreferences(context);
+        if (pendingRequest == null && preferences.contains(KEY_REQUEST)) {
+            pendingRequest = BillingEvent.fromJson(preferences.getString(KEY_REQUEST, ""),
                                                    Request.class);
         }
         return pendingRequest;
     }
 
-    public static void setPendingRequest(@Nullable final Request pendingRequest) {
+    static void setPendingRequest(@NonNull final Context context,
+                                  @Nullable final Request pendingRequest) {
+        final OPFPreferences preferences = getPreferences(context);
         BaseBillingProvider.pendingRequest = pendingRequest;
         if (pendingRequest == null) {
-            PREFERENCES.remove(KEY_REQUEST);
+            preferences.remove(KEY_REQUEST);
         } else {
-            PREFERENCES.put(KEY_REQUEST, pendingRequest.toJson());
+            preferences.put(KEY_REQUEST, pendingRequest.toJson());
         }
     }
 
 
     @NonNull
-    protected final Context context = OPFIab.getContext();
+    protected final EventBus eventBus = OPFIab.getEventBus();
+    @NonNull
+    protected final Context context;
     @NonNull
     protected final PurchaseVerifier purchaseVerifier;
     @NonNull
     protected final SkuResolver skuResolver;
 
-    @NonNull
-    private final EventBus eventBus = OPFIab.getEventBus();
-    @NonNull
-    private final BillingProviderInfo info = getInfo();
-
     protected BaseBillingProvider(
+            @NonNull final Context context,
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
+        this.context = context.getApplicationContext();
         this.purchaseVerifier = purchaseVerifier;
         this.skuResolver = skuResolver;
     }
 
     public final void onEventAsync(@NonNull final Request event) {
-        setPendingRequest(event);
+        setPendingRequest(context, event);
         handleRequest(event);
     }
 
@@ -146,75 +146,73 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     protected final void postResponse(@NonNull final Response response) {
-        setPendingRequest(null);
+        setPendingRequest(context, null);
         eventBus.postSticky(response);
     }
 
+    @NonNull
+    private Request getPendingRequestOrFail() {
+        final Request request = getPendingRequest(context);
+        if (request == null) {
+            throw new IllegalStateException();
+        }
+        return request;
+    }
+
     protected void postResponse(@NonNull final Response.Status status) {
-        //TODO abstract check
-        OPFChecks.checkInit(CHECK_REQUEST, false);
-        final Request request = getPendingRequest();
-        //noinspection ConstantConditions
+        final Request request = getPendingRequestOrFail();
         postResponse(OPFIabUtils.emptyResponse(request, status));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final SkusDetails skusDetails) {
-        OPFChecks.checkInit(CHECK_REQUEST, false);
-        final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) getPendingRequest();
-        //noinspection ConstantConditions
+        final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) getPendingRequestOrFail();
         postResponse(new SkuDetailsResponse(skuDetailsRequest, status, skusDetails));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Inventory inventory) {
-        OPFChecks.checkInit(CHECK_REQUEST, false);
-        final InventoryRequest inventoryRequest = (InventoryRequest) getPendingRequest();
-        //noinspection ConstantConditions
+        final InventoryRequest inventoryRequest = (InventoryRequest) getPendingRequestOrFail();
         postResponse(new InventoryResponse(inventoryRequest, status, inventory));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Purchase purchase) {
-        OPFChecks.checkInit(CHECK_REQUEST, false);
-        final PurchaseRequest purchaseRequest = (PurchaseRequest) getPendingRequest();
-        //noinspection ConstantConditions
+        final PurchaseRequest purchaseRequest = (PurchaseRequest) getPendingRequestOrFail();
         postResponse(new PurchaseResponse(purchaseRequest, status, purchase));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final ConsumableDetails consumableDetails) {
-        OPFChecks.checkInit(CHECK_REQUEST, false);
-        final ConsumeRequest consumeRequest = (ConsumeRequest) getPendingRequest();
-        //noinspection ConstantConditions
+        final ConsumeRequest consumeRequest = (ConsumeRequest) getPendingRequestOrFail();
         postResponse(new ConsumeResponse(consumeRequest, status, consumableDetails));
     }
 
-//    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-//    @Override
-//    public void purchase(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
-//        switch (skuDetails.getType()) {
-//            case CONSUMABLE:
-//                purchase(activity, (ConsumableDetails) skuDetails);
-//                break;
-//            case ENTITLEMENT:
-//                purchase(activity, (EntitlementDetails) skuDetails);
-//                break;
-//            case SUBSCRIPTION:
-//                purchase(activity, (SubscriptionDetails) skuDetails);
-//                break;
-//        }
-//    }
-//
-//    public void purchase(@NonNull final Activity activity,
-//                         @NonNull final ConsumableDetails skuDetails) { }
-//
-//
-//    public void purchase(@NonNull final Activity activity,
-//                         @NonNull final EntitlementDetails skuDetails) { }
-//
-//    public void purchase(@NonNull final Activity activity,
-//                         @NonNull final SubscriptionDetails skuDetails) { }
+    //    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
+    //    @Override
+    //    public void purchase(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
+    //        switch (skuDetails.getType()) {
+    //            case CONSUMABLE:
+    //                purchase(activity, (ConsumableDetails) skuDetails);
+    //                break;
+    //            case ENTITLEMENT:
+    //                purchase(activity, (EntitlementDetails) skuDetails);
+    //                break;
+    //            case SUBSCRIPTION:
+    //                purchase(activity, (SubscriptionDetails) skuDetails);
+    //                break;
+    //        }
+    //    }
+    //
+    //    public void purchase(@NonNull final Activity activity,
+    //                         @NonNull final ConsumableDetails skuDetails) { }
+    //
+    //
+    //    public void purchase(@NonNull final Activity activity,
+    //                         @NonNull final EntitlementDetails skuDetails) { }
+    //
+    //    public void purchase(@NonNull final Activity activity,
+    //                         @NonNull final SubscriptionDetails skuDetails) { }
 
     @Override
     public void onActivityResult(@NonNull final Activity activity, final int requestCode,
@@ -222,12 +220,12 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     @Override
     public boolean isAvailable() {
-        final String packageName = info.getPackageName();
+        final String packageName = getInfo().getPackageName();
         if (TextUtils.isEmpty(packageName)) {
             throw new UnsupportedOperationException(
                     "You must override this method for packageless Billing Providers.");
         }
-        return OPFUtils.isInstalled(context, packageName);
+        return OPFUtils.isInstalled(OPFIab.getContext(), packageName);
     }
 
     @Nullable
@@ -245,30 +243,36 @@ public abstract class BaseBillingProvider implements BillingProvider {
     //CHECKSTYLE:OFF
     @Override
     public boolean equals(final Object o) {
+        final BillingProviderInfo info = getInfo();
         if (this == o) return true;
         if (!(o instanceof BaseBillingProvider)) return false;
 
         final BaseBillingProvider that = (BaseBillingProvider) o;
 
         //noinspection RedundantIfStatement
-        if (!info.equals(that.info)) return false;
+        if (!info.equals(that.getInfo())) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return info.hashCode();
+        return getInfo().hashCode();
     }
     //CHECKSTYLE:ON
 
     public abstract static class Builder {
 
         @NonNull
+        protected final Context context;
+        @NonNull
         protected PurchaseVerifier purchaseVerifier = PurchaseVerifier.STUB;
-
         @NonNull
         protected SkuResolver skuResolver = SkuResolver.STUB;
+
+        protected Builder(@NonNull final Context context) {
+            this.context = context;
+        }
 
         protected Builder purchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;

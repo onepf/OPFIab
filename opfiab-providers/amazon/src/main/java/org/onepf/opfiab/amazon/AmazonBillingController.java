@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab.amazon;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -31,18 +32,16 @@ import com.amazon.device.iap.model.Receipt;
 import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
-import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.billing.BillingController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
-final class AmazonBillingController implements BillingController {
+final class AmazonBillingController implements BillingController, PurchasingListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmazonBillingController.class);
 
@@ -61,8 +60,8 @@ final class AmazonBillingController implements BillingController {
     @NonNull
     private volatile List<Receipt> receipts;
 
-    public AmazonBillingController() {
-        PurchasingService.registerListener(OPFIab.getContext(), new Listener());
+    public AmazonBillingController(@NonNull final Context context) {
+        PurchasingService.registerListener(context, this);
     }
 
     @Override
@@ -120,56 +119,53 @@ final class AmazonBillingController implements BillingController {
         PurchasingService.notifyFulfillment(sku, FulfillmentResult.FULFILLED);
     }
 
-    private final class Listener implements PurchasingListener {
+    @Override
+    public void onUserDataResponse(@NonNull final UserDataResponse userDataResponse) {
+        final UserDataResponse.RequestStatus requestStatus;
+        switch (requestStatus = userDataResponse.getRequestStatus()) {
+            case SUCCESSFUL:
+                userData = userDataResponse.getUserData();
+                break;
+            case FAILED:
+            case NOT_SUPPORTED:
+                userData = null;
+                LOGGER.error("User data request failed.", requestStatus, userDataResponse);
+                break;
+        }
+        semaphore.release();
+    }
 
-        @Override
-        public void onUserDataResponse(@NonNull final UserDataResponse userDataResponse) {
-            final UserDataResponse.RequestStatus requestStatus;
-            switch (requestStatus = userDataResponse.getRequestStatus()) {
-                case SUCCESSFUL:
-                    userData = userDataResponse.getUserData();
-                    break;
-                case FAILED:
-                case NOT_SUPPORTED:
-                    userData = null;
-                    LOGGER.error("User data request failed.", requestStatus, userDataResponse);
-                    break;
+    @Override
+    public void onProductDataResponse(@NonNull final ProductDataResponse productDataResponse) {
+        productData = productDataResponse;
+        semaphore.release();
+    }
+
+    @Override
+    public void onPurchaseResponse(@NonNull final PurchaseResponse purchaseResponse) {
+        purchase = purchaseResponse;
+        semaphore.release();
+    }
+
+    @Override
+    public void onPurchaseUpdatesResponse(
+            @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
+        if (purchaseUpdatesResponse.getRequestStatus() == PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL) {
+            receipts.addAll(purchaseUpdatesResponse.getReceipts());
+            if (purchaseUpdatesResponse.hasMore()) {
+                PurchasingService.getPurchaseUpdates(true);
+                return;
             }
-            semaphore.release();
+            purchaseUpdates = new PurchaseUpdatesResponseBuilder()
+                    .setReceipts(receipts)
+                    .setHasMore(purchaseUpdatesResponse.hasMore())
+                    .setRequestId(purchaseUpdatesResponse.getRequestId())
+                    .setRequestStatus(purchaseUpdatesResponse.getRequestStatus())
+                    .setUserData(purchaseUpdatesResponse.getUserData())
+                    .build();
+        } else {
+            purchaseUpdates = purchaseUpdatesResponse;
         }
-
-        @Override
-        public void onProductDataResponse(@NonNull final ProductDataResponse productDataResponse) {
-            productData = productDataResponse;
-            semaphore.release();
-        }
-
-        @Override
-        public void onPurchaseResponse(@NonNull final PurchaseResponse purchaseResponse) {
-            purchase = purchaseResponse;
-            semaphore.release();
-        }
-
-        @Override
-        public void onPurchaseUpdatesResponse(
-                @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-            if (purchaseUpdatesResponse.getRequestStatus() == PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL) {
-                receipts.addAll(purchaseUpdatesResponse.getReceipts());
-                if (purchaseUpdatesResponse.hasMore()) {
-                    PurchasingService.getPurchaseUpdates(true);
-                    return;
-                }
-                purchaseUpdates = new PurchaseUpdatesResponseBuilder()
-                        .setReceipts(receipts)
-                        .setHasMore(purchaseUpdatesResponse.hasMore())
-                        .setRequestId(purchaseUpdatesResponse.getRequestId())
-                        .setRequestStatus(purchaseUpdatesResponse.getRequestStatus())
-                        .setUserData(purchaseUpdatesResponse.getUserData())
-                        .build();
-            } else {
-                purchaseUpdates = purchaseUpdatesResponse;
-            }
-            semaphore.release();
-        }
+        semaphore.release();
     }
 }

@@ -36,17 +36,15 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
     private final Object eventHandler = new Object() {
 
         public void onEvent(@NonNull final FragmentLifecycleEvent event) {
-            if (opfFragment != event.getFragment()) {
-                return;
+            if (opfFragment == event.getFragment()) {
+                handleLifecycle(event.getType());
             }
-            handleLifecycle(event.getType());
         }
 
         public void onEvent(@NonNull final SupportFragmentLifecycleEvent event) {
-            if (opfFragment != event.getFragment()) {
-                return;
+            if (opfFragment == event.getFragment()) {
+                handleLifecycle(event.getType());
             }
-            handleLifecycle(event.getType());
         }
 
         private void handleLifecycle(@NonNull final Type type) {
@@ -95,6 +93,7 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
         }
         //TODO check attach\detach condition. Use sticky?
         this.opfFragment = fragment;
+        fragmentManager.executePendingTransactions();
     }
 
     public ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
@@ -112,6 +111,7 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
                     .commit();
         }
         this.opfFragment = fragment;
+        fragmentManager.executePendingTransactions();
     }
 
     @Override

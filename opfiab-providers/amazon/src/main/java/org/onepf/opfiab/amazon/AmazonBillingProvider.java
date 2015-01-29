@@ -17,6 +17,7 @@
 package org.onepf.opfiab.amazon;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -28,7 +29,6 @@ import com.amazon.device.iap.model.UserData;
 
 import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.OPFIabUtils;
-import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
 import org.onepf.opfiab.model.billing.ConsumablePurchase;
@@ -59,16 +59,18 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     private static final String PACKAGE_NAME = "com.amazon.venezia";
 
 
-    private final AmazonBillingController controller = new AmazonBillingController();
     private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
+    @NonNull
+    private final AmazonBillingController controller = new AmazonBillingController(context);
 
     @Nullable
     private UserData userData;
 
     protected AmazonBillingProvider(
+            @NonNull final Context context,
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
-        super(purchaseVerifier, skuResolver);
+        super(context, purchaseVerifier, skuResolver);
     }
 
     @NonNull
@@ -79,7 +81,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
     @NonNull
     @Override
-    public BillingController getController() {
+    public AmazonBillingController getController() {
         return controller;
     }
 
@@ -123,7 +125,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         final PurchaseUpdatesResponse.RequestStatus status;
         switch (status = purchaseUpdatesResponse.getRequestStatus()) {
             case SUCCESSFUL:
-                // Map sku
+                //TODO Map sku
                 final Inventory inventory = new Inventory(Collections.<Purchase>emptyList());
                 postResponse(SUCCESS, inventory);
                 break;
@@ -181,9 +183,13 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
     public static class Builder extends BaseBillingProvider.Builder {
 
+        public Builder(@NonNull final Context context) {
+            super(context);
+        }
+
         @Override
         public BaseBillingProvider build() {
-            return new AmazonBillingProvider(purchaseVerifier, skuResolver);
+            return new AmazonBillingProvider(context, purchaseVerifier, skuResolver);
         }
     }
 }

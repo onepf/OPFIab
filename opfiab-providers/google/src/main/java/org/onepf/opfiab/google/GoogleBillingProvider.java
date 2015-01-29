@@ -17,6 +17,7 @@
 package org.onepf.opfiab.google;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -42,9 +43,10 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
 
     protected GoogleBillingProvider(
+            @NonNull final Context context,
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
-        super(purchaseVerifier, skuResolver);
+        super(context, purchaseVerifier, skuResolver);
     }
 
     @NonNull
@@ -88,9 +90,13 @@ public class GoogleBillingProvider extends BaseBillingProvider {
 
     public static class Builder extends BaseBillingProvider.Builder {
 
+        public Builder(@NonNull final Context context) {
+            super(context);
+        }
+
         @Override
         public GoogleBillingProvider build() {
-            return new GoogleBillingProvider(purchaseVerifier, skuResolver);
+            return new GoogleBillingProvider(context, purchaseVerifier, skuResolver);
         }
 
         public Builder purchaseVerifier(

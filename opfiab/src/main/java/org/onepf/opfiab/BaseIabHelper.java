@@ -51,7 +51,8 @@ final class BaseIabHelper extends IabHelper {
     BaseIabHelper() {
         final Configuration configuration = OPFIab.getConfiguration();
         final BillingListener billingListener = configuration.getBillingListener();
-        eventBus.register(new GlobalBillingListener(billingListener), Integer.MAX_VALUE);
+        eventBus.register(this, Integer.MAX_VALUE);
+        eventBus.register(new GlobalBillingListener(billingListener), Integer.MAX_VALUE - 1);
     }
 
     public void onEventMainThread(@NonNull final SetupEvent event) {
