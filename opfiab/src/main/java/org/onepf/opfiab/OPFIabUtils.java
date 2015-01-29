@@ -18,6 +18,17 @@ package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.event.BillingEvent;
+import org.onepf.opfiab.model.event.request.ConsumeRequest;
+import org.onepf.opfiab.model.event.request.InventoryRequest;
+import org.onepf.opfiab.model.event.request.PurchaseRequest;
+import org.onepf.opfiab.model.event.request.Request;
+import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
+import org.onepf.opfiab.model.event.response.ConsumeResponse;
+import org.onepf.opfiab.model.event.response.InventoryResponse;
+import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.event.response.Response;
+import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 
 import java.util.Arrays;
@@ -29,6 +40,33 @@ public final class OPFIabUtils {
 
     private OPFIabUtils() {
         throw new UnsupportedOperationException();
+    }
+
+    public static Response emptyResponse(@NonNull final Request request,
+                                         @NonNull final Response.Status status) {
+        final Response response;
+        final BillingEvent.Type type = request.getType();
+        switch (type) {
+            case CONSUME:
+                final ConsumeRequest consumeRequest = (ConsumeRequest) request;
+                response = new ConsumeResponse(consumeRequest, status, null);
+                break;
+            case PURCHASE:
+                final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
+                response = new PurchaseResponse(purchaseRequest, status, null);
+                break;
+            case SKU_DETAILS:
+                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
+                response = new SkuDetailsResponse(skuDetailsRequest, status, null);
+                break;
+            case INVENTORY:
+                final InventoryRequest inventoryRequest = (InventoryRequest) request;
+                response = new InventoryResponse(inventoryRequest, status, null);
+                break;
+            default:
+                throw new IllegalStateException();
+        }
+        return response;
     }
 
     public static Set<String> resolve(@NonNull final SkuResolver resolver,

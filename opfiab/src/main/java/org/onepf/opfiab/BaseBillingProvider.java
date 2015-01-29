@@ -147,36 +147,15 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     protected final void postResponse(@NonNull final Response response) {
         setPendingRequest(null);
-        eventBus.post(response);
+        eventBus.postSticky(response);
     }
 
     protected void postResponse(@NonNull final Response.Status status) {
-        final Response response;
+        //TODO abstract check
         OPFChecks.checkInit(CHECK_REQUEST, false);
         final Request request = getPendingRequest();
         //noinspection ConstantConditions
-        final BillingEvent.Type type = request.getType();
-        switch (type) {
-            case CONSUME:
-                final ConsumeRequest consumeRequest = (ConsumeRequest) request;
-                response = new ConsumeResponse(consumeRequest, status, null);
-                break;
-            case PURCHASE:
-                final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
-                response = new PurchaseResponse(purchaseRequest, status, null);
-                break;
-            case SKU_DETAILS:
-                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
-                response = new SkuDetailsResponse(skuDetailsRequest, status, null);
-                break;
-            case INVENTORY:
-                final InventoryRequest inventoryRequest = (InventoryRequest) request;
-                response = new InventoryResponse(inventoryRequest, status, null);
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-        postResponse(response);
+        postResponse(OPFIabUtils.emptyResponse(request, status));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
