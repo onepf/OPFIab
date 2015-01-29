@@ -21,7 +21,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.amazon.device.iap.model.ProductDataResponse;
+import com.amazon.device.iap.model.PurchaseResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
+import com.amazon.device.iap.model.Receipt;
 import com.amazon.device.iap.model.UserData;
 
 import org.onepf.opfiab.BaseBillingProvider;
@@ -29,6 +31,9 @@ import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.ConsumablePurchase;
+import org.onepf.opfiab.model.billing.Inventory;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkusDetails;
 import org.onepf.opfiab.sku.SkuResolver;
@@ -37,11 +42,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
-import static org.onepf.opfiab.model.event.response.Response.Status.BILLING_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.response.Response.Status.ITEM_ALREADY_OWNED;
+import static org.onepf.opfiab.model.event.response.Response.Status.ITEM_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.response.Response.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.response.Response.Status.UNAUTHORISED;
+import static org.onepf.opfiab.model.event.response.Response.Status.UNKNOWN_ERROR;
 
 public class AmazonBillingProvider extends BaseBillingProvider {
 
@@ -91,8 +99,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         }
         final Set<String> resolvedSkus = OPFIabUtils.resolveSkus(skuResolver, skus);
         final ProductDataResponse productDataResponse = controller.getProductData(resolvedSkus);
-        final ProductDataResponse.RequestStatus requestStatus;
-        switch (requestStatus = productDataResponse.getRequestStatus()) {
+        final ProductDataResponse.RequestStatus status;
+        switch (status = productDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 //TODO
                 final SkusDetails skusDetails = new SkusDetails(null, null);
@@ -100,8 +108,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                LOGGER.error("Product data request failed.", requestStatus, productDataResponse);
-                postResponse(BILLING_UNAVAILABLE);
+                LOGGER.error("Product data request failed.", status, productDataResponse);
+                postResponse(UNKNOWN_ERROR);
                 break;
         }
     }
@@ -111,8 +119,21 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         if (!checkAuthorisation()) {
             return;
         }
-        //TODO revert sku
         final PurchaseUpdatesResponse purchaseUpdatesResponse = controller.getPurchaseUpdates();
+        final PurchaseUpdatesResponse.RequestStatus status;
+        switch (status = purchaseUpdatesResponse.getRequestStatus()) {
+            case SUCCESSFUL:
+                // Map sku
+                final Inventory inventory = new Inventory(Collections.<Purchase>emptyList());
+                postResponse(SUCCESS, inventory);
+                break;
+            case FAILED:
+            case NOT_SUPPORTED:
+                LOGGER.error("Purchase updates request failed.", status, purchaseUpdatesResponse);
+                postResponse(UNKNOWN_ERROR);
+                break;
+        }
+
     }
 
     @Override
@@ -120,7 +141,26 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         if (!checkAuthorisation()) {
             return;
         }
-        final String resolvedSku = skuDetails.getSku();
+        final String resolvedSku = skuResolver.resolve(skuDetails.getSku());
+        final PurchaseResponse purchaseResponse = controller.getPurchase(resolvedSku);
+        final PurchaseResponse.RequestStatus status;
+        switch (status = purchaseResponse.getRequestStatus()) {
+            case SUCCESSFUL:
+                final Purchase purchase = getPurchase(purchaseResponse.getReceipt());
+                postResponse(SUCCESS, purchase);
+                break;
+            case INVALID_SKU:
+                postResponse(ITEM_UNAVAILABLE);
+                break;
+            case ALREADY_PURCHASED:
+                postResponse(ITEM_ALREADY_OWNED);
+                break;
+            case FAILED:
+            case NOT_SUPPORTED:
+                LOGGER.error("Purchase request failed.", status, purchaseResponse);
+                postResponse(UNKNOWN_ERROR);
+                break;
+        }
     }
 
     @Override
@@ -133,6 +173,11 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         postResponse(SUCCESS, consumableDetails);
     }
 
+
+    private Purchase getPurchase(@NonNull final Receipt receipt) {
+        //TODO
+        return new ConsumablePurchase(new ConsumableDetails(receipt.getSku()));
+    }
 
     public static class Builder extends BaseBillingProvider.Builder {
 
