@@ -21,9 +21,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.model.event.SetupEvent;
 import org.onepf.opfutils.Checkable;
 import org.onepf.opfutils.OPFChecks;
 
@@ -121,6 +123,13 @@ public final class OPFIab {
     public static SelfManagedIabHelper getHelper(
             @NonNull final android.support.v4.app.Fragment fragment) {
         return new FragmentIabHelper(getManagedHelper(), fragment);
+    }
+
+    @Nullable
+    public static SetupEvent getSetupEvent() {
+        OPFChecks.checkInit(CHECK_INIT, true);
+        //TODO blocking call?
+        return eventBus.getStickyEvent(SetupEvent.class);
     }
 
     public static void init(@NonNull final Context context,

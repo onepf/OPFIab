@@ -22,30 +22,30 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 public final class Configuration {
 
     @NonNull
-    private final Collection<BillingProvider> providers;
+    private final Set<BillingProvider> providers;
 
     @Nullable
     private final BillingListener billingListener;
 
     private final boolean skipUnauthorised;
 
-    private Configuration(@NonNull final Collection<BillingProvider> providers,
+    private Configuration(@NonNull final Set<BillingProvider> providers,
                           @Nullable final BillingListener billingListener,
                           final boolean skipUnauthorised) {
-        this.providers = Collections.unmodifiableCollection(providers);
+        this.providers = Collections.unmodifiableSet(providers);
         this.billingListener = billingListener;
         this.skipUnauthorised = skipUnauthorised;
     }
 
     @NonNull
-    public Collection<BillingProvider> getProviders() {
+    public Set<BillingProvider> getProviders() {
         return providers;
     }
 
@@ -61,7 +61,7 @@ public final class Configuration {
     public static class Builder {
 
         @NonNull
-        private final Collection<BillingProvider> providers = new LinkedHashSet<>();
+        private final Set<BillingProvider> providers = new LinkedHashSet<>();
 
         @Nullable
         private BillingListener billingListener;

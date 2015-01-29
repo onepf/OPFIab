@@ -35,13 +35,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 final class GlobalBillingListener extends BillingListenerWrapper {
 
-    @NonNull
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalBillingListener.class);
 
 
     GlobalBillingListener(@Nullable final BillingListener billingListener) {
         super(billingListener);
-        OPFIab.getEventBus().register(this);
     }
 
     public void onEventMainThread(@NonNull final SetupEvent setupEvent) {

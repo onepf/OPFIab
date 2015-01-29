@@ -17,15 +17,16 @@
 package org.onepf.opfiab;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.SetupEvent;
 import org.onepf.opfiab.model.event.request.ConsumeRequest;
 import org.onepf.opfiab.model.event.request.InventoryRequest;
 import org.onepf.opfiab.model.event.request.PurchaseRequest;
@@ -40,24 +41,32 @@ final class BaseIabHelper extends IabHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseIabHelper.class);
 
 
-    @NonNull
-    private final Context context = OPFIab.getContext();
-
-    @NonNull
-    private final Configuration configuration = OPFIab.getConfiguration();
-
-    @NonNull
-    private final GlobalBillingListener globalBillingListener;
+    private final SetupManager setupManager = new SetupManager();
 
     BaseIabHelper() {
-        this.globalBillingListener = new GlobalBillingListener(
-                configuration.getBillingListener());
+        final Configuration configuration = OPFIab.getConfiguration();
+        final BillingListener billingListener = configuration.getBillingListener();
+        eventBus.register(new GlobalBillingListener(billingListener));
+    }
+
+    public void onEventMainThread(@NonNull final SetupEvent event) {
+        final BillingProvider billingProvider;
+        if (event.isSuccessful()) {
+            billingProvider = event.getBillingProvider();
+        } else {
+            billingProvider = new DummyBillingProvider();
+        }
+        eventBus.register(billingProvider);
     }
 
     void setup() {
-        //TODO
+        if (setupManager.getState() != SetupManager.State.INITIAL) {
+            throw new IllegalStateException();
+        }
+        setupManager.setup();
     }
 
+    //TODO lazy initialized setup
     @Override
     public void purchase(@NonNull final Activity activity,
                          @NonNull final SkuDetails skuDetails) {
