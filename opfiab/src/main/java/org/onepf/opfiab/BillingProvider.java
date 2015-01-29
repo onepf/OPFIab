@@ -21,14 +21,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.BillingController;
+import org.onepf.opfiab.model.BillingProviderInfo;
 
 public interface BillingProvider extends BillingBase {
 
     @NonNull
-    String getName();
-
-    @Nullable
-    String getPackageName();
+    BillingProviderInfo getInfo();
 
     @NonNull
     BillingController getController();

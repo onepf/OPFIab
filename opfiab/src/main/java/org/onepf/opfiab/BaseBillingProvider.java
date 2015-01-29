@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
 import org.onepf.opfiab.model.billing.EntitlementDetails;
 import org.onepf.opfiab.model.billing.Inventory;
@@ -99,9 +100,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
     @NonNull
     private final EventBus eventBus = OPFIab.getEventBus();
     @NonNull
-    private final String name = getName();
-    @Nullable
-    private final String packageName = getPackageName();
+    private final BillingProviderInfo info = getInfo();
 
     protected BaseBillingProvider(
             @NonNull final PurchaseVerifier purchaseVerifier,
@@ -244,6 +243,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     @Override
     public boolean isAvailable() {
+        final String packageName = info.getPackageName();
         if (TextUtils.isEmpty(packageName)) {
             throw new UnsupportedOperationException(
                     "You must override this method for packageless Billing Providers.");
@@ -264,7 +264,6 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     //CHECKSTYLE:OFF
-    @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -272,20 +271,15 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
         final BaseBillingProvider that = (BaseBillingProvider) o;
 
-        if (!name.equals(that.name)) return false;
-        if (packageName != null ? !packageName.equals(
-                that.packageName) : that.packageName != null) {
-            return false;
-        }
+        //noinspection RedundantIfStatement
+        if (!info.equals(that.info)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
-        return result;
+        return info.hashCode();
     }
     //CHECKSTYLE:ON
 

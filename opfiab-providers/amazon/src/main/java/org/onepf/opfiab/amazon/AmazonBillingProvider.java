@@ -27,6 +27,7 @@ import com.amazon.device.iap.model.UserData;
 import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.billing.BillingController;
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkusDetails;
@@ -46,15 +47,12 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmazonBillingProvider.class);
 
-
-    @NonNull
     private static final String NAME = "Amazon";
-
-    @NonNull
     private static final String PACKAGE_NAME = "com.amazon.venezia";
 
 
     private final AmazonBillingController controller = new AmazonBillingController();
+    private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
 
     @Nullable
     private UserData userData;
@@ -67,14 +65,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
     @NonNull
     @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Nullable
-    @Override
-    public String getPackageName() {
-        return PACKAGE_NAME;
+    public BillingProviderInfo getInfo() {
+        return info;
     }
 
     @NonNull
