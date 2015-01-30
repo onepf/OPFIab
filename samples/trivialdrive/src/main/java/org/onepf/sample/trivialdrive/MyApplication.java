@@ -41,6 +41,7 @@ public class MyApplication extends Application {
                 .build();
 
         OPFIab.init(this, configuration);
+        OPFIab.setup();
     }
 
     private BillingProvider createAmazonBillingProvider() {

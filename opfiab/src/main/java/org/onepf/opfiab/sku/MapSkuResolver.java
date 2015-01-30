@@ -21,6 +21,8 @@ import android.support.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 
 public class MapSkuResolver implements SkuResolver {
 
@@ -37,6 +39,7 @@ public class MapSkuResolver implements SkuResolver {
         add(map);
     }
 
+    @SuppressFBWarnings({"WMI_WRONG_MAP_ITERATOR"})
     public void add(@NonNull final Map<String, String> map) {
         direct.putAll(map);
         for (final String key : map.keySet()) {

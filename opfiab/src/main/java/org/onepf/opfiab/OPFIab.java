@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 
 import de.greenrobot.event.EventBus;
 import de.greenrobot.event.EventBusBuilder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public final class OPFIab {
 
@@ -58,6 +59,8 @@ public final class OPFIab {
         }
     };
 
+    // Only call from Main Thread
+    @SuppressFBWarnings({"LI_LAZY_INIT_STATIC"})
     @NonNull
     static EventBus getEventBus() {
         OPFChecks.checkThread(true);

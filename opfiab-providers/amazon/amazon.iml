@@ -90,7 +90,6 @@
     <orderEntry type="library" exported="" name="in-app-purchasing-2.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.10" level="project" />
-    <orderEntry type="library" exported="" name="slf4j-android-1.7.10" level="project" />
     <orderEntry type="library" exported="" name="annotations-3.0.0" level="project" />
     <orderEntry type="module" module-name="opfiab" exported="" />
   </component>

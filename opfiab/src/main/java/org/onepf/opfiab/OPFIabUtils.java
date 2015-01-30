@@ -36,12 +36,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public final class OPFIabUtils {
 
     private OPFIabUtils() {
         throw new UnsupportedOperationException();
     }
 
+    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     public static Response emptyResponse(@NonNull final Request request,
                                          @NonNull final Response.Status status) {
         final Response response;

@@ -25,6 +25,8 @@ import org.onepf.opfiab.model.billing.SkuDetails;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class PurchaseRequest extends Request {
 
     @Nullable
@@ -33,6 +35,7 @@ public class PurchaseRequest extends Request {
     @NonNull
     private final SkuDetails skuDetails;
 
+    @SuppressFBWarnings({"SE_NO_SERIALVERSIONID"})
     public PurchaseRequest(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
         super(Type.PURCHASE);
         this.activityReference = new WeakReference<Activity>(activity);

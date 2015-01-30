@@ -27,11 +27,14 @@ import org.onepf.opfiab.model.event.request.Request;
 
 import java.util.Collection;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import static org.onepf.opfiab.model.event.response.Response.Status.BILLING_UNAVAILABLE;
 
 @SuppressWarnings("ConstantConditions")
 final class DummyBillingProvider extends BaseBillingProvider {
 
+    @SuppressFBWarnings({"NP_NULL_PARAM_DEREF_NONVIRTUAL"})
     public DummyBillingProvider() {
         super(null, null, null);
     }

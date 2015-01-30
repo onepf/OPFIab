@@ -61,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         iabHelper = OPFIab.getHelper(this);
         iabHelper.addSetupListener(setupListener);
-        OPFIab.setup();
+        iabHelper.addPurchaseListener(purchaseListener);
         setContentView(R.layout.activity_main);
     }
 

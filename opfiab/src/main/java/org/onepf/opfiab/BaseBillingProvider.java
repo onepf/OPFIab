@@ -135,6 +135,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 final Activity activity = purchaseRequest.getActivity();
                 final SkuDetails skuDetails = purchaseRequest.getSkuDetails();
                 purchase(activity, skuDetails);
+                break;
             case SKU_DETAILS:
                 final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
                 skuDetails(skuDetailsRequest.getSkus());

@@ -68,7 +68,7 @@ dependencies {
     //noinspection GradleDependency,GradleCompatible
     provided 'com.android.support:support-v4:13.0.0'
     compile 'com.android.support:support-annotations:21.0.3'
-    compile 'org.slf4j:slf4j-android:1.7.10'
+    compile 'org.slf4j:slf4j-api:1.7.10'
     compile 'com.google.code.findbugs:annotations:3.0.0'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.google.code.gson:gson:2.3.1'
