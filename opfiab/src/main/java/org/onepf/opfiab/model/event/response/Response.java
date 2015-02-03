@@ -17,7 +17,9 @@
 package org.onepf.opfiab.model.event.response;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.request.Request;
 
@@ -46,17 +48,25 @@ public abstract class Response extends BillingEvent {
     private static final Collection<Status> SUCCESSFUL = Arrays.asList(SUCCESS, PENDING);
 
 
+    @Nullable
+    private final BillingProviderInfo providerInfo;
+    @NonNull
+    private final Request request;
     @NonNull
     private final Status status;
 
-    @NonNull
-    private final Request request;
-
-    protected Response(@NonNull final Request request,
+    protected Response(@Nullable final BillingProviderInfo providerInfo,
+                       @NonNull final Request request,
                        @NonNull final Status status) {
         super(request.getType());
+        this.providerInfo = providerInfo;
         this.request = request;
         this.status = status;
+    }
+
+    @Nullable
+    public BillingProviderInfo getProviderInfo() {
+        return providerInfo;
     }
 
     @NonNull

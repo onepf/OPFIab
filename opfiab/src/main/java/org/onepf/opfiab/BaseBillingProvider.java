@@ -162,31 +162,31 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     protected void postResponse(@NonNull final Response.Status status) {
         final Request request = getPendingRequestOrFail();
-        postResponse(OPFIabUtils.emptyResponse(request, status));
+        postResponse(OPFIabUtils.emptyResponse(getInfo(), request, status));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final SkusDetails skusDetails) {
         final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) getPendingRequestOrFail();
-        postResponse(new SkuDetailsResponse(skuDetailsRequest, status, skusDetails));
+        postResponse(new SkuDetailsResponse(getInfo(), skuDetailsRequest, status, skusDetails));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Inventory inventory) {
         final InventoryRequest inventoryRequest = (InventoryRequest) getPendingRequestOrFail();
-        postResponse(new InventoryResponse(inventoryRequest, status, inventory));
+        postResponse(new InventoryResponse(getInfo(), inventoryRequest, status, inventory));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Purchase purchase) {
         final PurchaseRequest purchaseRequest = (PurchaseRequest) getPendingRequestOrFail();
-        postResponse(new PurchaseResponse(purchaseRequest, status, purchase));
+        postResponse(new PurchaseResponse(getInfo(), purchaseRequest, status, purchase));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final ConsumableDetails consumableDetails) {
         final ConsumeRequest consumeRequest = (ConsumeRequest) getPendingRequestOrFail();
-        postResponse(new ConsumeResponse(consumeRequest, status, consumableDetails));
+        postResponse(new ConsumeResponse(getInfo(), consumeRequest, status, consumableDetails));
     }
 
     @Override

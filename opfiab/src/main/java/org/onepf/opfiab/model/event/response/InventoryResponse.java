@@ -19,6 +19,7 @@ package org.onepf.opfiab.model.event.response;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Inventory;
 import org.onepf.opfiab.model.event.request.InventoryRequest;
 
@@ -27,11 +28,18 @@ public class InventoryResponse extends Response {
     @Nullable
     private final Inventory inventory;
 
+    public InventoryResponse(@Nullable final BillingProviderInfo providerInfo,
+                             @NonNull final InventoryRequest request,
+                             @NonNull final Status status,
+                             @Nullable final Inventory inventory) {
+        super(providerInfo, request, status);
+        this.inventory = inventory;
+    }
+
     public InventoryResponse(@NonNull final InventoryRequest request,
                              @NonNull final Status status,
                              @Nullable final Inventory inventory) {
-        super(request, status);
-        this.inventory = inventory;
+        this(null, request, status, inventory);
     }
 
     @Nullable

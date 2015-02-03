@@ -17,7 +17,9 @@
 package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.request.ConsumeRequest;
 import org.onepf.opfiab.model.event.request.InventoryRequest;
@@ -45,26 +47,27 @@ public final class OPFIabUtils {
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
-    public static Response emptyResponse(@NonNull final Request request,
+    public static Response emptyResponse(@Nullable final BillingProviderInfo providerInfo,
+                                         @NonNull final Request request,
                                          @NonNull final Response.Status status) {
         final Response response;
         final BillingEvent.Type type = request.getType();
         switch (type) {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) request;
-                response = new ConsumeResponse(consumeRequest, status, null);
+                response = new ConsumeResponse(providerInfo, consumeRequest, status, null);
                 break;
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
-                response = new PurchaseResponse(purchaseRequest, status, null);
+                response = new PurchaseResponse(providerInfo, purchaseRequest, status, null);
                 break;
             case SKU_DETAILS:
                 final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
-                response = new SkuDetailsResponse(skuDetailsRequest, status, null);
+                response = new SkuDetailsResponse(providerInfo, skuDetailsRequest, status, null);
                 break;
             case INVENTORY:
                 final InventoryRequest inventoryRequest = (InventoryRequest) request;
-                response = new InventoryResponse(inventoryRequest, status, null);
+                response = new InventoryResponse(providerInfo, inventoryRequest, status, null);
                 break;
             default:
                 throw new IllegalStateException();

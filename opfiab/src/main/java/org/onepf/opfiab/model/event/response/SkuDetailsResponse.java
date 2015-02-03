@@ -19,6 +19,7 @@ package org.onepf.opfiab.model.event.response;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.SkusDetails;
 import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
 
@@ -27,11 +28,18 @@ public class SkuDetailsResponse extends Response {
     @Nullable
     private final SkusDetails skusDetails;
 
+    public SkuDetailsResponse(@Nullable final BillingProviderInfo providerInfo,
+                              @NonNull final SkuDetailsRequest request,
+                              @NonNull final Status status,
+                              @Nullable final SkusDetails skusDetails) {
+        super(providerInfo, request, status);
+        this.skusDetails = skusDetails;
+    }
+
     public SkuDetailsResponse(@NonNull final SkuDetailsRequest request,
                               @NonNull final Status status,
                               @Nullable final SkusDetails skusDetails) {
-        super(request, status);
-        this.skusDetails = skusDetails;
+        this(null, request, status, skusDetails);
     }
 
     @Nullable

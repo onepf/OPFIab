@@ -44,7 +44,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onSetup(@NonNull final SetupEvent setupEvent) {
             if (setupEvent.isSuccessful()) {
-                iabHelper.purchase(new ConsumableDetails("org.onepf.sample.trivialdrive.sku_gas"));
+                LOGGER.debug("");
             }
         }
     };
@@ -63,6 +63,9 @@ public class MainActivity extends ActionBarActivity {
         iabHelper.addSetupListener(setupListener);
         iabHelper.addPurchaseListener(purchaseListener);
         setContentView(R.layout.activity_main);
+        if (savedInstanceState == null) {
+            iabHelper.purchase(new ConsumableDetails("org.onepf.sample.trivialdrive.sku_gas"));
+        }
     }
 
 
