@@ -21,37 +21,28 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.SetupEvent;
 import org.onepf.opfutils.Checkable;
 import org.onepf.opfutils.OPFChecks;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import de.greenrobot.event.EventBus;
-import de.greenrobot.event.EventBusBuilder;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public final class OPFIab {
 
-    private OPFIab() {
-        throw new UnsupportedOperationException();
-    }
-
-
-    static final String FRAGMENT_TAG = "OPFIabFragment";
-
-    private static BaseIabHelper baseIabHelper;
-
-    private static EventBus eventBus;
-
-    private static Context context;
-
-    private static Configuration configuration;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(OPFIab.class);
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final EventBus EVENT_BUS = EventBus.builder()
+            .executorService(EXECUTOR)
+            .throwSubscriberException(true)
+            .eventInheritance(true)
+            .build();
     private static final Checkable CHECK_INIT = new Checkable() {
         @Override
         public boolean check() {
@@ -59,19 +50,24 @@ public final class OPFIab {
         }
     };
 
-    // Only call from Main Thread
-    @SuppressFBWarnings({"LI_LAZY_INIT_STATIC"})
+    private static volatile Configuration configuration;
+    private static volatile Context context;
+
+    private static BaseIabHelper baseIabHelper;
+
+
+    private OPFIab() {
+        throw new UnsupportedOperationException();
+    }
+
+    @NonNull
+    static ExecutorService getExecutor() {
+        return EXECUTOR;
+    }
+
     @NonNull
     static EventBus getEventBus() {
-        OPFChecks.checkThread(true);
-        if (eventBus == null) {
-            final EventBusBuilder builder = EventBus.builder();
-            builder.eventInheritance(true);
-            builder.executorService(Executors.newSingleThreadExecutor());
-            builder.throwSubscriberException(true);
-            eventBus = builder.build();
-        }
-        return eventBus;
+        return EVENT_BUS;
     }
 
     @NonNull
@@ -79,24 +75,6 @@ public final class OPFIab {
         OPFChecks.checkThread(true);
         OPFChecks.checkInit(CHECK_INIT, true);
         return baseIabHelper;
-    }
-
-    @NonNull
-    public static Context getContext() {
-        OPFChecks.checkThread(true);
-        if (context == null) {
-            throw new IllegalStateException();
-        }
-        return context;
-    }
-
-    @NonNull
-    public static Configuration getConfiguration() {
-        OPFChecks.checkThread(true);
-        if (configuration == null) {
-            throw new IllegalStateException();
-        }
-        return configuration;
     }
 
     @NonNull
@@ -109,8 +87,8 @@ public final class OPFIab {
         return new ManagedIabHelper(getBaseHelper());
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @NonNull
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static SelfManagedIabHelper getHelper(@NonNull final Activity activity) {
         return new ActivityIabHelper(getManagedHelper(), activity);
     }
@@ -120,8 +98,8 @@ public final class OPFIab {
         return new ActivityIabHelper(getManagedHelper(), fragmentActivity);
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @NonNull
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public static SelfManagedIabHelper getHelper(@NonNull final android.app.Fragment fragment) {
         return new FragmentIabHelper(getManagedHelper(), fragment);
     }
@@ -132,25 +110,36 @@ public final class OPFIab {
         return new FragmentIabHelper(getManagedHelper(), fragment);
     }
 
-    @Nullable
-    public static SetupEvent getSetupEvent() {
-        OPFChecks.checkInit(CHECK_INIT, true);
-        //TODO blocking call?
-        return eventBus.getStickyEvent(SetupEvent.class);
+    @NonNull
+    public static Context getContext() {
+        if (context == null) {
+            throw new IllegalStateException();
+        }
+        return context;
+    }
+
+    @NonNull
+    public static Configuration getConfiguration() {
+        if (configuration == null) {
+            throw new IllegalStateException();
+        }
+        return configuration;
     }
 
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
+        LOGGER.debug("init()");
         OPFChecks.checkThread(true);
         OPFChecks.checkInit(CHECK_INIT, false);
         OPFIab.context = context.getApplicationContext();
         OPFIab.configuration = configuration;
-        baseIabHelper = new BaseIabHelper();
+        EVENT_BUS.register(baseIabHelper = new BaseIabHelper(), Integer.MAX_VALUE);
+        EVENT_BUS.register(new GlobalBillingListener(configuration.getBillingListener()));
     }
 
     public static void setup() {
         OPFChecks.checkThread(true);
         OPFChecks.checkInit(CHECK_INIT, true);
-        getBaseHelper().setup();
+        SetupManager.setup();
     }
 }

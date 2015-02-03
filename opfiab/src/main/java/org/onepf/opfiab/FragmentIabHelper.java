@@ -26,7 +26,6 @@ import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
-import static org.onepf.opfiab.OPFIab.FRAGMENT_TAG;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type;
 
 public class FragmentIabHelper extends SelfManagedIabHelper {
@@ -91,12 +90,12 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
         final android.app.FragmentManager fragmentManager = fragment.getChildFragmentManager();
         if ((opfFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
             opfFragment = OPFIabFragment.newInstance();
-            fragmentManager.executePendingTransactions();
             fragmentManager.beginTransaction()
                     .add(opfFragment, FRAGMENT_TAG)
                     .commit();
         }
         this.opfFragment = opfFragment;
+        fragmentManager.executePendingTransactions();
     }
 
     FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
@@ -107,12 +106,12 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
         final android.support.v4.app.FragmentManager fragmentManager = supportFragment.getChildFragmentManager();
         if ((opfFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
             opfFragment = OPFIabSupportFragment.newInstance();
-            fragmentManager.executePendingTransactions();
             fragmentManager.beginTransaction()
                     .add(opfFragment, FRAGMENT_TAG)
                     .commit();
         }
         this.opfFragment = opfFragment;
+        fragmentManager.executePendingTransactions();
     }
 
     @Override

@@ -17,22 +17,26 @@
 package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFPreferences;
+import org.onepf.opfutils.OPFUtils;
 
-import java.util.Iterator;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+
+import de.greenrobot.event.EventBus;
 
 import static org.onepf.opfiab.model.event.SetupEvent.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupEvent.Status.SUCCESS;
 
 final class SetupManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SetupManager.class);
-
-    private static final String KEY_LAST_PROVIDER = "last_provider";
 
     static enum State {
 
@@ -41,28 +45,74 @@ final class SetupManager {
         FINISHED,
     }
 
+    private static final OPFPreferences PREFERENCES = new OPFPreferences(OPFIab.getContext());
+    private static final String KEY_LAST_PROVIDER = "last_provider";
+
+    private static final Configuration CONFIGURATION = OPFIab.getConfiguration();
+    private static final ExecutorService EXECUTOR = OPFIab.getExecutor();
+    private static final EventBus EVENT_BUS = OPFIab.getEventBus();
 
     @NonNull
-    private State state = State.INITIAL;
+    private static volatile State state = State.INITIAL;
 
-    //TODO stub implementation
-    void setup() {
-        final Configuration configuration = OPFIab.getConfiguration();
-        final Iterator<BillingProvider> iterator = configuration.getProviders().iterator();
-        final BillingProvider billingProvider = iterator.hasNext() ? iterator.next() : null;
-
-        final SetupEvent event;
-        if (billingProvider == null || !billingProvider.isAvailable()) {
-            event = new SetupEvent(FAILED, null);
-        } else {
-            event = new SetupEvent(SUCCESS, billingProvider);
-        }
-        OPFIab.getEventBus().postSticky(event);
-        state = State.FINISHED;
+    private SetupManager() {
+        throw new UnsupportedOperationException();
     }
 
     @NonNull
-    State getState() {
+    private static Collection<BillingProvider> getAvailableProviders() {
+        final Set<BillingProvider> availableProviders = new LinkedHashSet<>();
+        for (final BillingProvider provider : CONFIGURATION.getProviders()) {
+            if (provider.isAvailable()) {
+                availableProviders.add(provider);
+            }
+        }
+        return availableProviders;
+    }
+
+    @Nullable
+    private static BillingProvider pickProvider(
+            @NonNull final Collection<BillingProvider> providers) {
+        //TODO stub implementation
+        for (final BillingProvider provider : providers) {
+            final BillingController controller = provider.getController();
+            if (CONFIGURATION.skipUnauthorised() && !controller.isAuthorised()) {
+                continue;
+            }
+            if (controller.isBillingSupported()) {
+                return provider;
+            }
+        }
+        return null;
+    }
+
+    static void setup() {
+        OPFChecks.checkThread(true);
+        if (state == State.STARTED) {
+            return;
+        }
+        state = State.STARTED;
+        EVENT_BUS.removeStickyEvent(SetupEvent.class);
+        EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                final BillingProvider provider = pickProvider(getAvailableProviders());
+                final SetupEvent.Status status = provider == null ? FAILED : SUCCESS;
+                final SetupEvent setupEvent = new SetupEvent(status, provider);
+                OPFUtils.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        state = State.FINISHED;
+                        EVENT_BUS.postSticky(setupEvent);
+                    }
+                });
+            }
+        });
+    }
+
+    @NonNull
+    //TODO lazy setup
+    static State getState() {
         return state;
     }
 }

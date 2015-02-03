@@ -102,6 +102,11 @@ public class ManagedIabHelper extends IabHelperWrapper {
 
     public void addSetupListener(@NonNull final OnSetupListener setupListener) {
         setupListeners.add(setupListener);
+        // Deliver last setup even right away
+        final SetupEvent setupEvent = eventBus.getStickyEvent(SetupEvent.class);
+        if (setupEvent != null) {
+            setupListener.onSetup(setupEvent);
+        }
     }
 
     public void addPurchaseListener(@NonNull final OnPurchaseListener purchaseListener) {

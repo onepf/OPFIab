@@ -24,7 +24,6 @@ import de.greenrobot.event.EventBus;
 
 public abstract class IabHelper implements BillingBase {
 
-    @NonNull
     protected final EventBus eventBus = OPFIab.getEventBus();
 
     public final void skuDetails(@NonNull final String... skus) {

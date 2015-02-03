@@ -31,6 +31,9 @@ import org.onepf.opfiab.model.billing.SkuDetails;
 
 public abstract class SelfManagedIabHelper extends IabHelperWrapper {
 
+    protected static final String FRAGMENT_TAG = "OPFIabFragment";
+
+
     @NonNull
     protected final ManagedIabHelper managedIabHelper;
 

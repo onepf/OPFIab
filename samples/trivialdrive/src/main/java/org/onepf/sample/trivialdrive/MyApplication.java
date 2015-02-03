@@ -34,7 +34,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        LOGGER.debug("Application onCreate()");
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(createAmazonBillingProvider())
                 .setBillingListener(new TrivialBillingListener())

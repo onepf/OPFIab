@@ -27,7 +27,6 @@ import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
-import static org.onepf.opfiab.OPFIab.FRAGMENT_TAG;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type;
 
 public class ActivityIabHelper extends SelfManagedIabHelper {
@@ -86,7 +85,6 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
         final android.app.FragmentManager fragmentManager = activity.getFragmentManager();
         if ((fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
             fragment = OPFIabFragment.newInstance();
-            fragmentManager.executePendingTransactions();
             fragmentManager.beginTransaction()
                     .add(fragment, FRAGMENT_TAG)
                     .commit();
@@ -105,7 +103,6 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
                 fragmentActivity.getSupportFragmentManager();
         if ((fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
             fragment = OPFIabSupportFragment.newInstance();
-            fragmentManager.executePendingTransactions();
             fragmentManager.beginTransaction()
                     .add(fragment, FRAGMENT_TAG)
                     .commit();

@@ -119,6 +119,7 @@ public class OPFIabActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        handler.removeCallbacks(finishTask);
         eventBus.post(new ActivityLifecycleEvent(DESTROY, this));
     }
 

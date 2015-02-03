@@ -189,32 +189,6 @@ public abstract class BaseBillingProvider implements BillingProvider {
         postResponse(new ConsumeResponse(consumeRequest, status, consumableDetails));
     }
 
-    //    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
-    //    @Override
-    //    public void purchase(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
-    //        switch (skuDetails.getType()) {
-    //            case CONSUMABLE:
-    //                purchase(activity, (ConsumableDetails) skuDetails);
-    //                break;
-    //            case ENTITLEMENT:
-    //                purchase(activity, (EntitlementDetails) skuDetails);
-    //                break;
-    //            case SUBSCRIPTION:
-    //                purchase(activity, (SubscriptionDetails) skuDetails);
-    //                break;
-    //        }
-    //    }
-    //
-    //    public void purchase(@NonNull final Activity activity,
-    //                         @NonNull final ConsumableDetails skuDetails) { }
-    //
-    //
-    //    public void purchase(@NonNull final Activity activity,
-    //                         @NonNull final EntitlementDetails skuDetails) { }
-    //
-    //    public void purchase(@NonNull final Activity activity,
-    //                         @NonNull final SubscriptionDetails skuDetails) { }
-
     @Override
     public void onActivityResult(@NonNull final Activity activity, final int requestCode,
                                  final int resultCode, @Nullable final Intent data) { }

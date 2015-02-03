@@ -21,8 +21,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.ConsumableDetails;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
@@ -34,39 +32,51 @@ import org.onepf.opfiab.model.event.request.PurchaseRequest;
 import org.onepf.opfiab.model.event.request.Request;
 import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.response.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.onepf.opfutils.OPFChecks;
 
 import java.util.Collection;
 
 final class BaseIabHelper extends IabHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseIabHelper.class);
-
-
-    private final SetupManager setupManager = new SetupManager();
     @Nullable
     private BillingProvider currentProvider;
+    @Nullable
+    private Request pendingRequest;
 
-    BaseIabHelper() {
-        final Configuration configuration = OPFIab.getConfiguration();
-        final BillingListener billingListener = configuration.getBillingListener();
-        eventBus.register(this, Integer.MAX_VALUE);
-        eventBus.register(new GlobalBillingListener(billingListener), Integer.MAX_VALUE - 1);
-    }
+    BaseIabHelper() { }
 
     public void onEventMainThread(@NonNull final SetupEvent event) {
         if (event.isSuccessful()) {
             currentProvider = event.getBillingProvider();
             eventBus.register(currentProvider);
         }
+        if (pendingRequest != null) {
+            postRequest(pendingRequest);
+            pendingRequest = null;
+        }
     }
 
-    void setup() {
-        if (setupManager.getState() != SetupManager.State.INITIAL) {
-            throw new IllegalStateException();
+    void postRequest(@NonNull final Request request) {
+        OPFChecks.checkThread(true);
+        final SetupManager.State state = SetupManager.getState();
+        if (state != SetupManager.State.FINISHED) {
+            if (state == SetupManager.State.INITIAL) {
+                SetupManager.setup();
+            }
+            if (pendingRequest != null) {
+                eventBus.post(OPFIabUtils.emptyResponse(request, Response.Status.BUSY));
+            } else {
+                pendingRequest = request;
+            }
+            return;
         }
-        setupManager.setup();
+        if (currentProvider == null || !currentProvider.isAvailable()) {
+            eventBus.post(OPFIabUtils.emptyResponse(request, Response.Status.BILLING_UNAVAILABLE));
+        } else if (eventBus.getStickyEvent(BillingEvent.class) instanceof Request) {
+            eventBus.post(OPFIabUtils.emptyResponse(request, Response.Status.BUSY));
+        } else {
+            eventBus.postSticky(request);
+        }
     }
 
     //TODO lazy initialized setup
@@ -83,22 +93,12 @@ final class BaseIabHelper extends IabHelper {
 
     @Override
     public void inventory() {
-        eventBus.post(new InventoryRequest());
+        postRequest(new InventoryRequest());
     }
 
     @Override
     public void skuDetails(@NonNull final Collection<String> skus) {
         postRequest(new SkuDetailsRequest(skus));
-    }
-
-    void postRequest(@NonNull final Request request) {
-        if (currentProvider == null) {
-            eventBus.post(OPFIabUtils.emptyResponse(request, Response.Status.BILLING_UNAVAILABLE));
-        } else if (eventBus.getStickyEvent(BillingEvent.class) instanceof Request) {
-            eventBus.post(OPFIabUtils.emptyResponse(request, Response.Status.BUSY));
-        } else {
-            eventBus.postSticky(request);
-        }
     }
 
     @Override
