@@ -3,28 +3,29 @@ OPFIab
 
 ## The Road Ahead
 - [ ] OPFIab Core
-  - [ ] Solid Library API - **80%**
-    - [ ] Public ```OPFIab``` methods.
+  - [ ] Solid Library API
+    - [x] Public ```OPFIab``` methods.
     - [ ] Public ```IabHelper``` methods.
     - [ ] Public models.
-    - [ ] Public listeners.
+    - [x] Public listeners.
     - [ ] Configuration.
-  - [ ] Solid internal architecture. - **80%**
+  - [ ] Solid internal architecture.
     - [x] Event based internal communication.
-    - [ ] Request handling.
+    - [x] Request handling.
     - [x] Response handling.
-  - [ ] ```BillingProvider``` - **50%**
-    - [ ] ```BillingController```
-    - [ ] Abstract asyc based implementation.
+  - [ ] ```BillingProvider```
+    - [x] ```BillingController```
+    - [x] Abstract asyc based implementation.
     - [ ] Abstract aidl services (Google based) implementation.
     - [x] Sku resolver abstraction.
+    - [ ] Transparent Sku mapping
     - [ ] PurchaseVerifier abstraction.
-      - [ ] Abstract public key based implementation.
-      - [ ] Abstract server side check based implementation.
   - [ ] Store picking algorithm implementation. - **10%**
-    - [ ] Package installer based.
-    - [ ] Setup state handling.
-    - [ ] BillingProved percistance.
+    - [x] Package installer based.
+    - [x] Setup state handling.
+    - [x] Authentication
+    - [ ] Prefer last used provider.
+    - [ ] Dynamically switch from stale provider.
   - [ ] Documentation - **0%**
     - [ ] Public API.
     - [ ] Internal impelentation comments.
@@ -38,7 +39,7 @@ OPFIab
     - [ ] Test Coverage.
 - [ ] BillingProvider implementations. - **10%**
   - [ ] Google InApp Billing
-  - [ ] Amazon InApp
+  - [x] Amazon InApp
   - [ ] Samsung
     - [ ] Abstract activity-dependant BilingProvider implementation.
   - [ ] Fortumo
