@@ -24,9 +24,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfutils.Checkable;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.exception.InitException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,12 +41,6 @@ public final class OPFIab {
             .throwSubscriberException(true)
             .eventInheritance(true)
             .build();
-    private static final Checkable CHECK_INIT = new Checkable() {
-        @Override
-        public boolean check() {
-            return baseIabHelper != null;
-        }
-    };
 
     private static volatile Configuration configuration;
     private static volatile Context context;
@@ -56,6 +50,14 @@ public final class OPFIab {
 
     private OPFIab() {
         throw new UnsupportedOperationException();
+    }
+
+    private static void checkInit(final boolean expectInit) {
+        OPFChecks.checkThread(true);
+        final boolean isInit = baseIabHelper != null;
+        if (expectInit != isInit) {
+            throw new InitException(isInit);
+        }
     }
 
     @NonNull
@@ -70,8 +72,7 @@ public final class OPFIab {
 
     @NonNull
     static BaseIabHelper getBaseHelper() {
-        OPFChecks.checkThread(true);
-        OPFChecks.checkInit(CHECK_INIT, true);
+        checkInit(true);
         return baseIabHelper;
     }
 
@@ -126,13 +127,8 @@ public final class OPFIab {
 
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
-        OPFChecks.checkThread(true);
-        OPFChecks.checkInit(CHECK_INIT, false);
-        OPFLog.init(OPFIab.class);
-        OPFLog.methodD(context, configuration);
-        OPFLog.d("Test log");
-        OPFLog.d(null);
-        OPFLog.d("Test formatted log: %s", "argument");
+        checkInit(false);
+        OPFLog.init(OPFIab.class.getSimpleName());
         OPFIab.context = context.getApplicationContext();
         OPFIab.configuration = configuration;
         EVENT_BUS.register(baseIabHelper = new BaseIabHelper(), Integer.MAX_VALUE);
@@ -140,8 +136,7 @@ public final class OPFIab {
     }
 
     public static void setup() {
-        OPFChecks.checkThread(true);
-        OPFChecks.checkInit(CHECK_INIT, true);
+        checkInit(true);
         SetupManager.setup();
     }
 }
