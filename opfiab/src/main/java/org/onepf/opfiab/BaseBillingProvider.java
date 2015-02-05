@@ -45,15 +45,11 @@ import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.greenrobot.event.EventBus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public abstract class BaseBillingProvider implements BillingProvider {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseBillingProvider.class);
 
     private static final String KEY_REQUEST = "request";
     @Nullable

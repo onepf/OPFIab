@@ -33,8 +33,6 @@ import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
 import org.onepf.opfiab.billing.BillingController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +40,6 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 final class AmazonBillingController implements BillingController, PurchasingListener {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AmazonBillingController.class);
-
 
     @NonNull
     private final Semaphore semaphore = new Semaphore(0);
@@ -129,7 +124,6 @@ final class AmazonBillingController implements BillingController, PurchasingList
             case FAILED:
             case NOT_SUPPORTED:
                 userData = null;
-                LOGGER.error("User data request failed.", requestStatus, userDataResponse);
                 break;
         }
         semaphore.release();

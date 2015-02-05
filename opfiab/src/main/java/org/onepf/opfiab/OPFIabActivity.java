@@ -27,8 +27,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.onepf.opfutils.OPFLog;
 
 import de.greenrobot.event.EventBus;
 
@@ -42,8 +41,6 @@ import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
 public class OPFIabActivity extends Activity {
 
     protected static final int FINISH_DELAY = 3000;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(OPFIabActivity.class);
 
     public static void start(@NonNull final Context context) {
         final Context applicationContext = context.getApplicationContext();
@@ -63,7 +60,7 @@ public class OPFIabActivity extends Activity {
     protected final Runnable finishTask = new Runnable() {
         @Override
         public void run() {
-            LOGGER.error("OPFIabActivity wasn't utilised! Finishing...");
+            OPFLog.e("OPFIabActivity wasn't utilised! Finishing...");
             finish();
         }
     };

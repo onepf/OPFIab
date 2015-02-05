@@ -17,6 +17,7 @@
 package org.onepf.sample.trivialdrive;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.event.SetupEvent;
@@ -26,46 +27,44 @@ import org.onepf.opfiab.model.event.response.InventoryResponse;
 import org.onepf.opfiab.model.event.response.PurchaseResponse;
 import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class TrivialBillingListener implements BillingListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrivialBillingListener.class);
+    private static final String TAG = TrivialBillingListener.class.getSimpleName();
 
     @Override
     public void onRequest(@NonNull final Request request) {
-        LOGGER.debug("", request);
+        Log.d(TAG, "" + request);
     }
 
     @Override
     public void onResponse(@NonNull final Response response) {
-        LOGGER.debug("", response);
+        Log.d(TAG, "" + response);
     }
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
-        LOGGER.debug("", consumeResponse);
+        Log.d(TAG, "" + consumeResponse);
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        LOGGER.debug("", inventoryResponse);
+        Log.d(TAG, "" + inventoryResponse);
     }
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-        LOGGER.debug("", purchaseResponse);
+        Log.d(TAG, "" + purchaseResponse);
     }
 
     @Override
     public void onSetup(@NonNull final SetupEvent setupEvent) {
-        LOGGER.debug("", setupEvent);
+        Log.d(TAG, "" + setupEvent);
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        LOGGER.debug("", skuDetailsResponse);
+        Log.d(TAG, "" + skuDetailsResponse);
     }
 }

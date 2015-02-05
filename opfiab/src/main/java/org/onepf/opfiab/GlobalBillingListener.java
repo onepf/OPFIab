@@ -28,15 +28,10 @@ import org.onepf.opfiab.model.event.response.InventoryResponse;
 import org.onepf.opfiab.model.event.response.PurchaseResponse;
 import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 final class GlobalBillingListener extends BillingListenerWrapper {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalBillingListener.class);
-
 
     GlobalBillingListener(@Nullable final BillingListener billingListener) {
         super(billingListener);

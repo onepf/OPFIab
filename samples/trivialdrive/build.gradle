@@ -58,7 +58,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.google.android.gms:play-services-base:6.5.87'
     compile 'com.amazon:in-app-purchasing:2.0.1'
-    compile 'org.slf4j:slf4j-android:1.7.10'
 
     compile project(':opfiab')
     compile project(':opfiab-providers:google')

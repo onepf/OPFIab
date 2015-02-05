@@ -26,8 +26,7 @@ import android.support.v4.app.FragmentActivity;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfutils.Checkable;
 import org.onepf.opfutils.OPFChecks;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +35,6 @@ import de.greenrobot.event.EventBus;
 
 public final class OPFIab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OPFIab.class);
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
     private static final EventBus EVENT_BUS = EventBus.builder()
             .executorService(EXECUTOR)
@@ -128,9 +126,13 @@ public final class OPFIab {
 
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
-        LOGGER.debug("init()");
         OPFChecks.checkThread(true);
         OPFChecks.checkInit(CHECK_INIT, false);
+        OPFLog.init(OPFIab.class);
+        OPFLog.methodD(context, configuration);
+        OPFLog.d("Test log");
+        OPFLog.d(null);
+        OPFLog.d("Test formatted log: %s", "argument");
         OPFIab.context = context.getApplicationContext();
         OPFIab.configuration = configuration;
         EVENT_BUS.register(baseIabHelper = new BaseIabHelper(), Integer.MAX_VALUE);

@@ -22,19 +22,16 @@ import org.onepf.opfiab.BillingProvider;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.model.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.onepf.opfutils.OPFLog;
 
 
 public class MyApplication extends Application {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MyApplication.class);
 
 
     @Override
     public void onCreate() {
         super.onCreate();
-        LOGGER.debug("Application onCreate()");
+        OPFLog.setEnabled(true);
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(createAmazonBillingProvider())
                 .setBillingListener(new TrivialBillingListener())

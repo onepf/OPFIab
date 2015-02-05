@@ -38,8 +38,6 @@ import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkusDetails;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -52,8 +50,6 @@ import static org.onepf.opfiab.model.event.response.Response.Status.UNAUTHORISED
 import static org.onepf.opfiab.model.event.response.Response.Status.UNKNOWN_ERROR;
 
 public class AmazonBillingProvider extends BaseBillingProvider {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AmazonBillingProvider.class);
 
     private static final String NAME = "Amazon";
     private static final String PACKAGE_NAME = "com.amazon.venezia";
@@ -105,12 +101,11 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         switch (status = productDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 //TODO
-                final SkusDetails skusDetails = new SkusDetails(null, null);
+                final SkusDetails skusDetails = new SkusDetails(Collections.<SkuDetails>emptyList(), null);
                 postResponse(SUCCESS, skusDetails);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                LOGGER.error("Product data request failed.", status, productDataResponse);
                 postResponse(UNKNOWN_ERROR);
                 break;
         }
@@ -131,7 +126,6 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                LOGGER.error("Purchase updates request failed.", status, purchaseUpdatesResponse);
                 postResponse(UNKNOWN_ERROR);
                 break;
         }
@@ -148,7 +142,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         final PurchaseResponse.RequestStatus status;
         switch (status = purchaseResponse.getRequestStatus()) {
             case SUCCESSFUL:
-                final Purchase purchase = getPurchase(purchaseResponse.getReceipt());
+                final Purchase purchase = newPurchase(purchaseResponse.getReceipt());
                 postResponse(SUCCESS, purchase);
                 break;
             case INVALID_SKU:
@@ -159,7 +153,6 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                LOGGER.error("Purchase request failed.", status, purchaseResponse);
                 postResponse(UNKNOWN_ERROR);
                 break;
         }
@@ -176,8 +169,18 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
 
-    private Purchase getPurchase(@NonNull final Receipt receipt) {
-        //TODO
+    private Purchase newPurchase(@NonNull final Receipt receipt) {
+//        final Purchase purchase;
+//        switch (receipt.getProductType()) {
+//            case CONSUMABLE:
+//                purchase = new ConsumablePurchase();
+//                break;
+//            case ENTITLED:
+//                break;
+//            case SUBSCRIPTION:
+//                break;
+//        }
+
         return new ConsumablePurchase(new ConsumableDetails(receipt.getSku()));
     }
 
