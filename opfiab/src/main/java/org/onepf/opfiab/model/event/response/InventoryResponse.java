@@ -36,12 +36,6 @@ public class InventoryResponse extends Response {
         this.inventory = inventory;
     }
 
-    public InventoryResponse(@NonNull final InventoryRequest request,
-                             @NonNull final Status status,
-                             @Nullable final Inventory inventory) {
-        this(null, request, status, inventory);
-    }
-
     @Nullable
     public Inventory getInventory() {
         return inventory;

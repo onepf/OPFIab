@@ -36,12 +36,6 @@ public class PurchaseResponse extends Response {
         this.purchase = purchase;
     }
 
-    public PurchaseResponse(@NonNull final PurchaseRequest request,
-                            @NonNull final Status status,
-                            @Nullable final Purchase purchase) {
-        this(null, request, status, purchase);
-    }
-
     @Nullable
     public Purchase getPurchase() {
         return purchase;

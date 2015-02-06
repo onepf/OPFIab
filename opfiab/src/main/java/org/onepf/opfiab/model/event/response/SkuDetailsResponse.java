@@ -36,12 +36,6 @@ public class SkuDetailsResponse extends Response {
         this.skusDetails = skusDetails;
     }
 
-    public SkuDetailsResponse(@NonNull final SkuDetailsRequest request,
-                              @NonNull final Status status,
-                              @Nullable final SkusDetails skusDetails) {
-        this(null, request, status, skusDetails);
-    }
-
     @Nullable
     public SkusDetails getSkusDetails() {
         return skusDetails;

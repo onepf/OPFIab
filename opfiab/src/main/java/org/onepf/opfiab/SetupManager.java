@@ -111,7 +111,6 @@ final class SetupManager {
     }
 
     @NonNull
-    //TODO lazy setup
     static State getState() {
         return state;
     }

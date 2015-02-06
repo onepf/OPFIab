@@ -36,12 +36,6 @@ public class ConsumeResponse extends Response {
         this.consumableDetails = consumableDetails;
     }
 
-    public ConsumeResponse(@NonNull final ConsumeRequest request,
-                           @NonNull final Status status,
-                           @Nullable final ConsumableDetails consumableDetails) {
-        this(null, request, status, consumableDetails);
-    }
-
     @Nullable
     public ConsumableDetails getConsumableDetails() {
         return consumableDetails;
