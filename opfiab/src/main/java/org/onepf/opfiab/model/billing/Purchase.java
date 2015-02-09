@@ -19,23 +19,28 @@ package org.onepf.opfiab.model.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public abstract class Purchase extends BillingModel {
+public class Purchase extends BillingModel {
 
     @NonNull
-    private final SkuDetails skuDetails;
+    private final String sku;
+    @NonNull
+    private final SkuType type;
 
-    Purchase(@NonNull final SkuDetails skuDetails, @Nullable final String json) {
+    public Purchase(@NonNull final String sku,
+                    @Nullable final SkuType type,
+                    @Nullable final String json) {
         super(json);
-        this.skuDetails = skuDetails;
+        this.sku = sku;
+        this.type = type == null ? SkuType.UNKNOWN : type;
     }
 
     @NonNull
-    public SkuDetails getSkuDetails() {
-        return skuDetails;
+    public String getSku() {
+        return sku;
     }
 
     @NonNull
-    public SkuDetails.Type getType() {
-        return skuDetails.getType();
+    public SkuType getType() {
+        return type;
     }
 }

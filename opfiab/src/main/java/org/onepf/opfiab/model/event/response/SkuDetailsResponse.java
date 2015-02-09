@@ -20,24 +20,30 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.SkusDetails;
+import org.onepf.opfiab.model.billing.SkuDetails;
+import org.onepf.opfiab.model.event.request.Request;
 import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public class SkuDetailsResponse extends Response {
 
     @Nullable
-    private final SkusDetails skusDetails;
+    private final Collection<SkuDetails> skusDetails;
 
     public SkuDetailsResponse(@Nullable final BillingProviderInfo providerInfo,
-                              @NonNull final SkuDetailsRequest request,
+                              @NonNull final Request request,
                               @NonNull final Status status,
-                              @Nullable final SkusDetails skusDetails) {
-        super(providerInfo, request, status);
-        this.skusDetails = skusDetails;
+                              @Nullable final Collection<SkuDetails> skusDetails) {
+        super(providerInfo, Type.SKU_DETAILS, request, status);
+        this.skusDetails = skusDetails == null
+                ? null
+                : Collections.unmodifiableCollection(skusDetails);
     }
 
     @Nullable
-    public SkusDetails getSkusDetails() {
+    public Collection<SkuDetails> getSkusDetails() {
         return skusDetails;
     }
 

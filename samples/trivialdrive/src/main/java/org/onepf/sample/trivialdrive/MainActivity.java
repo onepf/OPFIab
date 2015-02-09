@@ -59,8 +59,8 @@ public class MainActivity extends ActionBarActivity {
         iabHelper.addPurchaseListener(purchaseListener);
         setContentView(R.layout.activity_main);
         if (savedInstanceState == null) {
-//            iabHelper.purchase(new ConsumableDetails("org.onepf.sample.trivialdrive.sku_gas"));
-            iabHelper.skuDetails("org.onepf.sample.trivialdrive.sku_gas");
+            iabHelper.purchase("org.onepf.sample.trivialdrive.sku_gas");
+            //            iabHelper.skuDetails("org.onepf.sample.trivialdrive.sku_gas");
         }
     }
 

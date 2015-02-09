@@ -30,17 +30,10 @@ import com.amazon.device.iap.model.UserData;
 import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.ConsumablePurchase;
-import org.onepf.opfiab.model.billing.Inventory;
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.model.billing.SkusDetails;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 
 import static org.onepf.opfiab.model.event.response.Response.Status.ITEM_ALREADY_OWNED;
@@ -91,7 +84,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     @Override
-    public void skuDetails(@NonNull final Collection<String> skus) {
+    public void skuDetails(@NonNull final Set<String> skus) {
         if (!checkAuthorisation()) {
             return;
         }
@@ -101,8 +94,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         switch (status = productDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 //TODO
-                final SkusDetails skusDetails = new SkusDetails(Collections.<SkuDetails>emptyList(), null);
-                postResponse(SUCCESS, skusDetails);
+                postResponse(SUCCESS);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
@@ -121,8 +113,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         switch (status = purchaseUpdatesResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 //TODO Map sku
-                final Inventory inventory = new Inventory(Collections.<Purchase>emptyList());
-                postResponse(SUCCESS, inventory);
+                postResponse(SUCCESS);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
@@ -133,12 +124,11 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     @Override
-    public void purchase(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
+    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
         if (!checkAuthorisation()) {
             return;
         }
-        final String resolvedSku = skuResolver.resolve(skuDetails.getSku());
-        final PurchaseResponse purchaseResponse = controller.getPurchase(resolvedSku);
+        final PurchaseResponse purchaseResponse = controller.getPurchase(sku);
         final PurchaseResponse.RequestStatus status;
         switch (status = purchaseResponse.getRequestStatus()) {
             case SUCCESSFUL:
@@ -159,29 +149,28 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     @Override
-    public void consume(@NonNull final ConsumableDetails consumableDetails) {
+    public void consume(@NonNull final Purchase purchase) {
         if (!checkAuthorisation()) {
             return;
         }
-        final String resolvedSku = consumableDetails.getSku();
-        controller.consume(resolvedSku);
-        postResponse(SUCCESS, consumableDetails);
+        controller.consume(purchase.getSku());
+        postResponse(SUCCESS);
     }
 
 
     private Purchase newPurchase(@NonNull final Receipt receipt) {
-//        final Purchase purchase;
-//        switch (receipt.getProductType()) {
-//            case CONSUMABLE:
-//                purchase = new ConsumablePurchase();
-//                break;
-//            case ENTITLED:
-//                break;
-//            case SUBSCRIPTION:
-//                break;
-//        }
+        //        final Purchase purchase;
+        //        switch (receipt.getProductType()) {
+        //            case CONSUMABLE:
+        //                purchase = new ConsumablePurchase();
+        //                break;
+        //            case ENTITLED:
+        //                break;
+        //            case SUBSCRIPTION:
+        //                break;
+        //        }
 
-        return new ConsumablePurchase(new ConsumableDetails(receipt.getSku()));
+        return null;
     }
 
     public static class Builder extends BaseBillingProvider.Builder {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,10 @@
 
 package org.onepf.opfiab.model.billing;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+public enum SkuType {
 
-import java.util.List;
-
-public class Inventory extends BillingModel {
-
-    @NonNull
-    final List<Purchase> purchases;
-
-    public Inventory(@NonNull final List<Purchase> purchases, @Nullable final String json) {
-        super(json);
-        this.purchases = purchases;
-    }
-
-    public Inventory(@NonNull final List<Purchase> purchases) {
-        this(purchases, null);
-    }
-
-    @NonNull
-    public List<Purchase> getPurchases() {
-        return purchases;
-    }
+    CONSUMABLE,
+    ENTITLEMENT,
+    SUBSCRIPTION,
+    UNKNOWN,
 }

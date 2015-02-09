@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.request.PurchaseRequest;
+import org.onepf.opfiab.model.event.request.Request;
 
 public class PurchaseResponse extends Response {
 
@@ -29,10 +30,10 @@ public class PurchaseResponse extends Response {
     private final Purchase purchase;
 
     public PurchaseResponse(@Nullable final BillingProviderInfo providerInfo,
-                            @NonNull final PurchaseRequest request,
+                            @NonNull final Request request,
                             @NonNull final Status status,
                             @Nullable final Purchase purchase) {
-        super(providerInfo, request, status);
+        super(providerInfo, Type.PURCHASE, request, status);
         this.purchase = purchase;
     }
 

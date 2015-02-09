@@ -22,7 +22,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
@@ -115,21 +114,20 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
     }
 
     @Override
-    public void purchase(@NonNull final SkuDetails skuDetails) {
-        managedIabHelper.purchase(getActivity(), skuDetails);
+    public void purchase(@NonNull final String sku) {
+        managedIabHelper.purchase(getActivity(), sku);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @NonNull
     private Activity getActivity() {
-        Activity activity = null;
+        final Activity activity;
         if (supportFragment != null) {
             activity = supportFragment.getActivity();
         } else if (fragment != null) {
             activity = fragment.getActivity();
-        }
-        if (activity == null) {
-            throw new IllegalStateException("Fragment already detached!");
+        } else {
+            throw new IllegalStateException("Fragment is detached!");
         }
         return activity;
     }

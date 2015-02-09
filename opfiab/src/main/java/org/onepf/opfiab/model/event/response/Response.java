@@ -35,13 +35,15 @@ public abstract class Response extends BillingEvent {
 
         SUCCESS,
         PENDING,
+
+        UNAUTHORISED,
+
         BUSY,
         USER_CANCELED,
         BILLING_UNAVAILABLE,
         ITEM_UNAVAILABLE,
         ITEM_ALREADY_OWNED,
         SUBSCRIPTIONS_NOT_SUPPORTED,
-        UNAUTHORISED,
         UNKNOWN_ERROR,
     }
 
@@ -56,9 +58,13 @@ public abstract class Response extends BillingEvent {
     private final Status status;
 
     protected Response(@Nullable final BillingProviderInfo providerInfo,
+                       @NonNull final Type type,
                        @NonNull final Request request,
                        @NonNull final Status status) {
-        super(request.getType());
+        super(type);
+        if (request.getType() != type) {
+            throw new IllegalArgumentException("Request and Response types doesn't match.");
+        }
         this.providerInfo = providerInfo;
         this.request = request;
         this.status = status;

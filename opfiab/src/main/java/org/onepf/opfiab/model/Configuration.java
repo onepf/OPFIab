@@ -30,10 +30,8 @@ public final class Configuration {
 
     @NonNull
     private final Set<BillingProvider> providers;
-
     @Nullable
     private final BillingListener billingListener;
-
     private final boolean skipUnauthorised;
 
     private Configuration(@NonNull final Set<BillingProvider> providers,
@@ -62,10 +60,8 @@ public final class Configuration {
 
         @NonNull
         private final Set<BillingProvider> providers = new LinkedHashSet<>();
-
         @Nullable
         private BillingListener billingListener;
-
         private boolean skipUnauthorised = false;
 
         public Builder addBillingProvider(@NonNull final BillingProvider provider) {

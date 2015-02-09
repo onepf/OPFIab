@@ -33,13 +33,13 @@ public class PurchaseRequest extends Request {
     private final transient Reference<Activity> activityReference;
 
     @NonNull
-    private final SkuDetails skuDetails;
+    private final String sku;
 
     @SuppressFBWarnings({"SE_NO_SERIALVERSIONID"})
-    public PurchaseRequest(@NonNull final Activity activity, @NonNull final SkuDetails skuDetails) {
+    public PurchaseRequest(@NonNull final Activity activity, @NonNull final String sku) {
         super(Type.PURCHASE);
-        this.activityReference = new WeakReference<Activity>(activity);
-        this.skuDetails = skuDetails;
+        this.activityReference = new WeakReference<>(activity);
+        this.sku = sku;
     }
 
     @Nullable
@@ -48,7 +48,7 @@ public class PurchaseRequest extends Request {
     }
 
     @NonNull
-    public SkuDetails getSkuDetails() {
-        return skuDetails;
+    public String getSku() {
+        return sku;
     }
 }

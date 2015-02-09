@@ -21,22 +21,23 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.SkuDetails;
+import org.onepf.opfiab.model.billing.Purchase;
 
-import java.util.Collection;
+import java.util.Set;
 
 interface BillingBase {
 
     void purchase(@NonNull final Activity activity,
-                  @NonNull final SkuDetails skuDetails);
+                  @NonNull final String sku);
 
-    void consume(@NonNull final ConsumableDetails consumableDetails);
+    void consume(@NonNull final Purchase purchase);
 
     void inventory();
 
-    void skuDetails(@NonNull final Collection<String> skus);
+    void skuDetails(@NonNull final Set<String> skus);
 
-    void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                          final int resultCode, @Nullable final Intent data);
+    void onActivityResult(@NonNull final Activity activity,
+                          final int requestCode,
+                          final int resultCode,
+                          @Nullable final Intent data);
 }

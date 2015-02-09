@@ -22,8 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.SkuDetails;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.SetupEvent;
@@ -35,7 +34,7 @@ import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfutils.OPFChecks;
 
-import java.util.Collection;
+import java.util.Set;
 
 import static org.onepf.opfiab.model.event.response.Response.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.response.Response.Status.BUSY;
@@ -88,13 +87,13 @@ final class BaseIabHelper extends IabHelper {
     //TODO lazy initialized setup
     @Override
     public void purchase(@NonNull final Activity activity,
-                         @NonNull final SkuDetails skuDetails) {
-        postRequest(new PurchaseRequest(activity, skuDetails));
+                         @NonNull final String sku) {
+        postRequest(new PurchaseRequest(activity, sku));
     }
 
     @Override
-    public void consume(@NonNull final ConsumableDetails consumableDetails) {
-        postRequest(new ConsumeRequest(consumableDetails));
+    public void consume(@NonNull final Purchase purchase) {
+        postRequest(new ConsumeRequest(purchase));
     }
 
     @Override
@@ -103,7 +102,7 @@ final class BaseIabHelper extends IabHelper {
     }
 
     @Override
-    public void skuDetails(@NonNull final Collection<String> skus) {
+    public void skuDetails(@NonNull final Set<String> skus) {
         postRequest(new SkuDetailsRequest(skus));
     }
 

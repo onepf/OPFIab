@@ -112,7 +112,7 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
     }
 
     @Override
-    public void purchase(@NonNull final SkuDetails skuDetails) {
-        managedIabHelper.purchase(activity, skuDetails);
+    public void purchase(@NonNull final String sku) {
+        managedIabHelper.purchase(activity, sku);
     }
 }

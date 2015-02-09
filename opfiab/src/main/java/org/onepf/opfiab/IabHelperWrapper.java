@@ -21,10 +21,9 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.SkuDetails;
+import org.onepf.opfiab.model.billing.Purchase;
 
-import java.util.Collection;
+import java.util.Set;
 
 class IabHelperWrapper extends IabHelper {
 
@@ -37,13 +36,13 @@ class IabHelperWrapper extends IabHelper {
 
     @Override
     public void purchase(@NonNull final Activity activity,
-                         @NonNull final SkuDetails skuDetails) {
-        iabHelper.purchase(activity, skuDetails);
+                         @NonNull final String sku) {
+        iabHelper.purchase(activity, sku);
     }
 
     @Override
-    public void consume(@NonNull final ConsumableDetails consumableDetails) {
-        iabHelper.consume(consumableDetails);
+    public void consume(@NonNull final Purchase purchase) {
+        iabHelper.consume(purchase);
     }
 
     @Override
@@ -52,7 +51,7 @@ class IabHelperWrapper extends IabHelper {
     }
 
     @Override
-    public void skuDetails(@NonNull final Collection<String> skus) {
+    public void skuDetails(@NonNull final Set<String> skus) {
         iabHelper.skuDetails(skus);
     }
 

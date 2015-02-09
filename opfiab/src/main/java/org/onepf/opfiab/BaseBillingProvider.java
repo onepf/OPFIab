@@ -24,19 +24,14 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.Inventory;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.model.billing.SkusDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.request.ConsumeRequest;
-import org.onepf.opfiab.model.event.request.InventoryRequest;
 import org.onepf.opfiab.model.event.request.PurchaseRequest;
 import org.onepf.opfiab.model.event.request.Request;
 import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
-import org.onepf.opfiab.model.event.response.ConsumeResponse;
 import org.onepf.opfiab.model.event.response.InventoryResponse;
 import org.onepf.opfiab.model.event.response.PurchaseResponse;
 import org.onepf.opfiab.model.event.response.Response;
@@ -45,6 +40,8 @@ import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
+
+import java.util.Collection;
 
 import de.greenrobot.event.EventBus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -124,13 +121,13 @@ public abstract class BaseBillingProvider implements BillingProvider {
         switch (request.getType()) {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) request;
-                consume(consumeRequest.getConsumableDetails());
+                consume(consumeRequest.getPurchase());
                 break;
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
                 final Activity activity = purchaseRequest.getActivity();
-                final SkuDetails skuDetails = purchaseRequest.getSkuDetails();
-                purchase(activity, skuDetails);
+                final String sku = purchaseRequest.getSku();
+                purchase(activity, sku);
                 break;
             case SKU_DETAILS:
                 final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
@@ -162,27 +159,30 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final SkusDetails skusDetails) {
-        final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) getPendingRequestOrFail();
-        postResponse(new SkuDetailsResponse(getInfo(), skuDetailsRequest, status, skusDetails));
-    }
-
-    protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final Inventory inventory) {
-        final InventoryRequest inventoryRequest = (InventoryRequest) getPendingRequestOrFail();
-        postResponse(new InventoryResponse(getInfo(), inventoryRequest, status, inventory));
-    }
-
-    protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Purchase purchase) {
         final PurchaseRequest purchaseRequest = (PurchaseRequest) getPendingRequestOrFail();
         postResponse(new PurchaseResponse(getInfo(), purchaseRequest, status, purchase));
     }
 
+    @SuppressWarnings("unchecked")
     protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final ConsumableDetails consumableDetails) {
-        final ConsumeRequest consumeRequest = (ConsumeRequest) getPendingRequestOrFail();
-        postResponse(new ConsumeResponse(getInfo(), consumeRequest, status, consumableDetails));
+                                @NonNull final Collection items) {
+        final BillingProviderInfo info = getInfo();
+        final Request request = getPendingRequestOrFail();
+        final Response response;
+        switch (request.getType()) {
+            case SKU_DETAILS:
+                final Collection<SkuDetails> skusDetails = (Collection<SkuDetails>) items;
+                response = new SkuDetailsResponse(info, request, status, skusDetails);
+                break;
+            case INVENTORY:
+                final Collection<Purchase> inventory = (Collection<Purchase>) items;
+                response = new InventoryResponse(info, request, status, inventory);
+                break;
+            default:
+                throw new IllegalStateException("Response type is unmatched by request.");
+        }
+        postResponse(response);
     }
 
     @Override

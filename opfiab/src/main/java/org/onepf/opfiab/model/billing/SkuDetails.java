@@ -19,26 +19,19 @@ package org.onepf.opfiab.model.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public abstract class SkuDetails extends BillingModel {
-
-    public static enum Type {
-
-        CONSUMABLE,
-        ENTITLEMENT,
-        SUBSCRIPTION,
-    }
+public class SkuDetails extends BillingModel {
 
     @NonNull
     private final String sku;
-
     @NonNull
-    private final Type type;
+    private final SkuType type;
 
-    SkuDetails(@NonNull final Type type, @NonNull final String sku,
-                         @Nullable final String json) {
+    public SkuDetails(@NonNull final String sku,
+                      @Nullable final SkuType type,
+                      @Nullable final String json) {
         super(json);
-        this.type = type;
         this.sku = sku;
+        this.type = type == null ? SkuType.UNKNOWN : type;
     }
 
     @NonNull
@@ -47,7 +40,7 @@ public abstract class SkuDetails extends BillingModel {
     }
 
     @NonNull
-    public Type getType() {
+    public SkuType getType() {
         return type;
     }
 }

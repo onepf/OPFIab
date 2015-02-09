@@ -20,24 +20,28 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.Inventory;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.request.InventoryRequest;
+import org.onepf.opfiab.model.event.request.Request;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public class InventoryResponse extends Response {
 
     @Nullable
-    private final Inventory inventory;
+    private final Collection<Purchase> inventory;
 
     public InventoryResponse(@Nullable final BillingProviderInfo providerInfo,
-                             @NonNull final InventoryRequest request,
+                             @NonNull final Request request,
                              @NonNull final Status status,
-                             @Nullable final Inventory inventory) {
-        super(providerInfo, request, status);
-        this.inventory = inventory;
+                             @Nullable final Collection<Purchase> inventory) {
+        super(providerInfo, Type.INVENTORY, request, status);
+        this.inventory = inventory == null ? null : Collections.unmodifiableCollection(inventory);
     }
 
     @Nullable
-    public Inventory getInventory() {
+    public Collection<Purchase> getInventory() {
         return inventory;
     }
 

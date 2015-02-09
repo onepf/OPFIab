@@ -18,20 +18,20 @@ package org.onepf.opfiab.model.event.request;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.billing.ConsumableDetails;
+import org.onepf.opfiab.model.billing.Purchase;
 
 public class ConsumeRequest extends Request {
 
     @NonNull
-    private final ConsumableDetails consumableDetails;
+    private final Purchase purchase;
 
-    public ConsumeRequest(@NonNull final ConsumableDetails consumableDetails) {
+    public ConsumeRequest(@NonNull final Purchase purchase) {
         super(Type.CONSUME);
-        this.consumableDetails = consumableDetails;
+        this.purchase = purchase;
     }
 
     @NonNull
-    public ConsumableDetails getConsumableDetails() {
-        return consumableDetails;
+    public Purchase getPurchase() {
+        return purchase;
     }
 }

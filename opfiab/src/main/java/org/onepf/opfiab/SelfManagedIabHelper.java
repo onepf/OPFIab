@@ -27,7 +27,6 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.billing.SkuDetails;
 
 public abstract class SelfManagedIabHelper extends IabHelperWrapper {
 
@@ -49,7 +48,7 @@ public abstract class SelfManagedIabHelper extends IabHelperWrapper {
         throw new UnsupportedOperationException();
     }
 
-    public abstract void purchase(@NonNull final SkuDetails skuDetails);
+    public abstract void purchase(@NonNull final String sku);
 
     public void addSetupListener(
             @NonNull final OnSetupListener setupListener) {

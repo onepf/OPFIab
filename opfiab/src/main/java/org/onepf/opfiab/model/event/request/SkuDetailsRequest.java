@@ -18,23 +18,22 @@ package org.onepf.opfiab.model.event.request;
 
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SkuDetailsRequest extends Request {
 
     @NonNull
-    private final ArrayList<String> skus;
+    private final HashSet<String> skus;
 
-    public SkuDetailsRequest(@NonNull final Collection<String> skus) {
+    public SkuDetailsRequest(@NonNull final Set<String> skus) {
         super(Type.SKU_DETAILS);
-        this.skus = new ArrayList<>(skus);
+        this.skus = new HashSet<>(skus);
     }
 
     @NonNull
-    public List<String> getSkus() {
-        return Collections.unmodifiableList(skus);
+    public Set<String> getSkus() {
+        return Collections.unmodifiableSet(skus);
     }
 }

@@ -54,20 +54,16 @@ public final class OPFIabUtils {
         final BillingEvent.Type type = request.getType();
         switch (type) {
             case CONSUME:
-                final ConsumeRequest consumeRequest = (ConsumeRequest) request;
-                response = new ConsumeResponse(providerInfo, consumeRequest, status, null);
+                response = new ConsumeResponse(providerInfo, request, status);
                 break;
             case PURCHASE:
-                final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
-                response = new PurchaseResponse(providerInfo, purchaseRequest, status, null);
+                response = new PurchaseResponse(providerInfo, request, status, null);
                 break;
             case SKU_DETAILS:
-                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
-                response = new SkuDetailsResponse(providerInfo, skuDetailsRequest, status, null);
+                response = new SkuDetailsResponse(providerInfo, request, status, null);
                 break;
             case INVENTORY:
-                final InventoryRequest inventoryRequest = (InventoryRequest) request;
-                response = new InventoryResponse(providerInfo, inventoryRequest, status, null);
+                response = new InventoryResponse(providerInfo, request, status, null);
                 break;
             default:
                 throw new IllegalStateException();

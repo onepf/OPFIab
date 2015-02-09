@@ -25,13 +25,12 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.ConsumableDetails;
-import org.onepf.opfiab.model.billing.SkuDetails;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
-import java.util.Collection;
+import java.util.Set;
 
 public class GoogleBillingProvider extends BaseBillingProvider {
 
@@ -62,17 +61,17 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     }
 
     @Override
-    public void purchase(@NonNull final Activity activity,
-                         @NonNull final SkuDetails consumableDetails) {
-    }
-
-    @Override
-    public void skuDetails(@NonNull final Collection<String> skus) {
+    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
 
     }
 
     @Override
-    public void consume(@NonNull final ConsumableDetails consumableDetails) {
+    public void consume(@NonNull final Purchase purchase) {
+
+    }
+
+    @Override
+    public void skuDetails(@NonNull final Set<String> skus) {
 
     }
 
