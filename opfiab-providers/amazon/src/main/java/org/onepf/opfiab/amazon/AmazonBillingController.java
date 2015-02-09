@@ -33,6 +33,7 @@ import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
 import org.onepf.opfiab.billing.BillingController;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +47,12 @@ final class AmazonBillingController implements BillingController, PurchasingList
 
     @Nullable
     private volatile UserData userData;
+    @Nullable
+    private volatile PurchaseUpdatesResponse purchaseUpdates;
     @NonNull
     private volatile ProductDataResponse productData;
     @NonNull
     private volatile PurchaseResponse purchase;
-    @NonNull
-    private volatile PurchaseUpdatesResponse purchaseUpdates;
-    @NonNull
-    private volatile List<Receipt> receipts;
 
     public AmazonBillingController(@NonNull final Context context) {
         PurchasingService.registerListener(context, this);
@@ -66,7 +65,8 @@ final class AmazonBillingController implements BillingController, PurchasingList
 
     @Override
     public boolean isAuthorised() {
-        final UserData userData = getUserData();
+        final UserData userData;
+        userData = getUserData();
         return userData != null && !TextUtils.isEmpty(userData.getUserId());
     }
 
@@ -96,9 +96,13 @@ final class AmazonBillingController implements BillingController, PurchasingList
     @NonNull
     PurchaseUpdatesResponse getPurchaseUpdates() {
         checkState();
-        receipts = new ArrayList<>();
+        purchaseUpdates = null;
         PurchasingService.getPurchaseUpdates(true);
         semaphore.acquireUninterruptibly();
+        if (purchaseUpdates == null) {
+            throw new IllegalStateException();
+        }
+        //noinspection ConstantConditions
         return purchaseUpdates;
     }
 
@@ -116,14 +120,14 @@ final class AmazonBillingController implements BillingController, PurchasingList
 
     @Override
     public void onUserDataResponse(@NonNull final UserDataResponse userDataResponse) {
-        final UserDataResponse.RequestStatus requestStatus;
-        switch (requestStatus = userDataResponse.getRequestStatus()) {
+        switch (userDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 userData = userDataResponse.getUserData();
                 break;
             case FAILED:
             case NOT_SUPPORTED:
                 userData = null;
+                OPFLog.d("UserData request failed: %s", userDataResponse);
                 break;
         }
         semaphore.release();
@@ -144,22 +148,23 @@ final class AmazonBillingController implements BillingController, PurchasingList
     @Override
     public void onPurchaseUpdatesResponse(
             @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        if (purchaseUpdatesResponse.getRequestStatus() == PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL) {
-            receipts.addAll(purchaseUpdatesResponse.getReceipts());
-            if (purchaseUpdatesResponse.hasMore()) {
-                PurchasingService.getPurchaseUpdates(true);
-                return;
-            }
-            purchaseUpdates = new PurchaseUpdatesResponseBuilder()
-                    .setReceipts(receipts)
-                    .setHasMore(purchaseUpdatesResponse.hasMore())
-                    .setRequestId(purchaseUpdatesResponse.getRequestId())
-                    .setRequestStatus(purchaseUpdatesResponse.getRequestStatus())
-                    .setUserData(purchaseUpdatesResponse.getUserData())
-                    .build();
-        } else {
-            purchaseUpdates = purchaseUpdatesResponse;
+        final PurchaseUpdatesResponse.RequestStatus requestStatus = purchaseUpdatesResponse.getRequestStatus();
+        final List<Receipt> receipts = new ArrayList<>(purchaseUpdatesResponse.getReceipts());
+        if (purchaseUpdates != null) {
+            receipts.addAll(purchaseUpdates.getReceipts());
         }
-        semaphore.release();
+        purchaseUpdates = new PurchaseUpdatesResponseBuilder()
+                .setReceipts(receipts)
+                .setHasMore(purchaseUpdatesResponse.hasMore())
+                .setRequestId(purchaseUpdatesResponse.getRequestId())
+                .setRequestStatus(requestStatus)
+                .setUserData(purchaseUpdatesResponse.getUserData())
+                .build();
+        if (requestStatus == PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL
+                && purchaseUpdatesResponse.hasMore()) {
+            PurchasingService.getPurchaseUpdates(true);
+        } else {
+            semaphore.release();
+        }
     }
 }

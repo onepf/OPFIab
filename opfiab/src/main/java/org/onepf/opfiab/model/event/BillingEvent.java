@@ -56,4 +56,9 @@ public abstract class BillingEvent implements Serializable {
     public String toJson() {
         return GSON.toJson(this);
     }
+
+    @Override
+    public String toString() {
+        return toJson();
+    }
 }

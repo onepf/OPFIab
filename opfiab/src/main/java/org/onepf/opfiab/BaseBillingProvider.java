@@ -39,6 +39,7 @@ import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
@@ -107,6 +108,10 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     public final void onEventAsync(@NonNull final Request event) {
+        final Request request = getPendingRequest(context);
+        if (request != null) {
+            OPFLog.e("Request skipped!\n%s", request);
+        }
         setPendingRequest(context, event);
         handleRequest(event);
     }
