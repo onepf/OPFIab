@@ -20,12 +20,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.request.ConsumeRequest;
-import org.onepf.opfiab.model.event.request.InventoryRequest;
-import org.onepf.opfiab.model.event.request.PurchaseRequest;
 import org.onepf.opfiab.model.event.request.Request;
-import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.response.ConsumeResponse;
 import org.onepf.opfiab.model.event.response.InventoryResponse;
 import org.onepf.opfiab.model.event.response.PurchaseResponse;
@@ -33,7 +31,6 @@ import org.onepf.opfiab.model.event.response.Response;
 import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -71,9 +68,39 @@ public final class OPFIabUtils {
         return response;
     }
 
-    public static Set<String> resolve(@NonNull final SkuResolver resolver,
-                                      @NonNull final String... skus) {
-        return resolveSkus(resolver, Arrays.asList(skus));
+    public static SkuDetails substituteSku(@NonNull final SkuDetails skuDetails,
+                                           @NonNull final String sku) {
+        final SkuDetails.Builder builder = new SkuDetails.Builder(sku);
+        builder.setType(skuDetails.getType());
+        builder.setJson(skuDetails.getJson());
+        builder.setPrice(skuDetails.getPrice());
+        builder.setTitle(skuDetails.getTitle());
+        builder.setDescription(skuDetails.getDescription());
+        builder.setIconUrl(skuDetails.getIconUrl());
+        return builder.build();
+    }
+
+    public static Purchase substituteSku(@NonNull final Purchase purchase,
+                                         @NonNull final String sku) {
+        final Purchase.Builder builder = new Purchase.Builder(sku);
+        builder.setType(purchase.getType());
+        builder.setJson(purchase.getJson());
+        builder.setToken(purchase.getToken());
+        builder.setPurchaseTime(purchase.getPurchaseTime());
+        builder.setCanceled(purchase.isCanceled());
+        return builder.build();
+    }
+
+    public static SkuDetails resolve(@NonNull final SkuDetails skuDetails,
+                                     @NonNull final SkuResolver skuResolver) {
+        final String resolvedSku = skuResolver.resolve(skuDetails.getSku());
+        return substituteSku(skuDetails, resolvedSku);
+    }
+
+    public static Purchase resolve(@NonNull final Purchase purchase,
+                                   @NonNull final SkuResolver skuResolver) {
+        final String resolvedSku = skuResolver.resolve(purchase.getSku());
+        return substituteSku(purchase, resolvedSku);
     }
 
     public static Set<String> resolveSkus(@NonNull final SkuResolver resolver,
@@ -83,5 +110,17 @@ public final class OPFIabUtils {
             resolvedSkus.add(resolver.resolve(sku));
         }
         return resolvedSkus;
+    }
+
+    public static SkuDetails revert(@NonNull final SkuDetails skuDetails,
+                                    @NonNull final SkuResolver skuResolver) {
+        final String resolvedSku = skuResolver.revert(skuDetails.getSku());
+        return substituteSku(skuDetails, resolvedSku);
+    }
+
+    public static Purchase revert(@NonNull final Purchase purchase,
+                                  @NonNull final SkuResolver skuResolver) {
+        final String resolvedSku = skuResolver.resolve(purchase.getSku());
+        return substituteSku(purchase, resolvedSku);
     }
 }

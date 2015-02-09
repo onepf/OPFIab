@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.billing.BillingModel;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
@@ -41,7 +42,10 @@ import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import de.greenrobot.event.EventBus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -118,20 +122,25 @@ public abstract class BaseBillingProvider implements BillingProvider {
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST", "DLS_DEAD_LOCAL_STORE"})
     @SuppressWarnings("ConstantConditions")
     protected void handleRequest(@NonNull final Request request) {
+        final String resolvedSku;
         switch (request.getType()) {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) request;
-                consume(consumeRequest.getPurchase());
+                final Purchase purchase = consumeRequest.getPurchase();
+                resolvedSku = skuResolver.resolve(purchase.getSku());
+                consume(OPFIabUtils.substituteSku(purchase, resolvedSku));
                 break;
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
                 final Activity activity = purchaseRequest.getActivity();
-                final String sku = purchaseRequest.getSku();
-                purchase(activity, sku);
+                resolvedSku = skuResolver.resolve(purchaseRequest.getSku());
+                purchase(activity, resolvedSku);
                 break;
             case SKU_DETAILS:
                 final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
-                skuDetails(skuDetailsRequest.getSkus());
+                final Set<String> skus = skuDetailsRequest.getSkus();
+                final Set<String> resolvedSkus = OPFIabUtils.resolveSkus(skuResolver, skus);
+                skuDetails(resolvedSkus);
                 break;
             case INVENTORY:
                 inventory();
@@ -161,23 +170,32 @@ public abstract class BaseBillingProvider implements BillingProvider {
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Purchase purchase) {
         final PurchaseRequest purchaseRequest = (PurchaseRequest) getPendingRequestOrFail();
-        postResponse(new PurchaseResponse(getInfo(), purchaseRequest, status, purchase));
+        final Purchase revertedPurchase = OPFIabUtils.revert(purchase, skuResolver);
+        postResponse(new PurchaseResponse(getInfo(), purchaseRequest, status, revertedPurchase));
     }
 
     @SuppressWarnings("unchecked")
     protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final Collection items) {
+                                @NonNull final Collection<? extends BillingModel> items) {
         final BillingProviderInfo info = getInfo();
         final Request request = getPendingRequestOrFail();
         final Response response;
         switch (request.getType()) {
             case SKU_DETAILS:
                 final Collection<SkuDetails> skusDetails = (Collection<SkuDetails>) items;
-                response = new SkuDetailsResponse(info, request, status, skusDetails);
+                final List<SkuDetails> revertedSkuDetails = new ArrayList<>(items.size());
+                for (final SkuDetails skuDetails : skusDetails) {
+                    revertedSkuDetails.add(OPFIabUtils.revert(skuDetails, skuResolver));
+                }
+                response = new SkuDetailsResponse(info, request, status, revertedSkuDetails);
                 break;
             case INVENTORY:
                 final Collection<Purchase> inventory = (Collection<Purchase>) items;
-                response = new InventoryResponse(info, request, status, inventory);
+                final List<Purchase> revertedInventory = new ArrayList<>(items.size());
+                for (final Purchase purchase : inventory) {
+                    revertedInventory.add(OPFIabUtils.revert(purchase, skuResolver));
+                }
+                response = new InventoryResponse(info, request, status, revertedInventory);
                 break;
             default:
                 throw new IllegalStateException("Response type is unmatched by request.");
@@ -245,12 +263,12 @@ public abstract class BaseBillingProvider implements BillingProvider {
             this.context = context;
         }
 
-        protected Builder purchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
+        protected Builder setPurchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;
             return this;
         }
 
-        protected Builder skuResolver(@NonNull final SkuResolver skuResolver) {
+        protected Builder setSkuResolver(@NonNull final SkuResolver skuResolver) {
             this.skuResolver = skuResolver;
             return this;
         }

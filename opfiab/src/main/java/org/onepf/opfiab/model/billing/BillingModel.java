@@ -16,21 +16,66 @@
 
 package org.onepf.opfiab.model.billing;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.Serializable;
 
-class BillingModel implements Serializable {
+public abstract class BillingModel implements Serializable {
 
+    @NonNull
+    private final String sku;
+    @NonNull
+    private final SkuType type;
     @Nullable
     private final String json;
 
-    BillingModel(@Nullable final String json) {
+    protected BillingModel(@NonNull final String sku,
+                 @Nullable final SkuType type,
+                 @Nullable final String json) {
+        this.sku = sku;
+        this.type = type == null ? SkuType.UNKNOWN : type;
         this.json = json;
+    }
+
+    @NonNull
+    public String getSku() {
+        return sku;
+    }
+
+    @NonNull
+    public SkuType getType() {
+        return type;
     }
 
     @Nullable
     public String getJson() {
         return json;
+    }
+
+    abstract static class Builder {
+
+        @NonNull
+        protected final String sku;
+        @Nullable
+        protected SkuType type = null;
+        @Nullable
+        protected String json = null;
+
+        protected Builder(@NonNull final String sku) {
+            this.sku = sku;
+        }
+
+        public Builder setType(@Nullable final SkuType type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder setJson(@Nullable final String json) {
+            this.json = json;
+            return this;
+        }
+
+        public abstract BillingModel build();
     }
 }

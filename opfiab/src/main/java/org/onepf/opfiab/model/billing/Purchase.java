@@ -21,26 +21,62 @@ import android.support.annotation.Nullable;
 
 public class Purchase extends BillingModel {
 
-    @NonNull
-    private final String sku;
-    @NonNull
-    private final SkuType type;
+    @Nullable
+    private final String token;
+    private final long purchaseTime;
+    private final boolean canceled;
 
-    public Purchase(@NonNull final String sku,
-                    @Nullable final SkuType type,
-                    @Nullable final String json) {
-        super(json);
-        this.sku = sku;
-        this.type = type == null ? SkuType.UNKNOWN : type;
+    protected Purchase(@NonNull final String sku,
+                       @Nullable final SkuType type,
+                       @Nullable final String json,
+                       @Nullable final String token,
+                       final long purchaseTime,
+                       final boolean canceled) {
+        super(sku, type, json);
+        this.token = token;
+        this.purchaseTime = purchaseTime;
+        this.canceled = canceled;
     }
 
-    @NonNull
-    public String getSku() {
-        return sku;
+    @Nullable
+    public String getToken() {
+        return token;
     }
 
-    @NonNull
-    public SkuType getType() {
-        return type;
+    public long getPurchaseTime() {
+        return purchaseTime;
+    }
+
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    public static class Builder extends BillingModel.Builder {
+
+        @Nullable
+        private String token = null;
+        private long purchaseTime = 0L;
+        private boolean canceled = false;
+
+        public Builder(@NonNull final String sku) {
+            super(sku);
+        }
+
+        public void setToken(@Nullable final String token) {
+            this.token = token;
+        }
+
+        public void setPurchaseTime(final long purchaseTime) {
+            this.purchaseTime = purchaseTime;
+        }
+
+        public void setCanceled(final boolean canceled) {
+            this.canceled = canceled;
+        }
+
+        @Override
+        public Purchase build() {
+            return new Purchase(sku, type, json, token, purchaseTime, canceled);
+        }
     }
 }

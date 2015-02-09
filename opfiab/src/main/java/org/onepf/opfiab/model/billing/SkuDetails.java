@@ -21,26 +21,87 @@ import android.support.annotation.Nullable;
 
 public class SkuDetails extends BillingModel {
 
-    @NonNull
-    private final String sku;
-    @NonNull
-    private final SkuType type;
+    @Nullable
+    private final String price;
+    @Nullable
+    private final String title;
+    @Nullable
+    private final String description;
+    @Nullable
+    private final String iconUrl;
 
-    public SkuDetails(@NonNull final String sku,
-                      @Nullable final SkuType type,
-                      @Nullable final String json) {
-        super(json);
-        this.sku = sku;
-        this.type = type == null ? SkuType.UNKNOWN : type;
+    protected SkuDetails(@NonNull final String sku,
+                         @Nullable final SkuType type,
+                         @Nullable final String json,
+                         @Nullable final String price,
+                         @Nullable final String title,
+                         @Nullable final String description,
+                         @Nullable final String iconUrl) {
+        super(sku, type, json);
+        this.price = price;
+        this.title = title;
+        this.description = description;
+        this.iconUrl = iconUrl;
     }
 
-    @NonNull
-    public String getSku() {
-        return sku;
+    @Nullable
+    public String getPrice() {
+        return price;
     }
 
-    @NonNull
-    public SkuType getType() {
-        return type;
+    @Nullable
+    public String getTitle() {
+        return title;
+    }
+
+    @Nullable
+    public String getDescription() {
+        return description;
+    }
+
+    @Nullable
+    public String getIconUrl() {
+        return iconUrl;
+    }
+
+
+    public static class Builder extends BillingModel.Builder {
+
+        @Nullable
+        private String price = null;
+        @Nullable
+        private String title = null;
+        @Nullable
+        private String description = null;
+        @Nullable
+        private String iconUrl = null;
+
+        public Builder(@NonNull final String sku) {
+            super(sku);
+        }
+
+        public Builder setPrice(@Nullable final String price) {
+            this.price = price;
+            return this;
+        }
+
+        public Builder setTitle(@Nullable final String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder setDescription(@Nullable final String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder setIconUrl(@Nullable final String iconUrl) {
+            this.iconUrl = iconUrl;
+            return this;
+        }
+
+        public SkuDetails build() {
+            return new SkuDetails(sku, type, json, price, title, description, iconUrl);
+        }
     }
 }

@@ -100,13 +100,13 @@ public class GoogleBillingProvider extends BaseBillingProvider {
 
         public Builder purchaseVerifier(
                 @NonNull final PublicKeyPurchaseVerifier purchaseVerifier) {
-            super.purchaseVerifier(purchaseVerifier);
+            super.setPurchaseVerifier(purchaseVerifier);
             return this;
         }
 
         @Override
-        public Builder skuResolver(@NonNull final SkuResolver skuResolver) {
-            super.skuResolver(skuResolver);
+        public Builder setSkuResolver(@NonNull final SkuResolver skuResolver) {
+            super.setSkuResolver(skuResolver);
             return this;
         }
     }
