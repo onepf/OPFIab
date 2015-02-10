@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event.request;
+package org.onepf.opfiab.model.event.billing;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
-import org.onepf.opfiab.model.billing.SkuDetails;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;

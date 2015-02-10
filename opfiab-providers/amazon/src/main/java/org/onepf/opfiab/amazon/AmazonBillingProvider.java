@@ -36,11 +36,11 @@ import org.onepf.opfiab.verification.PurchaseVerifier;
 
 import java.util.Set;
 
-import static org.onepf.opfiab.model.event.response.Response.Status.ITEM_ALREADY_OWNED;
-import static org.onepf.opfiab.model.event.response.Response.Status.ITEM_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.response.Response.Status.SUCCESS;
-import static org.onepf.opfiab.model.event.response.Response.Status.UNAUTHORISED;
-import static org.onepf.opfiab.model.event.response.Response.Status.UNKNOWN_ERROR;
+import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_ALREADY_OWNED;
+import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Response.Status.SUCCESS;
+import static org.onepf.opfiab.model.event.billing.Response.Status.UNAUTHORISED;
+import static org.onepf.opfiab.model.event.billing.Response.Status.UNKNOWN_ERROR;
 
 public class AmazonBillingProvider extends BaseBillingProvider {
 
@@ -172,6 +172,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
         return null;
     }
+
+
 
     public static class Builder extends BaseBillingProvider.Builder {
 

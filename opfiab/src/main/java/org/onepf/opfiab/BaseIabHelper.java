@@ -22,65 +22,84 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.SetupEvent;
-import org.onepf.opfiab.model.event.request.ConsumeRequest;
-import org.onepf.opfiab.model.event.request.InventoryRequest;
-import org.onepf.opfiab.model.event.request.PurchaseRequest;
-import org.onepf.opfiab.model.event.request.Request;
-import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
-import org.onepf.opfiab.model.event.response.Response;
+import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.Response;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Set;
 
-import static org.onepf.opfiab.model.event.response.Response.Status.BILLING_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.response.Response.Status.BUSY;
+import static org.onepf.opfiab.model.event.billing.Response.Status.BILLING_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Response.Status.BUSY;
 
 final class BaseIabHelper extends IabHelper {
 
     @Nullable
-    private BillingProvider currentProvider;
+    private BillingProvider currentProvider = null;
     @Nullable
     private Request pendingRequest;
 
     BaseIabHelper() { }
 
-    public void onEventMainThread(@NonNull final SetupEvent event) {
-        if (event.isSuccessful()) {
-            currentProvider = event.getBillingProvider();
-            eventBus.register(currentProvider);
+    private void setCurrentProvider(@Nullable final BillingProvider provider) {
+        OPFChecks.checkThread(true);
+        //noinspection ConstantConditions
+        if (currentProvider != null) {
+            OPFIab.unregister(currentProvider);
+        }
+        currentProvider = provider;
+        OPFIab.register(currentProvider);
+    }
+
+    private void lazySetup(@NonNull final Request request) {
+        if (pendingRequest != null) {
+            OPFIab.post(OPFIabUtils.emptyResponse(null, request, BUSY));
+        } else {
+            pendingRequest = request;
+        }
+        OPFIab.setup();
+    }
+
+    private void postRequest(@NonNull final Request request) {
+        OPFLog.methodD(request);
+        OPFChecks.checkThread(true);
+        if (OPFIab.getStickyEvent(SetupResponse.class) == null) {
+            lazySetup(request);
+        } else if (currentProvider == null) {
+            OPFIab.post(OPFIabUtils.emptyResponse(null, request, BILLING_UNAVAILABLE));
+        } else if (!currentProvider.isAvailable()) {
+            OPFLog.e("BillingProvider is no longer available!\n%s", currentProvider);
+            final Configuration configuration = OPFIab.getConfiguration();
+            if (configuration.autoRecover()) {
+                setCurrentProvider(null);
+                lazySetup(request);
+            } else {
+                OPFIab.post(OPFIabUtils.emptyResponse(null, request, BILLING_UNAVAILABLE));
+            }
+        } else if (OPFIab.getStickyEvent(Request.class) != null) {
+            final BillingProviderInfo info = currentProvider.getInfo();
+            OPFIab.post(OPFIabUtils.emptyResponse(info, request, BUSY));
+        } else {
+            OPFIab.postSticky(request);
+        }
+    }
+
+    public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
+        if (setupResponse.isSuccessful()) {
+            setCurrentProvider(setupResponse.getBillingProvider());
         }
         if (pendingRequest != null) {
             postRequest(pendingRequest);
             pendingRequest = null;
-        }
-    }
-
-    void postRequest(@NonNull final Request request) {
-        OPFChecks.checkThread(true);
-        final SetupManager.State state = SetupManager.getState();
-        if (state != SetupManager.State.FINISHED) {
-            if (state == SetupManager.State.INITIAL) {
-                SetupManager.setup();
-            }
-            if (pendingRequest != null) {
-                eventBus.post(OPFIabUtils.emptyResponse(null, request, BUSY));
-            } else {
-                pendingRequest = request;
-            }
-            return;
-        }
-        if (currentProvider == null || !currentProvider.isAvailable()) {
-            eventBus.post(OPFIabUtils.emptyResponse(null, request, BILLING_UNAVAILABLE));
-        } else if (eventBus.getStickyEvent(BillingEvent.class) instanceof Request) {
-            final BillingProviderInfo info = currentProvider.getInfo();
-            final Response response = OPFIabUtils.emptyResponse(info, request, BUSY);
-            eventBus.post(response);
-        } else {
-            eventBus.postSticky(request);
         }
     }
 
@@ -107,9 +126,10 @@ final class BaseIabHelper extends IabHelper {
     }
 
     @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
+    public void onActivityResult(@NonNull final Activity activity,
+                                 final int requestCode,
                                  final int resultCode,
                                  @Nullable final Intent data) {
-        eventBus.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
+        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
     }
 }

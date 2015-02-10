@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event.request;
+package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.BillingEvent;
+import org.onepf.opfiab.model.Configuration;
 
-public abstract class Request extends BillingEvent {
+public class SetupRequest {
 
-    protected Request(@NonNull final Type type) {
-        super(type);
+    @NonNull
+    private final Configuration configuration;
+
+    public SetupRequest(@NonNull final Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    @NonNull
+    public Configuration getConfiguration() {
+        return configuration;
     }
 }

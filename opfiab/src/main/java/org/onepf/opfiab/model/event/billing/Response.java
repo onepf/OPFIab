@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event.response;
+package org.onepf.opfiab.model.event.billing;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.request.Request;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.onepf.opfiab.model.event.response.Response.Status.PENDING;
-import static org.onepf.opfiab.model.event.response.Response.Status.SUCCESS;
+import static org.onepf.opfiab.model.event.billing.Response.Status.PENDING;
+import static org.onepf.opfiab.model.event.billing.Response.Status.SUCCESS;
 
 public abstract class Response extends BillingEvent {
 
@@ -35,15 +34,12 @@ public abstract class Response extends BillingEvent {
 
         SUCCESS,
         PENDING,
-
         UNAUTHORISED,
-
         BUSY,
         USER_CANCELED,
         BILLING_UNAVAILABLE,
         ITEM_UNAVAILABLE,
         ITEM_ALREADY_OWNED,
-        SUBSCRIPTIONS_NOT_SUPPORTED,
         UNKNOWN_ERROR,
     }
 

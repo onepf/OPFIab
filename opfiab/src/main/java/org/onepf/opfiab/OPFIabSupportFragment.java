@@ -44,9 +44,6 @@ public class OPFIabSupportFragment extends Fragment {
     }
 
 
-    @NonNull
-    protected final EventBus eventBus = OPFIab.getEventBus();
-
     public OPFIabSupportFragment() {
         // Required empty public constructor
     }
@@ -55,54 +52,54 @@ public class OPFIabSupportFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        eventBus.post(new SupportFragmentLifecycleEvent(CREATE, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(CREATE, this));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        eventBus.post(new SupportFragmentLifecycleEvent(ATTACH, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(ATTACH, this));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        eventBus.post(new SupportFragmentLifecycleEvent(START, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(START, this));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        eventBus.post(new SupportFragmentLifecycleEvent(RESUME, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(RESUME, this));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        eventBus.post(new SupportFragmentLifecycleEvent(PAUSE, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(PAUSE, this));
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        eventBus.post(new SupportFragmentLifecycleEvent(STOP, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(STOP, this));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        eventBus.post(new SupportFragmentLifecycleEvent(DETACH, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(DETACH, this));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        eventBus.post(new SupportFragmentLifecycleEvent(DESTROY, this));
+        OPFIab.post(new SupportFragmentLifecycleEvent(DESTROY, this));
     }
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        eventBus.post(new ActivityResultEvent(getActivity(), requestCode, resultCode, data));
+        OPFIab.post(new ActivityResultEvent(getActivity(), requestCode, resultCode, data));
     }
 }

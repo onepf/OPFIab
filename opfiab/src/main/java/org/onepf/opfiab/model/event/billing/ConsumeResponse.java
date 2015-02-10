@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.model.event.billing;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import org.onepf.opfiab.model.BillingProviderInfo;
 
-import de.greenrobot.event.EventBus;
+public class ConsumeResponse extends Response {
 
-public abstract class IabHelper implements BillingBase {
+    public ConsumeResponse(@Nullable final BillingProviderInfo providerInfo,
+                           @NonNull final Request request,
+                           @NonNull final Status status) {
+        super(providerInfo, Type.CONSUME, request, status);
+    }
 
-    public final void skuDetails(@NonNull final String... skus) {
-        skuDetails(new HashSet<>(Arrays.asList(skus)));
+    @NonNull
+    @Override
+    public ConsumeRequest getRequest() {
+        return (ConsumeRequest) super.getRequest();
     }
 }

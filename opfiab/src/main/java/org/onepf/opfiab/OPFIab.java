@@ -24,25 +24,19 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.model.event.SetupRequest;
+import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfutils.OPFChecks;
-import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import de.greenrobot.event.EventBus;
 
 public final class OPFIab {
 
-    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
-    private static final EventBus EVENT_BUS = EventBus.builder()
-            .executorService(EXECUTOR)
-            .throwSubscriberException(true)
-            .eventInheritance(true)
-            .build();
-
     private static volatile Configuration configuration;
+    private static volatile EventBus eventBus;
     private static volatile Context context;
 
     private static BaseIabHelper baseIabHelper;
@@ -52,27 +46,51 @@ public final class OPFIab {
         throw new UnsupportedOperationException();
     }
 
-    private static void checkInit(final boolean expectInit) {
+    private static void checkInit() {
         OPFChecks.checkThread(true);
-        final boolean isInit = baseIabHelper != null;
-        if (expectInit != isInit) {
-            throw new InitException(isInit);
+        if (baseIabHelper == null) {
+            throw new InitException(false);
         }
     }
 
-    @NonNull
-    static ExecutorService getExecutor() {
-        return EXECUTOR;
+    private static EventBus newBus() {
+        return EventBus.builder()
+                .executorService(Executors.newSingleThreadExecutor())
+                .throwSubscriberException(true)
+                .eventInheritance(true)
+                .logNoSubscriberMessages(true)
+                .build();
     }
 
-    @NonNull
-    static EventBus getEventBus() {
-        return EVENT_BUS;
+    static void register(final Object subscriber) {
+        eventBus.register(subscriber);
+    }
+
+    static void register(final Object subscriber, final int priority) {
+        eventBus.register(subscriber, priority);
+    }
+
+    static void unregister(final Object subscriber) {eventBus.unregister(subscriber);}
+
+    static void post(final Object event) {
+        eventBus.post(event);
+    }
+
+    static void postSticky(final Object event) {
+        eventBus.postSticky(event);
+    }
+
+    static <T> T getStickyEvent(final Class<T> eventType) {
+        return eventBus.getStickyEvent(eventType);
+    }
+
+    static <T> T removeStickyEvent(final Class<T> eventType) {
+        return eventBus.removeStickyEvent(eventType);
     }
 
     @NonNull
     static BaseIabHelper getBaseHelper() {
-        checkInit(true);
+        checkInit();
         return baseIabHelper;
     }
 
@@ -127,16 +145,21 @@ public final class OPFIab {
 
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
-        checkInit(false);
-        OPFLog.init(OPFIab.class.getSimpleName());
-        OPFIab.context = context.getApplicationContext();
+        OPFChecks.checkThread(true);
         OPFIab.configuration = configuration;
-        EVENT_BUS.register(baseIabHelper = new BaseIabHelper(), Integer.MAX_VALUE);
-        EVENT_BUS.register(new GlobalBillingListener(configuration.getBillingListener()));
+        OPFIab.eventBus = newBus();
+        OPFIab.context = context.getApplicationContext();
+        OPFIab.baseIabHelper = new BaseIabHelper();
+        register(baseIabHelper, Integer.MAX_VALUE);
+        register(new SetupManager());
+        register(new GlobalBillingListener(configuration.getBillingListener()));
     }
 
     public static void setup() {
-        checkInit(true);
-        SetupManager.setup();
+        checkInit();
+        if (getStickyEvent(SetupRequest.class) != null) {
+            return;
+        }
+        postSticky(new SetupRequest(configuration));
     }
 }

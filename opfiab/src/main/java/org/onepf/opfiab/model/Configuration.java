@@ -33,10 +33,13 @@ public final class Configuration {
     @Nullable
     private final BillingListener billingListener;
     private final boolean skipUnauthorised;
+    private final boolean autoRecover;
 
     private Configuration(@NonNull final Set<BillingProvider> providers,
                           @Nullable final BillingListener billingListener,
-                          final boolean skipUnauthorised) {
+                          final boolean skipUnauthorised,
+                          final boolean autoRecover) {
+        this.autoRecover = autoRecover;
         this.providers = Collections.unmodifiableSet(providers);
         this.billingListener = billingListener;
         this.skipUnauthorised = skipUnauthorised;
@@ -56,6 +59,10 @@ public final class Configuration {
         return skipUnauthorised;
     }
 
+    public boolean autoRecover() {
+        return autoRecover;
+    }
+
     public static class Builder {
 
         @NonNull
@@ -63,6 +70,7 @@ public final class Configuration {
         @Nullable
         private BillingListener billingListener;
         private boolean skipUnauthorised = false;
+        private boolean autoRecover = false;
 
         public Builder addBillingProvider(@NonNull final BillingProvider provider) {
             providers.add(provider);
@@ -78,8 +86,12 @@ public final class Configuration {
             this.skipUnauthorised = skipUnauthorised;
         }
 
+        public void setAutoRecover(final boolean autoRecover) {
+            this.autoRecover = autoRecover;
+        }
+
         public Configuration build() {
-            return new Configuration(providers, billingListener, skipUnauthorised);
+            return new Configuration(providers, billingListener, skipUnauthorised, autoRecover);
         }
     }
 }

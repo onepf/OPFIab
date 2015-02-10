@@ -53,7 +53,7 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
             } else if (type == Type.DETACH) {
                 managedIabHelper.unsubscribe();
             } else if (type == Type.DESTROY) {
-                eventBus.unregister(this);
+                OPFIab.unregister(this);
             }
         }
     };
@@ -77,7 +77,7 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
         this.managedIabHelper = managedIabHelper;
         this.fragment = fragment;
         this.supportFragment = supportFragment;
-        eventBus.register(eventHandler);
+        OPFIab.register(eventHandler);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)

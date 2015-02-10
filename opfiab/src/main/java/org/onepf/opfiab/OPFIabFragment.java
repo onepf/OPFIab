@@ -46,10 +46,6 @@ public class OPFIabFragment extends Fragment {
         return new OPFIabFragment();
     }
 
-
-    @NonNull
-    protected final EventBus eventBus = OPFIab.getEventBus();
-
     public OPFIabFragment() {
         // Required empty public constructor
     }
@@ -58,54 +54,54 @@ public class OPFIabFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        eventBus.post(new FragmentLifecycleEvent(CREATE, this));
+        OPFIab.post(new FragmentLifecycleEvent(CREATE, this));
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        eventBus.post(new FragmentLifecycleEvent(ATTACH, this));
+        OPFIab.post(new FragmentLifecycleEvent(ATTACH, this));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        eventBus.post(new FragmentLifecycleEvent(START, this));
+        OPFIab.post(new FragmentLifecycleEvent(START, this));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        eventBus.post(new FragmentLifecycleEvent(RESUME, this));
+        OPFIab.post(new FragmentLifecycleEvent(RESUME, this));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        eventBus.post(new FragmentLifecycleEvent(PAUSE, this));
+        OPFIab.post(new FragmentLifecycleEvent(PAUSE, this));
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        eventBus.post(new FragmentLifecycleEvent(STOP, this));
+        OPFIab.post(new FragmentLifecycleEvent(STOP, this));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        eventBus.post(new FragmentLifecycleEvent(DETACH, this));
+        OPFIab.post(new FragmentLifecycleEvent(DETACH, this));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        eventBus.post(new FragmentLifecycleEvent(DESTROY, this));
+        OPFIab.post(new FragmentLifecycleEvent(DESTROY, this));
     }
 
     @Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        eventBus.post(new ActivityResultEvent(getActivity(), requestCode, resultCode, data));
+        OPFIab.post(new ActivityResultEvent(getActivity(), requestCode, resultCode, data));
     }
 }

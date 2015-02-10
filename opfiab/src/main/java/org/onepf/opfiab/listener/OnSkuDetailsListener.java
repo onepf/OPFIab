@@ -18,7 +18,7 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 public interface OnSkuDetailsListener {
 

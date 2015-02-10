@@ -29,14 +29,14 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.request.ConsumeRequest;
-import org.onepf.opfiab.model.event.request.PurchaseRequest;
-import org.onepf.opfiab.model.event.request.Request;
-import org.onepf.opfiab.model.event.request.SkuDetailsRequest;
-import org.onepf.opfiab.model.event.response.InventoryResponse;
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
-import org.onepf.opfiab.model.event.response.Response;
-import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Response;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
@@ -56,11 +56,9 @@ public abstract class BaseBillingProvider implements BillingProvider {
     private static final String KEY_REQUEST = "request";
     @Nullable
     private static OPFPreferences preferences;
-    @Nullable
-    private static Request pendingRequest;
 
     @NonNull
-    static OPFPreferences getPreferences(@NonNull final Context context) {
+    private static OPFPreferences getPreferences(@NonNull final Context context) {
         if (preferences == null) {
             preferences = new OPFPreferences(context);
         }
@@ -68,29 +66,27 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     @Nullable
-    static Request getPendingRequest(@NonNull final Context context) {
+    private static Request getPendingRequest(@NonNull final Context context) {
         final OPFPreferences preferences = getPreferences(context);
+        final Request pendingRequest = OPFIab.getStickyEvent(Request.class);
         if (pendingRequest == null && preferences.contains(KEY_REQUEST)) {
-            pendingRequest = BillingEvent.fromJson(preferences.getString(KEY_REQUEST, ""),
-                                                   Request.class);
+            return BillingEvent.fromJson(preferences.getString(KEY_REQUEST, ""), Request.class);
         }
         return pendingRequest;
     }
 
-    static void setPendingRequest(@NonNull final Context context,
+    private static void setPendingRequest(@NonNull final Context context,
                                   @Nullable final Request pendingRequest) {
         final OPFPreferences preferences = getPreferences(context);
-        BaseBillingProvider.pendingRequest = pendingRequest;
         if (pendingRequest == null) {
             preferences.remove(KEY_REQUEST);
+            OPFIab.removeStickyEvent(Request.class);
         } else {
             preferences.put(KEY_REQUEST, pendingRequest.toJson());
         }
     }
 
 
-    @NonNull
-    protected final EventBus eventBus = OPFIab.getEventBus();
     @NonNull
     protected final Context context;
     @NonNull
@@ -107,13 +103,13 @@ public abstract class BaseBillingProvider implements BillingProvider {
         this.skuResolver = skuResolver;
     }
 
-    public final void onEventAsync(@NonNull final Request event) {
-        final Request request = getPendingRequest(context);
-        if (request != null) {
-            OPFLog.e("Request skipped!\n%s", request);
+    public final void onEventAsync(@NonNull final Request request) {
+        final Request pendingRequest = getPendingRequest(context);
+        if (pendingRequest != null) {
+            OPFLog.e("Request skipped!\n%s", pendingRequest);
         }
-        setPendingRequest(context, event);
-        handleRequest(event);
+        setPendingRequest(context, request);
+        handleRequest(request);
     }
 
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
@@ -155,7 +151,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     protected final void postResponse(@NonNull final Response response) {
         setPendingRequest(context, null);
-        eventBus.postSticky(response);
+        OPFIab.post(response);
     }
 
     @NonNull

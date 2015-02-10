@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event.request;
+package org.onepf.opfiab.model.event.billing;
 
 public class InventoryRequest extends Request {
 

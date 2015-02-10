@@ -51,9 +51,6 @@ public class OPFIabActivity extends Activity {
 
 
     @NonNull
-    protected final EventBus eventBus = OPFIab.getEventBus();
-
-    @NonNull
     protected final Handler handler = new Handler(Looper.getMainLooper());
 
     @NonNull
@@ -69,7 +66,7 @@ public class OPFIabActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handler.postDelayed(finishTask, FINISH_DELAY);
-        eventBus.post(new ActivityLifecycleEvent(CREATE, this));
+        OPFIab.post(new ActivityLifecycleEvent(CREATE, this));
     }
 
     @Override
@@ -92,39 +89,39 @@ public class OPFIabActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        eventBus.post(new ActivityLifecycleEvent(START, this));
+        OPFIab.post(new ActivityLifecycleEvent(START, this));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        eventBus.post(new ActivityLifecycleEvent(RESUME, this));
+        OPFIab.post(new ActivityLifecycleEvent(RESUME, this));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        eventBus.post(new ActivityLifecycleEvent(PAUSE, this));
+        OPFIab.post(new ActivityLifecycleEvent(PAUSE, this));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        eventBus.post(new ActivityLifecycleEvent(STOP, this));
+        OPFIab.post(new ActivityLifecycleEvent(STOP, this));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         handler.removeCallbacks(finishTask);
-        eventBus.post(new ActivityLifecycleEvent(DESTROY, this));
+        OPFIab.post(new ActivityLifecycleEvent(DESTROY, this));
     }
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        eventBus.post(new ActivityResultEvent(this, requestCode, resultCode, data));
+        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
         finish();
     }
 }

@@ -20,16 +20,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.BillingProvider;
-import org.onepf.opfiab.OPFIab;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.onepf.opfiab.model.event.SetupEvent.Status.PROVIDER_CHANGED;
-import static org.onepf.opfiab.model.event.SetupEvent.Status.SUCCESS;
-import static org.onepf.opfiab.model.event.SetupEvent.Status.UNAUTHORISED;
+import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
+import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
+import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 
-public class SetupEvent {
+
+public class SetupResponse {
 
     public static enum Status {
 
@@ -39,22 +39,22 @@ public class SetupEvent {
         FAILED,
     }
 
-    private static final Collection<Status> SUCCESSFUL = OPFIab.getConfiguration().skipUnauthorised()
-            ? Arrays.asList(SUCCESS, PROVIDER_CHANGED)
-            : Arrays.asList(SUCCESS, PROVIDER_CHANGED, UNAUTHORISED);
+    private static final Collection<Status> SUCCESSFUL =
+            Arrays.asList(SUCCESS, PROVIDER_CHANGED, FAILED);
 
 
     @NonNull
     private final Status status;
-
     @Nullable
     private final BillingProvider billingProvider;
 
-
-    public SetupEvent(@NonNull final Status status,
-                      @Nullable final BillingProvider billingProvider) {
+    public SetupResponse(@NonNull final Status status,
+                         @Nullable final BillingProvider billingProvider) {
         this.status = status;
         this.billingProvider = billingProvider;
+        if (billingProvider == null && isSuccessful()) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Nullable
@@ -68,6 +68,6 @@ public class SetupEvent {
     }
 
     public boolean isSuccessful() {
-        return SUCCESSFUL.contains(getStatus());
+        return SUCCESSFUL.contains(status);
     }
 }

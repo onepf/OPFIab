@@ -24,12 +24,12 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.event.SetupEvent;
-import org.onepf.opfiab.model.event.response.ConsumeResponse;
-import org.onepf.opfiab.model.event.response.InventoryResponse;
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
-import org.onepf.opfiab.model.event.response.Response;
-import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Response;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,13 +37,12 @@ import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-//TODO: think about filter for listeners.
 public class ManagedIabHelper extends IabHelperWrapper {
 
     @NonNull
     private final Object eventHandler = new Object() {
 
-        public void onEventMainThread(@NonNull final SetupEvent event) {
+        public void onEventMainThread(@NonNull final SetupResponse event) {
             for (final OnSetupListener listener : setupListeners) {
                 listener.onSetup(event);
             }
@@ -103,9 +102,9 @@ public class ManagedIabHelper extends IabHelperWrapper {
     public void addSetupListener(@NonNull final OnSetupListener setupListener) {
         setupListeners.add(setupListener);
         // Deliver last setup even right away
-        final SetupEvent setupEvent = eventBus.getStickyEvent(SetupEvent.class);
-        if (setupEvent != null) {
-            setupListener.onSetup(setupEvent);
+        final SetupResponse setupResponse = OPFIab.getStickyEvent(SetupResponse.class);
+        if (setupResponse != null) {
+            setupListener.onSetup(setupResponse);
         }
     }
 
@@ -134,10 +133,10 @@ public class ManagedIabHelper extends IabHelperWrapper {
     }
 
     public void subscribe() {
-        eventBus.register(eventHandler);
+        OPFIab.register(eventHandler);
     }
 
     public void unsubscribe() {
-        eventBus.unregister(eventHandler);
+        OPFIab.unregister(eventHandler);
     }
 }

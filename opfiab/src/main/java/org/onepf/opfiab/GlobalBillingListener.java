@@ -21,13 +21,13 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerWrapper;
-import org.onepf.opfiab.model.event.SetupEvent;
-import org.onepf.opfiab.model.event.request.Request;
-import org.onepf.opfiab.model.event.response.ConsumeResponse;
-import org.onepf.opfiab.model.event.response.InventoryResponse;
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
-import org.onepf.opfiab.model.event.response.Response;
-import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Response;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -37,8 +37,8 @@ final class GlobalBillingListener extends BillingListenerWrapper {
         super(billingListener);
     }
 
-    public void onEventMainThread(@NonNull final SetupEvent setupEvent) {
-        onSetup(setupEvent);
+    public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
+        onSetup(setupResponse);
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})

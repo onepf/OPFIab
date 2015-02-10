@@ -18,7 +18,7 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.response.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 
 public interface OnConsumeListener {
 

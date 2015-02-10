@@ -52,7 +52,7 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
             } else if (type == Type.DETACH) {
                 managedIabHelper.unsubscribe();
             } else if (type == Type.DESTROY) {
-                eventBus.unregister(eventHandler);
+                OPFIab.unregister(eventHandler);
             }
         }
     };
@@ -71,7 +71,7 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
                               @Nullable final FragmentActivity fragmentActivity) {
         super(managedIabHelper);
         this.managedIabHelper = managedIabHelper;
-        eventBus.register(eventHandler);
+        OPFIab.register(eventHandler);
         //noinspection ConstantConditions
         this.activity = fragmentActivity != null ? fragmentActivity : activity;
     }

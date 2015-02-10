@@ -23,12 +23,12 @@ import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.request.Request;
-import org.onepf.opfiab.model.event.response.ConsumeResponse;
-import org.onepf.opfiab.model.event.response.InventoryResponse;
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
-import org.onepf.opfiab.model.event.response.Response;
-import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Response;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 
 import java.util.Collection;

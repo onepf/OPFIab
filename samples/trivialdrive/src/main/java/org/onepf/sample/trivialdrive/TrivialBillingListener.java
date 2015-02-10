@@ -20,13 +20,13 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.model.event.SetupEvent;
-import org.onepf.opfiab.model.event.request.Request;
-import org.onepf.opfiab.model.event.response.ConsumeResponse;
-import org.onepf.opfiab.model.event.response.InventoryResponse;
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
-import org.onepf.opfiab.model.event.response.Response;
-import org.onepf.opfiab.model.event.response.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Response;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 
 public class TrivialBillingListener implements BillingListener {
@@ -59,8 +59,8 @@ public class TrivialBillingListener implements BillingListener {
     }
 
     @Override
-    public void onSetup(@NonNull final SetupEvent setupEvent) {
-        Log.d(TAG, "" + setupEvent);
+    public void onSetup(@NonNull final SetupResponse setupResponse) {
+        Log.d(TAG, "" + setupResponse);
     }
 
     @Override

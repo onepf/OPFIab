@@ -27,8 +27,8 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.SelfManagedIabHelper;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.model.event.SetupEvent;
-import org.onepf.opfiab.model.event.response.PurchaseResponse;
+import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -39,8 +39,8 @@ public class MainActivity extends ActionBarActivity {
 
     private final OnSetupListener setupListener = new OnSetupListener() {
         @Override
-        public void onSetup(@NonNull final SetupEvent setupEvent) {
-            Log.d(TAG, "" + setupEvent);
+        public void onSetup(@NonNull final SetupResponse setupResponse) {
+            Log.d(TAG, "" + setupResponse);
         }
     };
 

@@ -14,26 +14,35 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event.response;
+package org.onepf.opfiab.model.event.billing;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.event.request.ConsumeRequest;
-import org.onepf.opfiab.model.event.request.Request;
+import org.onepf.opfiab.model.billing.Purchase;
 
-public class ConsumeResponse extends Response {
+public class PurchaseResponse extends Response {
 
-    public ConsumeResponse(@Nullable final BillingProviderInfo providerInfo,
-                           @NonNull final Request request,
-                           @NonNull final Status status) {
-        super(providerInfo, Type.CONSUME, request, status);
+    @Nullable
+    private final Purchase purchase;
+
+    public PurchaseResponse(@Nullable final BillingProviderInfo providerInfo,
+                            @NonNull final Request request,
+                            @NonNull final Status status,
+                            @Nullable final Purchase purchase) {
+        super(providerInfo, Type.PURCHASE, request, status);
+        this.purchase = purchase;
+    }
+
+    @Nullable
+    public Purchase getPurchase() {
+        return purchase;
     }
 
     @NonNull
     @Override
-    public ConsumeRequest getRequest() {
-        return (ConsumeRequest) super.getRequest();
+    public PurchaseRequest getRequest() {
+        return (PurchaseRequest) super.getRequest();
     }
 }

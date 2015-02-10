@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.model.event.billing;
 
 import android.support.annotation.NonNull;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import org.onepf.opfiab.model.event.BillingEvent;
 
-import de.greenrobot.event.EventBus;
+public abstract class Request extends BillingEvent {
 
-public abstract class IabHelper implements BillingBase {
-
-    public final void skuDetails(@NonNull final String... skus) {
-        skuDetails(new HashSet<>(Arrays.asList(skus)));
+    protected Request(@NonNull final Type type) {
+        super(type);
     }
 }
