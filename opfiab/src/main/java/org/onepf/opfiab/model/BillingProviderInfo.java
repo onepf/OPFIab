@@ -64,5 +64,12 @@ public final class BillingProviderInfo {
         result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        //TODO
+        return String.format("{\"name\":\"%s\", \"packageName\":\"%s\"}", name,
+                             String.valueOf(packageName));
+    }
     //CHECKSTYLE:ON
 }

@@ -42,6 +42,7 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import static org.onepf.opfiab.model.event.billing.Response.Status.BUSY;
 
 public abstract class BaseBillingProvider implements BillingProvider {
+
+    protected static void postEvent(@NonNull final Object event) {
+        OPFIab.post(event);
+    }
+
 
     @NonNull
     protected final Context context;
@@ -71,26 +77,10 @@ public abstract class BaseBillingProvider implements BillingProvider {
         this.skuResolver = skuResolver;
     }
 
-    public final void onEventAsync(@NonNull final Request request) {
-        if (pendingRequest != null) {
-            postResponse(BUSY);
-            return;
-        }
-        pendingRequest = request;
-        handleRequest(request);
-    }
-
-    public final void onEventAsync(@NonNull final ActivityResultEvent event) {
-        final Activity activity = event.getActivity();
-        final int requestCode = event.getRequestCode();
-        final int resultCode = event.getResultCode();
-        final Intent data = event.getData();
-        onActivityResult(activity, requestCode, resultCode, data);
-    }
-
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST", "DLS_DEAD_LOCAL_STORE"})
     @SuppressWarnings("ConstantConditions")
     protected void handleRequest(@NonNull final Request request) {
+        OPFLog.methodD(request);
         final String resolvedSku;
         switch (request.getType()) {
             case CONSUME:
@@ -117,13 +107,9 @@ public abstract class BaseBillingProvider implements BillingProvider {
         }
     }
 
-    protected void post(@NonNull final Object event) {
-        OPFIab.post(event);
-    }
-
-    protected final void postResponse(@NonNull final Response response) {
+    protected void postResponse(@NonNull final Response response) {
         pendingRequest = null;
-        OPFIab.post(response);
+        postEvent(response);
     }
 
     protected void postResponse(@NonNull final Response.Status status) {
@@ -150,7 +136,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
                                 @NonNull final Collection<? extends BillingModel> items) {
         if (pendingRequest == null) {
             OPFLog.e("No pending request for response! Skipping...\nStatus:%s\nItems:%s",
-                     status, items);
+                     status, Arrays.toString(items.toArray()));
             return;
         }
         final BillingProviderInfo info = getInfo();
@@ -176,6 +162,23 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 throw new IllegalStateException("Response type is unmatched by request.");
         }
         postResponse(response);
+    }
+
+    public final void onEventAsync(@NonNull final Request request) {
+        if (pendingRequest != null) {
+            postEvent(OPFIabUtils.emptyResponse(getInfo(), request, BUSY));
+            return;
+        }
+        pendingRequest = request;
+        handleRequest(request);
+    }
+
+    public final void onEventAsync(@NonNull final ActivityResultEvent event) {
+        final Activity activity = event.getActivity();
+        final int requestCode = event.getRequestCode();
+        final int resultCode = event.getResultCode();
+        final Intent data = event.getData();
+        onActivityResult(activity, requestCode, resultCode, data);
     }
 
     @Override
@@ -223,6 +226,12 @@ public abstract class BaseBillingProvider implements BillingProvider {
     public int hashCode() {
         return getInfo().hashCode();
     }
+
+    @Override
+    public String toString() {
+        return getInfo().toString();
+    }
+
     //CHECKSTYLE:ON
 
     public abstract static class Builder {

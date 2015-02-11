@@ -22,24 +22,24 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class InventoryResponse extends Response {
 
     @Nullable
-    private final Collection<Purchase> inventory;
+    private final List<Purchase> inventory;
 
     public InventoryResponse(@Nullable final BillingProviderInfo providerInfo,
                              @NonNull final Request request,
                              @NonNull final Status status,
-                             @Nullable final Collection<Purchase> inventory) {
+                             @Nullable final List<Purchase> inventory) {
         super(providerInfo, Type.INVENTORY, request, status);
-        this.inventory = inventory == null ? null : Collections.unmodifiableCollection(inventory);
+        this.inventory = inventory == null ? null : Collections.unmodifiableList(inventory);
     }
 
     @Nullable
-    public Collection<Purchase> getInventory() {
+    public List<Purchase> getInventory() {
         return inventory;
     }
 

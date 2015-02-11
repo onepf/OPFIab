@@ -28,6 +28,7 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.opfutils.OPFLog;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -62,5 +63,23 @@ final class GlobalBillingListener extends BillingListenerWrapper {
 
     public void onEventMainThread(@NonNull final Request request) {
         onRequest(request);
+    }
+
+    @Override
+    public void onSetup(@NonNull final SetupResponse setupResponse) {
+        OPFLog.methodD(setupResponse);
+        super.onSetup(setupResponse);
+    }
+
+    @Override
+    public void onRequest(@NonNull final Request request) {
+        OPFLog.methodD(request);
+        super.onRequest(request);
+    }
+
+    @Override
+    public void onResponse(@NonNull final Response response) {
+        OPFLog.methodD(response);
+        super.onResponse(response);
     }
 }

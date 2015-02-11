@@ -16,15 +16,12 @@
 
 package org.onepf.opfiab.amazon;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.amazon.device.iap.PurchasingListener;
 import com.amazon.device.iap.PurchasingService;
 import com.amazon.device.iap.internal.model.PurchaseUpdatesResponseBuilder;
-import com.amazon.device.iap.model.FulfillmentResult;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.PurchaseResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
@@ -33,93 +30,64 @@ import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
 import org.onepf.opfiab.billing.BillingController;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 final class AmazonBillingController implements BillingController, PurchasingListener {
 
-    @NonNull
-    private final Semaphore semaphore = new Semaphore(0);
+    private static final int TIMEOUT = PurchasingService.IS_SANDBOX_MODE ? 60000 : 3000;
 
     @Nullable
-    private volatile UserData userData;
+    private volatile CountDownLatch userDataLatch = null;
     @Nullable
-    private volatile PurchaseUpdatesResponse purchaseUpdates;
-    @NonNull
-    private volatile ProductDataResponse productData;
-    @NonNull
-    private volatile PurchaseResponse purchase;
+    private volatile UserData userData = null;
+    private List<Receipt> pendingReceipts = null;
 
-    public AmazonBillingController(@NonNull final Context context) {
-        PurchasingService.registerListener(context, this);
+    public AmazonBillingController() { }
+
+    @Nullable
+    UserData getUserData() {
+        final UserData localUserData = userData;
+        if (localUserData != null) {
+            return localUserData;
+        }
+
+        try {
+            userDataLatch = new CountDownLatch(1);
+            PurchasingService.getUserData();
+            //noinspection ConstantConditions
+            if (!userDataLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+                OPFLog.e("User data request timed out.");
+            }
+        } catch (InterruptedException exception) {
+            OPFLog.e("User data request interrupted.", exception);
+        } finally {
+            userDataLatch = null;
+        }
+        return userData;
     }
 
     @Override
     public boolean isBillingSupported() {
+        //TODO check permissions etc...
         return true;
     }
 
     @Override
     public boolean isAuthorised() {
-        final UserData userData;
-        userData = getUserData();
-        return userData != null && !TextUtils.isEmpty(userData.getUserId());
+        OPFChecks.checkThread(false);
+        return getUserData() != null;
     }
 
-    private void checkState() {
-        if (semaphore.availablePermits() != 0) {
-            throw new IllegalStateException("There must not be any concurrent requests.");
-        }
-    }
-
-    @Nullable
-    UserData getUserData() {
-        checkState();
-        userData = null;
-        PurchasingService.getUserData();
-        semaphore.acquireUninterruptibly();
-        return userData;
-    }
-
-    @NonNull
-    ProductDataResponse getProductData(@NonNull final Set<String> skus) {
-        checkState();
-        PurchasingService.getProductData(skus);
-        semaphore.acquireUninterruptibly();
-        return productData;
-    }
-
-    @NonNull
-    PurchaseUpdatesResponse getPurchaseUpdates() {
-        checkState();
-        purchaseUpdates = null;
-        PurchasingService.getPurchaseUpdates(true);
-        semaphore.acquireUninterruptibly();
-        if (purchaseUpdates == null) {
-            throw new IllegalStateException();
-        }
-        //noinspection ConstantConditions
-        return purchaseUpdates;
-    }
-
-    @NonNull
-    PurchaseResponse getPurchase(@NonNull final String sku) {
-        checkState();
-        PurchasingService.purchase(sku);
-        semaphore.acquireUninterruptibly();
-        return purchase;
-    }
-
-    void consume(@NonNull final String sku) {
-        PurchasingService.notifyFulfillment(sku, FulfillmentResult.FULFILLED);
-    }
 
     @Override
     public void onUserDataResponse(@NonNull final UserDataResponse userDataResponse) {
+        OPFLog.methodD(userDataResponse);
         switch (userDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 userData = userDataResponse.getUserData();
@@ -127,44 +95,53 @@ final class AmazonBillingController implements BillingController, PurchasingList
             case FAILED:
             case NOT_SUPPORTED:
                 userData = null;
-                OPFLog.d("UserData request failed: %s", userDataResponse);
+                OPFLog.e("UserData request failed: %s", userDataResponse);
                 break;
         }
-        semaphore.release();
+        final CountDownLatch latch = userDataLatch;
+        if (latch != null) {
+            latch.countDown();
+        }
     }
 
     @Override
     public void onProductDataResponse(@NonNull final ProductDataResponse productDataResponse) {
-        productData = productDataResponse;
-        semaphore.release();
+        AmazonBillingProvider.post(productDataResponse);
     }
 
     @Override
-    public void onPurchaseResponse(@NonNull final PurchaseResponse purchaseResponse) {
-        purchase = purchaseResponse;
-        semaphore.release();
+    public void onPurchaseResponse(
+            @NonNull final PurchaseResponse purchaseResponse) {
+        AmazonBillingProvider.post(purchaseResponse);
     }
 
     @Override
     public void onPurchaseUpdatesResponse(
             @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        final PurchaseUpdatesResponse.RequestStatus requestStatus = purchaseUpdatesResponse.getRequestStatus();
-        final List<Receipt> receipts = new ArrayList<>(purchaseUpdatesResponse.getReceipts());
-        if (purchaseUpdates != null) {
-            receipts.addAll(purchaseUpdates.getReceipts());
+        OPFChecks.checkThread(true);
+        final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
+        if (purchaseUpdatesResponse.hasMore()) {
+            if (pendingReceipts == null) {
+                pendingReceipts = new ArrayList<>(receipts);
+            } else {
+                pendingReceipts.addAll(receipts);
+            }
+            PurchasingService.getPurchaseUpdates(false);
+            return;
         }
-        purchaseUpdates = new PurchaseUpdatesResponseBuilder()
-                .setReceipts(receipts)
-                .setHasMore(purchaseUpdatesResponse.hasMore())
-                .setRequestId(purchaseUpdatesResponse.getRequestId())
-                .setRequestStatus(requestStatus)
-                .setUserData(purchaseUpdatesResponse.getUserData())
-                .build();
-        if (requestStatus == PurchaseUpdatesResponse.RequestStatus.SUCCESSFUL
-                && purchaseUpdatesResponse.hasMore()) {
-            PurchasingService.getPurchaseUpdates(true);
+
+        if (pendingReceipts == null) {
+            AmazonBillingProvider.post(purchaseUpdatesResponse);
         } else {
-            semaphore.release();
+            pendingReceipts.addAll(receipts);
+            final PurchaseUpdatesResponseBuilder builder = new PurchaseUpdatesResponseBuilder();
+            builder.setReceipts(pendingReceipts);
+            builder.setHasMore(purchaseUpdatesResponse.hasMore());
+            builder.setRequestId(purchaseUpdatesResponse.getRequestId());
+            builder.setRequestStatus(purchaseUpdatesResponse.getRequestStatus());
+            builder.setUserData(purchaseUpdatesResponse.getUserData());
+            AmazonBillingProvider.post(builder.build());
         }
+        pendingReceipts = null;
     }
 }

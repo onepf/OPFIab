@@ -17,14 +17,13 @@
 package org.onepf.sample.trivialdrive;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.event.SetupResponse;
-import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
@@ -35,36 +34,29 @@ public class TrivialBillingListener implements BillingListener {
 
     @Override
     public void onRequest(@NonNull final Request request) {
-        Log.d(TAG, "" + request);
     }
 
     @Override
     public void onResponse(@NonNull final Response response) {
-        Log.d(TAG, "" + response);
     }
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
-        Log.d(TAG, "" + consumeResponse);
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        Log.d(TAG, "" + inventoryResponse);
     }
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-        Log.d(TAG, "" + purchaseResponse);
     }
 
     @Override
     public void onSetup(@NonNull final SetupResponse setupResponse) {
-        Log.d(TAG, "" + setupResponse);
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        Log.d(TAG, "" + skuDetailsResponse);
     }
 }

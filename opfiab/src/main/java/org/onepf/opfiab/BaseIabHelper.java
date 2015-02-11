@@ -36,6 +36,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import static org.onepf.opfiab.model.event.billing.Response.Status.BILLING_UNAVAILABLE;
@@ -70,7 +71,6 @@ final class BaseIabHelper extends IabHelper {
     }
 
     private void postRequest(@NonNull final Request request) {
-        OPFLog.methodD(request);
         OPFChecks.checkThread(true);
         if (OPFIab.getStickyEvent(SetupResponse.class) == null) {
             lazySetup(request);
@@ -104,21 +104,25 @@ final class BaseIabHelper extends IabHelper {
     @Override
     public void purchase(@NonNull final Activity activity,
                          @NonNull final String sku) {
+        OPFLog.methodD(activity, sku);
         postRequest(new PurchaseRequest(activity, sku));
     }
 
     @Override
     public void consume(@NonNull final Purchase purchase) {
+        OPFLog.methodD(purchase);
         postRequest(new ConsumeRequest(purchase));
     }
 
     @Override
     public void inventory() {
+        OPFLog.methodD();
         postRequest(new InventoryRequest());
     }
 
     @Override
     public void skuDetails(@NonNull final Set<String> skus) {
+        OPFLog.methodD(Arrays.toString(skus.toArray()));
         postRequest(new SkuDetailsRequest(skus));
     }
 

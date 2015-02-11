@@ -70,4 +70,11 @@ public class SetupResponse {
     public boolean isSuccessful() {
         return SUCCESSFUL.contains(status);
     }
+
+    @Override
+    public String toString() {
+        //TODO
+        return String.format("{\"status\":\"%s\", \"billingProvider\":%s}", status,
+                             String.valueOf(billingProvider));
+    }
 }

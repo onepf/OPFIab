@@ -44,6 +44,10 @@ public class SkuDetails extends BillingModel {
         this.iconUrl = iconUrl;
     }
 
+    public SkuDetails(@NonNull final String sku) {
+        this(sku, null, null, null, null, null, null);
+    }
+
     @Nullable
     public String getPrice() {
         return price;

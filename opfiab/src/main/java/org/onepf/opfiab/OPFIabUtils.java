@@ -18,15 +18,16 @@ package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
@@ -70,6 +71,9 @@ public final class OPFIabUtils {
 
     public static SkuDetails substituteSku(@NonNull final SkuDetails skuDetails,
                                            @NonNull final String sku) {
+        if (TextUtils.equals(skuDetails.getSku(), sku)) {
+            return skuDetails;
+        }
         final SkuDetails.Builder builder = new SkuDetails.Builder(sku);
         builder.setType(skuDetails.getType());
         builder.setJson(skuDetails.getJson());
@@ -82,6 +86,9 @@ public final class OPFIabUtils {
 
     public static Purchase substituteSku(@NonNull final Purchase purchase,
                                          @NonNull final String sku) {
+        if (TextUtils.equals(purchase.getSku(), sku)) {
+            return purchase;
+        }
         final Purchase.Builder builder = new Purchase.Builder(sku);
         builder.setType(purchase.getType());
         builder.setJson(purchase.getJson());

@@ -19,16 +19,20 @@ package org.onepf.sample.trivialdrive;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.SelfManagedIabHelper;
-import org.onepf.opfiab.listener.OnPurchaseListener;
-import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.listener.BillingListener;
+import org.onepf.opfiab.listener.SimpleBillingListener;
+import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+
+import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -37,17 +41,33 @@ public class MainActivity extends ActionBarActivity {
     @NonNull
     private SelfManagedIabHelper iabHelper;
 
-    private final OnSetupListener setupListener = new OnSetupListener() {
-        @Override
-        public void onSetup(@NonNull final SetupResponse setupResponse) {
-            Log.d(TAG, "" + setupResponse);
-        }
-    };
+    private final BillingListener billingListener = new SimpleBillingListener() {
 
-    private final OnPurchaseListener purchaseListener = new OnPurchaseListener() {
+        @Override
+        public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+            super.onSkuDetails(skuDetailsResponse);
+            if (skuDetailsResponse.isSuccessful()) {
+                iabHelper.inventory();
+            }
+        }
+
+        @Override
+        public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
+            super.onInventory(inventoryResponse);
+            if (inventoryResponse.isSuccessful()) {
+                final List<Purchase> purchases = inventoryResponse.getInventory();
+                if (!purchases.isEmpty()) {
+                    iabHelper.consume(purchases.get(0));
+                }
+            }
+        }
+
         @Override
         public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-            Log.d(TAG, "" + purchaseResponse);
+            super.onPurchase(purchaseResponse);
+            if (purchaseResponse.isSuccessful()) {
+                iabHelper.inventory();
+            }
         }
     };
 
@@ -55,12 +75,21 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         iabHelper = OPFIab.getHelper(this);
-        iabHelper.addSetupListener(setupListener);
-        iabHelper.addPurchaseListener(purchaseListener);
+        iabHelper.addBillingListener(billingListener);
         setContentView(R.layout.activity_main);
+
+        final String sku = "org.onepf.sample.trivialdrive.sku_gas";
+
+        final View button = findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                iabHelper.purchase(sku);
+            }
+        });
+
         if (savedInstanceState == null) {
-            iabHelper.purchase("org.onepf.sample.trivialdrive.sku_gas");
-            //            iabHelper.skuDetails("org.onepf.sample.trivialdrive.sku_gas");
+            iabHelper.skuDetails(sku);
         }
     }
 
