@@ -28,19 +28,17 @@ import org.onepf.opfiab.model.billing.BillingModel;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
-import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
-import org.onepf.opfiab.model.event.billing.PurchaseRequest;
-import org.onepf.opfiab.model.event.billing.Request;
-import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.model.event.billing.Response;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
@@ -48,44 +46,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import de.greenrobot.event.EventBus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import static org.onepf.opfiab.model.event.billing.Response.Status.BUSY;
+
 public abstract class BaseBillingProvider implements BillingProvider {
-
-    private static final String KEY_REQUEST = "request";
-    @Nullable
-    private static OPFPreferences preferences;
-
-    @NonNull
-    private static OPFPreferences getPreferences(@NonNull final Context context) {
-        if (preferences == null) {
-            preferences = new OPFPreferences(context);
-        }
-        return preferences;
-    }
-
-    @Nullable
-    private static Request getPendingRequest(@NonNull final Context context) {
-        final OPFPreferences preferences = getPreferences(context);
-        final Request pendingRequest = OPFIab.getStickyEvent(Request.class);
-        if (pendingRequest == null && preferences.contains(KEY_REQUEST)) {
-            return BillingEvent.fromJson(preferences.getString(KEY_REQUEST, ""), Request.class);
-        }
-        return pendingRequest;
-    }
-
-    private static void setPendingRequest(@NonNull final Context context,
-                                  @Nullable final Request pendingRequest) {
-        final OPFPreferences preferences = getPreferences(context);
-        if (pendingRequest == null) {
-            preferences.remove(KEY_REQUEST);
-            OPFIab.removeStickyEvent(Request.class);
-        } else {
-            preferences.put(KEY_REQUEST, pendingRequest.toJson());
-        }
-    }
-
 
     @NonNull
     protected final Context context;
@@ -93,6 +58,9 @@ public abstract class BaseBillingProvider implements BillingProvider {
     protected final PurchaseVerifier purchaseVerifier;
     @NonNull
     protected final SkuResolver skuResolver;
+
+    @Nullable
+    private Request pendingRequest;
 
     protected BaseBillingProvider(
             @NonNull final Context context,
@@ -104,11 +72,11 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     public final void onEventAsync(@NonNull final Request request) {
-        final Request pendingRequest = getPendingRequest(context);
         if (pendingRequest != null) {
-            OPFLog.e("Request skipped!\n%s", pendingRequest);
+            postResponse(BUSY);
+            return;
         }
-        setPendingRequest(context, request);
+        pendingRequest = request;
         handleRequest(request);
     }
 
@@ -149,46 +117,52 @@ public abstract class BaseBillingProvider implements BillingProvider {
         }
     }
 
+    protected void post(@NonNull final Object event) {
+        OPFIab.post(event);
+    }
+
     protected final void postResponse(@NonNull final Response response) {
-        setPendingRequest(context, null);
+        pendingRequest = null;
         OPFIab.post(response);
     }
 
-    @NonNull
-    private Request getPendingRequestOrFail() {
-        final Request request = getPendingRequest(context);
-        if (request == null) {
-            throw new IllegalStateException();
-        }
-        return request;
-    }
-
     protected void postResponse(@NonNull final Response.Status status) {
-        final Request request = getPendingRequestOrFail();
-        postResponse(OPFIabUtils.emptyResponse(getInfo(), request, status));
+        if (pendingRequest == null) {
+            OPFLog.e("No pending request for response! Skipping...\nStatus:%s", status);
+            return;
+        }
+        postResponse(OPFIabUtils.emptyResponse(getInfo(), pendingRequest, status));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Purchase purchase) {
-        final PurchaseRequest purchaseRequest = (PurchaseRequest) getPendingRequestOrFail();
+        if (pendingRequest == null) {
+            OPFLog.e("No pending request for response! Skipping...\nStatus:%s\nPurchase:%s",
+                     status, purchase);
+            return;
+        }
         final Purchase revertedPurchase = OPFIabUtils.revert(purchase, skuResolver);
-        postResponse(new PurchaseResponse(getInfo(), purchaseRequest, status, revertedPurchase));
+        postResponse(new PurchaseResponse(getInfo(), pendingRequest, status, revertedPurchase));
     }
 
     @SuppressWarnings("unchecked")
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Collection<? extends BillingModel> items) {
+        if (pendingRequest == null) {
+            OPFLog.e("No pending request for response! Skipping...\nStatus:%s\nItems:%s",
+                     status, items);
+            return;
+        }
         final BillingProviderInfo info = getInfo();
-        final Request request = getPendingRequestOrFail();
         final Response response;
-        switch (request.getType()) {
+        switch (pendingRequest.getType()) {
             case SKU_DETAILS:
                 final Collection<SkuDetails> skusDetails = (Collection<SkuDetails>) items;
                 final List<SkuDetails> revertedSkuDetails = new ArrayList<>(items.size());
                 for (final SkuDetails skuDetails : skusDetails) {
                     revertedSkuDetails.add(OPFIabUtils.revert(skuDetails, skuResolver));
                 }
-                response = new SkuDetailsResponse(info, request, status, revertedSkuDetails);
+                response = new SkuDetailsResponse(info, pendingRequest, status, revertedSkuDetails);
                 break;
             case INVENTORY:
                 final Collection<Purchase> inventory = (Collection<Purchase>) items;
@@ -196,7 +170,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 for (final Purchase purchase : inventory) {
                     revertedInventory.add(OPFIabUtils.revert(purchase, skuResolver));
                 }
-                response = new InventoryResponse(info, request, status, revertedInventory);
+                response = new InventoryResponse(info, pendingRequest, status, revertedInventory);
                 break;
             default:
                 throw new IllegalStateException("Response type is unmatched by request.");

@@ -26,11 +26,6 @@ public abstract class BillingEvent implements Serializable {
 
     private static final Gson GSON = new Gson();
 
-    public static <T extends BillingEvent> T fromJson(@NonNull final String json,
-                                                      @NonNull final Class<T> clazz) {
-        return GSON.fromJson(json, clazz);
-    }
-
     public static enum Type {
 
         CONSUME,

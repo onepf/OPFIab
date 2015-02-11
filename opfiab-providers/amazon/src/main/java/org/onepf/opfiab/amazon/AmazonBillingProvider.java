@@ -170,7 +170,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         //                break;
         //        }
 
-        return null;
+        return new Purchase.Builder(receipt.getSku()).build();
     }
 
 

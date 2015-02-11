@@ -85,11 +85,8 @@ final class BaseIabHelper extends IabHelper {
             } else {
                 OPFIab.post(OPFIabUtils.emptyResponse(null, request, BILLING_UNAVAILABLE));
             }
-        } else if (OPFIab.getStickyEvent(Request.class) != null) {
-            final BillingProviderInfo info = currentProvider.getInfo();
-            OPFIab.post(OPFIabUtils.emptyResponse(info, request, BUSY));
         } else {
-            OPFIab.postSticky(request);
+            OPFIab.post(request);
         }
     }
 
