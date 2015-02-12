@@ -41,13 +41,6 @@ public abstract class SelfManagedIabHelper extends IabHelperWrapper {
         this.managedIabHelper = managedIabHelper;
     }
 
-    @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode,
-                                 @Nullable final Intent data) {
-        throw new UnsupportedOperationException();
-    }
-
     public abstract void purchase(@NonNull final String sku);
 
     public void addSetupListener(
@@ -78,5 +71,12 @@ public abstract class SelfManagedIabHelper extends IabHelperWrapper {
     public void addBillingListener(
             @NonNull final BillingListener billingListener) {
         managedIabHelper.addBillingListener(billingListener);
+    }
+
+    @Override
+    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
+                                 final int resultCode,
+                                 @Nullable final Intent data) {
+        throw new UnsupportedOperationException("Activity result is handled automatically.");
     }
 }

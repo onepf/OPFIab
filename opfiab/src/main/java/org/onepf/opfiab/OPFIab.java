@@ -25,7 +25,6 @@ import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
-import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
@@ -60,6 +59,7 @@ public final class OPFIab {
                 .throwSubscriberException(true)
                 .eventInheritance(true)
                 .logNoSubscriberMessages(OPFLog.isEnabled())
+                .logSubscriberExceptions(OPFLog.isEnabled())
                 .build();
     }
 
