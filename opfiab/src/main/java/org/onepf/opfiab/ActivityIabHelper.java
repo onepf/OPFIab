@@ -23,7 +23,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
-import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
@@ -32,37 +31,9 @@ import static org.onepf.opfiab.model.event.LifecycleEvent.Type;
 public class ActivityIabHelper extends SelfManagedIabHelper {
 
     @NonNull
-    private final Object eventHandler = new Object() {
-
-        public void onEvent(@NonNull final FragmentLifecycleEvent event) {
-            if (opfFragment == event.getFragment()) {
-                handleLifecycle(event.getType());
-            }
-        }
-
-        public void onEvent(@NonNull final SupportFragmentLifecycleEvent event) {
-            if (opfFragment == event.getFragment()) {
-                handleLifecycle(event.getType());
-            }
-        }
-
-        private void handleLifecycle(@NonNull final Type type) {
-            if (type == Type.ATTACH) {
-                managedIabHelper.subscribe();
-            } else if (type == Type.DETACH) {
-                managedIabHelper.unsubscribe();
-            } else if (type == Type.DESTROY) {
-                OPFIab.unregister(eventHandler);
-            }
-        }
-    };
-
-    @NonNull
     private final Activity activity;
-
     @NonNull
     private final ManagedIabHelper managedIabHelper;
-
     @NonNull
     private Object opfFragment;
 
@@ -71,9 +42,9 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
                               @Nullable final FragmentActivity fragmentActivity) {
         super(managedIabHelper);
         this.managedIabHelper = managedIabHelper;
-        OPFIab.register(eventHandler);
         //noinspection ConstantConditions
         this.activity = fragmentActivity != null ? fragmentActivity : activity;
+        OPFIab.register(this);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -109,6 +80,29 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
         }
         this.opfFragment = fragment;
         fragmentManager.executePendingTransactions();
+    }
+
+    public void onEventMainThread(@NonNull final FragmentLifecycleEvent event) {
+        if (opfFragment == event.getFragment()) {
+            handleLifecycle(event.getType());
+        }
+    }
+
+    public void onEventMainThread(@NonNull final SupportFragmentLifecycleEvent event) {
+        if (opfFragment == event.getFragment()) {
+            handleLifecycle(event.getType());
+        }
+    }
+
+    private void handleLifecycle(@NonNull final Type type) {
+        if (type == Type.ATTACH) {
+            managedIabHelper.subscribe();
+        } else if (type == Type.DETACH) {
+            managedIabHelper.unsubscribe();
+        } else if ((type == Type.PAUSE && activity.isFinishing()) || type == Type.DESTROY) {
+            managedIabHelper.unsubscribe();
+            OPFIab.unregister(this);
+        }
     }
 
     @Override

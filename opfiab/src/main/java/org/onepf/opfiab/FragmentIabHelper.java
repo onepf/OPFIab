@@ -29,35 +29,6 @@ import static org.onepf.opfiab.model.event.LifecycleEvent.Type;
 
 public class FragmentIabHelper extends SelfManagedIabHelper {
 
-    @SuppressWarnings("FieldCanBeLocal")
-    @NonNull
-    private final Object eventHandler = new Object() {
-
-        public void onEvent(@NonNull final FragmentLifecycleEvent event) {
-            if (opfFragment != event.getFragment()) {
-                return;
-            }
-            handleLifecycle(event.getType());
-        }
-
-        public void onEvent(@NonNull final SupportFragmentLifecycleEvent event) {
-            if (opfFragment != event.getFragment()) {
-                return;
-            }
-            handleLifecycle(event.getType());
-        }
-
-        private void handleLifecycle(@NonNull final Type type) {
-            if (type == Type.ATTACH) {
-                managedIabHelper.subscribe();
-            } else if (type == Type.DETACH) {
-                managedIabHelper.unsubscribe();
-            } else if (type == Type.DESTROY) {
-                OPFIab.unregister(this);
-            }
-        }
-    };
-
     @Nullable
     private final android.app.Fragment fragment;
 
@@ -77,7 +48,7 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
         this.managedIabHelper = managedIabHelper;
         this.fragment = fragment;
         this.supportFragment = supportFragment;
-        OPFIab.register(eventHandler);
+        OPFIab.register(this);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -111,6 +82,31 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
         }
         this.opfFragment = opfFragment;
         fragmentManager.executePendingTransactions();
+    }
+
+    public void onEventMainThread(@NonNull final FragmentLifecycleEvent event) {
+        if (opfFragment != event.getFragment()) {
+            return;
+        }
+        handleLifecycle(event.getType());
+    }
+
+    public void onEventMainThread(@NonNull final SupportFragmentLifecycleEvent event) {
+        if (opfFragment != event.getFragment()) {
+            return;
+        }
+        handleLifecycle(event.getType());
+    }
+
+    private void handleLifecycle(@NonNull final Type type) {
+        if (type == Type.ATTACH) {
+            managedIabHelper.subscribe();
+        } else if (type == Type.DETACH) {
+            managedIabHelper.unsubscribe();
+        } else if ((type == Type.PAUSE && getActivity().isFinishing()) || type == Type.DESTROY) {
+            managedIabHelper.unsubscribe();
+            OPFIab.unregister(this);
+        }
     }
 
     @Override

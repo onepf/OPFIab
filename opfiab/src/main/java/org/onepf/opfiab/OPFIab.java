@@ -27,6 +27,7 @@ import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
 
 import java.util.concurrent.Executors;
@@ -58,7 +59,7 @@ public final class OPFIab {
                 .executorService(Executors.newSingleThreadExecutor())
                 .throwSubscriberException(true)
                 .eventInheritance(true)
-                .logNoSubscriberMessages(true)
+                .logNoSubscriberMessages(OPFLog.isEnabled())
                 .build();
     }
 
@@ -70,7 +71,9 @@ public final class OPFIab {
         eventBus.register(subscriber, priority);
     }
 
-    static void unregister(final Object subscriber) {eventBus.unregister(subscriber);}
+    static void unregister(final Object subscriber) {
+        eventBus.unregister(subscriber);
+    }
 
     static void post(final Object event) {
         eventBus.post(event);

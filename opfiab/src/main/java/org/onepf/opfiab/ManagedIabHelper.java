@@ -40,42 +40,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class ManagedIabHelper extends IabHelperWrapper {
 
     @NonNull
-    private final Object eventHandler = new Object() {
-
-        public void onEventMainThread(@NonNull final SetupResponse event) {
-            for (final OnSetupListener listener : setupListeners) {
-                listener.onSetup(event);
-            }
-        }
-
-        @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
-        public void onEventMainThread(@NonNull final Response event) {
-            switch (event.getType()) {
-                case CONSUME:
-                    for (final OnConsumeListener listener : consumeListeners) {
-                        listener.onConsume((ConsumeResponse) event);
-                    }
-                    break;
-                case PURCHASE:
-                    for (final OnPurchaseListener listener : purchaseListeners) {
-                        listener.onPurchase((PurchaseResponse) event);
-                    }
-                    break;
-                case SKU_DETAILS:
-                    for (final OnSkuDetailsListener listener : skuDetailsListeners) {
-                        listener.onSkuDetails((SkuDetailsResponse) event);
-                    }
-                    break;
-                case INVENTORY:
-                    for (final OnInventoryListener listener : inventoryListeners) {
-                        listener.onInventory((InventoryResponse) event);
-                    }
-                    break;
-            }
-        }
-    };
-
-    @NonNull
     final Set<OnSetupListener> setupListeners = Collections.synchronizedSet(
             new HashSet<OnSetupListener>());
 
@@ -97,6 +61,38 @@ public class ManagedIabHelper extends IabHelperWrapper {
 
     public ManagedIabHelper(@NonNull final BaseIabHelper baseIabHelper) {
         super(baseIabHelper);
+    }
+
+    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
+    public void onEventMainThread(@NonNull final Response event) {
+        switch (event.getType()) {
+            case CONSUME:
+                for (final OnConsumeListener listener : consumeListeners) {
+                    listener.onConsume((ConsumeResponse) event);
+                }
+                break;
+            case PURCHASE:
+                for (final OnPurchaseListener listener : purchaseListeners) {
+                    listener.onPurchase((PurchaseResponse) event);
+                }
+                break;
+            case SKU_DETAILS:
+                for (final OnSkuDetailsListener listener : skuDetailsListeners) {
+                    listener.onSkuDetails((SkuDetailsResponse) event);
+                }
+                break;
+            case INVENTORY:
+                for (final OnInventoryListener listener : inventoryListeners) {
+                    listener.onInventory((InventoryResponse) event);
+                }
+                break;
+        }
+    }
+
+    public void onEventMainThread(@NonNull final SetupResponse event) {
+        for (final OnSetupListener listener : setupListeners) {
+            listener.onSetup(event);
+        }
     }
 
     public void addSetupListener(@NonNull final OnSetupListener setupListener) {
@@ -133,10 +129,10 @@ public class ManagedIabHelper extends IabHelperWrapper {
     }
 
     public void subscribe() {
-        OPFIab.register(eventHandler);
+        OPFIab.register(this);
     }
 
     public void unsubscribe() {
-        OPFIab.unregister(eventHandler);
+        OPFIab.unregister(this);
     }
 }
