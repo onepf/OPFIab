@@ -16,9 +16,9 @@
 
 package org.onepf.opfiab;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.ComponentName;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -37,12 +37,9 @@ import org.onepf.opfiab.sku.SkuResolver;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import static android.content.Context.ACTIVITY_SERVICE;
 
 public final class OPFIabUtils {
 
@@ -50,17 +47,11 @@ public final class OPFIabUtils {
         throw new UnsupportedOperationException();
     }
 
-    public static boolean isOnTopOfTask(@NonNull final Activity activity) {
-        final ActivityManager am = (ActivityManager) activity.getSystemService(ACTIVITY_SERVICE);
-        final List<ActivityManager.RunningTaskInfo> tasks;
-        //        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-        tasks = am.getRunningTasks(1);
-        if (!tasks.isEmpty()) {
-            final ComponentName componentName = tasks.get(0).topActivity;
-            return componentName == activity.getComponentName();
-        }
-        //        }
-        return false;
+    public static boolean isConnected(@NonNull final Context context) {
+        final Object service = context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final ConnectivityManager cm = (ConnectivityManager) service;
+        final NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})

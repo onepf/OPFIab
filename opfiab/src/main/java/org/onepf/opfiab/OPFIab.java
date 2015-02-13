@@ -159,9 +159,10 @@ public final class OPFIab {
         OPFIab.eventBus = newBus();
         OPFIab.context = context.getApplicationContext();
         OPFIab.baseIabHelper = new BaseIabHelper();
-        register(baseIabHelper, Integer.MAX_VALUE);
-        register(new SetupManager());
-        register(new GlobalBillingListener(configuration.getBillingListener()));
+        int priority = Integer.MAX_VALUE;
+        register(baseIabHelper, priority);
+        register(new SetupManager(), --priority);
+        register(new GlobalBillingListener(configuration.getBillingListener()), --priority);
     }
 
     public static void setup() {

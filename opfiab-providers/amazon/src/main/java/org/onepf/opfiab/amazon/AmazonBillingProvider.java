@@ -17,10 +17,13 @@
 package org.onepf.opfiab.amazon;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
 import com.amazon.device.iap.PurchasingService;
+import com.amazon.device.iap.ResponseReceiver;
 import com.amazon.device.iap.model.FulfillmentResult;
 import com.amazon.device.iap.model.Product;
 import com.amazon.device.iap.model.ProductDataResponse;
@@ -42,6 +45,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_ALREADY_OWNED;
 import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Response.Status.SUCCESS;
@@ -67,6 +71,20 @@ public class AmazonBillingProvider extends BaseBillingProvider {
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
         super(context, purchaseVerifier, skuResolver);
+        // Check if application is suited to use Amazon
+        final PackageManager packageManager = context.getPackageManager();
+        final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
+        try {
+            if (!packageManager.getReceiverInfo(componentName, 0).exported) {
+                throw new IllegalStateException("Amazon receiver must be exported.");
+            }
+        } catch (PackageManager.NameNotFoundException exception) {
+            throw new IllegalStateException(
+                    "You must declare Amazon receiver to use Amazon billing provider.", exception);
+        }
+        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
+
+        // Register Amazon callbacks handler
         PurchasingService.registerListener(context, controller);
     }
 
@@ -113,6 +131,11 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
         builder.setJson(receipt.toJSON().toString());
         return builder.build();
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return PurchasingService.IS_SANDBOX_MODE || super.isAvailable();
     }
 
     @Override
