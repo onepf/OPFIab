@@ -64,15 +64,21 @@ public final class OPFIab {
     }
 
     static void register(final Object subscriber) {
-        eventBus.register(subscriber);
+        if (!eventBus.isRegistered(subscriber)) {
+            eventBus.register(subscriber);
+        }
     }
 
     static void register(final Object subscriber, final int priority) {
-        eventBus.register(subscriber, priority);
+        if (!eventBus.isRegistered(subscriber)) {
+            eventBus.register(subscriber, priority);
+        }
     }
 
     static void unregister(final Object subscriber) {
-        eventBus.unregister(subscriber);
+        if (eventBus.isRegistered(subscriber)) {
+            eventBus.unregister(subscriber);
+        }
     }
 
     static void post(final Object event) {

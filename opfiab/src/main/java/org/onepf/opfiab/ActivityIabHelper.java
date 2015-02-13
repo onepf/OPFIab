@@ -60,7 +60,6 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
                     .add(fragment, FRAGMENT_TAG)
                     .commit();
         }
-        //TODO check attach\detach condition. Use sticky?
         this.opfFragment = fragment;
         fragmentManager.executePendingTransactions();
     }
@@ -95,11 +94,14 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
     }
 
     private void handleLifecycle(@NonNull final Type type) {
-        if (type == Type.ATTACH) {
+        if (type == Type.START || type == Type.RESUME) {
             managedIabHelper.subscribe();
-        } else if (type == Type.DETACH) {
+        } else if (type == Type.STOP || type == Type.PAUSE) {
             managedIabHelper.unsubscribe();
-        } else if ((type == Type.PAUSE && activity.isFinishing()) || type == Type.DESTROY) {
+            if (activity.isFinishing()) {
+                OPFIab.unregister(this);
+            }
+        } else if (type == Type.DESTROY || type == Type.DETACH) {
             managedIabHelper.unsubscribe();
             OPFIab.unregister(this);
         }

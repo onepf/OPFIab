@@ -18,7 +18,9 @@ package org.onepf.sample.trivialdrive;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.listener.BillingListener;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
@@ -26,6 +28,8 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+
+import java.util.Collection;
 
 
 public class TrivialBillingListener implements BillingListener {
@@ -46,10 +50,20 @@ public class TrivialBillingListener implements BillingListener {
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
+        final Collection<Purchase> inventory;
+        if (inventoryResponse.isSuccessful()
+                && (inventory = inventoryResponse.getInventory()) != null) {
+            for (final Purchase purchase : inventory) {
+//                OPFIab.getHelper().consume(purchase);
+            }
+        }
     }
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+        if (purchaseResponse.isSuccessful()) {
+            OPFIab.getHelper().inventory();
+        }
     }
 
     @Override

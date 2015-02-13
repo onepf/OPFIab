@@ -51,28 +51,28 @@ public class OPFIabFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(false);
-//        OPFIab.post(new FragmentLifecycleEvent(CREATE, this));
-    }
-
-    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         OPFIab.post(new FragmentLifecycleEvent(ATTACH, this));
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(false);
+        OPFIab.post(new FragmentLifecycleEvent(CREATE, this));
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
-//        OPFIab.post(new FragmentLifecycleEvent(START, this));
+        OPFIab.post(new FragmentLifecycleEvent(START, this));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-//        OPFIab.post(new FragmentLifecycleEvent(RESUME, this));
+        OPFIab.post(new FragmentLifecycleEvent(RESUME, this));
     }
 
     @Override
@@ -84,19 +84,19 @@ public class OPFIabFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-//        OPFIab.post(new FragmentLifecycleEvent(STOP, this));
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        OPFIab.post(new FragmentLifecycleEvent(DETACH, this));
+        OPFIab.post(new FragmentLifecycleEvent(STOP, this));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         OPFIab.post(new FragmentLifecycleEvent(DESTROY, this));
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        OPFIab.post(new FragmentLifecycleEvent(DETACH, this));
     }
 
     @Override

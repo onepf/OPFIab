@@ -16,9 +16,12 @@
 
 package org.onepf.sample.trivialdrive;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +35,7 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
-import java.util.List;
+import java.util.Collection;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -46,6 +49,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
             super.onSkuDetails(skuDetailsResponse);
+            Log.e("XXX", MainActivity.this.hashCode() + " " + skuDetailsResponse);
             if (skuDetailsResponse.isSuccessful()) {
                 iabHelper.inventory();
             }
@@ -54,20 +58,13 @@ public class MainActivity extends ActionBarActivity {
         @Override
         public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
             super.onInventory(inventoryResponse);
-            if (inventoryResponse.isSuccessful()) {
-                final List<Purchase> purchases = inventoryResponse.getInventory();
-                if (!purchases.isEmpty()) {
-                    iabHelper.consume(purchases.get(0));
-                }
-            }
+            Log.e("XXX", MainActivity.this.hashCode() + " " + inventoryResponse);
         }
 
         @Override
         public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
             super.onPurchase(purchaseResponse);
-            if (purchaseResponse.isSuccessful()) {
-                iabHelper.inventory();
-            }
+            Log.e("XXX", MainActivity.this.hashCode() + " " + purchaseResponse);
         }
     };
 

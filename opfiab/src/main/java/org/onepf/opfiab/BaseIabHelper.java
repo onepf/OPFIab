@@ -52,7 +52,6 @@ final class BaseIabHelper extends IabHelper {
     BaseIabHelper() { }
 
     private void setCurrentProvider(@Nullable final BillingProvider provider) {
-        OPFChecks.checkThread(true);
         //noinspection ConstantConditions
         if (currentProvider != null) {
             OPFIab.unregister(currentProvider);
@@ -100,7 +99,6 @@ final class BaseIabHelper extends IabHelper {
         }
     }
 
-    //TODO lazy initialized setup
     @Override
     public void purchase(@NonNull final Activity activity,
                          @NonNull final String sku) {
