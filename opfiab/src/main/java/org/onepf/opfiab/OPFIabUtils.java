@@ -16,6 +16,9 @@
 
 package org.onepf.opfiab;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -37,9 +40,12 @@ import org.onepf.opfiab.sku.SkuResolver;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 public final class OPFIabUtils {
 

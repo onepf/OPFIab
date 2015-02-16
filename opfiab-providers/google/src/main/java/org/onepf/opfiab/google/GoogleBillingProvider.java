@@ -23,7 +23,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.BaseBillingProvider;
-import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.sku.SkuResolver;
@@ -38,7 +37,6 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     private static final String PACKAGE_NAME = "com.google.play";
 
 
-    private final GoogleBillingController controller = new GoogleBillingController();
     private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
 
     protected GoogleBillingProvider(
@@ -52,12 +50,6 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     @Override
     public BillingProviderInfo getInfo() {
         return info;
-    }
-
-    @NonNull
-    @Override
-    public BillingController getController() {
-        return controller;
     }
 
     @Override

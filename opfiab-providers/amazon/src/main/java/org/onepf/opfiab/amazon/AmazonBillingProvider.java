@@ -32,10 +32,12 @@ import com.amazon.device.iap.model.Receipt;
 
 import org.json.JSONException;
 import org.onepf.opfiab.BaseBillingProvider;
+import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
+import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
@@ -48,6 +50,7 @@ import java.util.Set;
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_ALREADY_OWNED;
 import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Response.Status.SERVICE_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Response.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.billing.Response.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Response.Status.UNKNOWN_ERROR;
@@ -57,35 +60,19 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     private static final String NAME = "Amazon";
     private static final String PACKAGE_NAME = "com.amazon.venezia";
 
-    static void post(@NonNull final Object event) {
-        BaseBillingProvider.postEvent(event);
-    }
-
 
     private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
     @NonNull
-    private final AmazonBillingController controller = new AmazonBillingController();
+    private final AmazonBillingHelper billingHelper = new AmazonBillingHelper();
 
     protected AmazonBillingProvider(
             @NonNull final Context context,
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
         super(context, purchaseVerifier, skuResolver);
-        // Check if application is suited to use Amazon
-        final PackageManager packageManager = context.getPackageManager();
-        final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
-        try {
-            if (!packageManager.getReceiverInfo(componentName, 0).exported) {
-                throw new IllegalStateException("Amazon receiver must be exported.");
-            }
-        } catch (PackageManager.NameNotFoundException exception) {
-            throw new IllegalStateException(
-                    "You must declare Amazon receiver to use Amazon billing provider.", exception);
-        }
-        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
-
+        checkRequirements();
         // Register Amazon callbacks handler
-        PurchasingService.registerListener(context, controller);
+        PurchasingService.registerListener(new AmazonContextWrapper(context), billingHelper);
     }
 
     private SkuDetails newSkuDetails(@NonNull final Product product) {
@@ -133,9 +120,118 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return builder.build();
     }
 
+    private void checkRequirements() {
+        // Check if application is suited to use Amazon
+        final PackageManager packageManager = context.getPackageManager();
+        final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
+        try {
+            if (!packageManager.getReceiverInfo(componentName, 0).exported) {
+                throw new IllegalStateException("Amazon receiver must be exported.");
+            }
+        } catch (PackageManager.NameNotFoundException exception) {
+            throw new IllegalStateException(
+                    "You must declare Amazon receiver to use Amazon billing provider.", exception);
+        }
+        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
+    }
+
+    private boolean checkConnection() {
+        if (!PurchasingService.IS_SANDBOX_MODE && !OPFIabUtils.isConnected(context)) {
+            postResponse(SERVICE_UNAVAILABLE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkAuthorisation() {
+        if (!isAuthorised()) {
+            postResponse(UNAUTHORISED);
+            return false;
+        }
+        return true;
+    }
+
+    private void handleFailure() {
+        if (checkConnection() && checkAuthorisation()) {
+            postResponse(UNKNOWN_ERROR);
+        }
+    }
+
+    public final void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
+        switch (productDataResponse.getRequestStatus()) {
+            case SUCCESSFUL:
+                final List<SkuDetails> skusDetails = new ArrayList<>();
+                final Collection<Product> products = productDataResponse.getProductData().values();
+                for (final Product product : products) {
+                    skusDetails.add(newSkuDetails(product));
+                }
+                for (final String sku : productDataResponse.getUnavailableSkus()) {
+                    skusDetails.add(new SkuDetails(sku));
+                }
+                postResponse(SUCCESS, skusDetails);
+                break;
+            case FAILED:
+            case NOT_SUPPORTED:
+                handleFailure();
+                OPFLog.e("Product data request failed: %s", productDataResponse);
+                break;
+        }
+    }
+
+    public final void onEventAsync(@NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
+        switch (purchaseUpdatesResponse.getRequestStatus()) {
+            case SUCCESSFUL:
+                final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
+                final List<Purchase> purchases = new ArrayList<>(receipts.size());
+                for (final Receipt receipt : receipts) {
+                    purchases.add(newPurchase(receipt));
+                }
+                postResponse(SUCCESS, purchases);
+                break;
+            case FAILED:
+            case NOT_SUPPORTED:
+                handleFailure();
+                OPFLog.e("Purchase updates request failed: %s", purchaseUpdatesResponse);
+                break;
+        }
+    }
+
+    public final void onEventAsync(
+            @NonNull final com.amazon.device.iap.model.PurchaseResponse purchaseResponse) {
+        switch (purchaseResponse.getRequestStatus()) {
+            case SUCCESSFUL:
+                final Purchase purchase = newPurchase(purchaseResponse.getReceipt());
+                postResponse(SUCCESS, purchase);
+                break;
+            case INVALID_SKU:
+                postResponse(ITEM_UNAVAILABLE);
+                break;
+            case ALREADY_PURCHASED:
+                postResponse(ITEM_ALREADY_OWNED);
+                break;
+            case FAILED:
+            case NOT_SUPPORTED:
+                handleFailure();
+                OPFLog.e("Purchase request failed: %s", purchaseResponse);
+                break;
+        }
+    }
+
+    @Override
+    protected void handleRequest(@NonNull final Request request) {
+        if (checkConnection() && checkAuthorisation()) {
+            super.handleRequest(request);
+        }
+    }
+
     @Override
     public boolean isAvailable() {
         return PurchasingService.IS_SANDBOX_MODE || super.isAvailable();
+    }
+
+    @Override
+    public boolean isAuthorised() {
+        return billingHelper.getUserData() != null;
     }
 
     @Override
@@ -155,83 +251,11 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
     @Override
     public void consume(@NonNull final Purchase purchase) {
-        if (controller.getUserData() != null) {
+        if (billingHelper.getUserData() != null) {
             PurchasingService.notifyFulfillment(purchase.getSku(), FulfillmentResult.FULFILLED);
             postResponse(SUCCESS);
         } else {
             postResponse(UNAUTHORISED);
-        }
-    }
-
-    public final void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
-        switch (productDataResponse.getRequestStatus()) {
-            case SUCCESSFUL:
-                final List<SkuDetails> skusDetails = new ArrayList<>();
-                final Collection<Product> products = productDataResponse.getProductData().values();
-                for (final Product product : products) {
-                    skusDetails.add(newSkuDetails(product));
-                }
-                for (final String sku : productDataResponse.getUnavailableSkus()) {
-                    skusDetails.add(new SkuDetails(sku));
-                }
-                postResponse(SUCCESS, skusDetails);
-                break;
-            case FAILED:
-                if (controller.getUserData() == null) {
-                    postResponse(UNAUTHORISED);
-                    break;
-                }
-            case NOT_SUPPORTED:
-                OPFLog.e("Product data request failed: %s", productDataResponse);
-                postResponse(UNKNOWN_ERROR);
-                break;
-        }
-    }
-
-    public final void onEventAsync(@NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        switch (purchaseUpdatesResponse.getRequestStatus()) {
-            case SUCCESSFUL:
-                final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
-                final List<Purchase> purchases = new ArrayList<>(receipts.size());
-                for (final Receipt receipt : receipts) {
-                    purchases.add(newPurchase(receipt));
-                }
-                postResponse(SUCCESS, purchases);
-                break;
-            case FAILED:
-                if (controller.getUserData() == null) {
-                    postResponse(UNAUTHORISED);
-                    break;
-                }
-            case NOT_SUPPORTED:
-                OPFLog.e("Purchase updates request failed: %s", purchaseUpdatesResponse);
-                postResponse(UNKNOWN_ERROR);
-                break;
-        }
-    }
-
-    public final void onEventAsync(
-            @NonNull final com.amazon.device.iap.model.PurchaseResponse purchaseResponse) {
-        switch (purchaseResponse.getRequestStatus()) {
-            case SUCCESSFUL:
-                final Purchase purchase = newPurchase(purchaseResponse.getReceipt());
-                postResponse(SUCCESS, purchase);
-                break;
-            case INVALID_SKU:
-                postResponse(ITEM_UNAVAILABLE);
-                break;
-            case ALREADY_PURCHASED:
-                postResponse(ITEM_ALREADY_OWNED);
-                break;
-            case FAILED:
-                if (controller.getUserData() == null) {
-                    postResponse(UNAUTHORISED);
-                    break;
-                }
-            case NOT_SUPPORTED:
-                OPFLog.e("Purchase request failed: %s", purchaseResponse);
-                postResponse(UNKNOWN_ERROR);
-                break;
         }
     }
 
@@ -240,13 +264,6 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     public BillingProviderInfo getInfo() {
         return info;
     }
-
-    @NonNull
-    @Override
-    public AmazonBillingController getController() {
-        return controller;
-    }
-
 
     public static class Builder extends BaseBillingProvider.Builder {
 

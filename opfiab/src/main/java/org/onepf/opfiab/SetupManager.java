@@ -18,7 +18,6 @@ package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
@@ -55,12 +54,8 @@ class SetupManager {
         //TODO utilize shared preferences
         final Configuration configuration = setupRequest.getConfiguration();
         for (final BillingProvider provider : getAvailableProviders(configuration.getProviders())) {
-            final BillingController controller = provider.getController();
-            final boolean authorised = controller.isAuthorised();
-            if (!authorised && configuration.skipUnauthorised()) {
-                continue;
-            }
-            if (controller.isBillingSupported()) {
+            final boolean authorised = provider.isAuthorised();
+            if (authorised || !configuration.skipUnauthorised()) {
                 return new SetupResponse(authorised ? SUCCESS : UNAUTHORISED, provider);
             }
         }

@@ -20,7 +20,6 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.billing.BillingController;
 import org.onepf.opfiab.model.BillingProviderInfo;
 
 public interface BillingProvider extends BillingBase {
@@ -28,10 +27,15 @@ public interface BillingProvider extends BillingBase {
     @NonNull
     BillingProviderInfo getInfo();
 
-    @NonNull
-    BillingController getController();
-
+    /**
+     * Indicates whether this provider is available on the system.
+     * Called before each request, thus it might be a good idea to cache intermediate result.
+     *
+     * @return true is BillingProvider is currently available, false otherwise.
+     */
     boolean isAvailable();
+
+    boolean isAuthorised();
 
     @Nullable
     Intent getStorePageIntent();

@@ -16,22 +16,6 @@
 
 package org.onepf.opfiab.billing;
 
-public interface BillingController {
+public abstract class ServiceBillingHelper {
 
-    BillingController STUB = new BillingController() {
-
-        @Override
-        public boolean isBillingSupported() {
-            return true;
-        }
-
-        @Override
-        public boolean isAuthorised() {
-            return true;
-        }
-    };
-
-    boolean isBillingSupported();
-
-    boolean isAuthorised();
 }

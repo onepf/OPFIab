@@ -29,7 +29,7 @@ import com.amazon.device.iap.model.Receipt;
 import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
-import org.onepf.opfiab.billing.BillingController;
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
@@ -38,9 +38,10 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-final class AmazonBillingController implements BillingController, PurchasingListener {
+final class AmazonBillingHelper implements PurchasingListener {
 
     private static final int TIMEOUT = PurchasingService.IS_SANDBOX_MODE ? 60000 : 3000;
+
 
     @Nullable
     private volatile CountDownLatch userDataLatch = null;
@@ -48,13 +49,18 @@ final class AmazonBillingController implements BillingController, PurchasingList
     private volatile UserData userData = null;
     private List<Receipt> pendingReceipts = null;
 
-    public AmazonBillingController() { }
+    AmazonBillingHelper() { }
 
     @Nullable
     UserData getUserData() {
+        OPFChecks.checkThread(false);
         final UserData localUserData = userData;
         if (localUserData != null) {
             return localUserData;
+        }
+
+        if (userDataLatch != null) {
+            throw new IllegalStateException("There must be no concurrent requests.");
         }
 
         try {
@@ -71,19 +77,6 @@ final class AmazonBillingController implements BillingController, PurchasingList
         }
         return userData;
     }
-
-    @Override
-    public boolean isBillingSupported() {
-        //TODO check permissions etc...
-        return true;
-    }
-
-    @Override
-    public boolean isAuthorised() {
-        OPFChecks.checkThread(false);
-        return getUserData() != null;
-    }
-
 
     @Override
     public void onUserDataResponse(@NonNull final UserDataResponse userDataResponse) {
@@ -106,19 +99,18 @@ final class AmazonBillingController implements BillingController, PurchasingList
 
     @Override
     public void onProductDataResponse(@NonNull final ProductDataResponse productDataResponse) {
-        AmazonBillingProvider.post(productDataResponse);
+        OPFIab.post(productDataResponse);
     }
 
     @Override
     public void onPurchaseResponse(
             @NonNull final PurchaseResponse purchaseResponse) {
-        AmazonBillingProvider.post(purchaseResponse);
+        OPFIab.post(purchaseResponse);
     }
 
     @Override
     public void onPurchaseUpdatesResponse(
             @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        OPFChecks.checkThread(true);
         final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
         if (purchaseUpdatesResponse.hasMore()) {
             if (pendingReceipts == null) {
@@ -130,8 +122,9 @@ final class AmazonBillingController implements BillingController, PurchasingList
             return;
         }
 
+        final PurchaseUpdatesResponse response;
         if (pendingReceipts == null) {
-            AmazonBillingProvider.post(purchaseUpdatesResponse);
+            response = purchaseUpdatesResponse;
         } else {
             pendingReceipts.addAll(receipts);
             final PurchaseUpdatesResponseBuilder builder = new PurchaseUpdatesResponseBuilder();
@@ -140,8 +133,9 @@ final class AmazonBillingController implements BillingController, PurchasingList
             builder.setRequestId(purchaseUpdatesResponse.getRequestId());
             builder.setRequestStatus(purchaseUpdatesResponse.getRequestStatus());
             builder.setUserData(purchaseUpdatesResponse.getUserData());
-            AmazonBillingProvider.post(builder.build());
+            response = builder.build();
         }
         pendingReceipts = null;
+        OPFIab.post(response);
     }
 }

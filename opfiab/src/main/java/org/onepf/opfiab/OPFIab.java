@@ -81,10 +81,6 @@ public final class OPFIab {
         }
     }
 
-    static void post(final Object event) {
-        eventBus.post(event);
-    }
-
     static void postSticky(final Object event) {
         eventBus.postSticky(event);
     }
@@ -101,6 +97,14 @@ public final class OPFIab {
     static BaseIabHelper getBaseHelper() {
         checkInit();
         return baseIabHelper;
+    }
+
+    /**
+     * Post an event to deliver to all subscribers. Intend to be used by {@link org.onepf.opfiab.BillingProvider} implementations.
+     * @param event Event object to deliver.
+     */
+    public static void post(final Object event) {
+        eventBus.post(event);
     }
 
     @NonNull

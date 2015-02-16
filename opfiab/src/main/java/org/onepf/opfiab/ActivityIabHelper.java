@@ -35,50 +35,53 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
     @NonNull
     private final ManagedIabHelper managedIabHelper;
     @NonNull
-    private Object opfFragment;
+    private final Object opfFragment;
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                               @Nullable final Activity activity,
                               @Nullable final FragmentActivity fragmentActivity) {
         super(managedIabHelper);
         this.managedIabHelper = managedIabHelper;
-        //noinspection ConstantConditions
-        this.activity = fragmentActivity != null ? fragmentActivity : activity;
-        OPFIab.register(this);
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
-                             @NonNull final Activity activity) {
-        this(managedIabHelper, activity, null);
-
-        android.app.Fragment fragment;
-        final android.app.FragmentManager fragmentManager = activity.getFragmentManager();
-        if ((fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
-            fragment = OPFIabFragment.newInstance();
+        if (fragmentActivity != null) {
+            this.activity = fragmentActivity;
+            final android.support.v4.app.FragmentManager fragmentManager =
+                    fragmentActivity.getSupportFragmentManager();
+            if (fragmentManager.findFragmentByTag(FRAGMENT_TAG) != null) {
+                throw new IllegalStateException("OPFFragment already attached!");
+            }
+            final android.support.v4.app.Fragment fragment = OPFIabSupportFragment.newInstance();
             fragmentManager.beginTransaction()
                     .add(fragment, FRAGMENT_TAG)
                     .commit();
+            fragmentManager.executePendingTransactions();
+            opfFragment = fragment;
+        } else if (activity != null) {
+            this.activity = activity;
+            final android.app.FragmentManager fragmentManager = activity.getFragmentManager();
+            if (fragmentManager.findFragmentByTag(FRAGMENT_TAG) != null) {
+                throw new IllegalStateException("OPFFragment already attached!");
+            }
+            final android.app.Fragment fragment = OPFIabFragment.newInstance();
+            fragmentManager.beginTransaction()
+                    .add(fragment, FRAGMENT_TAG)
+                    .commit();
+            fragmentManager.executePendingTransactions();
+            opfFragment = fragment;
+        } else {
+            throw new IllegalArgumentException("Activity can't be null.");
         }
-        this.opfFragment = fragment;
-        fragmentManager.executePendingTransactions();
+        OPFIab.register(this);
+    }
+
+    public ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
+                             @NonNull final Activity activity) {
+        this(managedIabHelper, activity, null);
     }
 
     public ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                              @NonNull final FragmentActivity fragmentActivity) {
         this(managedIabHelper, null, fragmentActivity);
-
-        android.support.v4.app.Fragment fragment;
-        final android.support.v4.app.FragmentManager fragmentManager =
-                fragmentActivity.getSupportFragmentManager();
-        if ((fragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
-            fragment = OPFIabSupportFragment.newInstance();
-            fragmentManager.beginTransaction()
-                    .add(fragment, FRAGMENT_TAG)
-                    .commit();
-        }
-        this.opfFragment = fragment;
-        fragmentManager.executePendingTransactions();
     }
 
     public void onEventMainThread(@NonNull final FragmentLifecycleEvent event) {
@@ -94,14 +97,22 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
     }
 
     private void handleLifecycle(@NonNull final Type type) {
-        if (type == Type.START || type == Type.RESUME) {
+        // Handle billing events depending on fragment lifecycle
+        if (type == Type.ATTACH || type == Type.START || type == Type.RESUME) {
+            // Attach - subscribe for event right away when helper is created
+            // Start - necessary to handle onActivityResult since it's called before onResume
+            // Resume - re-subscribe for billing events if we unsubscribed in onPause
             managedIabHelper.subscribe();
         } else if (type == Type.STOP || type == Type.PAUSE) {
+            // Pause - only callback guaranteed to be called
+            // Stop - mirror onStart
             managedIabHelper.unsubscribe();
+            // We won't be needing any lifecycle events if activity is finishing
             if (activity.isFinishing()) {
                 OPFIab.unregister(this);
             }
-        } else if (type == Type.DESTROY || type == Type.DETACH) {
+        } else if (type == Type.DETACH) {
+            // Detach - fragment is removed, unsubscribe from everything
             managedIabHelper.unsubscribe();
             OPFIab.unregister(this);
         }

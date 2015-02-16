@@ -38,6 +38,7 @@ public abstract class Response extends BillingEvent {
         BUSY,
         USER_CANCELED,
         BILLING_UNAVAILABLE,
+        SERVICE_UNAVAILABLE,
         ITEM_UNAVAILABLE,
         ITEM_ALREADY_OWNED,
         UNKNOWN_ERROR,

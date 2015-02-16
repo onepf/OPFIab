@@ -50,13 +50,9 @@ import java.util.Set;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static org.onepf.opfiab.model.event.billing.Response.Status.BUSY;
+import static org.onepf.opfiab.model.event.billing.Response.Status.USER_CANCELED;
 
 public abstract class BaseBillingProvider implements BillingProvider {
-
-    protected static void postEvent(@NonNull final Object event) {
-        OPFIab.post(event);
-    }
-
 
     @NonNull
     protected final Context context;
@@ -92,6 +88,10 @@ public abstract class BaseBillingProvider implements BillingProvider {
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
                 final Activity activity = purchaseRequest.getActivity();
+                if (activity == null) {
+                    postResponse(USER_CANCELED);
+                    break;
+                }
                 resolvedSku = skuResolver.resolve(purchaseRequest.getSku());
                 purchase(activity, resolvedSku);
                 break;
@@ -109,7 +109,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     protected void postResponse(@NonNull final Response response) {
         pendingRequest = null;
-        postEvent(response);
+        OPFIab.post(response);
     }
 
     protected void postResponse(@NonNull final Response.Status status) {
@@ -166,7 +166,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     public final void onEventAsync(@NonNull final Request request) {
         if (pendingRequest != null) {
-            postEvent(OPFIabUtils.emptyResponse(getInfo(), request, BUSY));
+            OPFIab.post(OPFIabUtils.emptyResponse(getInfo(), request, BUSY));
             return;
         }
         pendingRequest = request;
@@ -193,6 +193,11 @@ public abstract class BaseBillingProvider implements BillingProvider {
                     "You must override this method for packageless Billing Providers.");
         }
         return OPFUtils.isInstalled(OPFIab.getContext(), packageName);
+    }
+
+    @Override
+    public boolean isAuthorised() {
+        return true;
     }
 
     @Nullable
