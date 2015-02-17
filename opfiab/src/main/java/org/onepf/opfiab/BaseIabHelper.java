@@ -20,12 +20,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.SparseArray;
 
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
-import org.onepf.opfiab.model.event.BillingEvent;
+import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.InventoryRequest;
@@ -39,20 +39,36 @@ import org.onepf.opfutils.OPFLog;
 import java.util.Arrays;
 import java.util.Set;
 
+import static org.onepf.opfiab.model.event.BillingEvent.Type;
 import static org.onepf.opfiab.model.event.billing.Response.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Response.Status.BUSY;
 
 final class BaseIabHelper extends IabHelper {
 
+    private final Configuration configuration = OPFIab.getConfiguration();
+    private final SparseArray<Long> requestsTiming;
+    private boolean busy = false;
     @Nullable
     private BillingProvider currentProvider = null;
     @Nullable
     private Request pendingRequest;
 
-    BaseIabHelper() { }
+    BaseIabHelper() {
+        final Type[] types = Type.values();
+        requestsTiming = new SparseArray<>(types.length);
+        for (final Type type : types) {
+            requestsTiming.put(type.ordinal(), 0L);
+        }
+
+        OPFIab.register(new Object() {
+            public final void onEventMainThread(@NonNull final RequestHandledEvent event) {
+                // At this point request should be handled by BillingProvider
+                busy = false;
+            }
+        }, Integer.MIN_VALUE);
+    }
 
     private void setCurrentProvider(@Nullable final BillingProvider provider) {
-        //noinspection ConstantConditions
         if (currentProvider != null) {
             OPFIab.unregister(currentProvider);
         }
@@ -60,9 +76,14 @@ final class BaseIabHelper extends IabHelper {
         OPFIab.register(currentProvider);
     }
 
+    private void postEmptyResponse(@NonNull final Request request,
+                                   @NonNull Response.Status status) {
+        OPFIab.post(OPFIabUtils.emptyResponse(null, request.getType(), status));
+    }
+
     private void lazySetup(@NonNull final Request request) {
         if (pendingRequest != null) {
-            OPFIab.post(OPFIabUtils.emptyResponse(null, request, BUSY));
+            postEmptyResponse(request, BUSY);
         } else {
             pendingRequest = request;
         }
@@ -71,21 +92,42 @@ final class BaseIabHelper extends IabHelper {
 
     private void postRequest(@NonNull final Request request) {
         OPFChecks.checkThread(true);
+        final int type = request.getType().ordinal();
+        // Check if it's too soon to handle this type of request
+        final long requestGap = configuration.getSameTypeRequestGap();
+        if (requestGap > 0) {
+            final long lastTime = requestsTiming.get(type);
+            if (System.currentTimeMillis() - lastTime < requestGap) {
+                postEmptyResponse(request, BUSY);
+                return;
+            }
+        }
+
         if (OPFIab.getStickyEvent(SetupResponse.class) == null) {
+            // Setup is not yet started or is in progress
             lazySetup(request);
         } else if (currentProvider == null) {
-            OPFIab.post(OPFIabUtils.emptyResponse(null, request, BILLING_UNAVAILABLE));
+            // Setup is finished, but there's no suitable BillingProvider
+            postEmptyResponse(request, BILLING_UNAVAILABLE);
         } else if (!currentProvider.isAvailable()) {
+            // BillingProvider is no longer available
             OPFLog.e("BillingProvider is no longer available!\n%s", currentProvider);
-            final Configuration configuration = OPFIab.getConfiguration();
             if (configuration.autoRecover()) {
+                // Try to pick new BillingProvider
                 setCurrentProvider(null);
                 lazySetup(request);
             } else {
-                OPFIab.post(OPFIabUtils.emptyResponse(null, request, BILLING_UNAVAILABLE));
+                // Billing is unavailable until current BillingProvider becomes available again
+                postEmptyResponse(request, BILLING_UNAVAILABLE);
             }
+        } else if (busy) {
+            // Previous request is still being handled by BillingProvider
+            postEmptyResponse(request, BUSY);
         } else {
+            // Send request to be handled by BillingProvider
+            busy = true;
             OPFIab.post(request);
+            requestsTiming.put(type, System.currentTimeMillis());
         }
     }
 

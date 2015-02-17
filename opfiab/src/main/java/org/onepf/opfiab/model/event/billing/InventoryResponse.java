@@ -31,21 +31,14 @@ public class InventoryResponse extends Response {
     private final List<Purchase> inventory;
 
     public InventoryResponse(@Nullable final BillingProviderInfo providerInfo,
-                             @NonNull final Request request,
                              @NonNull final Status status,
                              @Nullable final List<Purchase> inventory) {
-        super(providerInfo, Type.INVENTORY, request, status);
+        super(providerInfo, Type.INVENTORY, status);
         this.inventory = inventory == null ? null : Collections.unmodifiableList(inventory);
     }
 
     @Nullable
     public List<Purchase> getInventory() {
         return inventory;
-    }
-
-    @NonNull
-    @Override
-    public InventoryRequest getRequest() {
-        return (InventoryRequest) super.getRequest();
     }
 }

@@ -28,21 +28,14 @@ public class PurchaseResponse extends Response {
     private final Purchase purchase;
 
     public PurchaseResponse(@Nullable final BillingProviderInfo providerInfo,
-                            @NonNull final Request request,
                             @NonNull final Status status,
                             @Nullable final Purchase purchase) {
-        super(providerInfo, Type.PURCHASE, request, status);
+        super(providerInfo, Type.PURCHASE, status);
         this.purchase = purchase;
     }
 
     @Nullable
     public Purchase getPurchase() {
         return purchase;
-    }
-
-    @NonNull
-    @Override
-    public PurchaseRequest getRequest() {
-        return (PurchaseRequest) super.getRequest();
     }
 }

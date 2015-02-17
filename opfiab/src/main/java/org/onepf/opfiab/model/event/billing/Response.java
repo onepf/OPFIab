@@ -50,31 +50,19 @@ public abstract class Response extends BillingEvent {
     @Nullable
     private final BillingProviderInfo providerInfo;
     @NonNull
-    private final Request request;
-    @NonNull
     private final Status status;
 
     protected Response(@Nullable final BillingProviderInfo providerInfo,
                        @NonNull final Type type,
-                       @NonNull final Request request,
                        @NonNull final Status status) {
         super(type);
-        if (request.getType() != type) {
-            throw new IllegalArgumentException("Request and Response types doesn't match.");
-        }
         this.providerInfo = providerInfo;
-        this.request = request;
         this.status = status;
     }
 
     @Nullable
     public BillingProviderInfo getProviderInfo() {
         return providerInfo;
-    }
-
-    @NonNull
-    public Request getRequest() {
-        return request;
     }
 
     @NonNull

@@ -31,10 +31,9 @@ public class SkuDetailsResponse extends Response {
     private final Collection<SkuDetails> skusDetails;
 
     public SkuDetailsResponse(@Nullable final BillingProviderInfo providerInfo,
-                              @NonNull final Request request,
                               @NonNull final Status status,
                               @Nullable final Collection<SkuDetails> skusDetails) {
-        super(providerInfo, Type.SKU_DETAILS, request, status);
+        super(providerInfo, Type.SKU_DETAILS, status);
         this.skusDetails = skusDetails == null
                 ? null
                 : Collections.unmodifiableCollection(skusDetails);
@@ -43,11 +42,5 @@ public class SkuDetailsResponse extends Response {
     @Nullable
     public Collection<SkuDetails> getSkusDetails() {
         return skusDetails;
-    }
-
-    @NonNull
-    @Override
-    public SkuDetailsRequest getRequest() {
-        return (SkuDetailsRequest) super.getRequest();
     }
 }

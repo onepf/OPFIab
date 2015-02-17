@@ -16,9 +16,6 @@
 
 package org.onepf.opfiab;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -33,19 +30,15 @@ import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.Request;
 import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import static android.content.Context.ACTIVITY_SERVICE;
 
 public final class OPFIabUtils {
 
@@ -62,22 +55,21 @@ public final class OPFIabUtils {
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     public static Response emptyResponse(@Nullable final BillingProviderInfo providerInfo,
-                                         @NonNull final Request request,
+                                         @NonNull final BillingEvent.Type type,
                                          @NonNull final Response.Status status) {
         final Response response;
-        final BillingEvent.Type type = request.getType();
         switch (type) {
             case CONSUME:
-                response = new ConsumeResponse(providerInfo, request, status);
+                response = new ConsumeResponse(providerInfo, status);
                 break;
             case PURCHASE:
-                response = new PurchaseResponse(providerInfo, request, status, null);
+                response = new PurchaseResponse(providerInfo, status, null);
                 break;
             case SKU_DETAILS:
-                response = new SkuDetailsResponse(providerInfo, request, status, null);
+                response = new SkuDetailsResponse(providerInfo, status, null);
                 break;
             case INVENTORY:
-                response = new InventoryResponse(providerInfo, request, status, null);
+                response = new InventoryResponse(providerInfo, status, null);
                 break;
             default:
                 throw new IllegalStateException();

@@ -29,7 +29,12 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
 
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
@@ -101,6 +106,7 @@ public final class OPFIab {
 
     /**
      * Post an event to deliver to all subscribers. Intend to be used by {@link org.onepf.opfiab.BillingProvider} implementations.
+     *
      * @param event Event object to deliver.
      */
     public static void post(final Object event) {
@@ -162,6 +168,7 @@ public final class OPFIab {
         OPFIab.configuration = configuration;
         OPFIab.eventBus = newBus();
         OPFIab.context = context.getApplicationContext();
+
         OPFIab.baseIabHelper = new BaseIabHelper();
         int priority = Integer.MAX_VALUE;
         register(baseIabHelper, priority);

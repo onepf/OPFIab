@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event.billing;
+package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.event.billing.Request;
 
-public class ConsumeResponse extends Response {
+public class RequestHandledEvent {
 
-    public ConsumeResponse(@Nullable final BillingProviderInfo providerInfo,
-                           @NonNull final Status status) {
-        super(providerInfo, Type.CONSUME, status);
+    @NonNull
+    private final Request request;
+
+    public RequestHandledEvent(@NonNull final Request request) {
+        this.request = request;
+    }
+
+    @NonNull
+    public Request getRequest() {
+        return request;
     }
 }

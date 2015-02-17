@@ -28,6 +28,8 @@ import org.onepf.opfiab.model.billing.BillingModel;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.BillingEvent;
+import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
@@ -42,14 +44,12 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static org.onepf.opfiab.model.event.billing.Response.Status.BUSY;
 import static org.onepf.opfiab.model.event.billing.Response.Status.USER_CANCELED;
 
 public abstract class BaseBillingProvider implements BillingProvider {
@@ -61,9 +61,6 @@ public abstract class BaseBillingProvider implements BillingProvider {
     @NonNull
     protected final SkuResolver skuResolver;
 
-    @Nullable
-    private Request pendingRequest;
-
     protected BaseBillingProvider(
             @NonNull final Context context,
             @NonNull final PurchaseVerifier purchaseVerifier,
@@ -73,12 +70,11 @@ public abstract class BaseBillingProvider implements BillingProvider {
         this.skuResolver = skuResolver;
     }
 
-    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST", "DLS_DEAD_LOCAL_STORE"})
-    @SuppressWarnings("ConstantConditions")
     protected void handleRequest(@NonNull final Request request) {
         OPFLog.methodD(request);
         final String resolvedSku;
-        switch (request.getType()) {
+        final BillingEvent.Type type = request.getType();
+        switch (type) {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) request;
                 final Purchase purchase = consumeRequest.getPurchase();
@@ -89,7 +85,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
                 final Activity activity = purchaseRequest.getActivity();
                 if (activity == null) {
-                    postResponse(USER_CANCELED);
+                    postResponse(type, USER_CANCELED);
                     break;
                 }
                 resolvedSku = skuResolver.resolve(purchaseRequest.getSku());
@@ -108,47 +104,28 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     protected void postResponse(@NonNull final Response response) {
-        pendingRequest = null;
         OPFIab.post(response);
     }
 
-    protected void postResponse(@NonNull final Response.Status status) {
-        if (pendingRequest == null) {
-            OPFLog.e("No pending request for response! Skipping...\nStatus:%s", status);
-            return;
-        }
-        postResponse(OPFIabUtils.emptyResponse(getInfo(), pendingRequest, status));
-    }
-
-    protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final Purchase purchase) {
-        if (pendingRequest == null) {
-            OPFLog.e("No pending request for response! Skipping...\nStatus:%s\nPurchase:%s",
-                     status, purchase);
-            return;
-        }
-        final Purchase revertedPurchase = OPFIabUtils.revert(purchase, skuResolver);
-        postResponse(new PurchaseResponse(getInfo(), pendingRequest, status, revertedPurchase));
+    protected void postResponse(@NonNull final BillingEvent.Type type,
+                                @NonNull final Response.Status status) {
+        postResponse(OPFIabUtils.emptyResponse(getInfo(), type, status));
     }
 
     @SuppressWarnings("unchecked")
-    protected void postResponse(@NonNull final Response.Status status,
+    protected void postResponse(@NonNull final BillingEvent.Type type,
+                                @NonNull final Response.Status status,
                                 @NonNull final Collection<? extends BillingModel> items) {
-        if (pendingRequest == null) {
-            OPFLog.e("No pending request for response! Skipping...\nStatus:%s\nItems:%s",
-                     status, Arrays.toString(items.toArray()));
-            return;
-        }
         final BillingProviderInfo info = getInfo();
         final Response response;
-        switch (pendingRequest.getType()) {
+        switch (type) {
             case SKU_DETAILS:
                 final Collection<SkuDetails> skusDetails = (Collection<SkuDetails>) items;
                 final List<SkuDetails> revertedSkuDetails = new ArrayList<>(items.size());
                 for (final SkuDetails skuDetails : skusDetails) {
                     revertedSkuDetails.add(OPFIabUtils.revert(skuDetails, skuResolver));
                 }
-                response = new SkuDetailsResponse(info, pendingRequest, status, revertedSkuDetails);
+                response = new SkuDetailsResponse(info, status, revertedSkuDetails);
                 break;
             case INVENTORY:
                 final Collection<Purchase> inventory = (Collection<Purchase>) items;
@@ -156,7 +133,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 for (final Purchase purchase : inventory) {
                     revertedInventory.add(OPFIabUtils.revert(purchase, skuResolver));
                 }
-                response = new InventoryResponse(info, pendingRequest, status, revertedInventory);
+                response = new InventoryResponse(info, status, revertedInventory);
                 break;
             default:
                 throw new IllegalStateException("Response type is unmatched by request.");
@@ -164,13 +141,15 @@ public abstract class BaseBillingProvider implements BillingProvider {
         postResponse(response);
     }
 
+    protected void postResponse(@NonNull final Response.Status status,
+                                @NonNull final Purchase purchase) {
+        final Purchase revertedPurchase = OPFIabUtils.revert(purchase, skuResolver);
+        postResponse(new PurchaseResponse(getInfo(), status, revertedPurchase));
+    }
+
     public final void onEventAsync(@NonNull final Request request) {
-        if (pendingRequest != null) {
-            OPFIab.post(OPFIabUtils.emptyResponse(getInfo(), request, BUSY));
-            return;
-        }
-        pendingRequest = request;
         handleRequest(request);
+        OPFIab.post(new RequestHandledEvent(request));
     }
 
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {

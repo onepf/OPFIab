@@ -35,10 +35,10 @@ public class MyApplication extends Application {
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(createAmazonBillingProvider())
                 .setBillingListener(new TrivialBillingListener())
+                .setSameTypeRequestGap(1000)
                 .build();
-
         OPFIab.init(this, configuration);
-//        OPFIab.setup();
+        OPFIab.setup();
     }
 
     private BillingProvider createAmazonBillingProvider() {

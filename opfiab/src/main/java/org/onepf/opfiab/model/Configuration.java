@@ -32,13 +32,15 @@ public final class Configuration {
     private final Set<BillingProvider> providers;
     @Nullable
     private final BillingListener billingListener;
+    private final long sameTypeRequestGap;
     private final boolean skipUnauthorised;
     private final boolean autoRecover;
 
     private Configuration(@NonNull final Set<BillingProvider> providers,
                           @Nullable final BillingListener billingListener,
-                          final boolean skipUnauthorised,
+                          final long sameTypeRequestGap, final boolean skipUnauthorised,
                           final boolean autoRecover) {
+        this.sameTypeRequestGap = sameTypeRequestGap;
         this.autoRecover = autoRecover;
         this.providers = Collections.unmodifiableSet(providers);
         this.billingListener = billingListener;
@@ -55,6 +57,15 @@ public final class Configuration {
         return billingListener;
     }
 
+    /**
+     * Minimal time gap between requests with the same type.
+     *
+     * @return time gap in milliseconds.
+     */
+    public long getSameTypeRequestGap() {
+        return sameTypeRequestGap;
+    }
+
     public boolean skipUnauthorised() {
         return skipUnauthorised;
     }
@@ -69,6 +80,7 @@ public final class Configuration {
         private final Set<BillingProvider> providers = new LinkedHashSet<>();
         @Nullable
         private BillingListener billingListener;
+        private long sameTypeRequestGap = 0L;
         private boolean skipUnauthorised = false;
         private boolean autoRecover = false;
 
@@ -82,16 +94,30 @@ public final class Configuration {
             return this;
         }
 
-        public void setSkipUnauthorised(final boolean skipUnauthorised) {
-            this.skipUnauthorised = skipUnauthorised;
+        /**
+         * Set minimal time gap between requests with the same type.
+         * There's no gap by default.
+         *
+         * @param sameTypeRequestGap time gap in milliseconds.
+         */
+        public Builder setSameTypeRequestGap(final long sameTypeRequestGap) {
+            this.sameTypeRequestGap = sameTypeRequestGap;
+            return this;
         }
 
-        public void setAutoRecover(final boolean autoRecover) {
+        public Builder setSkipUnauthorised(final boolean skipUnauthorised) {
+            this.skipUnauthorised = skipUnauthorised;
+            return this;
+        }
+
+        public Builder setAutoRecover(final boolean autoRecover) {
             this.autoRecover = autoRecover;
+            return this;
         }
 
         public Configuration build() {
-            return new Configuration(providers, billingListener, skipUnauthorised, autoRecover);
+            return new Configuration(providers, billingListener, sameTypeRequestGap,
+                                     skipUnauthorised, autoRecover);
         }
     }
 }
