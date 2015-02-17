@@ -38,7 +38,7 @@ public class MyApplication extends Application {
                 .setSameTypeRequestGap(1000)
                 .build();
         OPFIab.init(this, configuration);
-        OPFIab.setup();
+//        OPFIab.setup();
     }
 
     private BillingProvider createAmazonBillingProvider() {

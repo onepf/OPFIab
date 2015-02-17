@@ -16,9 +16,7 @@
 
 package org.onepf.sample.trivialdrive;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -30,12 +28,9 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.SelfManagedIabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.SimpleBillingListener;
-import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-
-import java.util.Collection;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -82,11 +77,12 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(final View v) {
                 iabHelper.purchase(sku);
+                finish();
             }
         });
 
         if (savedInstanceState == null) {
-            iabHelper.skuDetails(sku);
+            //            iabHelper.skuDetails(sku);
         }
     }
 

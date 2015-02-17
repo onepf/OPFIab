@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFPreferences;
 
 import java.util.LinkedHashSet;
@@ -30,10 +31,19 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.UNAUTHORISED;
 
-class SetupManager {
+final class SetupManager {
 
     private static final String KEY_LAST_PROVIDER = "last_provider";
     private static final OPFPreferences PREFERENCES = new OPFPreferences(OPFIab.getContext());
+
+    static enum State {
+        INITIAL,
+        PROGRESS,
+        FINISHED,
+    }
+
+
+    private State state = State.INITIAL;
 
     SetupManager() { }
 
@@ -50,7 +60,7 @@ class SetupManager {
     }
 
     @NonNull
-    private SetupResponse makeResponse(@NonNull final SetupRequest setupRequest) {
+    private SetupResponse newResponse(@NonNull final SetupRequest setupRequest) {
         //TODO utilize shared preferences
         final Configuration configuration = setupRequest.getConfiguration();
         for (final BillingProvider provider : getAvailableProviders(configuration.getProviders())) {
@@ -62,9 +72,21 @@ class SetupManager {
         return new SetupResponse(FAILED, null);
     }
 
+    public void onEvent(@NonNull final SetupRequest setupRequest) {
+        OPFChecks.checkThread(true);
+        if (state == State.PROGRESS) {
+            OPFIab.cancelEventDelivery(setupRequest);
+        } else {
+            state = State.PROGRESS;
+        }
+    }
+
+    public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
+        state = State.FINISHED;
+    }
+
     public void onEventAsync(@NonNull final SetupRequest setupRequest) {
-        final SetupResponse setupResponse = makeResponse(setupRequest);
-        OPFIab.postSticky(setupResponse);
-        OPFIab.removeStickyEvent(SetupRequest.class);
+        final SetupResponse setupResponse = newResponse(setupRequest);
+        OPFIab.post(setupResponse);
     }
 }

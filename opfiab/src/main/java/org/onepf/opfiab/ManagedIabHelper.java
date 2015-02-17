@@ -98,7 +98,7 @@ public class ManagedIabHelper extends IabHelperWrapper {
     public void addSetupListener(@NonNull final OnSetupListener setupListener) {
         setupListeners.add(setupListener);
         // Deliver last setup even right away
-        final SetupResponse setupResponse = OPFIab.getStickyEvent(SetupResponse.class);
+        final SetupResponse setupResponse = OPFIab.getBaseHelper().getSetupResponse();
         if (setupResponse != null) {
             setupListener.onSetup(setupResponse);
         }

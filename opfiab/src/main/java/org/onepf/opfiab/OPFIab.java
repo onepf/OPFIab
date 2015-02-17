@@ -29,12 +29,7 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import de.greenrobot.event.EventBus;
 
@@ -45,6 +40,8 @@ public final class OPFIab {
     private static volatile Context context;
 
     private static BaseIabHelper baseIabHelper;
+    private static SetupManager setupManager;
+    private static GlobalBillingListener billingListener;
 
 
     private OPFIab() {
@@ -68,34 +65,26 @@ public final class OPFIab {
                 .build();
     }
 
-    static void register(final Object subscriber) {
+    static void register(@NonNull final Object subscriber) {
         if (!eventBus.isRegistered(subscriber)) {
             eventBus.register(subscriber);
         }
     }
 
-    static void register(final Object subscriber, final int priority) {
+    static void register(@NonNull final Object subscriber, final int priority) {
         if (!eventBus.isRegistered(subscriber)) {
             eventBus.register(subscriber, priority);
         }
     }
 
-    static void unregister(final Object subscriber) {
+    static void unregister(@NonNull final Object subscriber) {
         if (eventBus.isRegistered(subscriber)) {
             eventBus.unregister(subscriber);
         }
     }
 
-    static void postSticky(final Object event) {
-        eventBus.postSticky(event);
-    }
-
-    static <T> T getStickyEvent(final Class<T> eventType) {
-        return eventBus.getStickyEvent(eventType);
-    }
-
-    static <T> T removeStickyEvent(final Class<T> eventType) {
-        return eventBus.removeStickyEvent(eventType);
+    public static void cancelEventDelivery(@NonNull final Object event) {
+        eventBus.cancelEventDelivery(event);
     }
 
     @NonNull
@@ -110,7 +99,9 @@ public final class OPFIab {
      * @param event Event object to deliver.
      */
     public static void post(final Object event) {
-        eventBus.post(event);
+        if (eventBus.hasSubscriberForEvent(event.getClass())) {
+            eventBus.post(event);
+        }
     }
 
     @NonNull
@@ -168,19 +159,17 @@ public final class OPFIab {
         OPFIab.configuration = configuration;
         OPFIab.eventBus = newBus();
         OPFIab.context = context.getApplicationContext();
-
         OPFIab.baseIabHelper = new BaseIabHelper();
+        OPFIab.setupManager = new SetupManager();
+        OPFIab.billingListener = new GlobalBillingListener(configuration.getBillingListener());
         int priority = Integer.MAX_VALUE;
         register(baseIabHelper, priority);
-        register(new SetupManager(), --priority);
-        register(new GlobalBillingListener(configuration.getBillingListener()), --priority);
+        register(setupManager, --priority);
+        register(billingListener, --priority);
     }
 
     public static void setup() {
         checkInit();
-        if (getStickyEvent(SetupRequest.class) != null) {
-            return;
-        }
-        postSticky(new SetupRequest(configuration));
+        post(new SetupRequest(configuration));
     }
 }

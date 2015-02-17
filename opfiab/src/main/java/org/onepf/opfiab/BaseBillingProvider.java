@@ -48,8 +48,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import static org.onepf.opfiab.model.event.billing.Response.Status.USER_CANCELED;
 
 public abstract class BaseBillingProvider implements BillingProvider {
@@ -84,7 +82,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
                 final Activity activity = purchaseRequest.getActivity();
-                if (activity == null) {
+                if (activity == null || activity.isFinishing()) {
                     postResponse(type, USER_CANCELED);
                     break;
                 }

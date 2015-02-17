@@ -47,7 +47,8 @@ final class BaseIabHelper extends IabHelper {
 
     private final Configuration configuration = OPFIab.getConfiguration();
     private final SparseArray<Long> requestsTiming;
-    private boolean busy = false;
+    @Nullable
+    private SetupResponse setupResponse = null;
     @Nullable
     private BillingProvider currentProvider = null;
     @Nullable
@@ -63,7 +64,10 @@ final class BaseIabHelper extends IabHelper {
         OPFIab.register(new Object() {
             public final void onEventMainThread(@NonNull final RequestHandledEvent event) {
                 // At this point request should be handled by BillingProvider
-                busy = false;
+                if (pendingRequest != event.getRequest()) {
+                    throw new IllegalStateException();
+                }
+                pendingRequest = null;
             }
         }, Integer.MIN_VALUE);
     }
@@ -73,7 +77,9 @@ final class BaseIabHelper extends IabHelper {
             OPFIab.unregister(currentProvider);
         }
         currentProvider = provider;
-        OPFIab.register(currentProvider);
+        if (currentProvider != null) {
+            OPFIab.register(currentProvider);
+        }
     }
 
     private void postEmptyResponse(@NonNull final Request request,
@@ -81,21 +87,13 @@ final class BaseIabHelper extends IabHelper {
         OPFIab.post(OPFIabUtils.emptyResponse(null, request.getType(), status));
     }
 
-    private void lazySetup(@NonNull final Request request) {
-        if (pendingRequest != null) {
-            postEmptyResponse(request, BUSY);
-        } else {
-            pendingRequest = request;
-        }
-        OPFIab.setup();
-    }
-
     private void postRequest(@NonNull final Request request) {
         OPFChecks.checkThread(true);
+
         final int type = request.getType().ordinal();
         // Check if it's too soon to handle this type of request
         final long requestGap = configuration.getSameTypeRequestGap();
-        if (requestGap > 0) {
+        if (requestGap > 0L) {
             final long lastTime = requestsTiming.get(type);
             if (System.currentTimeMillis() - lastTime < requestGap) {
                 postEmptyResponse(request, BUSY);
@@ -103,9 +101,14 @@ final class BaseIabHelper extends IabHelper {
             }
         }
 
-        if (OPFIab.getStickyEvent(SetupResponse.class) == null) {
+        if (pendingRequest != null) {
+            // Library is busy with another request
+            postEmptyResponse(request, BUSY);
+        } else if (setupResponse == null) {
             // Setup is not yet started or is in progress
-            lazySetup(request);
+            // Start lazy setup
+            pendingRequest = request;
+            OPFIab.setup();
         } else if (currentProvider == null) {
             // Setup is finished, but there's no suitable BillingProvider
             postEmptyResponse(request, BILLING_UNAVAILABLE);
@@ -115,29 +118,36 @@ final class BaseIabHelper extends IabHelper {
             if (configuration.autoRecover()) {
                 // Try to pick new BillingProvider
                 setCurrentProvider(null);
-                lazySetup(request);
+                setupResponse = null;
+                pendingRequest = request;
+                OPFIab.setup();
             } else {
-                // Billing is unavailable until current BillingProvider becomes available again
+                // Can't handle requests until current BillingProvider becomes available again
                 postEmptyResponse(request, BILLING_UNAVAILABLE);
             }
-        } else if (busy) {
-            // Previous request is still being handled by BillingProvider
-            postEmptyResponse(request, BUSY);
         } else {
             // Send request to be handled by BillingProvider
-            busy = true;
+            pendingRequest = request;
             OPFIab.post(request);
             requestsTiming.put(type, System.currentTimeMillis());
         }
     }
 
+    @Nullable
+    SetupResponse getSetupResponse() {
+        OPFChecks.checkThread(true);
+        return setupResponse;
+    }
+
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
+        this.setupResponse = setupResponse;
         if (setupResponse.isSuccessful()) {
             setCurrentProvider(setupResponse.getBillingProvider());
         }
         if (pendingRequest != null) {
-            postRequest(pendingRequest);
+            final Request request = pendingRequest;
             pendingRequest = null;
+            postRequest(request);
         }
     }
 

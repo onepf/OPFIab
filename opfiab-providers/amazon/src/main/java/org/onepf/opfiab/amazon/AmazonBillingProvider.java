@@ -76,6 +76,21 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         PurchasingService.registerListener(new AmazonContextWrapper(context), billingHelper);
     }
 
+    private void checkRequirements() {
+        // Check if application is suited to use Amazon
+        final PackageManager packageManager = context.getPackageManager();
+        final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
+        try {
+            if (!packageManager.getReceiverInfo(componentName, 0).exported) {
+                throw new IllegalStateException("Amazon receiver must be exported.");
+            }
+        } catch (PackageManager.NameNotFoundException exception) {
+            throw new IllegalStateException(
+                    "You must declare Amazon receiver to use Amazon billing provider.", exception);
+        }
+        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
+    }
+
     private SkuDetails newSkuDetails(@NonNull final Product product) {
         final SkuDetails.Builder builder = new SkuDetails.Builder(product.getSku());
         switch (product.getProductType()) {
@@ -119,21 +134,6 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
         builder.setJson(receipt.toJSON().toString());
         return builder.build();
-    }
-
-    private void checkRequirements() {
-        // Check if application is suited to use Amazon
-        final PackageManager packageManager = context.getPackageManager();
-        final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
-        try {
-            if (!packageManager.getReceiverInfo(componentName, 0).exported) {
-                throw new IllegalStateException("Amazon receiver must be exported.");
-            }
-        } catch (PackageManager.NameNotFoundException exception) {
-            throw new IllegalStateException(
-                    "You must declare Amazon receiver to use Amazon billing provider.", exception);
-        }
-        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
     }
 
     private boolean checkConnection(@NonNull final Request.Type type) {
