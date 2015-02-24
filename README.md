@@ -20,6 +20,7 @@ OPFIab
     - [x] Sku resolver abstraction.
     - [ ] Transparent Sku mapping
     - [ ] PurchaseVerifier abstraction.
+    - [ ] Test purchase verification vs. [Freedom](http://onhax.net/freedom-iap-apk/)
   - [ ] Store picking algorithm implementation. - **10%**
     - [x] Package installer based.
     - [x] Setup state handling.
