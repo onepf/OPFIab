@@ -21,6 +21,7 @@ import android.app.Application;
 import org.onepf.opfiab.BillingProvider;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
+import org.onepf.opfiab.listener.SimpleGlobalBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfutils.OPFLog;
 
@@ -34,7 +35,7 @@ public class MyApplication extends Application {
         OPFLog.setEnabled(true);
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(createAmazonBillingProvider())
-                .setBillingListener(new TrivialBillingListener())
+                .setBillingListener(new SimpleGlobalBillingListener())
                 .setSameTypeRequestGap(1000)
                 .build();
         OPFIab.init(this, configuration);

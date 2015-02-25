@@ -29,16 +29,22 @@ public class InventoryResponse extends Response {
 
     @Nullable
     private final List<Purchase> inventory;
+    private final boolean hasMore;
 
     public InventoryResponse(@Nullable final BillingProviderInfo providerInfo,
                              @NonNull final Status status,
-                             @Nullable final List<Purchase> inventory) {
+                             @Nullable final List<Purchase> inventory, final boolean hasMore) {
         super(providerInfo, Type.INVENTORY, status);
         this.inventory = inventory == null ? null : Collections.unmodifiableList(inventory);
+        this.hasMore = hasMore;
     }
 
     @Nullable
     public List<Purchase> getInventory() {
         return inventory;
+    }
+
+    public boolean hasMore() {
+        return hasMore;
     }
 }

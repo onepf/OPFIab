@@ -16,16 +16,34 @@
 
 package org.onepf.opfiab;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.onepf.opfiab.model.billing.Purchase;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
-import de.greenrobot.event.EventBus;
+public abstract class IabHelper {
 
-public abstract class IabHelper implements BillingBase {
+    public abstract void purchase(@NonNull final Activity activity,
+                                  @NonNull final String sku);
+
+    public abstract void consume(@NonNull final Purchase purchase);
+
+    public abstract void inventory(final boolean startOver);
+
+    public abstract void skuDetails(@NonNull final Set<String> skus);
 
     public final void skuDetails(@NonNull final String... skus) {
         skuDetails(new HashSet<>(Arrays.asList(skus)));
     }
+
+    public abstract void onActivityResult(@NonNull final Activity activity,
+                                          final int requestCode,
+                                          final int resultCode,
+                                          @Nullable final Intent data);
 }

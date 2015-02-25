@@ -68,7 +68,7 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     }
 
     @Override
-    public void inventory() {
+    public void inventory(final boolean startOver) {
 
     }
 

@@ -21,8 +21,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 
-public interface BillingProvider extends BillingBase {
+public interface BillingProvider {
 
     @NonNull
     BillingProviderInfo getInfo();
@@ -36,6 +42,10 @@ public interface BillingProvider extends BillingBase {
     boolean isAvailable();
 
     boolean isAuthorised();
+
+    void onEventAsync(@NonNull final Request request);
+
+    void onEventAsync(@NonNull final ActivityResultEvent activityResultEvent);
 
     @Nullable
     Intent getStorePageIntent();

@@ -18,7 +18,14 @@ package org.onepf.opfiab.model.event.billing;
 
 public class InventoryRequest extends Request {
 
-    public InventoryRequest() {
+    private final boolean startOver;
+
+    public InventoryRequest(final boolean startOver) {
         super(Type.INVENTORY);
+        this.startOver = startOver;
+    }
+
+    public boolean startOver() {
+        return startOver;
     }
 }

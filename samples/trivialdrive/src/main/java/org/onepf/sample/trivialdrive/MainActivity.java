@@ -19,7 +19,6 @@ package org.onepf.sample.trivialdrive;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,8 +27,6 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.SelfManagedIabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.SimpleBillingListener;
-import org.onepf.opfiab.model.event.billing.InventoryResponse;
-import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 public class MainActivity extends ActionBarActivity {
@@ -38,28 +35,17 @@ public class MainActivity extends ActionBarActivity {
 
     @NonNull
     private SelfManagedIabHelper iabHelper;
-
+    @NonNull
+    private View button;
     private final BillingListener billingListener = new SimpleBillingListener() {
 
         @Override
         public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
             super.onSkuDetails(skuDetailsResponse);
-            Log.e("XXX", MainActivity.this.hashCode() + " " + skuDetailsResponse);
             if (skuDetailsResponse.isSuccessful()) {
-                iabHelper.inventory();
+                button.setEnabled(true);
+                iabHelper.inventory(true);
             }
-        }
-
-        @Override
-        public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-            super.onInventory(inventoryResponse);
-            Log.e("XXX", MainActivity.this.hashCode() + " " + inventoryResponse);
-        }
-
-        @Override
-        public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-            super.onPurchase(purchaseResponse);
-            Log.e("XXX", MainActivity.this.hashCode() + " " + purchaseResponse);
         }
     };
 
@@ -72,17 +58,17 @@ public class MainActivity extends ActionBarActivity {
 
         final String sku = "org.onepf.sample.trivialdrive.sku_gas";
 
-        final View button = findViewById(R.id.button);
+        button = findViewById(R.id.button);
+        button.setEnabled(false);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 iabHelper.purchase(sku);
-                finish();
             }
         });
 
         if (savedInstanceState == null) {
-            //            iabHelper.skuDetails(sku);
+            iabHelper.skuDetails(sku);
         }
     }
 

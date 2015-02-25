@@ -170,7 +170,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 for (final String sku : productDataResponse.getUnavailableSkus()) {
                     skusDetails.add(new SkuDetails(sku));
                 }
-                postResponse(type, SUCCESS, skusDetails);
+                postResponse(SUCCESS, skusDetails);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
@@ -189,7 +189,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 for (final Receipt receipt : receipts) {
                     purchases.add(newPurchase(receipt));
                 }
-                postResponse(type, SUCCESS, purchases);
+                final boolean hasMore = purchaseUpdatesResponse.hasMore();
+                postResponse(SUCCESS, purchases, hasMore);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
@@ -245,8 +246,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     @Override
-    public void inventory() {
-        PurchasingService.getPurchaseUpdates(true);
+    public void inventory(final boolean startOver) {
+        PurchasingService.getPurchaseUpdates(startOver);
     }
 
     @Override

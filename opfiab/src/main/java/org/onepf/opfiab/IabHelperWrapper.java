@@ -41,23 +41,17 @@ class IabHelperWrapper extends IabHelper {
     }
 
     @Override
-    public void consume(@NonNull final Purchase purchase) {
-        iabHelper.consume(purchase);
-    }
+    public void consume(@NonNull final Purchase purchase) {iabHelper.consume(purchase);}
 
     @Override
-    public void inventory() {
-        iabHelper.inventory();
-    }
+    public void inventory(final boolean startOver) {iabHelper.inventory(startOver);}
 
     @Override
-    public void skuDetails(@NonNull final Set<String> skus) {
-        iabHelper.skuDetails(skus);
-    }
+    public void skuDetails(@NonNull final Set<String> skus) {iabHelper.skuDetails(skus);}
 
     @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode,
+    public void onActivityResult(@NonNull final Activity activity,
+                                 final int requestCode, final int resultCode,
                                  @Nullable final Intent data) {
         iabHelper.onActivityResult(activity, requestCode, resultCode, data);
     }

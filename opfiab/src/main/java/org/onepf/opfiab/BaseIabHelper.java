@@ -165,9 +165,9 @@ final class BaseIabHelper extends IabHelper {
     }
 
     @Override
-    public void inventory() {
+    public void inventory(final boolean startOver) {
         OPFLog.methodD();
-        postRequest(new InventoryRequest());
+        postRequest(new InventoryRequest(startOver));
     }
 
     @Override

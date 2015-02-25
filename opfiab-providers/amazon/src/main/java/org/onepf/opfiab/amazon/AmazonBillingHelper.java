@@ -18,15 +18,12 @@ package org.onepf.opfiab.amazon;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.amazon.device.iap.PurchasingListener;
 import com.amazon.device.iap.PurchasingService;
-import com.amazon.device.iap.internal.model.PurchaseUpdatesResponseBuilder;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.PurchaseResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
-import com.amazon.device.iap.model.Receipt;
 import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
@@ -34,8 +31,6 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +43,6 @@ final class AmazonBillingHelper implements PurchasingListener {
     private volatile CountDownLatch userDataLatch = null;
     @Nullable
     private volatile UserData userData = null;
-    private List<Receipt> pendingReceipts = null;
 
     AmazonBillingHelper() { }
 
@@ -67,7 +61,6 @@ final class AmazonBillingHelper implements PurchasingListener {
         try {
             userDataLatch = new CountDownLatch(1);
             PurchasingService.getUserData();
-            Log.e("XXX", "request hash: " + hashCode());
             //noinspection ConstantConditions
             if (!userDataLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
                 OPFLog.e("User data request timed out.");
@@ -113,31 +106,33 @@ final class AmazonBillingHelper implements PurchasingListener {
     @Override
     public void onPurchaseUpdatesResponse(
             @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
-        if (purchaseUpdatesResponse.hasMore()) {
-            if (pendingReceipts == null) {
-                pendingReceipts = new ArrayList<>(receipts);
-            } else {
-                pendingReceipts.addAll(receipts);
-            }
-            PurchasingService.getPurchaseUpdates(false);
-            return;
-        }
-
-        final PurchaseUpdatesResponse response;
-        if (pendingReceipts == null) {
-            response = purchaseUpdatesResponse;
-        } else {
-            pendingReceipts.addAll(receipts);
-            final PurchaseUpdatesResponseBuilder builder = new PurchaseUpdatesResponseBuilder();
-            builder.setReceipts(pendingReceipts);
-            builder.setHasMore(purchaseUpdatesResponse.hasMore());
-            builder.setRequestId(purchaseUpdatesResponse.getRequestId());
-            builder.setRequestStatus(purchaseUpdatesResponse.getRequestStatus());
-            builder.setUserData(purchaseUpdatesResponse.getUserData());
-            response = builder.build();
-        }
-        pendingReceipts = null;
-        OPFIab.post(response);
+        //TODO cleanup
+        //        final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
+        //        if (purchaseUpdatesResponse.hasMore()) {
+        //            if (pendingReceipts == null) {
+        //                pendingReceipts = new ArrayList<>(receipts);
+        //            } else {
+        //                pendingReceipts.addAll(receipts);
+        //            }
+        //            PurchasingService.getPurchaseUpdates(false);
+        //            return;
+        //        }
+        //
+        //        final PurchaseUpdatesResponse response;
+        //        if (pendingReceipts == null) {
+        //            response = purchaseUpdatesResponse;
+        //        } else {
+        //            pendingReceipts.addAll(receipts);
+        //            final PurchaseUpdatesResponseBuilder builder = new PurchaseUpdatesResponseBuilder();
+        //            builder.setReceipts(pendingReceipts);
+        //            builder.setHasMore(purchaseUpdatesResponse.hasMore());
+        //            builder.setRequestId(purchaseUpdatesResponse.getRequestId());
+        //            builder.setRequestStatus(purchaseUpdatesResponse.getRequestStatus());
+        //            builder.setUserData(purchaseUpdatesResponse.getUserData());
+        //            response = builder.build();
+        //        }
+        //        pendingReceipts = null;
+        //        OPFIab.post(response);
+        OPFIab.post(purchaseUpdatesResponse);
     }
 }

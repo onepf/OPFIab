@@ -24,13 +24,13 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.BillingModel;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
@@ -68,6 +68,14 @@ public abstract class BaseBillingProvider implements BillingProvider {
         this.skuResolver = skuResolver;
     }
 
+    protected abstract void skuDetails(@NonNull final Set<String> skus);
+
+    protected abstract void inventory(final boolean startOver);
+
+    protected abstract void purchase(@NonNull final Activity activity, @NonNull final String sku);
+
+    protected abstract void consume(@NonNull final Purchase purchase);
+
     protected void handleRequest(@NonNull final Request request) {
         OPFLog.methodD(request);
         final String resolvedSku;
@@ -96,10 +104,15 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 skuDetails(resolvedSkus);
                 break;
             case INVENTORY:
-                inventory();
+                final InventoryRequest inventoryRequest = (InventoryRequest) request;
+                final boolean startOver = inventoryRequest.startOver();
+                inventory(startOver);
                 break;
         }
     }
+
+    protected void onActivityResult(@NonNull final Activity activity, final int requestCode,
+                                    final int resultCode, @Nullable final Intent data) { }
 
     protected void postResponse(@NonNull final Response response) {
         OPFIab.post(response);
@@ -110,46 +123,38 @@ public abstract class BaseBillingProvider implements BillingProvider {
         postResponse(OPFIabUtils.emptyResponse(getInfo(), type, status));
     }
 
-    @SuppressWarnings("unchecked")
-    protected void postResponse(@NonNull final BillingEvent.Type type,
-                                @NonNull final Response.Status status,
-                                @NonNull final Collection<? extends BillingModel> items) {
-        final BillingProviderInfo info = getInfo();
-        final Response response;
-        switch (type) {
-            case SKU_DETAILS:
-                final Collection<SkuDetails> skusDetails = (Collection<SkuDetails>) items;
-                final List<SkuDetails> revertedSkuDetails = new ArrayList<>(items.size());
-                for (final SkuDetails skuDetails : skusDetails) {
-                    revertedSkuDetails.add(OPFIabUtils.revert(skuDetails, skuResolver));
-                }
-                response = new SkuDetailsResponse(info, status, revertedSkuDetails);
-                break;
-            case INVENTORY:
-                final Collection<Purchase> inventory = (Collection<Purchase>) items;
-                final List<Purchase> revertedInventory = new ArrayList<>(items.size());
-                for (final Purchase purchase : inventory) {
-                    revertedInventory.add(OPFIabUtils.revert(purchase, skuResolver));
-                }
-                response = new InventoryResponse(info, status, revertedInventory);
-                break;
-            default:
-                throw new IllegalStateException("Response type is unmatched by request.");
+    protected void postResponse(@NonNull final Response.Status status,
+                                @NonNull final Collection<SkuDetails> skusDetails) {
+        final List<SkuDetails> revertedSkusDetails = new ArrayList<>(skusDetails.size());
+        for (final SkuDetails skuDetails : skusDetails) {
+            revertedSkusDetails.add(OPFIabUtils.revert(skuResolver, skuDetails));
         }
-        postResponse(response);
+        postResponse(new SkuDetailsResponse(getInfo(), status, revertedSkusDetails));
+    }
+
+    protected void postResponse(@NonNull final Response.Status status,
+                                @NonNull final Collection<Purchase> inventory,
+                                final boolean hasMore) {
+        final List<Purchase> revertedInventory = new ArrayList<>(inventory.size());
+        for (final Purchase purchase : inventory) {
+            revertedInventory.add(OPFIabUtils.revert(skuResolver, purchase));
+        }
+        postResponse(new InventoryResponse(getInfo(), status, revertedInventory, hasMore));
     }
 
     protected void postResponse(@NonNull final Response.Status status,
                                 @NonNull final Purchase purchase) {
-        final Purchase revertedPurchase = OPFIabUtils.revert(purchase, skuResolver);
+        final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
         postResponse(new PurchaseResponse(getInfo(), status, revertedPurchase));
     }
 
+    @Override
     public final void onEventAsync(@NonNull final Request request) {
         handleRequest(request);
         OPFIab.post(new RequestHandledEvent(request));
     }
 
+    @Override
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
         final Activity activity = event.getActivity();
         final int requestCode = event.getRequestCode();
@@ -157,10 +162,6 @@ public abstract class BaseBillingProvider implements BillingProvider {
         final Intent data = event.getData();
         onActivityResult(activity, requestCode, resultCode, data);
     }
-
-    @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode, @Nullable final Intent data) { }
 
     @Override
     public boolean isAvailable() {
@@ -213,8 +214,8 @@ public abstract class BaseBillingProvider implements BillingProvider {
     public String toString() {
         return getInfo().toString();
     }
-
     //CHECKSTYLE:ON
+
 
     public abstract static class Builder {
 

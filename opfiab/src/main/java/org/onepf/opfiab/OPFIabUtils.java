@@ -38,8 +38,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 public final class OPFIabUtils {
 
     private OPFIabUtils() {
@@ -53,7 +51,6 @@ public final class OPFIabUtils {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     public static Response emptyResponse(@Nullable final BillingProviderInfo providerInfo,
                                          @NonNull final BillingEvent.Type type,
                                          @NonNull final Response.Status status) {
@@ -69,10 +66,10 @@ public final class OPFIabUtils {
                 response = new SkuDetailsResponse(providerInfo, status, null);
                 break;
             case INVENTORY:
-                response = new InventoryResponse(providerInfo, status, null);
+                response = new InventoryResponse(providerInfo, status, null, false);
                 break;
             default:
-                throw new IllegalStateException();
+                throw new IllegalArgumentException(String.valueOf(type));
         }
         return response;
     }
@@ -106,14 +103,14 @@ public final class OPFIabUtils {
         return builder.build();
     }
 
-    public static SkuDetails resolve(@NonNull final SkuDetails skuDetails,
-                                     @NonNull final SkuResolver skuResolver) {
+    public static SkuDetails resolve(@NonNull final SkuResolver skuResolver,
+                                     @NonNull final SkuDetails skuDetails) {
         final String resolvedSku = skuResolver.resolve(skuDetails.getSku());
         return substituteSku(skuDetails, resolvedSku);
     }
 
-    public static Purchase resolve(@NonNull final Purchase purchase,
-                                   @NonNull final SkuResolver skuResolver) {
+    public static Purchase resolve(@NonNull final SkuResolver skuResolver,
+                                   @NonNull final Purchase purchase) {
         final String resolvedSku = skuResolver.resolve(purchase.getSku());
         return substituteSku(purchase, resolvedSku);
     }
@@ -127,14 +124,14 @@ public final class OPFIabUtils {
         return resolvedSkus;
     }
 
-    public static SkuDetails revert(@NonNull final SkuDetails skuDetails,
-                                    @NonNull final SkuResolver skuResolver) {
+    public static SkuDetails revert(@NonNull final SkuResolver skuResolver,
+                                    @NonNull final SkuDetails skuDetails) {
         final String resolvedSku = skuResolver.revert(skuDetails.getSku());
         return substituteSku(skuDetails, resolvedSku);
     }
 
-    public static Purchase revert(@NonNull final Purchase purchase,
-                                  @NonNull final SkuResolver skuResolver) {
+    public static Purchase revert(@NonNull final SkuResolver skuResolver,
+                                  @NonNull final Purchase purchase) {
         final String resolvedSku = skuResolver.resolve(purchase.getSku());
         return substituteSku(purchase, resolvedSku);
     }
