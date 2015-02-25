@@ -20,5 +20,6 @@
     <string name="app_name">Trivial Drive</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="button">Press me!</string>
 
 </resources>
