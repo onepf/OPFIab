@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId "org.onepf.sample.trivialdrive"
-        minSdkVersion 10
+        minSdkVersion 15
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -59,6 +59,6 @@ dependencies {
     compile 'com.amazon:in-app-purchasing:2.0.1'
 
     compile project(':opfiab')
-    compile project(':opfiab-providers:google')
-    compile project(':opfiab-providers:amazon')
+    compile project(':google')
+    compile project(':amazon')
 }

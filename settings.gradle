@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-include ':opfiab'
+include ':opfiab',
+        ':amazon',
+        ':google',
+        ':trivialdrive'
 
-include ':opfiab-providers:google'
-include ':opfiab-providers:amazon'
+project(':amazon').projectDir = new File('opfiab-providers/amazon')
+project(':google').projectDir = new File('opfiab-providers/google')
 
-include ':samples:trivialdrive'
+project(':trivialdrive').projectDir = new File('samples/trivialdrive')
