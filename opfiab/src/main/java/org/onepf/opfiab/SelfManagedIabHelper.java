@@ -28,7 +28,7 @@ import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 
-public abstract class SelfManagedIabHelper extends IabHelperWrapper {
+public abstract class SelfManagedIabHelper extends IabHelperAdapter {
 
     protected static final String FRAGMENT_TAG = "OPFIabFragment";
 
@@ -74,7 +74,8 @@ public abstract class SelfManagedIabHelper extends IabHelperWrapper {
     }
 
     @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
+    public void onActivityResult(@NonNull final Activity activity,
+                                 final int requestCode,
                                  final int resultCode,
                                  @Nullable final Intent data) {
         throw new UnsupportedOperationException("Activity result is handled automatically.");

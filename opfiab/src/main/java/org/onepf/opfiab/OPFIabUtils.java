@@ -26,11 +26,12 @@ import android.text.TextUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.model.event.BillingEvent;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 
@@ -51,27 +52,29 @@ public final class OPFIabUtils {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    public static Response emptyResponse(@Nullable final BillingProviderInfo providerInfo,
-                                         @NonNull final BillingEvent.Type type,
-                                         @NonNull final Response.Status status) {
-        final Response response;
-        switch (type) {
+    public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
+                                                @NonNull final BillingRequest billingRequest,
+                                                @NonNull final BillingResponse.Status status) {
+        final BillingResponse billingResponse;
+        switch (billingRequest.getType()) {
             case CONSUME:
-                response = new ConsumeResponse(providerInfo, status);
+                final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
+                final Purchase purchase = consumeRequest.getPurchase();
+                billingResponse = new ConsumeResponse(providerInfo, status, purchase);
                 break;
             case PURCHASE:
-                response = new PurchaseResponse(providerInfo, status, null);
+                billingResponse = new PurchaseResponse(providerInfo, status, null);
                 break;
             case SKU_DETAILS:
-                response = new SkuDetailsResponse(providerInfo, status, null);
+                billingResponse = new SkuDetailsResponse(providerInfo, status, null);
                 break;
             case INVENTORY:
-                response = new InventoryResponse(providerInfo, status, null, false);
+                billingResponse = new InventoryResponse(providerInfo, status, null, false);
                 break;
             default:
-                throw new IllegalArgumentException(String.valueOf(type));
+                throw new IllegalArgumentException();
         }
-        return response;
+        return billingResponse;
     }
 
     public static SkuDetails substituteSku(@NonNull final SkuDetails skuDetails,

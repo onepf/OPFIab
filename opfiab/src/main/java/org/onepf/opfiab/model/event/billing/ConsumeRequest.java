@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.billing.Purchase;
 
-public class ConsumeRequest extends Request {
+public class ConsumeRequest extends BillingRequest {
 
     @NonNull
     private final Purchase purchase;
@@ -34,4 +34,26 @@ public class ConsumeRequest extends Request {
     public Purchase getPurchase() {
         return purchase;
     }
+
+    //CHECKSTYLE:OFF
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        final ConsumeRequest that = (ConsumeRequest) o;
+
+        if (!purchase.equals(that.purchase)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + purchase.hashCode();
+        return result;
+    }
+    //CHECKSTYLE:ON
 }

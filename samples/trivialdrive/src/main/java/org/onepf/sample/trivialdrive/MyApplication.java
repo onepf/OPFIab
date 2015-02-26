@@ -18,7 +18,7 @@ package org.onepf.sample.trivialdrive;
 
 import android.app.Application;
 
-import org.onepf.opfiab.BillingProvider;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.listener.SimpleGlobalBillingListener;
@@ -36,7 +36,6 @@ public class MyApplication extends Application {
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(createAmazonBillingProvider())
                 .setBillingListener(new SimpleGlobalBillingListener())
-                .setSameTypeRequestGap(1000)
                 .build();
         OPFIab.init(this, configuration);
 //        OPFIab.setup();

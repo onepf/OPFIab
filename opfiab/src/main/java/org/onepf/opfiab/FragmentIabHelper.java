@@ -31,13 +31,10 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
 
     @Nullable
     private final android.app.Fragment fragment;
-
     @Nullable
     private final android.support.v4.app.Fragment supportFragment;
-
     @NonNull
     private final ManagedIabHelper managedIabHelper;
-
     @NonNull
     private Object opfFragment;
 

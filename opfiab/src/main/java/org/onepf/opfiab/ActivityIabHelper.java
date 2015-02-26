@@ -16,9 +16,7 @@
 
 package org.onepf.opfiab;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
@@ -37,7 +35,6 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
     @NonNull
     private final Object opfFragment;
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                               @Nullable final Activity activity,
                               @Nullable final FragmentActivity fragmentActivity) {

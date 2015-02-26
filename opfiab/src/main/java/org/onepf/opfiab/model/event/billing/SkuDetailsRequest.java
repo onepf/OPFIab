@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SkuDetailsRequest extends Request {
+public class SkuDetailsRequest extends BillingRequest {
 
     @NonNull
     private final HashSet<String> skus;
@@ -36,4 +36,26 @@ public class SkuDetailsRequest extends Request {
     public Set<String> getSkus() {
         return Collections.unmodifiableSet(skus);
     }
+
+    //CHECKSTYLE:OFF
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        final SkuDetailsRequest that = (SkuDetailsRequest) o;
+
+        if (!skus.equals(that.skus)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + skus.hashCode();
+        return result;
+    }
+    //CHECKSTYLE:OFF
 }

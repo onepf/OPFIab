@@ -16,7 +16,7 @@
 
 package org.onepf.opfiab.model.event.billing;
 
-public class InventoryRequest extends Request {
+public class InventoryRequest extends BillingRequest {
 
     private final boolean startOver;
 
@@ -28,4 +28,26 @@ public class InventoryRequest extends Request {
     public boolean startOver() {
         return startOver;
     }
+
+    //CHECKSTYLE:OFF
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        final InventoryRequest that = (InventoryRequest) o;
+
+        if (startOver != that.startOver) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (startOver ? 1 : 0);
+        return result;
+    }
+    //CHECKSTYLE:ON
 }

@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 
-public class PurchaseResponse extends Response {
+public class PurchaseResponse extends BillingResponse {
 
     @Nullable
     private final Purchase purchase;

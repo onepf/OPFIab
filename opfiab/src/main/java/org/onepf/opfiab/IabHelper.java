@@ -22,6 +22,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -29,21 +35,33 @@ import java.util.Set;
 
 public abstract class IabHelper {
 
-    public abstract void purchase(@NonNull final Activity activity,
-                                  @NonNull final String sku);
+    protected abstract void postRequest(@NonNull final BillingRequest billingRequest);
 
-    public abstract void consume(@NonNull final Purchase purchase);
+    public void purchase(@NonNull final Activity activity,
+                         @NonNull final String sku) {
+        postRequest(new PurchaseRequest(activity, sku));
+    }
 
-    public abstract void inventory(final boolean startOver);
+    public void consume(@NonNull final Purchase purchase) {
+        postRequest(new ConsumeRequest(purchase));
+    }
 
-    public abstract void skuDetails(@NonNull final Set<String> skus);
+    public void inventory(final boolean startOver) {
+        postRequest(new InventoryRequest(startOver));
+    }
+
+    public void skuDetails(@NonNull final Set<String> skus) {
+        postRequest(new SkuDetailsRequest(skus));
+    }
 
     public final void skuDetails(@NonNull final String... skus) {
         skuDetails(new HashSet<>(Arrays.asList(skus)));
     }
 
-    public abstract void onActivityResult(@NonNull final Activity activity,
-                                          final int requestCode,
-                                          final int resultCode,
-                                          @Nullable final Intent data);
+    public void onActivityResult(@NonNull final Activity activity,
+                                 final int requestCode,
+                                 final int resultCode,
+                                 @Nullable final Intent data) {
+        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
+    }
 }

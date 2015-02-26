@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.billing;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -22,11 +22,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
-import org.onepf.opfiab.model.event.billing.ConsumeRequest;
-import org.onepf.opfiab.model.event.billing.InventoryRequest;
-import org.onepf.opfiab.model.event.billing.PurchaseRequest;
-import org.onepf.opfiab.model.event.billing.Request;
-import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
 
 public interface BillingProvider {
 
@@ -43,7 +39,7 @@ public interface BillingProvider {
 
     boolean isAuthorised();
 
-    void onEventAsync(@NonNull final Request request);
+    void onEventAsync(@NonNull final BillingRequest billingRequest);
 
     void onEventAsync(@NonNull final ActivityResultEvent activityResultEvent);
 

@@ -18,6 +18,7 @@ package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;

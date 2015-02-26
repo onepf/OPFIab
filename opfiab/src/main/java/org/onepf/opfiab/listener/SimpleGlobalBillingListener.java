@@ -18,8 +18,8 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.IabHelper;
 import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.ScheduledIabHelper;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
@@ -33,7 +33,7 @@ public class SimpleGlobalBillingListener extends SimpleBillingListener {
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
         super.onPurchase(purchaseResponse);
         if (purchaseResponse.isSuccessful()) {
-            OPFIab.getHelper().inventory(true);
+            OPFIab.getScheduledHelper().inventory(true);
         }
     }
 
@@ -41,17 +41,17 @@ public class SimpleGlobalBillingListener extends SimpleBillingListener {
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         super.onInventory(inventoryResponse);
         if (inventoryResponse.isSuccessful()) {
-            final IabHelper iabHelper = OPFIab.getHelper();
+            final ScheduledIabHelper helper = OPFIab.getScheduledHelper();
             final List<Purchase> inventory = inventoryResponse.getInventory();
             if (inventory != null) {
                 for (final Purchase purchase : inventory) {
                     if (purchase.getType() == SkuType.CONSUMABLE) {
-                        iabHelper.consume(purchase);
+                        helper.consume(purchase);
                     }
                 }
             }
             if (inventoryResponse.hasMore()) {
-                iabHelper.inventory(false);
+                helper.inventory(false);
             }
         }
     }

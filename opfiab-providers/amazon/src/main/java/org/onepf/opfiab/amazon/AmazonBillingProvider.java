@@ -38,7 +38,7 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
@@ -49,12 +49,12 @@ import java.util.List;
 import java.util.Set;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
-import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_ALREADY_OWNED;
-import static org.onepf.opfiab.model.event.billing.Response.Status.ITEM_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.billing.Response.Status.SERVICE_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.billing.Response.Status.SUCCESS;
-import static org.onepf.opfiab.model.event.billing.Response.Status.UNAUTHORISED;
-import static org.onepf.opfiab.model.event.billing.Response.Status.UNKNOWN_ERROR;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.ITEM_ALREADY_OWNED;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.ITEM_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.SERVICE_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.SUCCESS;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.UNAUTHORISED;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.UNKNOWN_ERROR;
 
 public class AmazonBillingProvider extends BaseBillingProvider {
 
@@ -136,26 +136,18 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return builder.build();
     }
 
-    private boolean checkConnection(@NonNull final Request.Type type) {
-        if (!PurchasingService.IS_SANDBOX_MODE && !OPFIabUtils.isConnected(context)) {
-            postResponse(type, SERVICE_UNAVAILABLE);
-            return false;
-        }
-        return true;
+    private boolean isConnected() {
+        return PurchasingService.IS_SANDBOX_MODE || OPFIabUtils.isConnected(context);
     }
 
-    private boolean checkAuthorisation(@NonNull final Request.Type type) {
-        if (!isAuthorised()) {
-            postResponse(type, UNAUTHORISED);
-            return false;
+    private BillingResponse.Status handleFailure() {
+        if (!isConnected()) {
+            return SERVICE_UNAVAILABLE;
+        } else if (!isAuthorised()) {
+            return UNAUTHORISED;
         }
-        return true;
-    }
 
-    private void handleFailure(@NonNull final Request.Type type) {
-        if (checkConnection(type) && checkAuthorisation(type)) {
-            postResponse(type, UNKNOWN_ERROR);
-        }
+        return UNKNOWN_ERROR;
     }
 
     public final void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
@@ -170,18 +162,17 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 for (final String sku : productDataResponse.getUnavailableSkus()) {
                     skusDetails.add(new SkuDetails(sku));
                 }
-                postResponse(SUCCESS, skusDetails);
+                postSkuDetailsResponse(SUCCESS, skusDetails);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                handleFailure(type);
+                postSkuDetailsResponse(handleFailure(), null);
                 OPFLog.e("Product data request failed: %s", productDataResponse);
                 break;
         }
     }
 
     public final void onEventAsync(@NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        final BillingEvent.Type type = BillingEvent.Type.INVENTORY;
         switch (purchaseUpdatesResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
@@ -190,11 +181,11 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                     purchases.add(newPurchase(receipt));
                 }
                 final boolean hasMore = purchaseUpdatesResponse.hasMore();
-                postResponse(SUCCESS, purchases, hasMore);
+                postInventoryResponse(SUCCESS, purchases, hasMore);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                handleFailure(type);
+                postInventoryResponse(handleFailure(), null, false);
                 OPFLog.e("Purchase updates request failed: %s", purchaseUpdatesResponse);
                 break;
         }
@@ -202,31 +193,22 @@ public class AmazonBillingProvider extends BaseBillingProvider {
 
     public final void onEventAsync(
             @NonNull final com.amazon.device.iap.model.PurchaseResponse purchaseResponse) {
-        final BillingEvent.Type type = BillingEvent.Type.PURCHASE;
         switch (purchaseResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 final Purchase purchase = newPurchase(purchaseResponse.getReceipt());
-                postResponse(SUCCESS, purchase);
+                postPurchaseResponse(SUCCESS, purchase);
                 break;
             case INVALID_SKU:
-                postResponse(type, ITEM_UNAVAILABLE);
+                postPurchaseResponse(ITEM_UNAVAILABLE, null);
                 break;
             case ALREADY_PURCHASED:
-                postResponse(type, ITEM_ALREADY_OWNED);
+                postPurchaseResponse(ITEM_ALREADY_OWNED, null);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                handleFailure(type);
+                postPurchaseResponse(handleFailure(), null);
                 OPFLog.e("Purchase request failed: %s", purchaseResponse);
                 break;
-        }
-    }
-
-    @Override
-    protected void handleRequest(@NonNull final Request request) {
-        final BillingEvent.Type type = request.getType();
-        if (checkConnection(type) && checkAuthorisation(type)) {
-            super.handleRequest(request);
         }
     }
 
@@ -258,7 +240,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     @Override
     public void consume(@NonNull final Purchase purchase) {
         PurchasingService.notifyFulfillment(purchase.getSku(), FulfillmentResult.FULFILLED);
-        postResponse(BillingEvent.Type.CONSUME, SUCCESS);
+        postConsumeResponse(SUCCESS, purchase);
     }
 
     @NonNull

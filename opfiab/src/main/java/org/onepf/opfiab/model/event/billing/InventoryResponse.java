@@ -25,7 +25,7 @@ import org.onepf.opfiab.model.billing.Purchase;
 import java.util.Collections;
 import java.util.List;
 
-public class InventoryResponse extends Response {
+public class InventoryResponse extends BillingResponse {
 
     @Nullable
     private final List<Purchase> inventory;
@@ -33,7 +33,8 @@ public class InventoryResponse extends Response {
 
     public InventoryResponse(@Nullable final BillingProviderInfo providerInfo,
                              @NonNull final Status status,
-                             @Nullable final List<Purchase> inventory, final boolean hasMore) {
+                             @Nullable final List<Purchase> inventory,
+                             final boolean hasMore) {
         super(providerInfo, Type.INVENTORY, status);
         this.inventory = inventory == null ? null : Collections.unmodifiableList(inventory);
         this.hasMore = hasMore;

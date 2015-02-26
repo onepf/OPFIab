@@ -25,7 +25,7 @@ import java.lang.ref.WeakReference;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class PurchaseRequest extends Request {
+public class PurchaseRequest extends BillingRequest {
 
     @Nullable
     private final transient Reference<Activity> activityReference;
@@ -49,4 +49,26 @@ public class PurchaseRequest extends Request {
     public String getSku() {
         return sku;
     }
+
+    //CHECKSTYLE:OFF
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        final PurchaseRequest that = (PurchaseRequest) o;
+
+        if (!sku.equals(that.sku)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + sku.hashCode();
+        return result;
+    }
+    //CHECKSTYLE:ON
 }

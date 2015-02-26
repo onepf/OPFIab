@@ -25,7 +25,7 @@ import org.onepf.opfiab.model.billing.SkuDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-public class SkuDetailsResponse extends Response {
+public class SkuDetailsResponse extends BillingResponse {
 
     @Nullable
     private final Collection<SkuDetails> skusDetails;

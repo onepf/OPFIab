@@ -19,7 +19,7 @@ package org.onepf.opfiab.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.BillingProvider;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
 
 import java.util.Collections;
@@ -32,15 +32,15 @@ public final class Configuration {
     private final Set<BillingProvider> providers;
     @Nullable
     private final BillingListener billingListener;
-    private final long sameTypeRequestGap;
+    private final long subsequentRequestDelay;
     private final boolean skipUnauthorised;
     private final boolean autoRecover;
 
     private Configuration(@NonNull final Set<BillingProvider> providers,
                           @Nullable final BillingListener billingListener,
-                          final long sameTypeRequestGap, final boolean skipUnauthorised,
+                          final long subsequentRequestDelay, final boolean skipUnauthorised,
                           final boolean autoRecover) {
-        this.sameTypeRequestGap = sameTypeRequestGap;
+        this.subsequentRequestDelay = subsequentRequestDelay;
         this.autoRecover = autoRecover;
         this.providers = Collections.unmodifiableSet(providers);
         this.billingListener = billingListener;
@@ -62,8 +62,8 @@ public final class Configuration {
      *
      * @return time gap in milliseconds.
      */
-    public long getSameTypeRequestGap() {
-        return sameTypeRequestGap;
+    public long getSubsequentRequestDelay() {
+        return subsequentRequestDelay;
     }
 
     public boolean skipUnauthorised() {
@@ -80,7 +80,7 @@ public final class Configuration {
         private final Set<BillingProvider> providers = new LinkedHashSet<>();
         @Nullable
         private BillingListener billingListener;
-        private long sameTypeRequestGap = 0L;
+        private long subsequentRequestDelay = 500L;
         private boolean skipUnauthorised = false;
         private boolean autoRecover = false;
 
@@ -95,13 +95,13 @@ public final class Configuration {
         }
 
         /**
-         * Set minimal time gap between requests with the same type.
-         * There's no gap by default.
+         * Set time gap between attempts to execute enqueued requests.<br>
+         * Default valued is 300ms.
          *
-         * @param sameTypeRequestGap time gap in milliseconds.
+         * @param subsequentRequestDelay time gap in milliseconds.
          */
-        public Builder setSameTypeRequestGap(final long sameTypeRequestGap) {
-            this.sameTypeRequestGap = sameTypeRequestGap;
+        public Builder setSubsequentRequestDelay(final long subsequentRequestDelay) {
+            this.subsequentRequestDelay = subsequentRequestDelay;
             return this;
         }
 
@@ -116,7 +116,7 @@ public final class Configuration {
         }
 
         public Configuration build() {
-            return new Configuration(providers, billingListener, sameTypeRequestGap,
+            return new Configuration(providers, billingListener, subsequentRequestDelay,
                                      skipUnauthorised, autoRecover);
         }
     }

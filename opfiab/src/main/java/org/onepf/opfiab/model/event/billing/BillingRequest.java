@@ -20,9 +20,9 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.BillingEvent;
 
-public abstract class Request extends BillingEvent {
+public abstract class BillingRequest extends BillingEvent {
 
-    protected Request(@NonNull final Type type) {
+    protected BillingRequest(@NonNull final Type type) {
         super(type);
     }
 }

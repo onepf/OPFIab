@@ -42,6 +42,11 @@ public final class BillingProviderInfo {
         return packageName;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     //CHECKSTYLE:OFF
     @Override
     public boolean equals(final Object o) {
@@ -63,13 +68,6 @@ public final class BillingProviderInfo {
         int result = name.hashCode();
         result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        //TODO
-        return String.format("{\"name\":\"%s\", \"packageName\":\"%s\"}", name,
-                             String.valueOf(packageName));
     }
     //CHECKSTYLE:ON
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 One Platform Foundation
+ * Copyright 2012-2014 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event;
+package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 
-public class RequestHandledEvent {
+class IabHelperAdapter extends IabHelper {
 
     @NonNull
-    private final BillingRequest billingRequest;
+    protected final IabHelper iabHelper;
 
-    public RequestHandledEvent(@NonNull final BillingRequest billingRequest) {
-        this.billingRequest = billingRequest;
+    public IabHelperAdapter(@NonNull final IabHelper iabHelper) {
+        this.iabHelper = iabHelper;
     }
 
-    @NonNull
-    public BillingRequest getBillingRequest() {
-        return billingRequest;
+    @Override
+    protected void postRequest(@NonNull final BillingRequest billingRequest) {
+        iabHelper.postRequest(billingRequest);
     }
 }

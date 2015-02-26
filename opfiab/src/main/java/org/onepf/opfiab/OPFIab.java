@@ -94,7 +94,7 @@ public final class OPFIab {
     }
 
     /**
-     * Post an event to deliver to all subscribers. Intend to be used by {@link org.onepf.opfiab.BillingProvider} implementations.
+     * Post an event to deliver to all subscribers. Intend to be used by {@link org.onepf.opfiab.billing.BillingProvider} implementations.
      *
      * @param event Event object to deliver.
      */
@@ -110,12 +110,16 @@ public final class OPFIab {
     }
 
     @NonNull
+    public static ScheduledIabHelper getScheduledHelper() {
+        return new ScheduledIabHelper(getBaseHelper());
+    }
+
+    @NonNull
     public static ManagedIabHelper getManagedHelper() {
         return new ManagedIabHelper(getBaseHelper());
     }
 
     @NonNull
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static SelfManagedIabHelper getHelper(@NonNull final Activity activity) {
         return new ActivityIabHelper(getManagedHelper(), activity);
     }

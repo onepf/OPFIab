@@ -20,19 +20,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.listener.BillingListenerWrapper;
+import org.onepf.opfiab.listener.BillingListenerCompositor;
 import org.onepf.opfiab.model.event.SetupResponse;
-import org.onepf.opfiab.model.event.billing.Request;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfutils.OPFLog;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-final class GlobalBillingListener extends BillingListenerWrapper {
+final class GlobalBillingListener extends BillingListenerCompositor {
 
     GlobalBillingListener(@Nullable final BillingListener billingListener) {
         super(billingListener);
@@ -43,26 +43,26 @@ final class GlobalBillingListener extends BillingListenerWrapper {
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
-    public void onEventMainThread(@NonNull final Response response) {
-        onResponse(response);
-        switch (response.getType()) {
+    public void onEventMainThread(@NonNull final BillingResponse billingResponse) {
+        onResponse(billingResponse);
+        switch (billingResponse.getType()) {
             case PURCHASE:
-                onPurchase((PurchaseResponse) response);
+                onPurchase((PurchaseResponse) billingResponse);
                 break;
             case CONSUME:
-                onConsume((ConsumeResponse) response);
+                onConsume((ConsumeResponse) billingResponse);
                 break;
             case INVENTORY:
-                onInventory((InventoryResponse) response);
+                onInventory((InventoryResponse) billingResponse);
                 break;
             case SKU_DETAILS:
-                onSkuDetails((SkuDetailsResponse) response);
+                onSkuDetails((SkuDetailsResponse) billingResponse);
                 break;
         }
     }
 
-    public void onEventMainThread(@NonNull final Request request) {
-        onRequest(request);
+    public void onEventMainThread(@NonNull final BillingRequest billingRequest) {
+        onRequest(billingRequest);
     }
 
     @Override
@@ -72,14 +72,14 @@ final class GlobalBillingListener extends BillingListenerWrapper {
     }
 
     @Override
-    public void onRequest(@NonNull final Request request) {
-        OPFLog.methodD(request);
-        super.onRequest(request);
+    public void onRequest(@NonNull final BillingRequest billingRequest) {
+        OPFLog.methodD(billingRequest);
+        super.onRequest(billingRequest);
     }
 
     @Override
-    public void onResponse(@NonNull final Response response) {
-        OPFLog.methodD(response);
-        super.onResponse(response);
+    public void onResponse(@NonNull final BillingResponse billingResponse) {
+        OPFLog.methodD(billingResponse);
+        super.onResponse(billingResponse);
     }
 }

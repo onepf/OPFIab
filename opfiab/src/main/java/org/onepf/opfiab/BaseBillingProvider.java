@@ -23,19 +23,20 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
-import org.onepf.opfiab.model.event.BillingEvent;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryRequest;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.Request;
-import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
@@ -48,7 +49,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import static org.onepf.opfiab.model.event.billing.Response.Status.USER_CANCELED;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.BILLING_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.USER_CANCELED;
 
 public abstract class BaseBillingProvider implements BillingProvider {
 
@@ -76,35 +78,35 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     protected abstract void consume(@NonNull final Purchase purchase);
 
-    protected void handleRequest(@NonNull final Request request) {
-        OPFLog.methodD(request);
+    protected void handleRequest(@NonNull final BillingRequest billingRequest) {
+        OPFLog.methodD(billingRequest);
+
         final String resolvedSku;
-        final BillingEvent.Type type = request.getType();
-        switch (type) {
+        switch (billingRequest.getType()) {
             case CONSUME:
-                final ConsumeRequest consumeRequest = (ConsumeRequest) request;
+                final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
                 final Purchase purchase = consumeRequest.getPurchase();
                 resolvedSku = skuResolver.resolve(purchase.getSku());
                 consume(OPFIabUtils.substituteSku(purchase, resolvedSku));
                 break;
             case PURCHASE:
-                final PurchaseRequest purchaseRequest = (PurchaseRequest) request;
+                final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
                 final Activity activity = purchaseRequest.getActivity();
                 if (activity == null || activity.isFinishing()) {
-                    postResponse(type, USER_CANCELED);
+                    postEmptyResponse(billingRequest, USER_CANCELED);
                     break;
                 }
                 resolvedSku = skuResolver.resolve(purchaseRequest.getSku());
                 purchase(activity, resolvedSku);
                 break;
             case SKU_DETAILS:
-                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) request;
+                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) billingRequest;
                 final Set<String> skus = skuDetailsRequest.getSkus();
                 final Set<String> resolvedSkus = OPFIabUtils.resolveSkus(skuResolver, skus);
                 skuDetails(resolvedSkus);
                 break;
             case INVENTORY:
-                final InventoryRequest inventoryRequest = (InventoryRequest) request;
+                final InventoryRequest inventoryRequest = (InventoryRequest) billingRequest;
                 final boolean startOver = inventoryRequest.startOver();
                 inventory(startOver);
                 break;
@@ -114,44 +116,72 @@ public abstract class BaseBillingProvider implements BillingProvider {
     protected void onActivityResult(@NonNull final Activity activity, final int requestCode,
                                     final int resultCode, @Nullable final Intent data) { }
 
-    protected void postResponse(@NonNull final Response response) {
-        OPFIab.post(response);
+    protected void postResponse(@NonNull final BillingResponse billingResponse) {
+        OPFIab.post(billingResponse);
     }
 
-    protected void postResponse(@NonNull final BillingEvent.Type type,
-                                @NonNull final Response.Status status) {
-        postResponse(OPFIabUtils.emptyResponse(getInfo(), type, status));
+    protected void postEmptyResponse(@NonNull final BillingRequest billingRequest,
+                                     @NonNull final BillingResponse.Status status) {
+        postResponse(OPFIabUtils.emptyResponse(getInfo(), billingRequest, status));
     }
 
-    protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final Collection<SkuDetails> skusDetails) {
-        final List<SkuDetails> revertedSkusDetails = new ArrayList<>(skusDetails.size());
-        for (final SkuDetails skuDetails : skusDetails) {
-            revertedSkusDetails.add(OPFIabUtils.revert(skuResolver, skuDetails));
+    protected void postSkuDetailsResponse(@NonNull final BillingResponse.Status status,
+                                          @Nullable final Collection<SkuDetails> skusDetails) {
+        final SkuDetailsResponse response;
+        if (skusDetails == null) {
+            response = new SkuDetailsResponse(getInfo(), status, null);
+        } else {
+            final List<SkuDetails> revertedSkusDetails = new ArrayList<>(skusDetails.size());
+            for (final SkuDetails skuDetails : skusDetails) {
+                revertedSkusDetails.add(OPFIabUtils.revert(skuResolver, skuDetails));
+            }
+            response = new SkuDetailsResponse(getInfo(), status, revertedSkusDetails);
         }
-        postResponse(new SkuDetailsResponse(getInfo(), status, revertedSkusDetails));
+        postResponse(response);
     }
 
-    protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final Collection<Purchase> inventory,
-                                final boolean hasMore) {
-        final List<Purchase> revertedInventory = new ArrayList<>(inventory.size());
-        for (final Purchase purchase : inventory) {
-            revertedInventory.add(OPFIabUtils.revert(skuResolver, purchase));
+    protected void postInventoryResponse(@NonNull final BillingResponse.Status status,
+                                         @Nullable final Collection<Purchase> inventory,
+                                         final boolean hasMore) {
+        final InventoryResponse response;
+        if (inventory == null) {
+            response = new InventoryResponse(getInfo(), status, null, hasMore);
+        } else {
+            final List<Purchase> revertedInventory = new ArrayList<>(inventory.size());
+            for (final Purchase purchase : inventory) {
+                revertedInventory.add(OPFIabUtils.revert(skuResolver, purchase));
+            }
+            response = new InventoryResponse(getInfo(), status, revertedInventory, hasMore);
         }
-        postResponse(new InventoryResponse(getInfo(), status, revertedInventory, hasMore));
+        postResponse(response);
     }
 
-    protected void postResponse(@NonNull final Response.Status status,
-                                @NonNull final Purchase purchase) {
+    protected void postPurchaseResponse(@NonNull final BillingResponse.Status status,
+                                        @Nullable final Purchase purchase) {
+        final PurchaseResponse response;
+        if (purchase == null) {
+            response = new PurchaseResponse(getInfo(), status, null);
+        } else {
+            final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
+            response = new PurchaseResponse(getInfo(), status, revertedPurchase);
+        }
+        postResponse(response);
+    }
+
+    protected void postConsumeResponse(@NonNull final BillingResponse.Status status,
+                                       @NonNull final Purchase purchase) {
         final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
-        postResponse(new PurchaseResponse(getInfo(), status, revertedPurchase));
+        postResponse(new ConsumeResponse(getInfo(), status, revertedPurchase));
     }
 
     @Override
-    public final void onEventAsync(@NonNull final Request request) {
-        handleRequest(request);
-        OPFIab.post(new RequestHandledEvent(request));
+    public final void onEventAsync(@NonNull final BillingRequest billingRequest) {
+        if (!isAvailable()) {
+            postEmptyResponse(billingRequest, BILLING_UNAVAILABLE);
+        } else {
+            handleRequest(billingRequest);
+        }
+        OPFIab.post(new RequestHandledEvent(billingRequest));
     }
 
     @Override

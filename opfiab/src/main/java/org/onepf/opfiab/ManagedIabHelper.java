@@ -25,46 +25,37 @@ import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.Response;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.opfutils.OPFChecks;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class ManagedIabHelper extends IabHelperWrapper {
+public class ManagedIabHelper extends ScheduledIabHelper {
 
     @NonNull
-    final Set<OnSetupListener> setupListeners = Collections.synchronizedSet(
-            new HashSet<OnSetupListener>());
-
+    final Set<OnSetupListener> setupListeners = new HashSet<>();
     @NonNull
-    final Set<OnPurchaseListener> purchaseListeners = Collections.synchronizedSet(
-            new HashSet<OnPurchaseListener>());
-
+    final Set<OnPurchaseListener> purchaseListeners = new HashSet<>();
     @NonNull
-    final Set<OnInventoryListener> inventoryListeners = Collections.synchronizedSet(
-            new HashSet<OnInventoryListener>());
-
+    final Set<OnInventoryListener> inventoryListeners = new HashSet<>();
     @NonNull
-    final Set<OnSkuDetailsListener> skuDetailsListeners = Collections.synchronizedSet(
-            new HashSet<OnSkuDetailsListener>());
-
+    final Set<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
     @NonNull
-    final Set<OnConsumeListener> consumeListeners = Collections.synchronizedSet(
-            new HashSet<OnConsumeListener>());
+    final Set<OnConsumeListener> consumeListeners = new HashSet<>();
 
     public ManagedIabHelper(@NonNull final BaseIabHelper baseIabHelper) {
         super(baseIabHelper);
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
-    public void onEventMainThread(@NonNull final Response event) {
+    public void onEventMainThread(@NonNull final BillingResponse event) {
         switch (event.getType()) {
             case CONSUME:
                 for (final OnConsumeListener listener : consumeListeners) {
@@ -96,6 +87,7 @@ public class ManagedIabHelper extends IabHelperWrapper {
     }
 
     public void addSetupListener(@NonNull final OnSetupListener setupListener) {
+        OPFChecks.checkThread(true);
         setupListeners.add(setupListener);
         // Deliver last setup even right away
         final SetupResponse setupResponse = OPFIab.getBaseHelper().getSetupResponse();
@@ -105,18 +97,22 @@ public class ManagedIabHelper extends IabHelperWrapper {
     }
 
     public void addPurchaseListener(@NonNull final OnPurchaseListener purchaseListener) {
+        OPFChecks.checkThread(true);
         purchaseListeners.add(purchaseListener);
     }
 
     public void addInventoryListener(@NonNull final OnInventoryListener inventoryListener) {
+        OPFChecks.checkThread(true);
         inventoryListeners.add(inventoryListener);
     }
 
     public void addSkuInfoListener(@NonNull final OnSkuDetailsListener skuInfoListener) {
+        OPFChecks.checkThread(true);
         skuDetailsListeners.add(skuInfoListener);
     }
 
     public void addConsumeListener(@NonNull final OnConsumeListener consumeListener) {
+        OPFChecks.checkThread(true);
         consumeListeners.add(consumeListener);
     }
 
@@ -134,5 +130,6 @@ public class ManagedIabHelper extends IabHelperWrapper {
 
     public void unsubscribe() {
         OPFIab.unregister(this);
+        flush();
     }
 }

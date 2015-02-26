@@ -20,11 +20,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.billing.Purchase;
 
-public class ConsumeResponse extends Response {
+public class ConsumeResponse extends BillingResponse {
+
+    @NonNull
+    private final Purchase purchase;
 
     public ConsumeResponse(@Nullable final BillingProviderInfo providerInfo,
-                           @NonNull final Status status) {
+                           @NonNull final Status status,
+                           @NonNull final Purchase purchase) {
         super(providerInfo, Type.CONSUME, status);
+        this.purchase = purchase;
+    }
+
+    @NonNull
+    public Purchase getPurchase() {
+        return purchase;
     }
 }

@@ -32,6 +32,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String SKU = "org.onepf.sample.trivialdrive.sku_gas";
 
     @NonNull
     private SelfManagedIabHelper iabHelper;
@@ -56,19 +57,25 @@ public class MainActivity extends ActionBarActivity {
         iabHelper.addBillingListener(billingListener);
         setContentView(R.layout.activity_main);
 
-        final String sku = "org.onepf.sample.trivialdrive.sku_gas";
 
         button = findViewById(R.id.button);
         button.setEnabled(false);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                iabHelper.purchase(sku);
+                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU);
             }
         });
 
         if (savedInstanceState == null) {
-            iabHelper.skuDetails(sku);
+            iabHelper.skuDetails(SKU);
         }
     }
 
