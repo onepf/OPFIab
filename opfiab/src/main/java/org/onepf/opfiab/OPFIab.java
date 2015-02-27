@@ -160,6 +160,9 @@ public final class OPFIab {
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
+        if (baseIabHelper != null) {
+            throw new InitException(true);
+        }
         OPFIab.configuration = configuration;
         OPFIab.eventBus = newBus();
         OPFIab.context = context.getApplicationContext();
