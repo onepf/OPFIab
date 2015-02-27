@@ -27,6 +27,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.SelfManagedIabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.SimpleBillingListener;
+import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 public class MainActivity extends ActionBarActivity {
@@ -41,10 +42,15 @@ public class MainActivity extends ActionBarActivity {
     private final BillingListener billingListener = new SimpleBillingListener() {
 
         @Override
+        public void onSetup(@NonNull final SetupResponse setupResponse) {
+            super.onSetup(setupResponse);
+            button.setEnabled(setupResponse.isSuccessful());
+        }
+
+        @Override
         public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
             super.onSkuDetails(skuDetailsResponse);
             if (skuDetailsResponse.isSuccessful()) {
-                button.setEnabled(true);
                 iabHelper.inventory(true);
             }
         }
@@ -54,9 +60,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         iabHelper = OPFIab.getHelper(this);
-        iabHelper.addBillingListener(billingListener);
         setContentView(R.layout.activity_main);
-
 
         button = findViewById(R.id.button);
         button.setEnabled(false);
@@ -64,15 +68,10 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(final View v) {
                 iabHelper.purchase(SKU);
-                iabHelper.purchase(SKU);
-                iabHelper.purchase(SKU);
-                iabHelper.purchase(SKU);
-                iabHelper.purchase(SKU);
-                iabHelper.purchase(SKU);
-                iabHelper.purchase(SKU);
-                iabHelper.purchase(SKU);
             }
         });
+
+        iabHelper.addBillingListener(billingListener);
 
         if (savedInstanceState == null) {
             iabHelper.skuDetails(SKU);

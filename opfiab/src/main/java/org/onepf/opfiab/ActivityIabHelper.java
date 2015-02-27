@@ -44,27 +44,33 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
             this.activity = fragmentActivity;
             final android.support.v4.app.FragmentManager fragmentManager =
                     fragmentActivity.getSupportFragmentManager();
-            if (fragmentManager.findFragmentByTag(FRAGMENT_TAG) != null) {
-                throw new IllegalStateException("OPFFragment already attached!");
+            final android.support.v4.app.Fragment existingFragment;
+            if ((existingFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) != null) {
+                opfFragment = existingFragment;
+                managedIabHelper.subscribe();
+            } else {
+                final android.support.v4.app.Fragment fragment = OPFIabSupportFragment.newInstance();
+                fragmentManager.beginTransaction()
+                        .add(fragment, FRAGMENT_TAG)
+                        .commit();
+                fragmentManager.executePendingTransactions();
+                opfFragment = fragment;
             }
-            final android.support.v4.app.Fragment fragment = OPFIabSupportFragment.newInstance();
-            fragmentManager.beginTransaction()
-                    .add(fragment, FRAGMENT_TAG)
-                    .commit();
-            fragmentManager.executePendingTransactions();
-            opfFragment = fragment;
         } else if (activity != null) {
             this.activity = activity;
             final android.app.FragmentManager fragmentManager = activity.getFragmentManager();
-            if (fragmentManager.findFragmentByTag(FRAGMENT_TAG) != null) {
-                throw new IllegalStateException("OPFFragment already attached!");
+            final android.app.Fragment existingFragment;
+            if ((existingFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) != null) {
+                opfFragment = existingFragment;
+                managedIabHelper.subscribe();
+            } else {
+                final android.app.Fragment fragment = OPFIabFragment.newInstance();
+                fragmentManager.beginTransaction()
+                        .add(fragment, FRAGMENT_TAG)
+                        .commit();
+                fragmentManager.executePendingTransactions();
+                opfFragment = fragment;
             }
-            final android.app.Fragment fragment = OPFIabFragment.newInstance();
-            fragmentManager.beginTransaction()
-                    .add(fragment, FRAGMENT_TAG)
-                    .commit();
-            fragmentManager.executePendingTransactions();
-            opfFragment = fragment;
         } else {
             throw new IllegalArgumentException("Activity can't be null.");
         }
