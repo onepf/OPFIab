@@ -16,41 +16,9 @@
 
 package org.onepf.opfiab.verification;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+public enum VerificationResult {
 
-public class VerificationResult {
-
-    public static enum VerificationStatus {
-
-        SUCCESS,
-        FAILED,
-        ERROR,
-    }
-
-    @NonNull
-    private final VerificationStatus status;
-
-    @Nullable
-    private final Exception exception;
-
-    public VerificationResult(@NonNull final VerificationStatus status,
-                              @Nullable final Exception exception) {
-        this.status = status;
-        this.exception = exception;
-    }
-
-    public VerificationResult(@NonNull final VerificationStatus status) {
-        this(status, null);
-    }
-
-    @NonNull
-    public VerificationStatus getStatus() {
-        return status;
-    }
-
-    @Nullable
-    public Exception getException() {
-        return exception;
-    }
+    SUCCESS,
+    FAILED,
+    ERROR,
 }

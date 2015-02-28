@@ -20,27 +20,18 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.billing.Purchase;
 
-import static org.onepf.opfiab.verification.VerificationResult.VerificationStatus.SUCCESS;
-
 public interface PurchaseVerifier {
 
     @NonNull
     PurchaseVerifier STUB = new PurchaseVerifier() {
 
+        @NonNull
         @Override
         public VerificationResult verify(@NonNull final Purchase purchase) {
-            return new VerificationResult(SUCCESS);
-        }
-
-        @Override
-        public void verify(@NonNull final Purchase purchase,
-                           @NonNull final OnVerificationListener listener) {
-            listener.onVerification(verify(purchase));
+            return VerificationResult.SUCCESS;
         }
     };
 
-
+    @NonNull
     VerificationResult verify(@NonNull final Purchase purchase);
-
-    void verify(@NonNull final Purchase purchase, @NonNull final OnVerificationListener listener);
 }

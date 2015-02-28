@@ -29,15 +29,10 @@ public class PublicKeyPurchaseVerifier implements PurchaseVerifier {
         this.publicKey = publicKey;
     }
 
+    @NonNull
     @Override
     public VerificationResult verify(@NonNull final Purchase purchase) {
         //TODO
-        return null;
-    }
-
-    @Override
-    public void verify(@NonNull final Purchase purchase,
-                       @NonNull final OnVerificationListener listener) {
-        //TODO
+        return VerificationResult.SUCCESS;
     }
 }

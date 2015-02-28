@@ -109,7 +109,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         builder.setPrice(product.getPrice());
         builder.setIconUrl(product.getSmallIconUrl());
         try {
-            builder.setJson(product.toJSON().toString());
+            builder.setOriginalJson(product.toJSON().toString());
         } catch (JSONException exception) {
             OPFLog.e("Failed to set original JSON for SkuDetails.", exception);
         }
@@ -132,7 +132,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         builder.setToken(receipt.getReceiptId());
         builder.setCanceled(receipt.isCanceled());
         builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
-        builder.setJson(receipt.toJSON().toString());
+        builder.setOriginalJson(receipt.toJSON().toString());
         return builder.build();
     }
 

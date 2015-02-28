@@ -41,6 +41,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -149,7 +150,10 @@ public abstract class BaseBillingProvider implements BillingProvider {
         } else {
             final List<Purchase> revertedInventory = new ArrayList<>(inventory.size());
             for (final Purchase purchase : inventory) {
-                revertedInventory.add(OPFIabUtils.revert(skuResolver, purchase));
+                final VerificationResult result = purchaseVerifier.verify(purchase);
+                final Purchase verifiedPurchase = OPFIabUtils.withVerification(purchase, result);
+                final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, verifiedPurchase);
+                revertedInventory.add(revertedPurchase);
             }
             response = new InventoryResponse(getInfo(), status, revertedInventory, hasMore);
         }
@@ -162,7 +166,9 @@ public abstract class BaseBillingProvider implements BillingProvider {
         if (purchase == null) {
             response = new PurchaseResponse(getInfo(), status, null);
         } else {
-            final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
+            final VerificationResult result = purchaseVerifier.verify(purchase);
+            final Purchase verifiedPurchase = OPFIabUtils.withVerification(purchase, result);
+            final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, verifiedPurchase);
             response = new PurchaseResponse(getInfo(), status, revertedPurchase);
         }
         postResponse(response);

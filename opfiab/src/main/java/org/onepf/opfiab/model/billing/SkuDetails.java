@@ -19,7 +19,17 @@ package org.onepf.opfiab.model.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onepf.opfutils.OPFLog;
+
 public class SkuDetails extends BillingModel {
+
+    private static final String NAME_PRICE = "price";
+    private static final String NAME_TITLE = "title";
+    private static final String NAME_DESCRIPTION = "description";
+    private static final String NAME_ICON_URL = "iconUrl";
+
 
     @Nullable
     private final String price;
@@ -32,12 +42,12 @@ public class SkuDetails extends BillingModel {
 
     protected SkuDetails(@NonNull final String sku,
                          @Nullable final SkuType type,
-                         @Nullable final String json,
+                         @Nullable final String originalJson,
                          @Nullable final String price,
                          @Nullable final String title,
                          @Nullable final String description,
                          @Nullable final String iconUrl) {
-        super(sku, type, json);
+        super(sku, type, originalJson);
         this.price = price;
         this.title = title;
         this.description = description;
@@ -68,6 +78,21 @@ public class SkuDetails extends BillingModel {
         return iconUrl;
     }
 
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            jsonObject.put(NAME_PRICE, price == null ? JSONObject.NULL : price);
+            jsonObject.put(NAME_TITLE, title == null ? JSONObject.NULL : title);
+            jsonObject.put(NAME_DESCRIPTION, description == null ? JSONObject.NULL : description);
+            jsonObject.put(NAME_ICON_URL, iconUrl == null ? JSONObject.NULL : iconUrl);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+
+        return jsonObject;
+    }
 
     public static class Builder extends BillingModel.Builder {
 
@@ -82,6 +107,21 @@ public class SkuDetails extends BillingModel {
 
         public Builder(@NonNull final String sku) {
             super(sku);
+        }
+
+        @Override
+        public Builder setType(@Nullable final SkuType type) {
+            return (Builder) super.setType(type);
+        }
+
+        @Override
+        public Builder setOriginalJson(@Nullable final String originalJson) {
+            return (Builder) super.setOriginalJson(originalJson);
+        }
+
+        @Override
+        public Builder setBillingModel(@NonNull final BillingModel billingModel) {
+            return (Builder) super.setBillingModel(billingModel);
         }
 
         public Builder setPrice(@Nullable final String price) {
@@ -104,8 +144,17 @@ public class SkuDetails extends BillingModel {
             return this;
         }
 
+        public Builder setSkuDetails(@NonNull final SkuDetails skuDetails) {
+            setBillingModel(skuDetails);
+            setPrice(skuDetails.getPrice());
+            setTitle(skuDetails.getTitle());
+            setDescription(skuDetails.getDescription());
+            setIconUrl(skuDetails.getIconUrl());
+            return this;
+        }
+
         public SkuDetails build() {
-            return new SkuDetails(sku, type, json, price, title, description, iconUrl);
+            return new SkuDetails(sku, type, originalJson, price, title, description, iconUrl);
         }
     }
 }

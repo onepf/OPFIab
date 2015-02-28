@@ -19,23 +19,32 @@ package org.onepf.opfiab.model.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onepf.opfutils.OPFLog;
+
 import java.io.Serializable;
 
 public abstract class BillingModel implements Serializable {
+
+    private static final String NAME_SKU = "sku";
+    private static final String NAME_TYPE = "type";
+    private static final String NAME_ORIGINAL_JSON = "originalJson";
+
 
     @NonNull
     private final String sku;
     @NonNull
     private final SkuType type;
     @Nullable
-    private final String json;
+    private final String originalJson;
 
     protected BillingModel(@NonNull final String sku,
-                 @Nullable final SkuType type,
-                 @Nullable final String json) {
+                           @Nullable final SkuType type,
+                           @Nullable final String originalJson) {
         this.sku = sku;
         this.type = type == null ? SkuType.UNKNOWN : type;
-        this.json = json;
+        this.originalJson = originalJson;
     }
 
     @NonNull
@@ -49,8 +58,21 @@ public abstract class BillingModel implements Serializable {
     }
 
     @Nullable
-    public String getJson() {
-        return json;
+    public String getOriginalJson() {
+        return originalJson;
+    }
+
+    @NonNull
+    public JSONObject toJson() {
+        final JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(NAME_SKU, sku);
+            jsonObject.put(NAME_TYPE, type);
+            jsonObject.put(NAME_ORIGINAL_JSON, new JSONObject(originalJson));
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 
     abstract static class Builder {
@@ -60,19 +82,25 @@ public abstract class BillingModel implements Serializable {
         @Nullable
         protected SkuType type = null;
         @Nullable
-        protected String json = null;
+        protected String originalJson = null;
 
         protected Builder(@NonNull final String sku) {
             this.sku = sku;
         }
 
-        public Builder setType(@Nullable final SkuType type) {
+        protected Builder setType(@Nullable final SkuType type) {
             this.type = type;
             return this;
         }
 
-        public Builder setJson(@Nullable final String json) {
-            this.json = json;
+        protected Builder setOriginalJson(@Nullable final String originalJson) {
+            this.originalJson = originalJson;
+            return this;
+        }
+
+        protected Builder setBillingModel(@NonNull final BillingModel billingModel) {
+            setType(billingModel.getType());
+            setOriginalJson(billingModel.getOriginalJson());
             return this;
         }
 

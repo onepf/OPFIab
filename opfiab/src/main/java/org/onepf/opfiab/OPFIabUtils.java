@@ -34,6 +34,7 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -45,6 +46,7 @@ public final class OPFIabUtils {
         throw new UnsupportedOperationException();
     }
 
+    //TODO move to OPFUtils
     public static boolean isConnected(@NonNull final Context context) {
         final Object service = context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final ConnectivityManager cm = (ConnectivityManager) service;
@@ -83,12 +85,7 @@ public final class OPFIabUtils {
             return skuDetails;
         }
         final SkuDetails.Builder builder = new SkuDetails.Builder(sku);
-        builder.setType(skuDetails.getType());
-        builder.setJson(skuDetails.getJson());
-        builder.setPrice(skuDetails.getPrice());
-        builder.setTitle(skuDetails.getTitle());
-        builder.setDescription(skuDetails.getDescription());
-        builder.setIconUrl(skuDetails.getIconUrl());
+        builder.setSkuDetails(skuDetails);
         return builder.build();
     }
 
@@ -98,11 +95,7 @@ public final class OPFIabUtils {
             return purchase;
         }
         final Purchase.Builder builder = new Purchase.Builder(sku);
-        builder.setType(purchase.getType());
-        builder.setJson(purchase.getJson());
-        builder.setToken(purchase.getToken());
-        builder.setPurchaseTime(purchase.getPurchaseTime());
-        builder.setCanceled(purchase.isCanceled());
+        builder.setPurchase(purchase);
         return builder.build();
     }
 
@@ -137,5 +130,13 @@ public final class OPFIabUtils {
                                   @NonNull final Purchase purchase) {
         final String resolvedSku = skuResolver.resolve(purchase.getSku());
         return substituteSku(purchase, resolvedSku);
+    }
+
+    public static Purchase withVerification(@NonNull final Purchase purchase,
+                                            @Nullable final VerificationResult verificationResult) {
+        final Purchase.Builder builder = new Purchase.Builder(purchase.getSku());
+        builder.setPurchase(purchase);
+        builder.setVerificationResult(verificationResult);
+        return builder.build();
     }
 }
