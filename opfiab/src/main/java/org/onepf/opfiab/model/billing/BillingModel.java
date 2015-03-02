@@ -21,15 +21,19 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfutils.OPFLog;
 
 import java.io.Serializable;
+
+import static org.json.JSONObject.NULL;
 
 public abstract class BillingModel implements Serializable {
 
     private static final String NAME_SKU = "sku";
     private static final String NAME_TYPE = "type";
-    private static final String NAME_ORIGINAL_JSON = "originalJson";
+    private static final String NAME_PROVIDER_INFO = "provider_info";
+    private static final String NAME_ORIGINAL_JSON = "original_json";
 
 
     @NonNull
@@ -37,13 +41,17 @@ public abstract class BillingModel implements Serializable {
     @NonNull
     private final SkuType type;
     @Nullable
+    private final BillingProviderInfo providerInfo;
+    @Nullable
     private final String originalJson;
 
     protected BillingModel(@NonNull final String sku,
                            @Nullable final SkuType type,
+                           @Nullable final BillingProviderInfo providerInfo,
                            @Nullable final String originalJson) {
         this.sku = sku;
         this.type = type == null ? SkuType.UNKNOWN : type;
+        this.providerInfo = providerInfo;
         this.originalJson = originalJson;
     }
 
@@ -58,6 +66,11 @@ public abstract class BillingModel implements Serializable {
     }
 
     @Nullable
+    public BillingProviderInfo getProviderInfo() {
+        return providerInfo;
+    }
+
+    @Nullable
     public String getOriginalJson() {
         return originalJson;
     }
@@ -68,11 +81,22 @@ public abstract class BillingModel implements Serializable {
         try {
             jsonObject.put(NAME_SKU, sku);
             jsonObject.put(NAME_TYPE, type);
+            jsonObject.put(NAME_PROVIDER_INFO, providerInfo == null ? NULL : providerInfo.toJson());
             jsonObject.put(NAME_ORIGINAL_JSON, new JSONObject(originalJson));
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }
         return jsonObject;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return toJson().toString(4);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return super.toString();
     }
 
     abstract static class Builder {
@@ -81,6 +105,8 @@ public abstract class BillingModel implements Serializable {
         protected final String sku;
         @Nullable
         protected SkuType type = null;
+        @Nullable
+        protected BillingProviderInfo providerInfo = null;
         @Nullable
         protected String originalJson = null;
 
@@ -93,6 +119,11 @@ public abstract class BillingModel implements Serializable {
             return this;
         }
 
+        protected Builder setProviderInfo(@Nullable final BillingProviderInfo providerInfo) {
+            this.providerInfo = providerInfo;
+            return this;
+        }
+
         protected Builder setOriginalJson(@Nullable final String originalJson) {
             this.originalJson = originalJson;
             return this;
@@ -101,6 +132,7 @@ public abstract class BillingModel implements Serializable {
         protected Builder setBillingModel(@NonNull final BillingModel billingModel) {
             setType(billingModel.getType());
             setOriginalJson(billingModel.getOriginalJson());
+            setProviderInfo(billingModel.getProviderInfo());
             return this;
         }
 

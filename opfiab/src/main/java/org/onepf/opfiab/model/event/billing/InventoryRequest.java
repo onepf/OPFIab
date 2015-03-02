@@ -16,7 +16,16 @@
 
 package org.onepf.opfiab.model.event.billing;
 
+import android.support.annotation.NonNull;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onepf.opfutils.OPFLog;
+
 public class InventoryRequest extends BillingRequest {
+
+    private static final String NAME_START_OVER = "start_over";
+
 
     private final boolean startOver;
 
@@ -27,6 +36,18 @@ public class InventoryRequest extends BillingRequest {
 
     public boolean startOver() {
         return startOver;
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            jsonObject.put(NAME_START_OVER, startOver);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 
     //CHECKSTYLE:OFF

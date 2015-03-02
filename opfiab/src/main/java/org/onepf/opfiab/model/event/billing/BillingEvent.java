@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event;
+package org.onepf.opfiab.model.event.billing;
 
 import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onepf.opfutils.OPFLog;
 
 import java.io.Serializable;
 
-public abstract class BillingEvent implements Serializable {
+abstract class BillingEvent implements Serializable {
 
-    private static final Gson GSON = new Gson();
+    private static final String NAME_TYPE = "type";
 
     public static enum Type {
 
@@ -48,13 +50,24 @@ public abstract class BillingEvent implements Serializable {
     }
 
     @NonNull
-    public String toJson() {
-        return GSON.toJson(this);
+    public JSONObject toJson() {
+        final JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(NAME_TYPE, type);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 
     @Override
     public String toString() {
-        return toJson();
+        try {
+            return toJson().toString(4);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return super.toString();
     }
 
     //CHECKSTYLE:OFF

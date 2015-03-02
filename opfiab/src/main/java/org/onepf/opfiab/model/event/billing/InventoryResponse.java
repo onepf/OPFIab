@@ -19,33 +19,64 @@ package org.onepf.opfiab.model.event.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 public class InventoryResponse extends BillingResponse {
 
+    private static final String NAME_INVENTORY = "inventory";
+    private static final String NAME_PURCHASE = "purchase";
+    private static final String NAME_VERIFICATION_RESULT = "verification_result";
+    private static final String NAME_HAS_MORE = "has_more";
+
+
     @Nullable
-    private final List<Purchase> inventory;
+    private final Map<Purchase, VerificationResult> inventory;
     private final boolean hasMore;
 
-    public InventoryResponse(@Nullable final BillingProviderInfo providerInfo,
-                             @NonNull final Status status,
-                             @Nullable final List<Purchase> inventory,
+    public InventoryResponse(@NonNull final Status status,
+                             @Nullable final BillingProviderInfo providerInfo,
+                             @Nullable final Map<Purchase, VerificationResult> inventory,
                              final boolean hasMore) {
-        super(providerInfo, Type.INVENTORY, status);
-        this.inventory = inventory == null ? null : Collections.unmodifiableList(inventory);
+        super(Type.INVENTORY, status, providerInfo);
+        this.inventory = inventory == null ? null : Collections.unmodifiableMap(inventory);
         this.hasMore = hasMore;
     }
 
     @Nullable
-    public List<Purchase> getInventory() {
+    public Map<Purchase, VerificationResult> getInventory() {
         return inventory;
     }
 
     public boolean hasMore() {
         return hasMore;
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            if (inventory == null) {
+                jsonObject.put(NAME_INVENTORY, JSONObject.NULL);
+            } else {
+                for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
+                    final JSONObject item = new JSONObject();
+                    item.put(NAME_PURCHASE, entry.getKey().toJson());
+                    item.put(NAME_VERIFICATION_RESULT, entry.getValue());
+                    jsonObject.accumulate(NAME_INVENTORY, item);
+                }
+            }
+            jsonObject.put(NAME_HAS_MORE, hasMore);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 }

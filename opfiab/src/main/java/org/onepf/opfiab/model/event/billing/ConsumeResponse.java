@@ -19,23 +19,40 @@ package org.onepf.opfiab.model.event.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfutils.OPFLog;
 
 public class ConsumeResponse extends BillingResponse {
+
+    private static final String NAME_PURCHASE = "purchase";
 
     @NonNull
     private final Purchase purchase;
 
-    public ConsumeResponse(@Nullable final BillingProviderInfo providerInfo,
-                           @NonNull final Status status,
+    public ConsumeResponse(@NonNull final Status status,
+                           @Nullable final BillingProviderInfo providerInfo,
                            @NonNull final Purchase purchase) {
-        super(providerInfo, Type.CONSUME, status);
+        super(Type.CONSUME, status, providerInfo);
         this.purchase = purchase;
     }
 
     @NonNull
     public Purchase getPurchase() {
         return purchase;
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            jsonObject.put(NAME_PURCHASE, purchase.toJson());
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 }

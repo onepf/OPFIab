@@ -19,11 +19,20 @@ package org.onepf.opfiab.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onepf.opfutils.OPFLog;
+
+import static org.json.JSONObject.NULL;
+
 public final class BillingProviderInfo {
+
+    private static final String NAME_NAME = "name";
+    private static final String NAME_PACKAGE = "package_name";
+
 
     @NonNull
     private final String name;
-
     @Nullable
     private final String packageName;
 
@@ -42,9 +51,26 @@ public final class BillingProviderInfo {
         return packageName;
     }
 
+    @NonNull
+    public JSONObject toJson() {
+        final JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(NAME_NAME, name);
+            jsonObject.put(NAME_PACKAGE, packageName == null ? NULL : packageName);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
+    }
+
     @Override
     public String toString() {
-        return name;
+        try {
+            return toJson().toString(4);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return super.toString();
     }
 
     //CHECKSTYLE:OFF

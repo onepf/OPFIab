@@ -18,11 +18,19 @@ package org.onepf.opfiab.model.event.billing;
 
 import android.support.annotation.NonNull;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onepf.opfutils.OPFLog;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class SkuDetailsRequest extends BillingRequest {
+
+    private static final String NAME_SKUS = "skus";
+
 
     @NonNull
     private final HashSet<String> skus;
@@ -35,6 +43,18 @@ public class SkuDetailsRequest extends BillingRequest {
     @NonNull
     public Set<String> getSkus() {
         return Collections.unmodifiableSet(skus);
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            jsonObject.put(NAME_SKUS, new JSONArray(skus));
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 
     //CHECKSTYLE:OFF

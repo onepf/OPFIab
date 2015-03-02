@@ -24,8 +24,9 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.verification.VerificationResult;
 
-import java.util.List;
+import java.util.Map;
 
 public class SimpleGlobalBillingListener extends SimpleBillingListener {
 
@@ -42,10 +43,12 @@ public class SimpleGlobalBillingListener extends SimpleBillingListener {
         super.onInventory(inventoryResponse);
         if (inventoryResponse.isSuccessful()) {
             final ScheduledIabHelper helper = OPFIab.getScheduledHelper();
-            final List<Purchase> inventory = inventoryResponse.getInventory();
+            final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
             if (inventory != null) {
-                for (final Purchase purchase : inventory) {
-                    if (purchase.getType() == SkuType.CONSUMABLE) {
+                for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
+                    final Purchase purchase = entry.getKey();
+                    if (purchase.getType() == SkuType.CONSUMABLE
+                            && entry.getValue() == VerificationResult.SUCCESS) {
                         helper.consume(purchase);
                     }
                 }

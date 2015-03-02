@@ -19,17 +19,24 @@ package org.onepf.opfiab.model.event;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.json.JSONObject.NULL;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 
 
 public class SetupResponse {
+
+    private static final String NAME_STATUS = "status";
+    private static final String NAME_PROVIDER_INFO = "provider_info";
 
     public static enum Status {
 
@@ -71,10 +78,25 @@ public class SetupResponse {
         return SUCCESSFUL.contains(status);
     }
 
+    @NonNull
+    public JSONObject toJson() {
+        final JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put(NAME_STATUS, status);
+            jsonObject.put(NAME_PROVIDER_INFO, billingProvider == null ? NULL : billingProvider);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
+    }
+
     @Override
     public String toString() {
-        //TODO
-        return String.format("{\"status\":\"%s\", \"billingProvider\":%s}", status,
-                             String.valueOf(billingProvider));
+        try {
+            return toJson().toString(4);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return super.toString();
     }
 }

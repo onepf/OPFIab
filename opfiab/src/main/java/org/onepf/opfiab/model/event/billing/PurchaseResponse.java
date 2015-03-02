@@ -19,23 +19,56 @@ package org.onepf.opfiab.model.event.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.verification.VerificationResult;
+import org.onepf.opfutils.OPFLog;
+
+import static org.json.JSONObject.NULL;
 
 public class PurchaseResponse extends BillingResponse {
 
+    private static final String NAME_PURCHASE = "purchase";
+    private static final String NAME_VERIFICATION_RESULT = "verification_result";
+
+
     @Nullable
     private final Purchase purchase;
+    @Nullable
+    private final VerificationResult verificationResult;
 
-    public PurchaseResponse(@Nullable final BillingProviderInfo providerInfo,
-                            @NonNull final Status status,
-                            @Nullable final Purchase purchase) {
-        super(providerInfo, Type.PURCHASE, status);
+    public PurchaseResponse(@NonNull final Status status,
+                            @Nullable final BillingProviderInfo providerInfo,
+                            @Nullable final Purchase purchase,
+                            @Nullable final VerificationResult verificationResult) {
+        super(Type.PURCHASE, status, providerInfo);
         this.purchase = purchase;
+        this.verificationResult = verificationResult;
     }
 
     @Nullable
     public Purchase getPurchase() {
         return purchase;
+    }
+
+    @Nullable
+    public VerificationResult getVerificationResult() {
+        return verificationResult;
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            jsonObject.put(NAME_PURCHASE, purchase == null ? NULL : purchase.toJson());
+            jsonObject.put(NAME_VERIFICATION_RESULT,
+                           verificationResult == null ? NULL : verificationResult);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 }

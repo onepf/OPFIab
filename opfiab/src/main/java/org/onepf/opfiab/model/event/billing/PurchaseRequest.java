@@ -20,6 +20,10 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.onepf.opfutils.OPFLog;
+
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
@@ -27,9 +31,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class PurchaseRequest extends BillingRequest {
 
+    private static final String NAME_SKU = "sku";
+
+
     @Nullable
     private final transient Reference<Activity> activityReference;
-
     @NonNull
     private final String sku;
 
@@ -48,6 +54,18 @@ public class PurchaseRequest extends BillingRequest {
     @NonNull
     public String getSku() {
         return sku;
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            jsonObject.put(NAME_SKU, sku);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 
     //CHECKSTYLE:OFF

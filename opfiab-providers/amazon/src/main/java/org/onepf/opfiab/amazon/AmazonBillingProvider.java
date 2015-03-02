@@ -37,8 +37,7 @@ import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
-import org.onepf.opfiab.model.event.BillingEvent;
-import org.onepf.opfiab.model.event.billing.BillingResponse;
+import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
@@ -49,12 +48,12 @@ import java.util.List;
 import java.util.Set;
 
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.ITEM_ALREADY_OWNED;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.ITEM_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.SERVICE_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.SUCCESS;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.UNAUTHORISED;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.UNKNOWN_ERROR;
+import static org.onepf.opfiab.model.event.billing.Status.ITEM_ALREADY_OWNED;
+import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Status.SERVICE_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
+import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
+import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
 public class AmazonBillingProvider extends BaseBillingProvider {
 
@@ -108,6 +107,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         builder.setDescription(product.getDescription());
         builder.setPrice(product.getPrice());
         builder.setIconUrl(product.getSmallIconUrl());
+        builder.setProviderInfo(getInfo());
         try {
             builder.setOriginalJson(product.toJSON().toString());
         } catch (JSONException exception) {
@@ -132,6 +132,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         builder.setToken(receipt.getReceiptId());
         builder.setCanceled(receipt.isCanceled());
         builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
+        builder.setProviderInfo(getInfo());
         builder.setOriginalJson(receipt.toJSON().toString());
         return builder.build();
     }
@@ -140,7 +141,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return PurchasingService.IS_SANDBOX_MODE || OPFIabUtils.isConnected(context);
     }
 
-    private BillingResponse.Status handleFailure() {
+    private Status handleFailure() {
         if (!isConnected()) {
             return SERVICE_UNAVAILABLE;
         } else if (!isAuthorised()) {
@@ -151,7 +152,6 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     public final void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
-        final BillingEvent.Type type = BillingEvent.Type.SKU_DETAILS;
         switch (productDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 final List<SkuDetails> skusDetails = new ArrayList<>();

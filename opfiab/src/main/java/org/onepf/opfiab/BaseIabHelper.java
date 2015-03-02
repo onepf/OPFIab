@@ -25,11 +25,12 @@ import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
+import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfutils.OPFChecks;
 
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.BILLING_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.BUSY;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.NO_BILLING_PROVIDER;
+import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Status.BUSY;
+import static org.onepf.opfiab.model.event.billing.Status.NO_BILLING_PROVIDER;
 
 final class BaseIabHelper extends IabHelper {
 
@@ -54,7 +55,7 @@ final class BaseIabHelper extends IabHelper {
     }
 
     private void postEmptyResponse(@NonNull final BillingRequest billingRequest,
-                                   @NonNull BillingResponse.Status status) {
+                                   @NonNull Status status) {
         OPFIab.post(OPFIabUtils.emptyResponse(null, billingRequest, status));
     }
 

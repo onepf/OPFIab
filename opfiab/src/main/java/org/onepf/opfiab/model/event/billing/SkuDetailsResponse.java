@@ -19,21 +19,29 @@ package org.onepf.opfiab.model.event.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.SkuDetails;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.json.JSONObject.NULL;
+
 public class SkuDetailsResponse extends BillingResponse {
+
+    private static final String NAME_SKUS_DETAILS = "skus_details";
+
 
     @Nullable
     private final Collection<SkuDetails> skusDetails;
 
-    public SkuDetailsResponse(@Nullable final BillingProviderInfo providerInfo,
-                              @NonNull final Status status,
+    public SkuDetailsResponse(@NonNull final Status status,
+                              @Nullable final BillingProviderInfo providerInfo,
                               @Nullable final Collection<SkuDetails> skusDetails) {
-        super(providerInfo, Type.SKU_DETAILS, status);
+        super(Type.SKU_DETAILS, status, providerInfo);
         this.skusDetails = skusDetails == null
                 ? null
                 : Collections.unmodifiableCollection(skusDetails);
@@ -42,5 +50,23 @@ public class SkuDetailsResponse extends BillingResponse {
     @Nullable
     public Collection<SkuDetails> getSkusDetails() {
         return skusDetails;
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            if (skusDetails == null) {
+                jsonObject.put(NAME_SKUS_DETAILS, NULL);
+            } else {
+                for (final SkuDetails skuDetails : skusDetails) {
+                    jsonObject.accumulate(NAME_SKUS_DETAILS, skuDetails.toJson());
+                }
+            }
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 }

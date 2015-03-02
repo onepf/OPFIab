@@ -33,6 +33,7 @@ import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.VerificationResult;
 
@@ -56,22 +57,22 @@ public final class OPFIabUtils {
 
     public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
                                                 @NonNull final BillingRequest billingRequest,
-                                                @NonNull final BillingResponse.Status status) {
+                                                @NonNull final Status status) {
         final BillingResponse billingResponse;
         switch (billingRequest.getType()) {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
                 final Purchase purchase = consumeRequest.getPurchase();
-                billingResponse = new ConsumeResponse(providerInfo, status, purchase);
+                billingResponse = new ConsumeResponse(status, providerInfo, purchase);
                 break;
             case PURCHASE:
-                billingResponse = new PurchaseResponse(providerInfo, status, null);
+                billingResponse = new PurchaseResponse(status, providerInfo, null, null);
                 break;
             case SKU_DETAILS:
-                billingResponse = new SkuDetailsResponse(providerInfo, status, null);
+                billingResponse = new SkuDetailsResponse(status, providerInfo, null);
                 break;
             case INVENTORY:
-                billingResponse = new InventoryResponse(providerInfo, status, null, false);
+                billingResponse = new InventoryResponse(status, providerInfo, null, false);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -130,13 +131,5 @@ public final class OPFIabUtils {
                                   @NonNull final Purchase purchase) {
         final String resolvedSku = skuResolver.resolve(purchase.getSku());
         return substituteSku(purchase, resolvedSku);
-    }
-
-    public static Purchase withVerification(@NonNull final Purchase purchase,
-                                            @Nullable final VerificationResult verificationResult) {
-        final Purchase.Builder builder = new Purchase.Builder(purchase.getSku());
-        builder.setPurchase(purchase);
-        builder.setVerificationResult(verificationResult);
-        return builder.build();
     }
 }

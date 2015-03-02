@@ -19,66 +19,22 @@ package org.onepf.opfiab.model.event.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.event.BillingEvent;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.PENDING;
-import static org.onepf.opfiab.model.event.billing.BillingResponse.Status.SUCCESS;
+import static org.json.JSONObject.NULL;
+import static org.onepf.opfiab.model.event.billing.Status.PENDING;
+import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 
 public abstract class BillingResponse extends BillingEvent {
 
-    public static enum Status {
-
-        /**
-         * Everything is OK.
-         */
-        SUCCESS,
-        /**
-         * Request was handled, but takes considerable time to process.
-         */
-        PENDING,
-        /**
-         * Billing provider requires authorisation.
-         */
-        UNAUTHORISED,
-        /**
-         * Library is busy with another request.
-         */
-        BUSY,
-        /**
-         * User canceled billing request.
-         */
-        USER_CANCELED,
-        /**
-         * Billing provider reported it can't handle billing.
-         */
-        BILLING_UNAVAILABLE,
-        /**
-         * Library has no working billing provider.
-         */
-        NO_BILLING_PROVIDER,
-        /**
-         * Request can't be handled at a time.<br>
-         * For example: connection is down.
-         */
-        SERVICE_UNAVAILABLE,
-        /**
-         * Requested sku is unavailable from current billing provider.
-         */
-        ITEM_UNAVAILABLE,
-        /**
-         * Item is already owned by user.<br>
-         * If it's consumable - consume() must be called.
-         */
-        ITEM_ALREADY_OWNED,
-        /**
-         * For some reason billing provider refused to handle request.
-         */
-        UNKNOWN_ERROR,
-    }
+    private static final String NAME_PROVIDER_INFO = "provider_info";
+    private static final String NAME_STATUS = "status";
 
     private static final Collection<Status> SUCCESSFUL = Arrays.asList(SUCCESS, PENDING);
 
@@ -88,12 +44,12 @@ public abstract class BillingResponse extends BillingEvent {
     @NonNull
     private final Status status;
 
-    protected BillingResponse(@Nullable final BillingProviderInfo providerInfo,
-                              @NonNull final Type type,
-                              @NonNull final Status status) {
+    protected BillingResponse(@NonNull final Type type,
+                              @NonNull final Status status,
+                              @Nullable final BillingProviderInfo providerInfo) {
         super(type);
-        this.providerInfo = providerInfo;
         this.status = status;
+        this.providerInfo = providerInfo;
     }
 
     @Nullable
@@ -108,6 +64,19 @@ public abstract class BillingResponse extends BillingEvent {
 
     public boolean isSuccessful() {
         return SUCCESSFUL.contains(getStatus());
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        final JSONObject jsonObject = super.toJson();
+        try {
+            jsonObject.put(NAME_STATUS, status);
+            jsonObject.put(NAME_PROVIDER_INFO, providerInfo == null ? NULL : providerInfo.toJson());
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return jsonObject;
     }
 
     //CHECKSTYLE:OFF
