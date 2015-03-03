@@ -51,7 +51,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    provided 'com.amazon:in-app-purchasing:2.0.1'
+    provided 'com.amazon:in-app-purchasing:2.0.61'
 
     compile project(':opfiab')
 }

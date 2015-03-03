@@ -56,7 +56,7 @@ dependencies {
 
     compile 'com.android.support:support-v4:21.0.3'
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.amazon:in-app-purchasing:2.0.1'
+    compile 'com.amazon:in-app-purchasing:2.0.61'
 
     compile project(':opfiab')
     compile project(':google')

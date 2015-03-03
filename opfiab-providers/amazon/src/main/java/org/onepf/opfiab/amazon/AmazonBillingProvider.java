@@ -72,7 +72,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         super(context, purchaseVerifier, skuResolver);
         checkRequirements();
         // Register Amazon callbacks handler
-        PurchasingService.registerListener(new AmazonContextWrapper(context), billingHelper);
+        PurchasingService.registerListener(context, billingHelper);
     }
 
     private void checkRequirements() {

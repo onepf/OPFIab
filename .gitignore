@@ -32,6 +32,7 @@ proguard/
 ## Directory-based project format
 *.iml
 .idea/workspace.xml
+.idea/misc.xml
 .idea/tasks.xml
 # .idea/dictionaries
 # and these sensitive or high-churn files:
