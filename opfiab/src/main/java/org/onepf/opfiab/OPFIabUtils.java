@@ -16,9 +16,6 @@
 
 package org.onepf.opfiab;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -35,7 +32,6 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
-import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,13 +43,6 @@ public final class OPFIabUtils {
         throw new UnsupportedOperationException();
     }
 
-    //TODO move to OPFUtils
-    public static boolean isConnected(@NonNull final Context context) {
-        final Object service = context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        final ConnectivityManager cm = (ConnectivityManager) service;
-        final NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
 
     public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
                                                 @NonNull final BillingRequest billingRequest,

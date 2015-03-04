@@ -41,6 +41,7 @@ import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -138,7 +139,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     private boolean isConnected() {
-        return PurchasingService.IS_SANDBOX_MODE || OPFIabUtils.isConnected(context);
+        return PurchasingService.IS_SANDBOX_MODE || OPFUtils.isConnected(context);
     }
 
     private Status handleFailure() {
