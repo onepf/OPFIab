@@ -111,7 +111,6 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
         managedIabHelper.purchase(getActivity(), sku);
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @NonNull
     private Activity getActivity() {
         final Activity activity;

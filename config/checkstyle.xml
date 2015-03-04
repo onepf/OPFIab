@@ -34,8 +34,6 @@
 
     <module name="TreeWalker">
 
-        <module name="FileContentsHolder"/>
-
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
         <module name="JavadocMethod">
@@ -132,7 +130,7 @@
         <module name="HiddenField">
             <property name="ignoreConstructorParameter" value="true" />
             <property name="ignoreSetter" value="true" />
-            <property name="severity" value="ignore" />
+            <property name="severity" value="warning" />
         </module>
         <module name="IllegalInstantiation" />
         <module name="InnerAssignment" >
@@ -159,10 +157,7 @@
         <module name="FinalClass" />
         <module name="HideUtilityClassConstructor" />
         <module name="InterfaceIsType" />
-        <module name="VisibilityModifier">
-            <property name="protectedAllowed" value="true"/>
-            <property name="packageAllowed" value="true"/>
-        </module>
+        <module name="VisibilityModifier" />
 
 
         <!-- Miscellaneous other checks.                   -->
@@ -180,5 +175,6 @@
 
     </module>
 
+    <!-- Enable suppression comments -->
     <module name="SuppressionCommentFilter"/>
 </module>

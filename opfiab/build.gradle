@@ -17,6 +17,7 @@
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+apply plugin: 'com.noveogroup.android.check'
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -49,20 +50,21 @@ android {
     }
 }
 
-//apply plugin: 'android-checkstyle'
-//androidCheckstyle {
-//    abortOnError true
-//    config rootProject.file('.idea/analyzers/checkstyle/checkstyle.xml')
-//}
-//
-//apply plugin: 'android-pmd'
-//androidPmd {
-//    abortOnError false
-//    config rootProject.file('.idea/analyzers/pmd/ruleset.xml')
-//}
+check {
+    abortOnError false
+
+    checkstyle {
+        config rootProject.file('config/checkstyle.xml')
+    }
+
+    pmd {
+        config rootProject.file('config/pmd.xml')
+    }
+}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    //noinspection NewerVersionAvailable
     compile 'org.onepf:opfutils:0.1.15-SNAPSHOT'
     //noinspection GradleDependency,GradleCompatible
     provided 'com.android.support:support-v4:13.0.0'

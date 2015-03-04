@@ -29,8 +29,6 @@ import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfutils.OPFLog;
 
-import de.greenrobot.event.EventBus;
-
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DESTROY;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.PAUSE;

@@ -25,8 +25,6 @@ import android.support.v4.app.Fragment;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
-import de.greenrobot.event.EventBus;
-
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.ATTACH;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DESTROY;

@@ -16,18 +16,14 @@
 
 package org.onepf.opfiab;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
-
-import de.greenrobot.event.EventBus;
 
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.ATTACH;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
@@ -38,7 +34,6 @@ import static org.onepf.opfiab.model.event.LifecycleEvent.Type.RESUME;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.START;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
 
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class OPFIabFragment extends Fragment {
 
     @NonNull
