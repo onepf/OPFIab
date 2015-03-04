@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 final class AmazonBillingHelper implements PurchasingListener {
 
-    private static final int TIMEOUT = PurchasingService.IS_SANDBOX_MODE ? 60000 : 3000;
+    private static final int TIMEOUT = PurchasingService.IS_SANDBOX_MODE ? 60000 : 5000;
 
 
     @Nullable
@@ -106,33 +106,6 @@ final class AmazonBillingHelper implements PurchasingListener {
     @Override
     public void onPurchaseUpdatesResponse(
             @NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        //TODO cleanup
-        //        final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
-        //        if (purchaseUpdatesResponse.hasMore()) {
-        //            if (pendingReceipts == null) {
-        //                pendingReceipts = new ArrayList<>(receipts);
-        //            } else {
-        //                pendingReceipts.addAll(receipts);
-        //            }
-        //            PurchasingService.getPurchaseUpdates(false);
-        //            return;
-        //        }
-        //
-        //        final PurchaseUpdatesResponse response;
-        //        if (pendingReceipts == null) {
-        //            response = purchaseUpdatesResponse;
-        //        } else {
-        //            pendingReceipts.addAll(receipts);
-        //            final PurchaseUpdatesResponseBuilder builder = new PurchaseUpdatesResponseBuilder();
-        //            builder.setReceipts(pendingReceipts);
-        //            builder.setHasMore(purchaseUpdatesResponse.hasMore());
-        //            builder.setRequestId(purchaseUpdatesResponse.getRequestId());
-        //            builder.setRequestStatus(purchaseUpdatesResponse.getRequestStatus());
-        //            builder.setUserData(purchaseUpdatesResponse.getUserData());
-        //            response = builder.build();
-        //        }
-        //        pendingReceipts = null;
-        //        OPFIab.post(response);
         OPFIab.post(purchaseUpdatesResponse);
     }
 }

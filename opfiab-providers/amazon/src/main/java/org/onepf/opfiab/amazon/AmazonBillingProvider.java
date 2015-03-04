@@ -138,12 +138,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return builder.build();
     }
 
-    private boolean isConnected() {
-        return PurchasingService.IS_SANDBOX_MODE || OPFUtils.isConnected(context);
-    }
-
     private Status handleFailure() {
-        if (!isConnected()) {
+        if (!OPFUtils.isConnected(context)) {
             return SERVICE_UNAVAILABLE;
         } else if (!isAuthorised()) {
             return UNAUTHORISED;

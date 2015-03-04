@@ -28,9 +28,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.json.JSONObject.NULL;
-import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
+import static org.onepf.opfiab.model.event.SetupResponse.Status.UNAUTHORISED;
 
 
 public class SetupResponse {
@@ -47,7 +47,7 @@ public class SetupResponse {
     }
 
     private static final Collection<Status> SUCCESSFUL =
-            Arrays.asList(SUCCESS, PROVIDER_CHANGED, FAILED);
+            Arrays.asList(SUCCESS, PROVIDER_CHANGED, UNAUTHORISED);
 
 
     @NonNull
