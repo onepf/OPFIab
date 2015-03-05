@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -36,6 +37,7 @@ import static org.onepf.opfiab.model.event.LifecycleEvent.Type.RESUME;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.START;
 import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
 
+@SuppressLint("Registered")
 public class OPFIabActivity extends Activity {
 
     protected static final int FINISH_DELAY = 3000;

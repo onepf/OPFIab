@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
@@ -82,6 +84,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     protected abstract void consume(@NonNull final Purchase purchase);
 
+    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
         OPFLog.methodD(billingRequest);
 
@@ -114,6 +117,8 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 final boolean startOver = inventoryRequest.startOver();
                 inventory(startOver);
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 
@@ -264,8 +269,10 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
         @NonNull
         protected final Context context;
+        @SuppressFBWarnings({"URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"})
         @NonNull
         protected PurchaseVerifier purchaseVerifier = PurchaseVerifier.STUB;
+        @SuppressFBWarnings({"URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"})
         @NonNull
         protected SkuResolver skuResolver = SkuResolver.STUB;
 

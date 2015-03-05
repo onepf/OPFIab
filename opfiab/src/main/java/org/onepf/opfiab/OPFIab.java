@@ -23,6 +23,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
+import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfutils.OPFChecks;
@@ -32,6 +33,7 @@ import org.onepf.opfutils.exception.InitException;
 import java.util.concurrent.Executors;
 
 import de.greenrobot.event.EventBus;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public final class OPFIab {
 
@@ -40,8 +42,6 @@ public final class OPFIab {
     private static volatile Context context;
 
     private static BaseIabHelper baseIabHelper;
-    private static SetupManager setupManager;
-    private static GlobalBillingListener billingListener;
 
 
     private OPFIab() {
@@ -158,6 +158,7 @@ public final class OPFIab {
         return configuration;
     }
 
+    @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC"})
     public static void init(@NonNull final Context context,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
@@ -168,12 +169,16 @@ public final class OPFIab {
         OPFIab.eventBus = newBus();
         OPFIab.context = context.getApplicationContext();
         OPFIab.baseIabHelper = new BaseIabHelper();
-        OPFIab.setupManager = new SetupManager();
-        OPFIab.billingListener = new GlobalBillingListener(configuration.getBillingListener());
+
         int priority = Integer.MAX_VALUE;
+
         register(baseIabHelper, priority);
+
+        final SetupManager setupManager = new SetupManager();
         register(setupManager, --priority);
-        register(billingListener, --priority);
+
+        final BillingListener billingListener = configuration.getBillingListener();
+        register(new GlobalBillingListener(billingListener), --priority);
     }
 
     public static void setup() {

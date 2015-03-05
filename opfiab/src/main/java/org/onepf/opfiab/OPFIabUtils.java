@@ -39,6 +39,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public final class OPFIabUtils {
 
     private static final int JSON_SPACES = 4;
@@ -59,6 +61,7 @@ public final class OPFIabUtils {
         return "";
     }
 
+    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     @NonNull
     public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
                                                 @NonNull final BillingRequest billingRequest,

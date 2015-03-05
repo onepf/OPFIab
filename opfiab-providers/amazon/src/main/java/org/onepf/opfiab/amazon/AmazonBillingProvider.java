@@ -32,7 +32,6 @@ import com.amazon.device.iap.model.Receipt;
 
 import org.json.JSONException;
 import org.onepf.opfiab.BaseBillingProvider;
-import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;

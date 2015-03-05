@@ -58,6 +58,8 @@ final class GlobalBillingListener extends BillingListenerCompositor {
             case SKU_DETAILS:
                 onSkuDetails((SkuDetailsResponse) billingResponse);
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 
