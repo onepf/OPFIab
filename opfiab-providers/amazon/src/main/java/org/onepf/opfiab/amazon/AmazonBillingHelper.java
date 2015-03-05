@@ -36,15 +36,18 @@ import java.util.concurrent.TimeUnit;
 
 final class AmazonBillingHelper implements PurchasingListener {
 
+    @SuppressWarnings({"checkstyle:magicnumber"})
     private static final int TIMEOUT = PurchasingService.IS_SANDBOX_MODE ? 60000 : 5000;
 
 
     @Nullable
-    private volatile CountDownLatch userDataLatch = null;
+    private volatile CountDownLatch userDataLatch;
     @Nullable
-    private volatile UserData userData = null;
+    private volatile UserData userData;
 
-    AmazonBillingHelper() { }
+    AmazonBillingHelper() {
+        super();
+    }
 
     @Nullable
     UserData getUserData() {

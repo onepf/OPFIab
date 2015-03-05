@@ -17,6 +17,7 @@
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
+apply plugin: 'com.noveogroup.android.check'
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -45,6 +46,18 @@ android {
         checkAllWarnings true
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
+    }
+}
+
+check {
+    abortOnError false
+
+    checkstyle {
+        config rootProject.file('config/checkstyle.xml')
+    }
+
+    pmd {
+        config rootProject.file('config/pmd.xml')
     }
 }
 
