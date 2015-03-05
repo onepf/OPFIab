@@ -69,6 +69,7 @@ abstract class BillingEvent implements JsonCompatible, Serializable {
     }
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD")
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

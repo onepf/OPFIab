@@ -36,13 +36,15 @@ final class BaseIabHelper extends IabHelper {
 
     private final Configuration configuration = OPFIab.getConfiguration();
     @Nullable
-    private SetupResponse setupResponse = null;
+    private SetupResponse setupResponse;
     @Nullable
-    private BillingProvider currentProvider = null;
+    private BillingProvider currentProvider;
     @Nullable
     private BillingRequest pendingRequest;
 
-    BaseIabHelper() { }
+    BaseIabHelper() {
+        super();
+    }
 
     private void setCurrentProvider(@Nullable final BillingProvider provider) {
         if (currentProvider != null) {
@@ -109,7 +111,7 @@ final class BaseIabHelper extends IabHelper {
 
     public void onEventMainThread(@NonNull final BillingResponse billingResponse) {
         // Current provider is set but is not available
-        if (currentProvider != null && (billingResponse.getStatus() == BILLING_UNAVAILABLE)
+        if (currentProvider != null && billingResponse.getStatus() == BILLING_UNAVAILABLE
                 // However last setup attempt was successful
                 && setupResponse != null && setupResponse.isSuccessful()
                 // Auto-recovery is set

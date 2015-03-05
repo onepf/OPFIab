@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.verification.VerificationResult;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Collections;
 import java.util.Map;
@@ -75,7 +76,7 @@ public class InventoryResponse extends BillingResponse {
             }
             jsonObject.put(NAME_HAS_MORE, hasMore);
         } catch (JSONException e) {
-            e.printStackTrace();
+            OPFLog.e("", e);
         }
         return jsonObject;
     }

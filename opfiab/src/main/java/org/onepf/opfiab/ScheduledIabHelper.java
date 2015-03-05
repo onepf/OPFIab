@@ -73,7 +73,7 @@ public class ScheduledIabHelper extends IabHelperAdapter {
 
     private final Set<BillingRequest> requests = new LinkedHashSet<>();
 
-    public ScheduledIabHelper(@NonNull final IabHelper iabHelper) {
+    ScheduledIabHelper(@NonNull final IabHelper iabHelper) {
         super(iabHelper);
         OPFIab.register(EVENT_HANDLER);
         HELPERS.put(this, requests);

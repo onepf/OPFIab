@@ -42,10 +42,6 @@ public class OPFIabSupportFragment extends Fragment {
     }
 
 
-    public OPFIabSupportFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,26 +69,26 @@ public class OPFIabSupportFragment extends Fragment {
 
     @Override
     public void onPause() {
-        super.onPause();
         OPFIab.post(new SupportFragmentLifecycleEvent(PAUSE, this));
+        super.onPause();
     }
 
     @Override
     public void onStop() {
-        super.onStop();
         OPFIab.post(new SupportFragmentLifecycleEvent(STOP, this));
+        super.onStop();
     }
 
     @Override
     public void onDetach() {
-        super.onDetach();
         OPFIab.post(new SupportFragmentLifecycleEvent(DETACH, this));
+        super.onDetach();
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         OPFIab.post(new SupportFragmentLifecycleEvent(DESTROY, this));
+        super.onDestroy();
     }
 
     @Override

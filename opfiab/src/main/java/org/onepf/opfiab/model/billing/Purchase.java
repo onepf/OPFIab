@@ -85,9 +85,9 @@ public class Purchase extends BillingModel {
     public static class Builder extends BillingModel.Builder {
 
         @Nullable
-        private String token = null;
+        private String token;
+        private boolean canceled;
         private long purchaseTime = -1L;
-        private boolean canceled = false;
 
         public Builder(@NonNull final String sku) {
             super(sku);
@@ -99,9 +99,9 @@ public class Purchase extends BillingModel {
         }
 
         @Override
-        public BillingModel.Builder setProviderInfo(
+        public Builder setProviderInfo(
                 @Nullable final BillingProviderInfo providerInfo) {
-            return super.setProviderInfo(providerInfo);
+            return (Builder) super.setProviderInfo(providerInfo);
         }
 
         @Override
@@ -119,13 +119,13 @@ public class Purchase extends BillingModel {
             return this;
         }
 
-        public Builder setPurchaseTime(final long purchaseTime) {
-            this.purchaseTime = purchaseTime;
+        public Builder setCanceled(final boolean canceled) {
+            this.canceled = canceled;
             return this;
         }
 
-        public Builder setCanceled(final boolean canceled) {
-            this.canceled = canceled;
+        public Builder setPurchaseTime(final long purchaseTime) {
+            this.purchaseTime = purchaseTime;
             return this;
         }
 

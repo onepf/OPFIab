@@ -117,8 +117,11 @@ public abstract class BaseBillingProvider implements BillingProvider {
         }
     }
 
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     protected void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                    final int resultCode, @Nullable final Intent data) { }
+                                    final int resultCode, @Nullable final Intent data) {
+        // Ignore by default
+    }
 
     protected void postResponse(@NonNull final BillingResponse billingResponse) {
         OPFIab.post(billingResponse);
@@ -151,13 +154,13 @@ public abstract class BaseBillingProvider implements BillingProvider {
         if (inventory == null) {
             response = new InventoryResponse(status, getInfo(), null, hasMore);
         } else {
-            final Map<Purchase, VerificationResult> revertedInventory = new HashMap<>();
+            final Map<Purchase, VerificationResult> verifiedRevertedInventory = new HashMap<>();
             for (final Purchase purchase : inventory) {
                 final VerificationResult result = purchaseVerifier.verify(purchase);
                 final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
-                revertedInventory.put(revertedPurchase, result);
+                verifiedRevertedInventory.put(revertedPurchase, result);
             }
-            response = new InventoryResponse(status, getInfo(), revertedInventory, hasMore);
+            response = new InventoryResponse(status, getInfo(), verifiedRevertedInventory, hasMore);
         }
         postResponse(response);
     }
@@ -215,12 +218,14 @@ public abstract class BaseBillingProvider implements BillingProvider {
         return true;
     }
 
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     @Nullable
     @Override
     public Intent getStorePageIntent() {
         return null;
     }
 
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     @Nullable
     @Override
     public Intent getRateIntent() {
@@ -228,6 +233,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD")
     @Override
     public boolean equals(final Object o) {
         final BillingProviderInfo info = getInfo();

@@ -90,6 +90,7 @@ public class SkuDetails extends BillingModel {
                 && TextUtils.isEmpty(description);
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     @NonNull
     @Override
     public JSONObject toJson() {
@@ -102,20 +103,19 @@ public class SkuDetails extends BillingModel {
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }
-
         return jsonObject;
     }
 
     public static class Builder extends BillingModel.Builder {
 
         @Nullable
-        private String price = null;
+        private String price;
         @Nullable
-        private String title = null;
+        private String title;
         @Nullable
-        private String description = null;
+        private String description;
         @Nullable
-        private String iconUrl = null;
+        private String iconUrl;
 
         public Builder(@NonNull final String sku) {
             super(sku);
@@ -127,9 +127,9 @@ public class SkuDetails extends BillingModel {
         }
 
         @Override
-        public BillingModel.Builder setProviderInfo(
+        public Builder setProviderInfo(
                 @Nullable final BillingProviderInfo providerInfo) {
-            return super.setProviderInfo(providerInfo);
+            return (Builder) super.setProviderInfo(providerInfo);
         }
 
         @Override

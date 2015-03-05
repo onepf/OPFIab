@@ -57,6 +57,7 @@ public final class OPFIab {
 
     private static EventBus newBus() {
         return EventBus.builder()
+                // Must use only one background thread
                 .executorService(Executors.newSingleThreadExecutor())
                 .throwSubscriberException(true)
                 .eventInheritance(true)

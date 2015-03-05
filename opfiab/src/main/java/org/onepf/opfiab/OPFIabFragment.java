@@ -41,9 +41,6 @@ public class OPFIabFragment extends Fragment {
         return new OPFIabFragment();
     }
 
-    public OPFIabFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -72,26 +69,26 @@ public class OPFIabFragment extends Fragment {
 
     @Override
     public void onPause() {
-        super.onPause();
         OPFIab.post(new FragmentLifecycleEvent(PAUSE, this));
+        super.onPause();
     }
 
     @Override
     public void onStop() {
-        super.onStop();
         OPFIab.post(new FragmentLifecycleEvent(STOP, this));
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        OPFIab.post(new FragmentLifecycleEvent(DESTROY, this));
+        super.onStop();
     }
 
     @Override
     public void onDetach() {
-        super.onDetach();
         OPFIab.post(new FragmentLifecycleEvent(DETACH, this));
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        OPFIab.post(new FragmentLifecycleEvent(DESTROY, this));
+        super.onDestroy();
     }
 
     @Override

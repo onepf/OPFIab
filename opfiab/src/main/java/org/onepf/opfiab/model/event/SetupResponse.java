@@ -76,7 +76,7 @@ public class SetupResponse implements JsonCompatible {
         return status;
     }
 
-    public boolean isSuccessful() {
+    public final boolean isSuccessful() {
         return SUCCESSFUL.contains(status);
     }
 

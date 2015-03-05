@@ -208,11 +208,6 @@
         <entry key="STYLE" value="true" />
       </map>
     </option>
-    <option name="_excludeFilters">
-      <list>
-        <option value="$PROJECT_DIR$/.idea/analyzers/findbug/exclude.xml" />
-      </list>
-    </option>
     <option name="_enabledBundledPluginIds">
       <set>
         <option value="jp.f.dev.findbugs.detect.android" />

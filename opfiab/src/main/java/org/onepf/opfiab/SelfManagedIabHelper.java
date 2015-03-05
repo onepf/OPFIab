@@ -36,7 +36,7 @@ public abstract class SelfManagedIabHelper extends IabHelperAdapter {
     @NonNull
     protected final ManagedIabHelper managedIabHelper;
 
-    protected SelfManagedIabHelper(@NonNull final ManagedIabHelper managedIabHelper) {
+    SelfManagedIabHelper(@NonNull final ManagedIabHelper managedIabHelper) {
         super(managedIabHelper);
         this.managedIabHelper = managedIabHelper;
     }

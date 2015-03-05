@@ -46,7 +46,9 @@ final class SetupManager {
 
     private State state = State.INITIAL;
 
-    SetupManager() { }
+    SetupManager() {
+        super();
+    }
 
     @NonNull
     private Set<BillingProvider> getAvailableProviders(

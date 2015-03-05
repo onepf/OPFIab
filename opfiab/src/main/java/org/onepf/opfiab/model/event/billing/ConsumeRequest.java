@@ -54,6 +54,7 @@ public class ConsumeRequest extends BillingRequest {
     }
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD")
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

@@ -31,7 +31,8 @@ public class SkuDetailsRequest extends BillingRequest {
 
     private static final String NAME_SKUS = "skus";
 
-
+    // Must use serializable Set
+    @SuppressWarnings("PMD.LooseCoupling")
     @NonNull
     private final HashSet<String> skus;
 
@@ -58,6 +59,7 @@ public class SkuDetailsRequest extends BillingRequest {
     }
 
     //CHECKSTYLE:OFF
+    @SuppressWarnings("PMD")
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -77,5 +79,5 @@ public class SkuDetailsRequest extends BillingRequest {
         result = 31 * result + skus.hashCode();
         return result;
     }
-    //CHECKSTYLE:OFF
+    //CHECKSTYLE:ON
 }

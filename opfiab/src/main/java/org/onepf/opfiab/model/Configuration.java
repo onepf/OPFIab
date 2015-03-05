@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class Configuration {
 
     private static final long DEFAULT_REQUEST_DELAY = 500L;
@@ -39,7 +40,7 @@ public final class Configuration {
     private final boolean skipUnauthorised;
     private final boolean autoRecover;
 
-    private Configuration(@NonNull final Set<BillingProvider> providers,
+    Configuration(@NonNull final Set<BillingProvider> providers,
                           @Nullable final BillingListener billingListener,
                           final long subsequentRequestDelay, final boolean skipUnauthorised,
                           final boolean autoRecover) {
@@ -84,8 +85,8 @@ public final class Configuration {
         @Nullable
         private BillingListener billingListener;
         private long subsequentRequestDelay = DEFAULT_REQUEST_DELAY;
-        private boolean skipUnauthorised = false;
-        private boolean autoRecover = false;
+        private boolean skipUnauthorised;
+        private boolean autoRecover;
 
         public Builder addBillingProvider(@NonNull final BillingProvider provider) {
             providers.add(provider);

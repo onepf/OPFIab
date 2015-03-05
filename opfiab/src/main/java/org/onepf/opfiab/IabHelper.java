@@ -35,6 +35,10 @@ import java.util.Set;
 
 public abstract class IabHelper {
 
+    IabHelper() {
+        super();
+    }
+
     protected abstract void postRequest(@NonNull final BillingRequest billingRequest);
 
     public void purchase(@NonNull final Activity activity,

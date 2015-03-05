@@ -102,11 +102,11 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         @NonNull
         protected final String sku;
         @Nullable
-        protected SkuType type = null;
+        protected SkuType type;
         @Nullable
-        protected BillingProviderInfo providerInfo = null;
+        protected BillingProviderInfo providerInfo;
         @Nullable
-        protected String originalJson = null;
+        protected String originalJson;
 
         protected Builder(@NonNull final String sku) {
             this.sku = sku;

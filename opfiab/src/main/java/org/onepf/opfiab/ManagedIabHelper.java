@@ -50,7 +50,7 @@ public class ManagedIabHelper extends ScheduledIabHelper {
     @NonNull
     private final Set<OnConsumeListener> consumeListeners = new HashSet<>();
 
-    public ManagedIabHelper(@NonNull final BaseIabHelper baseIabHelper) {
+    ManagedIabHelper(@NonNull final BaseIabHelper baseIabHelper) {
         super(baseIabHelper);
     }
 

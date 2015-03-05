@@ -50,7 +50,6 @@ public class OPFIabActivity extends Activity {
 
     @NonNull
     protected final Handler handler = new Handler(Looper.getMainLooper());
-
     @NonNull
     protected final Runnable finishTask = new Runnable() {
         @Override
@@ -98,21 +97,21 @@ public class OPFIabActivity extends Activity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         OPFIab.post(new ActivityLifecycleEvent(PAUSE, this));
+        super.onPause();
     }
 
     @Override
     protected void onStop() {
-        super.onStop();
         OPFIab.post(new ActivityLifecycleEvent(STOP, this));
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         handler.removeCallbacks(finishTask);
         OPFIab.post(new ActivityLifecycleEvent(DESTROY, this));
+        super.onDestroy();
     }
 
     @Override

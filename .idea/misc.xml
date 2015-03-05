@@ -27,7 +27,7 @@
   </component>
   <component name="FindBugsConfigurable">
     <option name="make" value="true" />
-    <option name="effort" value="default" />
+    <option name="effort" value="max" />
     <option name="priority" value="Medium" />
     <option name="excludeFilter" value="" />
   </component>

@@ -38,6 +38,7 @@ public class SimpleGlobalBillingListener extends SimpleBillingListener {
         }
     }
 
+    @SuppressWarnings("PMD.AvoidDeeplyNestedIfStmts")
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         super.onInventory(inventoryResponse);

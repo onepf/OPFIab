@@ -25,7 +25,8 @@ class IabHelperAdapter extends IabHelper {
     @NonNull
     protected final IabHelper iabHelper;
 
-    public IabHelperAdapter(@NonNull final IabHelper iabHelper) {
+    IabHelperAdapter(@NonNull final IabHelper iabHelper) {
+        super();
         this.iabHelper = iabHelper;
     }
 

@@ -77,12 +77,12 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
         OPFIab.register(this);
     }
 
-    public ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
+    ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                              @NonNull final Activity activity) {
         this(managedIabHelper, activity, null);
     }
 
-    public ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
+    ActivityIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                              @NonNull final FragmentActivity fragmentActivity) {
         this(managedIabHelper, null, fragmentActivity);
     }

@@ -20,12 +20,13 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
+@SuppressWarnings("PMD.UncommentedEmptyMethod")
 public class SimpleBillingListener implements BillingListener {
 
     @Override
