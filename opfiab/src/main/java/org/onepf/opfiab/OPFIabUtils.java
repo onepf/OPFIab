@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.json.JSONException;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -32,6 +33,7 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -39,11 +41,25 @@ import java.util.Set;
 
 public final class OPFIabUtils {
 
+    private static final int JSON_SPACES = 4;
+
+
     private OPFIabUtils() {
         throw new UnsupportedOperationException();
     }
 
 
+    @NonNull
+    public static String toString(@NonNull final JsonCompatible jsonCompatible) {
+        try {
+            return jsonCompatible.toJson().toString(JSON_SPACES);
+        } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return "";
+    }
+
+    @NonNull
     public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
                                                 @NonNull final BillingRequest billingRequest,
                                                 @NonNull final Status status) {

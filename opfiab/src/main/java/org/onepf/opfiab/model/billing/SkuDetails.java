@@ -44,6 +44,7 @@ public class SkuDetails extends BillingModel {
     @Nullable
     private final String iconUrl;
 
+    @SuppressWarnings("checkstyle:parameternumber")
     protected SkuDetails(@NonNull final String sku,
                          @Nullable final SkuType type,
                          @Nullable final BillingProviderInfo providerInfo,

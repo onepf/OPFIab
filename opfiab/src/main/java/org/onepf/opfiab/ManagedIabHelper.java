@@ -40,15 +40,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class ManagedIabHelper extends ScheduledIabHelper {
 
     @NonNull
-    final Set<OnSetupListener> setupListeners = new HashSet<>();
+    private final Set<OnSetupListener> setupListeners = new HashSet<>();
     @NonNull
-    final Set<OnPurchaseListener> purchaseListeners = new HashSet<>();
+    private final Set<OnPurchaseListener> purchaseListeners = new HashSet<>();
     @NonNull
-    final Set<OnInventoryListener> inventoryListeners = new HashSet<>();
+    private final Set<OnInventoryListener> inventoryListeners = new HashSet<>();
     @NonNull
-    final Set<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
+    private final Set<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
     @NonNull
-    final Set<OnConsumeListener> consumeListeners = new HashSet<>();
+    private final Set<OnConsumeListener> consumeListeners = new HashSet<>();
 
     public ManagedIabHelper(@NonNull final BaseIabHelper baseIabHelper) {
         super(baseIabHelper);

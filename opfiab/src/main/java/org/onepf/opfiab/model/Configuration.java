@@ -28,6 +28,9 @@ import java.util.Set;
 
 public final class Configuration {
 
+    private static final long DEFAULT_REQUEST_DELAY = 500L;
+
+
     @NonNull
     private final Set<BillingProvider> providers;
     @Nullable
@@ -80,7 +83,7 @@ public final class Configuration {
         private final Set<BillingProvider> providers = new LinkedHashSet<>();
         @Nullable
         private BillingListener billingListener;
-        private long subsequentRequestDelay = 500L;
+        private long subsequentRequestDelay = DEFAULT_REQUEST_DELAY;
         private boolean skipUnauthorised = false;
         private boolean autoRecover = false;
 

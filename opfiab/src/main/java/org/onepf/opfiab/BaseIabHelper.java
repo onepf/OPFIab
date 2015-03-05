@@ -99,7 +99,7 @@ final class BaseIabHelper extends IabHelper {
         }
     }
 
-    public final void onEventMainThread(@NonNull final RequestHandledEvent event) {
+    public void onEventMainThread(@NonNull final RequestHandledEvent event) {
         // At this point request should be handled by BillingProvider
         if (pendingRequest != event.getBillingRequest()) {
             throw new IllegalStateException();

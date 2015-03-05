@@ -21,6 +21,8 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.JsonCompatible;
+import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfutils.OPFLog;
 
@@ -28,7 +30,7 @@ import java.io.Serializable;
 
 import static org.json.JSONObject.NULL;
 
-public abstract class BillingModel implements Serializable {
+public abstract class BillingModel implements JsonCompatible, Serializable {
 
     private static final String NAME_SKU = "sku";
     private static final String NAME_TYPE = "type";
@@ -76,6 +78,7 @@ public abstract class BillingModel implements Serializable {
     }
 
     @NonNull
+    @Override
     public JSONObject toJson() {
         final JSONObject jsonObject = new JSONObject();
         try {
@@ -91,12 +94,7 @@ public abstract class BillingModel implements Serializable {
 
     @Override
     public String toString() {
-        try {
-            return toJson().toString(4);
-        } catch (JSONException exception) {
-            OPFLog.e("", exception);
-        }
-        return super.toString();
+        return OPFIabUtils.toString(this);
     }
 
     abstract static class Builder {

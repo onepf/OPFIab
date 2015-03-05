@@ -21,11 +21,13 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.JsonCompatible;
+import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
 
-public final class BillingProviderInfo {
+public final class BillingProviderInfo implements JsonCompatible {
 
     private static final String NAME_NAME = "name";
     private static final String NAME_PACKAGE = "package_name";
@@ -52,6 +54,7 @@ public final class BillingProviderInfo {
     }
 
     @NonNull
+    @Override
     public JSONObject toJson() {
         final JSONObject jsonObject = new JSONObject();
         try {
@@ -65,12 +68,7 @@ public final class BillingProviderInfo {
 
     @Override
     public String toString() {
-        try {
-            return toJson().toString(4);
-        } catch (JSONException exception) {
-            OPFLog.e("", exception);
-        }
-        return super.toString();
+        return OPFIabUtils.toString(this);
     }
 
     //CHECKSTYLE:OFF

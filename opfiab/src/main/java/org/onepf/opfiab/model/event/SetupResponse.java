@@ -21,6 +21,8 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.JsonCompatible;
+import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfutils.OPFLog;
 
@@ -33,7 +35,7 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.UNAUTHORISED;
 
 
-public class SetupResponse {
+public class SetupResponse implements JsonCompatible {
 
     private static final String NAME_STATUS = "status";
     private static final String NAME_PROVIDER_INFO = "provider_info";
@@ -79,6 +81,7 @@ public class SetupResponse {
     }
 
     @NonNull
+    @Override
     public JSONObject toJson() {
         final JSONObject jsonObject = new JSONObject();
         try {
@@ -92,11 +95,6 @@ public class SetupResponse {
 
     @Override
     public String toString() {
-        try {
-            return toJson().toString(4);
-        } catch (JSONException exception) {
-            OPFLog.e("", exception);
-        }
-        return super.toString();
+        return OPFIabUtils.toString(this);
     }
 }

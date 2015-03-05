@@ -20,11 +20,13 @@ import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.JsonCompatible;
+import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import java.io.Serializable;
 
-abstract class BillingEvent implements Serializable {
+abstract class BillingEvent implements JsonCompatible, Serializable {
 
     private static final String NAME_TYPE = "type";
 
@@ -50,6 +52,7 @@ abstract class BillingEvent implements Serializable {
     }
 
     @NonNull
+    @Override
     public JSONObject toJson() {
         final JSONObject jsonObject = new JSONObject();
         try {
@@ -62,12 +65,7 @@ abstract class BillingEvent implements Serializable {
 
     @Override
     public String toString() {
-        try {
-            return toJson().toString(4);
-        } catch (JSONException exception) {
-            OPFLog.e("", exception);
-        }
-        return super.toString();
+        return OPFIabUtils.toString(this);
     }
 
     //CHECKSTYLE:OFF
