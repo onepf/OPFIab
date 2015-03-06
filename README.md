@@ -29,7 +29,7 @@ OPFIab
     - [ ] Dynamically switch from stale provider.
   - [ ] Documentation - **0%**
     - [ ] Public API.
-    - [ ] Internal impelentation comments.
+    - [ ] Internal implementation comments.
     - [ ] Project Wiki. // TODO
   - [ ] QA - **30%**
     - [ ] Static Analyzers compliance
@@ -42,7 +42,7 @@ OPFIab
   - [ ] Google InApp Billing
   - [x] Amazon InApp
   - [ ] Samsung
-    - [ ] Abstract activity-dependant BilingProvider implementation.
+    - [ ] Abstract activity-dependant BillingProvider implementation.
   - [ ] Fortumo
     - [ ] Subscriptions [#3](https://github.com/onepf/OPFIab/issues/3)
 - [ ] Sample project - **10%**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
         }
     }
 
+    @SuppressFBWarnings({"ACEM_ABSTRACT_CLASS_EMPTY_METHODS"})
     @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     protected void onActivityResult(@NonNull final Activity activity, final int requestCode,
                                     final int resultCode, @Nullable final Intent data) {
@@ -153,7 +154,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     protected void postInventoryResponse(@NonNull final Status status,
-                                         @Nullable final Collection<Purchase> inventory,
+                                         @Nullable final Iterable<Purchase> inventory,
                                          final boolean hasMore) {
         final InventoryResponse response;
         if (inventory == null) {
@@ -238,7 +239,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     //CHECKSTYLE:OFF
-    @SuppressWarnings("PMD")
+    @SuppressWarnings({"PMD", "TypeMayBeWeakened", "RedundantIfStatement"})
     @Override
     public boolean equals(final Object o) {
         final BillingProviderInfo info = getInfo();
@@ -247,7 +248,6 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
         final BaseBillingProvider that = (BaseBillingProvider) o;
 
-        //noinspection RedundantIfStatement
         if (!info.equals(that.getInfo())) return false;
 
         return true;

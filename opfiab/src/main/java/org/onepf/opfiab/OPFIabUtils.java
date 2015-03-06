@@ -35,7 +35,6 @@ import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfutils.OPFLog;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -121,7 +120,7 @@ public final class OPFIabUtils {
     }
 
     public static Set<String> resolveSkus(@NonNull final SkuResolver resolver,
-                                          @NonNull final Collection<String> skus) {
+                                          @NonNull final Iterable<String> skus) {
         final Set<String> resolvedSkus = new HashSet<>();
         for (final String sku : skus) {
             resolvedSkus.add(resolver.resolve(sku));

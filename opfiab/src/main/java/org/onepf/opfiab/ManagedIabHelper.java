@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,23 +32,23 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfutils.OPFChecks;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class ManagedIabHelper extends ScheduledIabHelper {
 
     @NonNull
-    private final Set<OnSetupListener> setupListeners = new HashSet<>();
+    private final Collection<OnSetupListener> setupListeners = new HashSet<>();
     @NonNull
-    private final Set<OnPurchaseListener> purchaseListeners = new HashSet<>();
+    private final Collection<OnPurchaseListener> purchaseListeners = new HashSet<>();
     @NonNull
-    private final Set<OnInventoryListener> inventoryListeners = new HashSet<>();
+    private final Collection<OnInventoryListener> inventoryListeners = new HashSet<>();
     @NonNull
-    private final Set<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
+    private final Collection<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
     @NonNull
-    private final Set<OnConsumeListener> consumeListeners = new HashSet<>();
+    private final Collection<OnConsumeListener> consumeListeners = new HashSet<>();
 
     ManagedIabHelper(@NonNull final BaseIabHelper baseIabHelper) {
         super(baseIabHelper);

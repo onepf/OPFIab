@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFPreferences;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
@@ -51,9 +51,9 @@ final class SetupManager {
     }
 
     @NonNull
-    private Set<BillingProvider> getAvailableProviders(
-            @NonNull final Set<BillingProvider> providers) {
-        final Set<BillingProvider> availableProviders = new LinkedHashSet<>();
+    private Iterable<BillingProvider> getAvailableProviders(
+            @NonNull final Iterable<BillingProvider> providers) {
+        final Collection<BillingProvider> availableProviders = new LinkedHashSet<>();
         for (final BillingProvider provider : providers) {
             if (provider.isAvailable()) {
                 availableProviders.add(provider);
@@ -84,6 +84,7 @@ final class SetupManager {
         }
     }
 
+    @SuppressWarnings("UnusedParameters")
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
         state = State.FINISHED;
     }

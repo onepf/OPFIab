@@ -31,11 +31,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public class ScheduledIabHelper extends IabHelperAdapter {
 
     private static final Map<IabHelperAdapter, Set<BillingRequest>> HELPERS =
             new WeakHashMap<>();
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+    @SuppressWarnings("OverlyComplexAnonymousInnerClass")
     private static final Runnable HANDLE_NEXT_REQUESTS = new Runnable() {
         @Override
         public void run() {
@@ -58,16 +61,20 @@ public class ScheduledIabHelper extends IabHelperAdapter {
             }
         }
     };
+    @SuppressFBWarnings({"UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS"})
     private static final Object EVENT_HANDLER = new Object() {
 
+        @SuppressWarnings("UnusedParameters")
         public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
             HANDLE_NEXT_REQUESTS.run();
         }
 
+        @SuppressWarnings("UnusedParameters")
         public final void onEventMainThread(@NonNull final RequestHandledEvent event) {
             final long requestDelay = OPFIab.getConfiguration().getSubsequentRequestDelay();
             HANDLER.removeCallbacks(HANDLE_NEXT_REQUESTS);
-            HANDLER.postDelayed(HANDLE_NEXT_REQUESTS, requestDelay);        }
+            HANDLER.postDelayed(HANDLE_NEXT_REQUESTS, requestDelay);
+        }
     };
 
 

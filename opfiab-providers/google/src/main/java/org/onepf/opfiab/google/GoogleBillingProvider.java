@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
 import java.util.Set;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class GoogleBillingProvider extends BaseBillingProvider {
 
@@ -90,6 +92,8 @@ public class GoogleBillingProvider extends BaseBillingProvider {
             return new GoogleBillingProvider(context, purchaseVerifier, skuResolver);
         }
 
+        @SuppressFBWarnings({"OCP_OVERLY_CONCRETE_PARAMETER"})
+        @SuppressWarnings("TypeMayBeWeakened")
         public Builder purchaseVerifier(
                 @NonNull final PublicKeyPurchaseVerifier purchaseVerifier) {
             super.setPurchaseVerifier(purchaseVerifier);

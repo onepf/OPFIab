@@ -47,6 +47,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static org.onepf.opfiab.model.event.billing.Status.ITEM_ALREADY_OWNED;
 import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
@@ -75,6 +77,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         PurchasingService.registerListener(context, billingHelper);
     }
 
+    @SuppressFBWarnings({"EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"})
     private void checkRequirements() {
         // Check if application is suited to use Amazon
         final PackageManager packageManager = context.getPackageManager();
@@ -102,6 +105,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
             case SUBSCRIPTION:
                 builder.setType(SkuType.SUBSCRIPTION);
                 break;
+            default:
+                throw new IllegalStateException();
         }
         builder.setTitle(product.getTitle());
         builder.setDescription(product.getDescription());
@@ -128,6 +133,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
             case SUBSCRIPTION:
                 builder.setType(SkuType.SUBSCRIPTION);
                 break;
+            default:
+                throw new IllegalStateException();
         }
         builder.setToken(receipt.getReceiptId());
         builder.setCanceled(receipt.isCanceled());
@@ -150,7 +157,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     public final void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
         switch (productDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
-                final List<SkuDetails> skusDetails = new ArrayList<>();
+                final Collection<SkuDetails> skusDetails = new ArrayList<>();
                 final Collection<Product> products = productDataResponse.getProductData().values();
                 for (final Product product : products) {
                     skusDetails.add(newSkuDetails(product));
@@ -165,6 +172,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 postSkuDetailsResponse(handleFailure(), null);
                 OPFLog.e("Product data request failed: %s", productDataResponse);
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 
@@ -172,7 +181,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         switch (purchaseUpdatesResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
-                final List<Purchase> purchases = new ArrayList<>(receipts.size());
+                final Collection<Purchase> purchases = new ArrayList<>(receipts.size());
                 for (final Receipt receipt : receipts) {
                     purchases.add(newPurchase(receipt));
                 }
@@ -184,6 +193,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 postInventoryResponse(handleFailure(), null, false);
                 OPFLog.e("Purchase updates request failed: %s", purchaseUpdatesResponse);
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 
@@ -205,6 +216,8 @@ public class AmazonBillingProvider extends BaseBillingProvider {
                 postPurchaseResponse(handleFailure(), null);
                 OPFLog.e("Purchase request failed: %s", purchaseResponse);
                 break;
+            default:
+                throw new IllegalStateException();
         }
     }
 

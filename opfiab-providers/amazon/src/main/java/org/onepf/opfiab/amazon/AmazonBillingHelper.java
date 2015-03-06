@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 final class AmazonBillingHelper implements PurchasingListener {
 
-    @SuppressWarnings({"checkstyle:magicnumber"})
+    @SuppressWarnings({"checkstyle:magicnumber", "MagicNumber"})
     private static final int TIMEOUT = PurchasingService.IS_SANDBOX_MODE ? 60000 : 5000;
 
 
@@ -88,6 +88,8 @@ final class AmazonBillingHelper implements PurchasingListener {
                 userData = null;
                 OPFLog.e("UserData request failed: %s", userDataResponse);
                 break;
+            default:
+                throw new IllegalStateException();
         }
         final CountDownLatch latch = userDataLatch;
         if (latch != null) {

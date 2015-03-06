@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ public class PurchaseRequest extends BillingRequest {
     private static final String NAME_SKU = "sku";
 
 
+    @SuppressFBWarnings({"NFF_NON_FUNCTIONAL_FIELD"})
     @Nullable
     private final transient Reference<Activity> activityReference;
     @NonNull
@@ -69,7 +70,7 @@ public class PurchaseRequest extends BillingRequest {
     }
 
     //CHECKSTYLE:OFF
-    @SuppressWarnings("PMD")
+    @SuppressWarnings({"PMD", "RedundantIfStatement"})
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
