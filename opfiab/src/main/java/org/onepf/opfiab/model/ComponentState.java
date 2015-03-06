@@ -14,23 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event;
+package org.onepf.opfiab.model;
 
-import android.support.annotation.NonNull;
-
-import org.onepf.opfiab.model.ComponentState;
-
-public class LifecycleEvent {
-
-    @NonNull
-    private final ComponentState type;
-
-    public LifecycleEvent(@NonNull final ComponentState type) {
-        this.type = type;
-    }
-
-    @NonNull
-    public ComponentState getType() {
-        return type;
-    }
+public enum ComponentState {
+    CREATE,
+    ATTACH,
+    START,
+    RESUME,
+    PAUSE,
+    STOP,
+    DETACH,
+    DESTROY,
 }

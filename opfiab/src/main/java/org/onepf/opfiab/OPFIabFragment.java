@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.ATTACH;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DESTROY;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DETACH;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.PAUSE;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.RESUME;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.START;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
+import static org.onepf.opfiab.model.ComponentState.ATTACH;
+import static org.onepf.opfiab.model.ComponentState.CREATE;
+import static org.onepf.opfiab.model.ComponentState.DESTROY;
+import static org.onepf.opfiab.model.ComponentState.DETACH;
+import static org.onepf.opfiab.model.ComponentState.PAUSE;
+import static org.onepf.opfiab.model.ComponentState.RESUME;
+import static org.onepf.opfiab.model.ComponentState.START;
+import static org.onepf.opfiab.model.ComponentState.STOP;
 
 public class OPFIabFragment extends Fragment {
 

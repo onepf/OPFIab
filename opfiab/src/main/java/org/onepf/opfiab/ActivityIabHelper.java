@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import android.support.v4.app.FragmentActivity;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type;
+import org.onepf.opfiab.model.ComponentState;
 
 public class ActivityIabHelper extends SelfManagedIabHelper {
 
@@ -99,14 +99,14 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
         }
     }
 
-    private void handleLifecycle(@NonNull final Type type) {
+    private void handleLifecycle(@NonNull final ComponentState type) {
         // Handle billing events depending on fragment lifecycle
-        if (type == Type.ATTACH || type == Type.START || type == Type.RESUME) {
+        if (type == ComponentState.ATTACH || type == ComponentState.START || type == ComponentState.RESUME) {
             // Attach - subscribe for event right away when helper is created
             // Start - necessary to handle onActivityResult since it's called before onResume
             // Resume - re-subscribe for billing events if we unsubscribed in onPause
             managedIabHelper.subscribe();
-        } else if (type == Type.STOP || type == Type.PAUSE) {
+        } else if (type == ComponentState.STOP || type == ComponentState.PAUSE) {
             // Pause - only callback guaranteed to be called
             // Stop - mirror onStart
             managedIabHelper.unsubscribe();
@@ -114,7 +114,7 @@ public class ActivityIabHelper extends SelfManagedIabHelper {
             if (activity.isFinishing()) {
                 OPFIab.unregister(this);
             }
-        } else if (type == Type.DETACH) {
+        } else if (type == ComponentState.DETACH) {
             // Detach - fragment is removed, unsubscribe from everything
             managedIabHelper.unsubscribe();
             OPFIab.unregister(this);

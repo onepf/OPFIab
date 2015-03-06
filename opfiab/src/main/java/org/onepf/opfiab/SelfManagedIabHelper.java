@@ -28,6 +28,8 @@ import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public abstract class SelfManagedIabHelper extends IabHelperAdapter {
 
     protected static final String FRAGMENT_TAG = "OPFIabFragment";
@@ -73,6 +75,7 @@ public abstract class SelfManagedIabHelper extends IabHelperAdapter {
         managedIabHelper.addBillingListener(billingListener);
     }
 
+    @SuppressFBWarnings({"ACEM_ABSTRACT_CLASS_EMPTY_METHODS"})
     @Override
     public final void onActivityResult(@NonNull final Activity activity,
                                  final int requestCode,

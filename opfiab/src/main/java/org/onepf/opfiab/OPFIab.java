@@ -18,6 +18,7 @@ package org.onepf.opfiab;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -159,7 +160,7 @@ public final class OPFIab {
     }
 
     @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC"})
-    public static void init(@NonNull final Context context,
+    public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
         if (baseIabHelper != null) {
@@ -167,8 +168,10 @@ public final class OPFIab {
         }
         OPFIab.configuration = configuration;
         OPFIab.eventBus = newBus();
-        OPFIab.context = context.getApplicationContext();
+        OPFIab.context = application.getApplicationContext();
         OPFIab.baseIabHelper = new BaseIabHelper();
+
+        application.registerActivityLifecycleCallbacks(new ActivityMonitor());
 
         int priority = Integer.MAX_VALUE;
 

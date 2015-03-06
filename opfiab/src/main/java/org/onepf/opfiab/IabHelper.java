@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,21 +41,39 @@ public abstract class IabHelper {
 
     protected abstract void postRequest(@NonNull final BillingRequest billingRequest);
 
-    public void purchase(@NonNull final Activity activity,
-                         @NonNull final String sku) {
-        postRequest(new PurchaseRequest(activity, sku));
+    protected BillingRequest newPurchaseRequest(@NonNull final Activity activity,
+                                                @NonNull final String sku) {
+        return new PurchaseRequest(activity, sku);
     }
 
-    public void consume(@NonNull final Purchase purchase) {
-        postRequest(new ConsumeRequest(purchase));
+    protected BillingRequest newConsumeRequest(@NonNull final Purchase purchase) {
+        return new ConsumeRequest(purchase);
     }
 
-    public void inventory(final boolean startOver) {
-        postRequest(new InventoryRequest(startOver));
+    protected BillingRequest newInventoryRequest(final boolean startOver) {
+        return new InventoryRequest(startOver);
     }
 
-    public void skuDetails(@NonNull final Set<String> skus) {
-        postRequest(new SkuDetailsRequest(skus));
+    protected BillingRequest newSkuDetailsRequest(@NonNull final Set<String> skus) {
+        return new SkuDetailsRequest(skus);
+    }
+
+    public final void purchase(@NonNull final Activity activity,
+                               @NonNull final String sku) {
+        postRequest(newPurchaseRequest(activity, sku));
+    }
+
+    public final void consume(@NonNull final Purchase purchase) {
+        postRequest(newConsumeRequest(purchase));
+    }
+
+
+    public final void inventory(final boolean startOver) {
+        postRequest(newInventoryRequest(startOver));
+    }
+
+    public final void skuDetails(@NonNull final Set<String> skus) {
+        postRequest(newSkuDetailsRequest(skus));
     }
 
     public final void skuDetails(@NonNull final String... skus) {

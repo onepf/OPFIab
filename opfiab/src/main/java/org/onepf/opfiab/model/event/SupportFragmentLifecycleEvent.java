@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,15 @@ package org.onepf.opfiab.model.event;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 
+import org.onepf.opfiab.model.ComponentState;
+
 public class SupportFragmentLifecycleEvent extends LifecycleEvent {
 
     @NonNull
     private final Fragment fragment;
 
     public SupportFragmentLifecycleEvent(
-            @NonNull final Type type, @NonNull final Fragment fragment) {
+            @NonNull final ComponentState type, @NonNull final Fragment fragment) {
         super(type);
         this.fragment = fragment;
     }

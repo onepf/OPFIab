@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,23 @@ package org.onepf.opfiab.model.event;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.ComponentState;
+
 import java.util.Arrays;
 
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.CREATE;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.DESTROY;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.PAUSE;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.RESUME;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.START;
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type.STOP;
+import static org.onepf.opfiab.model.ComponentState.CREATE;
+import static org.onepf.opfiab.model.ComponentState.DESTROY;
+import static org.onepf.opfiab.model.ComponentState.PAUSE;
+import static org.onepf.opfiab.model.ComponentState.RESUME;
+import static org.onepf.opfiab.model.ComponentState.START;
+import static org.onepf.opfiab.model.ComponentState.STOP;
 
 public class ActivityLifecycleEvent extends LifecycleEvent {
 
     @NonNull
     private final Activity activity;
 
-    public ActivityLifecycleEvent(@NonNull final Type type, @NonNull final Activity activity) {
+    public ActivityLifecycleEvent(@NonNull final ComponentState type, @NonNull final Activity activity) {
         super(type);
         if (!Arrays.asList(CREATE, START, RESUME, PAUSE, STOP, DESTROY).contains(type)) {
             throw new IllegalArgumentException("Illegal lifecycle callback for Activity");

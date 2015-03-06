@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
-import static org.onepf.opfiab.model.event.LifecycleEvent.Type;
+import org.onepf.opfiab.model.ComponentState;
 
 public class FragmentIabHelper extends SelfManagedIabHelper {
 
@@ -95,12 +95,12 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
         handleLifecycle(event.getType());
     }
 
-    private void handleLifecycle(@NonNull final Type type) {
-        if (type == Type.ATTACH) {
+    private void handleLifecycle(@NonNull final ComponentState type) {
+        if (type == ComponentState.ATTACH) {
             managedIabHelper.subscribe();
-        } else if (type == Type.DETACH) {
+        } else if (type == ComponentState.DETACH) {
             managedIabHelper.unsubscribe();
-        } else if ((type == Type.PAUSE && getActivity().isFinishing()) || type == Type.DESTROY) {
+        } else if ((type == ComponentState.PAUSE && getActivity().isFinishing()) || type == ComponentState.DESTROY) {
             managedIabHelper.unsubscribe();
             OPFIab.unregister(this);
         }

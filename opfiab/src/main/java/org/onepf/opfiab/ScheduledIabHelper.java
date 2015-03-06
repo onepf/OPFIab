@@ -61,14 +61,15 @@ public class ScheduledIabHelper extends IabHelperAdapter {
             }
         }
     };
-    @SuppressFBWarnings({"UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS"})
     private static final Object EVENT_HANDLER = new Object() {
 
+        @SuppressFBWarnings({"UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS"})
         @SuppressWarnings("UnusedParameters")
         public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
             HANDLE_NEXT_REQUESTS.run();
         }
 
+        @SuppressFBWarnings({"UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS"})
         @SuppressWarnings("UnusedParameters")
         public final void onEventMainThread(@NonNull final RequestHandledEvent event) {
             final long requestDelay = OPFIab.getConfiguration().getSubsequentRequestDelay();

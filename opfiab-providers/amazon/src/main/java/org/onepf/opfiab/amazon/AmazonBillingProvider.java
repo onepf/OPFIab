@@ -57,6 +57,7 @@ import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
+@SuppressWarnings("PMD.GodClass")
 public class AmazonBillingProvider extends BaseBillingProvider {
 
     private static final String NAME = "Amazon";

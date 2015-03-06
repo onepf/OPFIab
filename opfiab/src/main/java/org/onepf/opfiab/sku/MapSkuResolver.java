@@ -36,12 +36,11 @@ public class MapSkuResolver implements SkuResolver {
     public void add(@NonNull final Map<String, String> map) {
         direct.putAll(map);
         for (final Map.Entry<String, String> entry : map.entrySet()) {
-            final String key = entry.getKey();
             final String value = entry.getValue();
             if (value == null) {
                 throw new IllegalArgumentException("Mapped sku can't be null.");
             }
-            reverse.put(value, key);
+            reverse.put(value, entry.getKey());
         }
     }
 
