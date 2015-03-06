@@ -22,6 +22,7 @@ import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.billing.BillingRequest;

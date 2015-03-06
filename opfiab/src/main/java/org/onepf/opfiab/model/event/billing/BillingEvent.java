@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.JsonCompatible;
+import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 

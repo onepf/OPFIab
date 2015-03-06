@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.model;
 
 import android.support.annotation.NonNull;
 

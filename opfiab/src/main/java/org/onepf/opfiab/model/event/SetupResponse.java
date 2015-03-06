@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.JsonCompatible;
+import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.OPFIabUtils;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfutils.OPFLog;
