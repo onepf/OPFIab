@@ -25,8 +25,6 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
-import org.onepf.opfiab.model.ComponentState;
-
 public class FragmentIabHelper extends SelfManagedIabHelper {
 
     @Nullable
@@ -34,85 +32,75 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
     @Nullable
     private final android.support.v4.app.Fragment supportFragment;
     @NonNull
-    private final ManagedIabHelper managedIabHelper;
-    @NonNull
-    private Object opfFragment;
+    private final Object opfFragment;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                               @Nullable final android.app.Fragment fragment,
                               @Nullable final android.support.v4.app.Fragment supportFragment) {
         super(managedIabHelper);
-        this.managedIabHelper = managedIabHelper;
         this.fragment = fragment;
         this.supportFragment = supportFragment;
-        OPFIab.register(this);
+        if (supportFragment != null) {
+            final android.support.v4.app.FragmentManager fragmentManager =
+                    supportFragment.getChildFragmentManager();
+            final android.support.v4.app.Fragment existingFragment;
+            if ((existingFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) != null) {
+                opfFragment = existingFragment;
+                managedIabHelper.subscribe();
+            } else {
+                final android.support.v4.app.Fragment newFragment = OPFIabSupportFragment.newInstance();
+                fragmentManager.beginTransaction()
+                        .add(newFragment, FRAGMENT_TAG)
+                        .commit();
+                fragmentManager.executePendingTransactions();
+                opfFragment = newFragment;
+            }
+        } else if (fragment != null) {
+            final android.app.FragmentManager fragmentManager = fragment.getChildFragmentManager();
+            final android.app.Fragment existingFragment;
+            if ((existingFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) != null) {
+                opfFragment = existingFragment;
+                managedIabHelper.subscribe();
+            } else {
+                final android.app.Fragment newFragment = OPFIabFragment.newInstance();
+                fragmentManager.beginTransaction()
+                        .add(newFragment, FRAGMENT_TAG)
+                        .commit();
+                fragmentManager.executePendingTransactions();
+                opfFragment = newFragment;
+            }
+        } else {
+            throw new IllegalArgumentException("Fragment can't be null.");
+        }
+    }
+
+    FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
+                      @NonNull final android.app.Fragment fragment) {
+        this(managedIabHelper, fragment, null);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
-                      @NonNull final android.app.Fragment fragment) {
-        this(managedIabHelper, fragment, null);
-
-        android.app.Fragment opfFragment;
-        final android.app.FragmentManager fragmentManager = fragment.getChildFragmentManager();
-        if ((opfFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
-            opfFragment = OPFIabFragment.newInstance();
-            fragmentManager.beginTransaction()
-                    .add(opfFragment, FRAGMENT_TAG)
-                    .commit();
-        }
-        this.opfFragment = opfFragment;
-        fragmentManager.executePendingTransactions();
-    }
-
-    FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                       @NonNull final android.support.v4.app.Fragment supportFragment) {
         this(managedIabHelper, null, supportFragment);
-
-        android.support.v4.app.Fragment opfFragment;
-        final android.support.v4.app.FragmentManager fragmentManager = supportFragment.getChildFragmentManager();
-        if ((opfFragment = fragmentManager.findFragmentByTag(FRAGMENT_TAG)) == null) {
-            opfFragment = OPFIabSupportFragment.newInstance();
-            fragmentManager.beginTransaction()
-                    .add(opfFragment, FRAGMENT_TAG)
-                    .commit();
-        }
-        this.opfFragment = opfFragment;
-        fragmentManager.executePendingTransactions();
     }
 
     public void onEventMainThread(@NonNull final FragmentLifecycleEvent event) {
-        if (opfFragment != event.getFragment()) {
-            return;
+        if (opfFragment == event.getFragment()) {
+            handleLifecycle(event.getType());
         }
-        handleLifecycle(event.getType());
     }
 
     public void onEventMainThread(@NonNull final SupportFragmentLifecycleEvent event) {
-        if (opfFragment != event.getFragment()) {
-            return;
+        if (opfFragment == event.getFragment()) {
+            handleLifecycle(event.getType());
         }
-        handleLifecycle(event.getType());
-    }
-
-    private void handleLifecycle(@NonNull final ComponentState type) {
-        if (type == ComponentState.ATTACH) {
-            managedIabHelper.subscribe();
-        } else if (type == ComponentState.DETACH) {
-            managedIabHelper.unsubscribe();
-        } else if ((type == ComponentState.PAUSE && getActivity().isFinishing()) || type == ComponentState.DESTROY) {
-            managedIabHelper.unsubscribe();
-            OPFIab.unregister(this);
-        }
-    }
-
-    @Override
-    public void purchase(@NonNull final String sku) {
-        managedIabHelper.purchase(getActivity(), sku);
     }
 
     @NonNull
-    private Activity getActivity() {
+    @Override
+    protected Activity getActivity() {
         final Activity activity;
         if (supportFragment != null) {
             activity = supportFragment.getActivity();
