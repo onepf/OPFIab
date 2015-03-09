@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
@@ -66,8 +68,8 @@ check {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    //noinspection NewerVersionAvailable
-    compile 'org.onepf:opfutils:0.1.15-SNAPSHOT'
+    //noinspection GradleDynamicVersion
+    compile 'org.onepf:opfutils:+'
     compile 'de.greenrobot:eventbus:2.4.0'
 
     compile 'com.google.code.findbugs:annotations:3.0.0'

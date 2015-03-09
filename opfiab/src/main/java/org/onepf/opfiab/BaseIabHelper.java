@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfutils.OPFChecks;
 
@@ -87,6 +88,10 @@ final class BaseIabHelper extends IabHelper {
             pendingRequest = billingRequest;
             OPFIab.post(billingRequest);
         }
+    }
+
+    public void purchase(@NonNull final String sku) {
+        OPFIabActivity.start(new PurchaseRequest(null, sku));
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {

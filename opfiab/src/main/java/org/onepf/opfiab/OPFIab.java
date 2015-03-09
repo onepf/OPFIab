@@ -159,6 +159,11 @@ public final class OPFIab {
         return configuration;
     }
 
+
+    public static void purchase(@NonNull final String sku) {
+        getBaseHelper().purchase(sku);
+    }
+
     @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC"})
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {

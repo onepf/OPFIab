@@ -16,6 +16,8 @@
 
 package org.onepf.opfiab;
 
+import android.app.Activity;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -30,6 +32,7 @@ import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
@@ -41,8 +44,10 @@ import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+
 public final class OPFIabUtils {
 
+    private static final String KEY_REQUEST = OPFIabUtils.class.getName() + ".request";
     private static final int JSON_SPACES = 4;
 
 
@@ -86,6 +91,18 @@ public final class OPFIabUtils {
                 throw new IllegalArgumentException();
         }
         return billingResponse;
+    }
+
+    @NonNull
+    public static BillingRequest withActivity(@NonNull final BillingRequest billingRequest,
+                                              @NonNull final Activity activity) {
+        if (billingRequest.getType() == BillingRequest.Type.PURCHASE) {
+            final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
+            final boolean fake = purchaseRequest.isActivityFake();
+            final String sku = purchaseRequest.getSku();
+            return new PurchaseRequest(activity, sku, fake);
+        }
+        return billingRequest;
     }
 
     public static SkuDetails substituteSku(@NonNull final SkuDetails skuDetails,
@@ -139,5 +156,19 @@ public final class OPFIabUtils {
                                   @NonNull final Purchase purchase) {
         final String resolvedSku = skuResolver.resolve(purchase.getSku());
         return substituteSku(purchase, resolvedSku);
+    }
+
+    @SuppressWarnings("TypeMayBeWeakened")
+    public static void putRequest(@NonNull final Bundle bundle,
+                                  @NonNull final BillingRequest request) {
+        bundle.putSerializable(KEY_REQUEST, request);
+    }
+
+    @Nullable
+    public static BillingRequest getRequest(@Nullable final Bundle bundle) {
+        if (bundle != null && bundle.containsKey(KEY_REQUEST)) {
+            return (BillingRequest) bundle.getSerializable(KEY_REQUEST);
+        }
+        return null;
     }
 }

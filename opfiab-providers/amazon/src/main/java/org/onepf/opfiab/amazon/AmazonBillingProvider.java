@@ -146,7 +146,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     }
 
     private Status handleFailure() {
-        if (!OPFUtils.isConnected(context)) {
+        if (!PurchasingService.IS_SANDBOX_MODE && !OPFUtils.isConnected(context)) {
             return SERVICE_UNAVAILABLE;
         } else if (!isAuthorised()) {
             return UNAUTHORISED;

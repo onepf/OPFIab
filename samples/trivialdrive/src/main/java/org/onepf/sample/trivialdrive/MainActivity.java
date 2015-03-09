@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 public class MainActivity extends ActionBarActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
     private static final String SKU = "org.onepf.sample.trivialdrive.sku_gas";
 
     @NonNull
@@ -68,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(final View v) {
                 iabHelper.purchase(SKU);
+//                OPFIab.purchase(SKU);
             }
         });
 

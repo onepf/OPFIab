@@ -25,9 +25,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfutils.OPFLog;
 
 import static org.onepf.opfiab.model.ComponentState.CREATE;
@@ -42,11 +44,24 @@ public class OPFIabActivity extends Activity {
 
     protected static final int FINISH_DELAY = 3000;
 
-    public static void start(@NonNull final Context context) {
-        final Context applicationContext = context.getApplicationContext();
-        final Intent intent = new Intent(applicationContext, OPFIabActivity.class);
+    public static void start(@Nullable final Bundle bundle) {
+        final Context context = OPFIab.getContext();
+        final Intent intent = new Intent(context, OPFIabActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        applicationContext.startActivity(intent);
+        if (bundle != null) {
+            intent.putExtras(bundle);
+        }
+        context.startActivity(intent);
+    }
+
+    public static void start(@NonNull final BillingRequest request) {
+        final Bundle bundle = new Bundle();
+        OPFIabUtils.putRequest(bundle, request);
+        start(bundle);
+    }
+
+    public static void start() {
+        start((Bundle) null);
     }
 
 
@@ -64,8 +79,15 @@ public class OPFIabActivity extends Activity {
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        handler.postDelayed(finishTask, FINISH_DELAY);
-        OPFIab.post(new ActivityLifecycleEvent(CREATE, this));
+        final BillingRequest billingRequest = OPFIabUtils.getRequest(getIntent().getExtras());
+        if (billingRequest != null) {
+            final BillingRequest request = OPFIabUtils.withActivity(billingRequest, this);
+            OPFIab.getBaseHelper().postRequest(request);
+            finish();
+        } else {
+            handler.postDelayed(finishTask, FINISH_DELAY);
+            OPFIab.post(new ActivityLifecycleEvent(CREATE, this));
+        }
     }
 
     @Override
@@ -75,8 +97,10 @@ public class OPFIabActivity extends Activity {
     }
 
     @Override
-    public void startIntentSenderForResult(final IntentSender intent, final int requestCode,
-                                           final Intent fillInIntent, final int flagsMask,
+    public void startIntentSenderForResult(final IntentSender intent,
+                                           final int requestCode,
+                                           final Intent fillInIntent,
+                                           final int flagsMask,
                                            final int flagsValues,
                                            final int extraFlags)
             throws IntentSender.SendIntentException {
@@ -117,7 +141,8 @@ public class OPFIabActivity extends Activity {
     }
 
     @Override
-    protected void onActivityResult(final int requestCode, final int resultCode,
+    protected void onActivityResult(final int requestCode,
+                                    final int resultCode,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
