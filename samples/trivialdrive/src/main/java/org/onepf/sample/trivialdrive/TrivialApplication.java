@@ -21,6 +21,7 @@ import android.app.Application;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.listener.SimpleGlobalBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfutils.OPFLog;
@@ -34,14 +35,20 @@ public class TrivialApplication extends Application {
         super.onCreate();
         OPFLog.setEnabled(true);
         final Configuration configuration = new Configuration.Builder()
-                .addBillingProvider(createAmazonBillingProvider())
+                .addBillingProvider(newGoogleBillingProvider())
+                .addBillingProvider(newAmazonBillingProvider())
                 .setBillingListener(new SimpleGlobalBillingListener())
                 .build();
         OPFIab.init(this, configuration);
         OPFIab.setup();
     }
 
-    private BillingProvider createAmazonBillingProvider() {
+    private BillingProvider newGoogleBillingProvider() {
+        return new GoogleBillingProvider.Builder(this)
+                .build();
+    }
+
+    private BillingProvider newAmazonBillingProvider() {
         return new AmazonBillingProvider.Builder(this)
                 .build();
     }

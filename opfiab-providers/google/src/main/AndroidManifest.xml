@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2012-2014 One Platform Foundation
+  ~ Copyright 2012-2015 One Platform Foundation
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
   ~ limitations under the License.
   -->
 
-<manifest package="org.onepf.opfiab.google"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="org.onepf.opfiab.google"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <application>
-    </application>
+    <uses-permission android:name="com.android.vending.BILLING"/>
 </manifest>

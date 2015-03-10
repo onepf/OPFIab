@@ -26,26 +26,39 @@ import org.onepf.opfiab.BaseBillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.sku.SkuResolver;
-import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Set;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class GoogleBillingProvider extends BaseBillingProvider {
 
     private static final String NAME = "Google";
     private static final String PACKAGE_NAME = "com.google.play";
+    private static final String PERMISSION_BILLING = "com.android.vending.BILLING";
 
 
     private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
+    private final GoogleAidlBillingHelper helper;
 
     protected GoogleBillingProvider(
             @NonNull final Context context,
             @NonNull final PurchaseVerifier purchaseVerifier,
             @NonNull final SkuResolver skuResolver) {
         super(context, purchaseVerifier, skuResolver);
+        checkRequirements();
+        helper = new GoogleAidlBillingHelper(context);
+    }
+
+    private void checkRequirements() {
+        context.enforceCallingOrSelfPermission(PERMISSION_BILLING, null);
+    }
+
+    @Override
+    public boolean isAvailable() {
+        final Response response = helper.isBillingSupported();
+        OPFLog.d("Check if billing supported: %s", String.valueOf(response));
+        return response == Response.BILLING_RESPONSE_RESULT_OK;
     }
 
     @NonNull
@@ -92,10 +105,7 @@ public class GoogleBillingProvider extends BaseBillingProvider {
             return new GoogleBillingProvider(context, purchaseVerifier, skuResolver);
         }
 
-        @SuppressFBWarnings({"OCP_OVERLY_CONCRETE_PARAMETER"})
-        @SuppressWarnings("TypeMayBeWeakened")
-        public Builder purchaseVerifier(
-                @NonNull final PublicKeyPurchaseVerifier purchaseVerifier) {
+        public Builder purchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
             super.setPurchaseVerifier(purchaseVerifier);
             return this;
         }
