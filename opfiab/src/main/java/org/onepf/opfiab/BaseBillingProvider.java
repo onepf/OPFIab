@@ -100,8 +100,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
                 final Activity activity = purchaseRequest.getActivity();
                 final boolean activityFake = purchaseRequest.isActivityFake();
-                if (activity == null
-                        || !activityFake && !ActivityMonitor.isResumed(activity)) {
+                if (activity == null || !activityFake && !ActivityMonitor.isResumed(activity)) {
                     postEmptyResponse(billingRequest, USER_CANCELED);
                     break;
                 }

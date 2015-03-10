@@ -27,7 +27,6 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.ComponentState;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -48,28 +47,6 @@ public abstract class SelfManagedIabHelper extends IabHelperAdapter {
     @NonNull
     protected abstract Activity getActivity();
 
-    protected void handleLifecycle(@NonNull final ComponentState type) {
-        // Handle billing events depending on fragment lifecycle
-        if (type == ComponentState.ATTACH || type == ComponentState.START || type == ComponentState.RESUME) {
-            // Attach - subscribe for event right away when helper is created
-            // Start - necessary to handle onActivityResult since it's called before onResume
-            // Resume - re-subscribe for billing events if we unsubscribed in onPause
-            managedIabHelper.subscribe();
-        } else if (type == ComponentState.STOP || type == ComponentState.PAUSE) {
-            // Pause - only callback guaranteed to be called
-            // Stop - mirror onStart
-            managedIabHelper.unsubscribe();
-            // We won't be needing any lifecycle events if activity is finishing
-            if (getActivity().isFinishing()) {
-                OPFIab.unregister(this);
-            }
-        } else if (type == ComponentState.DETACH) {
-            // Detach - fragment is removed, unsubscribe from everything
-            managedIabHelper.unsubscribe();
-            OPFIab.unregister(this);
-        }
-    }
-
     public void purchase(@NonNull final String sku) {
         purchase(getActivity(), sku);
     }
@@ -89,9 +66,9 @@ public abstract class SelfManagedIabHelper extends IabHelperAdapter {
         managedIabHelper.addInventoryListener(inventoryListener);
     }
 
-    public void addSkuInfoListener(
+    public void addSkuDetailsListener(
             @NonNull final OnSkuDetailsListener skuInfoListener) {
-        managedIabHelper.addSkuInfoListener(skuInfoListener);
+        managedIabHelper.addSkuDetailsListener(skuInfoListener);
     }
 
     public void addConsumeListener(

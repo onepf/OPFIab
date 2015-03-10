@@ -22,20 +22,10 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context="org.onepf.sample.trivialdrive.MainActivity">
+                tools:context="org.onepf.sample.trivialdrive.TrivialActivityFragment">
 
-    <Button
-        android:id="@+id/btn_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="@string/btn_activity"/>
-
-    <Button
-        android:id="@+id/btn_fragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btn_activity"
-        android:layout_centerHorizontal="true"
-        android:text="@string/btn_fragment"/>
+    <FrameLayout
+        android:id="@android:id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </RelativeLayout>

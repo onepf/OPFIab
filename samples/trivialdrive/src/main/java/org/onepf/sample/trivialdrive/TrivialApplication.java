@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package org.onepf.sample.trivialdrive;
 
 import android.app.Application;
 
-import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.SimpleGlobalBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfutils.OPFLog;
 
 
-public class MyApplication extends Application {
+public class TrivialApplication extends Application {
 
 
     @Override
@@ -38,7 +38,7 @@ public class MyApplication extends Application {
                 .setBillingListener(new SimpleGlobalBillingListener())
                 .build();
         OPFIab.init(this, configuration);
-//        OPFIab.setup();
+        OPFIab.setup();
     }
 
     private BillingProvider createAmazonBillingProvider() {

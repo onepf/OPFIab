@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.sample.trivialdrive;
 
-public enum ComponentState {
-    ATTACH,
-    CREATE,
-    CREATE_VIEW,
-    START,
-    RESUME,
-    PAUSE,
-    STOP,
-    DESTROY_VIEW,
-    DESTROY,
-    DETACH,
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+
+
+public class TrivialFragmentActivity extends ActionBarActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_trivial);
+        if (savedInstanceState == null) {
+            getFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, TrivialFragment.newInstance())
+                    .commit();
+        }
+    }
 }

@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model;
+package org.onepf.sample.trivialdrive;
 
-public enum ComponentState {
-    ATTACH,
-    CREATE,
-    CREATE_VIEW,
-    START,
-    RESUME,
-    PAUSE,
-    STOP,
-    DESTROY_VIEW,
-    DESTROY,
-    DETACH,
+public final class TrivialConstants {
+
+    public static final String SKU = "org.onepf.sample.trivialdrive.sku_gas";
+
+
+    private TrivialConstants() {
+        throw new UnsupportedOperationException();
+    }
 }

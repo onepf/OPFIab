@@ -16,88 +16,40 @@
 
 package org.onepf.sample.trivialdrive;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
-import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.SelfManagedIabHelper;
-import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.listener.SimpleBillingListener;
-import org.onepf.opfiab.model.event.SetupResponse;
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
-public class MainActivity extends ActionBarActivity {
-
-    private static final String SKU = "org.onepf.sample.trivialdrive.sku_gas";
-
-    @NonNull
-    private SelfManagedIabHelper iabHelper;
-    @NonNull
-    private View button;
-    private final BillingListener billingListener = new SimpleBillingListener() {
-
-        @Override
-        public void onSetup(@NonNull final SetupResponse setupResponse) {
-            super.onSetup(setupResponse);
-            button.setEnabled(setupResponse.isSuccessful());
-        }
-
-        @Override
-        public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-            super.onSkuDetails(skuDetailsResponse);
-            if (skuDetailsResponse.isSuccessful()) {
-                iabHelper.inventory(true);
-            }
-        }
-    };
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        iabHelper = OPFIab.getHelper(this);
         setContentView(R.layout.activity_main);
 
-        button = findViewById(R.id.button);
-        button.setEnabled(false);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                iabHelper.purchase(SKU);
-//                OPFIab.purchase(SKU);
-            }
-        });
-
-        iabHelper.addBillingListener(billingListener);
-
-        if (savedInstanceState == null) {
-            iabHelper.skuDetails(SKU);
-        }
+        findViewById(R.id.btn_activity).setOnClickListener(this);
+        findViewById(R.id.btn_fragment).setOnClickListener(this);
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    private void startActivity(@NonNull final Class<? extends Activity> clazz) {
+        startActivity(new Intent(this, clazz));
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void onClick(final View v) {
+        switch (v.getId()) {
+            case R.id.btn_activity:
+                startActivity(TrivialActivity.class);
+                break;
+            case R.id.btn_fragment:
+                startActivity(TrivialFragmentActivity.class);
+                break;
+            default:
+                break;
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }

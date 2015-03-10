@@ -21,13 +21,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
 import static org.onepf.opfiab.model.ComponentState.ATTACH;
 import static org.onepf.opfiab.model.ComponentState.CREATE;
+import static org.onepf.opfiab.model.ComponentState.CREATE_VIEW;
 import static org.onepf.opfiab.model.ComponentState.DESTROY;
+import static org.onepf.opfiab.model.ComponentState.DESTROY_VIEW;
 import static org.onepf.opfiab.model.ComponentState.DETACH;
 import static org.onepf.opfiab.model.ComponentState.PAUSE;
 import static org.onepf.opfiab.model.ComponentState.RESUME;
@@ -43,6 +48,12 @@ public class OPFIabSupportFragment extends Fragment {
 
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        OPFIab.post(new SupportFragmentLifecycleEvent(ATTACH, this));
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
@@ -50,9 +61,11 @@ public class OPFIabSupportFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        OPFIab.post(new SupportFragmentLifecycleEvent(ATTACH, this));
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+        final View view = super.onCreateView(inflater, container, savedInstanceState);
+        OPFIab.post(new SupportFragmentLifecycleEvent(CREATE_VIEW, this));
+        return view;
     }
 
     @Override
@@ -80,15 +93,21 @@ public class OPFIabSupportFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        OPFIab.post(new SupportFragmentLifecycleEvent(DETACH, this));
-        super.onDetach();
+    public void onDestroyView() {
+        OPFIab.post(new SupportFragmentLifecycleEvent(DESTROY_VIEW, this));
+        super.onDestroyView();
     }
 
     @Override
     public void onDestroy() {
         OPFIab.post(new SupportFragmentLifecycleEvent(DESTROY, this));
         super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        OPFIab.post(new SupportFragmentLifecycleEvent(DETACH, this));
+        super.onDetach();
     }
 
     @Override

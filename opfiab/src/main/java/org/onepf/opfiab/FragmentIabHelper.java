@@ -22,6 +22,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
@@ -84,6 +85,22 @@ public class FragmentIabHelper extends SelfManagedIabHelper {
     FragmentIabHelper(@NonNull final ManagedIabHelper managedIabHelper,
                       @NonNull final android.support.v4.app.Fragment supportFragment) {
         this(managedIabHelper, null, supportFragment);
+    }
+
+    protected void handleLifecycle(@NonNull final ComponentState type) {
+        // Handle billing events depending on fragment lifecycle
+        if (type == ComponentState.ATTACH || type == ComponentState.CREATE_VIEW) {
+            // Attach - subscribe for billing events right away when helper is created
+            // CreateView - subscribe after view is recreated
+            managedIabHelper.subscribe();
+        } else if (type == ComponentState.DESTROY_VIEW) {
+            // DestroyView - don't handle any callbacks if fragment view is destroyed
+            managedIabHelper.unsubscribe();
+        } else if (type == ComponentState.DESTROY) {
+            // Destroy - fragment is being destroyed, unsubscribe from everything
+            managedIabHelper.unsubscribe();
+            OPFIab.unregister(this);
+        }
     }
 
     public void onEventMainThread(@NonNull final FragmentLifecycleEvent event) {

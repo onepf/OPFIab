@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2012-2014 One Platform Foundation
+  ~ Copyright 2012-2015 One Platform Foundation
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <resources>
 
     <string name="app_name">Trivial Drive</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="button">Press me!</string>
+    <string name="btn_activity">ActivityHelper</string>
+    <string name="btn_fragment">FragmentHelper</string>
+    <string name="btn_buy">Buy</string>
 </resources>

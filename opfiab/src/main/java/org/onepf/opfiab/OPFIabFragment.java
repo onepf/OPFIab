@@ -21,13 +21,19 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 
 import static org.onepf.opfiab.model.ComponentState.ATTACH;
 import static org.onepf.opfiab.model.ComponentState.CREATE;
+import static org.onepf.opfiab.model.ComponentState.CREATE_VIEW;
 import static org.onepf.opfiab.model.ComponentState.DESTROY;
+import static org.onepf.opfiab.model.ComponentState.DESTROY_VIEW;
 import static org.onepf.opfiab.model.ComponentState.DETACH;
 import static org.onepf.opfiab.model.ComponentState.PAUSE;
 import static org.onepf.opfiab.model.ComponentState.RESUME;
@@ -55,6 +61,15 @@ public class OPFIabFragment extends Fragment {
         OPFIab.post(new FragmentLifecycleEvent(CREATE, this));
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
+        final View view = super.onCreateView(inflater, container, savedInstanceState);
+        OPFIab.post(new FragmentLifecycleEvent(CREATE_VIEW, this));
+        return view;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -80,15 +95,21 @@ public class OPFIabFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        OPFIab.post(new FragmentLifecycleEvent(DETACH, this));
-        super.onDetach();
+    public void onDestroyView() {
+        OPFIab.post(new FragmentLifecycleEvent(DESTROY_VIEW, this));
+        super.onDestroyView();
     }
 
     @Override
     public void onDestroy() {
         OPFIab.post(new FragmentLifecycleEvent(DESTROY, this));
         super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        OPFIab.post(new FragmentLifecycleEvent(DETACH, this));
+        super.onDetach();
     }
 
     @Override

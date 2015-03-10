@@ -106,7 +106,7 @@ public class ManagedIabHelper extends ScheduledIabHelper {
         inventoryListeners.add(inventoryListener);
     }
 
-    public void addSkuInfoListener(@NonNull final OnSkuDetailsListener skuInfoListener) {
+    public void addSkuDetailsListener(@NonNull final OnSkuDetailsListener skuInfoListener) {
         OPFChecks.checkThread(true);
         skuDetailsListeners.add(skuInfoListener);
     }
@@ -120,7 +120,7 @@ public class ManagedIabHelper extends ScheduledIabHelper {
         addSetupListener(billingListener);
         addPurchaseListener(billingListener);
         addInventoryListener(billingListener);
-        addSkuInfoListener(billingListener);
+        addSkuDetailsListener(billingListener);
         addConsumeListener(billingListener);
     }
 
