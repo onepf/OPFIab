@@ -90,6 +90,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
                 || !context.bindService(getServiceIntent(), this, Context.BIND_AUTO_CREATE)) {
             return null;
         }
+        serviceSemaphore.drainPermits();
         try {
             serviceSemaphore.tryAcquire(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException exception) {

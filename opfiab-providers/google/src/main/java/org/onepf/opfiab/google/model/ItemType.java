@@ -14,34 +14,36 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.google;
+package org.onepf.opfiab.google.model;
 
 import android.support.annotation.Nullable;
 
-enum Response {
-    OK(0),
-    USER_CANCELED(1),
-    BILLING_UNAVAILABLE(3),
-    ITEM_UNAVAILABLE(4),
-    DEVELOPER_ERROR(5),
-    ERROR(6),
-    ITEM_ALREADY_OWNED(7),
-    ITEM_NOT_OWNED(8),;
+public enum ItemType {
+    SUBSCRIPTION("subs"),
+    CONSUMABLE_OR_ENTITLEMENT("inapp"),;
 
     @Nullable
-    static Response fromCode(final int code) {
-        for (final Response response : values()) {
-            if (response.code == code) {
-                return response;
+    public static ItemType fromCode(@Nullable final String code) {
+        if (code == null) {
+            return null;
+        }
+        for (final ItemType type : values()) {
+            if (type.code.equals(code)) {
+                return type;
             }
         }
         return null;
     }
 
 
-    final int code;
+    private final String code;
 
-    private Response(final int code) {
+    private ItemType(final String code) {
         this.code = code;
+    }
+
+    @Override
+    public String toString() {
+        return code;
     }
 }

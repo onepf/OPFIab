@@ -172,8 +172,9 @@ public final class OPFIab {
             throw new InitException(true);
         }
         OPFIab.configuration = configuration;
-        OPFIab.eventBus = newBus();
         OPFIab.context = application.getApplicationContext();
+
+        OPFIab.eventBus = newBus();
         OPFIab.baseIabHelper = new BaseIabHelper();
 
         application.registerActivityLifecycleCallbacks(new ActivityMonitor());

@@ -39,7 +39,7 @@ public class GoogleBillingProvider extends BaseBillingProvider {
 
 
     private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
-    private final GoogleAidlBillingHelper helper;
+    private final GoogleBillingHelper helper;
 
     protected GoogleBillingProvider(
             @NonNull final Context context,
@@ -47,7 +47,7 @@ public class GoogleBillingProvider extends BaseBillingProvider {
             @NonNull final SkuResolver skuResolver) {
         super(context, purchaseVerifier, skuResolver);
         checkRequirements();
-        helper = new GoogleAidlBillingHelper(context);
+        helper = new GoogleBillingHelper(context);
     }
 
     private void checkRequirements() {
@@ -57,8 +57,8 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     @Override
     public boolean isAvailable() {
         final Response response = helper.isBillingSupported();
-        OPFLog.d("Check if billing supported: %s", String.valueOf(response));
-        return response == Response.BILLING_RESPONSE_RESULT_OK;
+        OPFLog.d("Check if billing supported: %s", response);
+        return response == Response.OK;
     }
 
     @NonNull

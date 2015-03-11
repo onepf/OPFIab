@@ -60,6 +60,11 @@ import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
 public abstract class BaseBillingProvider implements BillingProvider {
 
+    /**
+     * <a href="http://imgs.xkcd.com/comics/random_number.png">http://imgs.xkcd.com/comics/random_number.png</a>
+     */
+    protected static final int REQUEST_CODE = 19685093;
+
     @NonNull
     protected final Context context;
     @NonNull
@@ -203,11 +208,13 @@ public abstract class BaseBillingProvider implements BillingProvider {
 
     @Override
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
-        final Activity activity = event.getActivity();
         final int requestCode = event.getRequestCode();
-        final int resultCode = event.getResultCode();
-        final Intent data = event.getData();
-        onActivityResult(activity, requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE) {
+            final Activity activity = event.getActivity();
+            final int resultCode = event.getResultCode();
+            final Intent data = event.getData();
+            onActivityResult(activity, requestCode, resultCode, data);
+        }
     }
 
     @Override
