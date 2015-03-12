@@ -19,6 +19,7 @@ package org.onepf.opfiab.google.model;
 import android.support.annotation.Nullable;
 
 public enum PurchaseState {
+
     PURCHASED(0),
     CANCELED(1),
     REFUNDED(2),;

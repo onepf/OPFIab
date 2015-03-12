@@ -63,8 +63,9 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     private static final String NAME = "Amazon";
     private static final String PACKAGE_NAME = "com.amazon.venezia";
 
+    static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
 
-    private final BillingProviderInfo info = new BillingProviderInfo(NAME, PACKAGE_NAME);
+
     @NonNull
     private final AmazonBillingHelper billingHelper = new AmazonBillingHelper();
 
@@ -256,7 +257,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
     @NonNull
     @Override
     public BillingProviderInfo getInfo() {
-        return info;
+        return INFO;
     }
 
     public static class Builder extends BaseBillingProvider.Builder {

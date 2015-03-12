@@ -19,6 +19,7 @@ package org.onepf.opfiab.google.model;
 import android.support.annotation.Nullable;
 
 public enum ItemType {
+
     SUBSCRIPTION("subs"),
     CONSUMABLE_OR_ENTITLEMENT("inapp"),;
 

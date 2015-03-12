@@ -16,34 +16,21 @@
 
 package org.onepf.opfiab.google;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 
-enum Response {
+import org.onepf.opfiab.model.billing.SkuType;
+import org.onepf.opfiab.sku.MapSkuResolver;
 
-    OK(0),
-    USER_CANCELED(1),
-    SERVICE_UNAVAILABLE(2),
-    BILLING_UNAVAILABLE(3),
-    ITEM_UNAVAILABLE(4),
-    DEVELOPER_ERROR(5),
-    ERROR(6),
-    ITEM_ALREADY_OWNED(7),
-    ITEM_NOT_OWNED(8),;
+public class GoogleMapSkuResolver extends MapSkuResolver implements GoogleSkuResolver {
 
-    @Nullable
-    static Response fromCode(final int code) {
-        for (final Response response : values()) {
-            if (response.code == code) {
-                return response;
-            }
-        }
-        return null;
+    public GoogleMapSkuResolver() {
+        super();
     }
 
-
-    final int code;
-
-    private Response(final int code) {
-        this.code = code;
+    @NonNull
+    @Override
+    public SkuType resolveType(@NonNull final String sku) {
+        //TODO
+        return null;
     }
 }

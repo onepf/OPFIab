@@ -23,13 +23,13 @@ import org.json.JSONObject;
 
 public class GooglePurchase extends GoogleModel {
 
-    private static final String NAME_ORDER_ID = "";
-    private static final String NAME_PACKAGE_NAME = "";
-    private static final String NAME_PURCHASE_STATE = "";
-    private static final String NAME_DEVELOPER_PAYLOAD = "";
-    private static final String NAME_PURCHASE_TOKEN = "";
-    private static final String NAME_PURCHASE_TIME = "";
-    private static final String NAME_AUTO_RENEWING = "";
+    private static final String NAME_ORDER_ID = "orderId";
+    private static final String NAME_PACKAGE_NAME = "packageName";
+    private static final String NAME_DEVELOPER_PAYLOAD = "purchaseTime";
+    private static final String NAME_PURCHASE_TOKEN = "purchaseState";
+    private static final String NAME_PURCHASE_STATE = "productId";
+    private static final String NAME_PURCHASE_TIME = "developerPayload";
+    private static final String NAME_AUTO_RENEWING = "autoRenewing";
 
 
     @NonNull
@@ -40,10 +40,10 @@ public class GooglePurchase extends GoogleModel {
     private final String developerPayload;
     @NonNull
     private final String purchaseToken;
-    private final long purchaseTime;
-    private final boolean autoRenewing;
     @NonNull
     private final PurchaseState purchaseState;
+    private final long purchaseTime;
+    private final boolean autoRenewing;
 
 
     public GooglePurchase(@NonNull final JSONObject json) throws JSONException {
@@ -87,16 +87,16 @@ public class GooglePurchase extends GoogleModel {
         return purchaseToken;
     }
 
+    @NonNull
+    public PurchaseState getPurchaseState() {
+        return purchaseState;
+    }
+
     public long getPurchaseTime() {
         return purchaseTime;
     }
 
     public boolean isAutoRenewing() {
         return autoRenewing;
-    }
-
-    @NonNull
-    public PurchaseState getPurchaseState() {
-        return purchaseState;
     }
 }

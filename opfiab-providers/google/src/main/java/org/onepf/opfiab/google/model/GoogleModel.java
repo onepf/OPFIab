@@ -28,11 +28,15 @@ abstract class GoogleModel {
 
 
     @NonNull
+    private final String originalJson;
+    @NonNull
     private final String productId;
     @NonNull
     private final ItemType itemType;
 
     protected GoogleModel(@NonNull final JSONObject json) throws JSONException {
+        super();
+        this.originalJson = json.toString();
         this.productId = json.getString(NAME_PRODUCT_ID);
 
         final String itemTypeCode = json.getString(NAME_TYPE);
@@ -41,6 +45,11 @@ abstract class GoogleModel {
             throw new JSONException("Unrecognized itemType: " + itemTypeCode);
         }
         this.itemType = itemType;
+    }
+
+    @NonNull
+    public String getOriginalJson() {
+        return originalJson;
     }
 
     @NonNull

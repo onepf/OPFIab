@@ -52,8 +52,8 @@ final class GoogleUtils {
     }
 
     @Nullable
-    static ArrayList<String> getSkuDetails(@NonNull final Bundle bundle) {
-        if (bundle.containsKey(SKU_DETAILS_LIST)) {
+    static ArrayList<String> getSkuDetails(@Nullable final Bundle bundle) {
+        if (bundle != null && bundle.containsKey(SKU_DETAILS_LIST)) {
             return bundle.getStringArrayList(SKU_DETAILS_LIST);
         }
         return null;
@@ -67,8 +67,8 @@ final class GoogleUtils {
     }
 
     @Nullable
-    static Response getResponse(@NonNull final Bundle bundle) {
-        if (bundle.containsKey(RESPONSE_CODE)) {
+    static Response getResponse(@Nullable final Bundle bundle) {
+        if (bundle != null && bundle.containsKey(RESPONSE_CODE)) {
             final int responseCode = bundle.getInt(RESPONSE_CODE);
             return Response.fromCode(responseCode);
         }

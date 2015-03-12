@@ -26,10 +26,10 @@ import android.support.annotation.Nullable;
 import com.android.vending.billing.IInAppBillingService;
 
 import org.onepf.opfiab.billing.AidlBillingHelper;
+import org.onepf.opfiab.google.model.ItemType;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,10 +39,6 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
     private static final String PACKAGE_NAME = "com.android.vending";
 
     private static final int API = 3;
-
-    private static final String INAPP = "inapp";
-    private static final String SUBS = "subs";
-
     private static final int BATCH_SIZE = 20;
 
 
@@ -61,13 +57,14 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
             return null;
         }
         try {
-            final int inAppCode = service.isBillingSupported(API, packageName, INAPP);
-            final Response inAppResponse = Response.fromCode(inAppCode);
-            if (inAppResponse != Response.OK) {
-                return inAppResponse;
+            for (final ItemType itemType : ItemType.values()) {
+                final int code = service.isBillingSupported(API, packageName, itemType.toString());
+                final Response response = Response.fromCode(code);
+                if (response != Response.OK) {
+                    return response;
+                }
             }
-            final int subsCode = service.isBillingSupported(API, packageName, SUBS);
-            return Response.fromCode(subsCode);
+            return Response.OK;
         } catch (RemoteException exception) {
             OPFLog.e("", exception);
         }
@@ -91,7 +88,8 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
                 final int last = Math.min((i + 1) * BATCH_SIZE, size);
                 final ArrayList<String> batch = new ArrayList<>(skuList.subList(first, last));
                 final Bundle bundle = GoogleUtils.putSkuList(new Bundle(), batch);
-                for (final String type : Arrays.asList(INAPP, SUBS)) {
+                for (final ItemType itemType : ItemType.values()) {
+                    final String type = itemType.toString();
                     final Bundle response = service.getSkuDetails(API, packageName, type, bundle);
                     if (GoogleUtils.getResponse(response) != Response.OK) {
                         return response;
