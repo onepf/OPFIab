@@ -58,29 +58,29 @@ import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
 @SuppressWarnings("PMD.GodClass")
-public class AmazonBillingProvider extends BaseBillingProvider {
+public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, PurchaseVerifier> {
 
-    private static final String NAME = "Amazon";
-    private static final String PACKAGE_NAME = "com.amazon.venezia";
+    protected static final String NAME = "Amazon";
+    protected static final String PACKAGE_NAME = "com.amazon.venezia";
 
     static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
 
 
     @NonNull
-    private final AmazonBillingHelper billingHelper = new AmazonBillingHelper();
+    protected final AmazonBillingHelper billingHelper = new AmazonBillingHelper();
 
     protected AmazonBillingProvider(
             @NonNull final Context context,
-            @NonNull final PurchaseVerifier purchaseVerifier,
-            @NonNull final SkuResolver skuResolver) {
-        super(context, purchaseVerifier, skuResolver);
+            @NonNull final SkuResolver skuResolver,
+            @NonNull final PurchaseVerifier purchaseVerifier) {
+        super(context, skuResolver, purchaseVerifier);
         checkRequirements();
         // Register Amazon callbacks handler
         PurchasingService.registerListener(context, billingHelper);
     }
 
     @SuppressFBWarnings({"EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"})
-    private void checkRequirements() {
+    protected void checkRequirements() {
         // Check if application is suited to use Amazon
         final PackageManager packageManager = context.getPackageManager();
         final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
@@ -95,7 +95,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
     }
 
-    private SkuDetails newSkuDetails(@NonNull final Product product) {
+    protected SkuDetails newSkuDetails(@NonNull final Product product) {
         final SkuDetails.Builder builder = new SkuDetails.Builder(product.getSku());
         switch (product.getProductType()) {
             case CONSUMABLE:
@@ -123,7 +123,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return builder.build();
     }
 
-    private Purchase newPurchase(@NonNull final Receipt receipt) {
+    protected Purchase newPurchase(@NonNull final Receipt receipt) {
         final Purchase.Builder builder = new Purchase.Builder(receipt.getSku());
         switch (receipt.getProductType()) {
             case CONSUMABLE:
@@ -146,7 +146,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return builder.build();
     }
 
-    private Status handleFailure() {
+    protected Status handleFailure() {
         if (!PurchasingService.IS_SANDBOX_MODE && !OPFUtils.isConnected(context)) {
             return SERVICE_UNAVAILABLE;
         } else if (!isAuthorised()) {
@@ -156,7 +156,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return UNKNOWN_ERROR;
     }
 
-    public final void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
+    public void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
         switch (productDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 final Collection<SkuDetails> skusDetails = new ArrayList<>();
@@ -179,7 +179,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         }
     }
 
-    public final void onEventAsync(@NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
+    public void onEventAsync(@NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
         switch (purchaseUpdatesResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
@@ -200,7 +200,7 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         }
     }
 
-    public final void onEventAsync(
+    public void onEventAsync(
             @NonNull final com.amazon.device.iap.model.PurchaseResponse purchaseResponse) {
         switch (purchaseResponse.getRequestStatus()) {
             case SUCCESSFUL:
@@ -260,22 +260,25 @@ public class AmazonBillingProvider extends BaseBillingProvider {
         return INFO;
     }
 
-    public static class Builder extends BaseBillingProvider.Builder {
+    public static class Builder extends BaseBillingProvider.Builder<SkuResolver, PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
-            super(context);
+            super(context, SkuResolver.STUB, PurchaseVerifier.STUB);
         }
 
         @Override
         public BaseBillingProvider build() {
-            return new AmazonBillingProvider(context, purchaseVerifier, skuResolver);
+            return new AmazonBillingProvider(context, skuResolver, purchaseVerifier);
         }
 
         @Override
-        protected Builder setSkuResolver(
-                @NonNull final SkuResolver skuResolver) {
-            super.setSkuResolver(skuResolver);
-            return this;
+        public Builder setSkuResolver(@NonNull final SkuResolver skuResolver) {
+            return (Builder) super.setSkuResolver(skuResolver);
+        }
+
+        @Override
+        public Builder setPurchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
+            return (Builder) super.setPurchaseVerifier(purchaseVerifier);
         }
     }
 }

@@ -49,7 +49,6 @@ import org.onepf.opfutils.OPFUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,7 +57,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
-public abstract class BaseBillingProvider implements BillingProvider {
+public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER extends PurchaseVerifier>
+        implements BillingProvider {
 
     /**
      * <a href="http://imgs.xkcd.com/comics/random_number.png">http://imgs.xkcd.com/comics/random_number.png</a>
@@ -68,14 +68,14 @@ public abstract class BaseBillingProvider implements BillingProvider {
     @NonNull
     protected final Context context;
     @NonNull
-    protected final PurchaseVerifier purchaseVerifier;
+    protected final RESOLVER skuResolver;
     @NonNull
-    protected final SkuResolver skuResolver;
+    protected final VERIFIER purchaseVerifier;
 
     protected BaseBillingProvider(
             @NonNull final Context context,
-            @NonNull final PurchaseVerifier purchaseVerifier,
-            @NonNull final SkuResolver skuResolver) {
+            @NonNull final RESOLVER skuResolver,
+            @NonNull final VERIFIER purchaseVerifier) {
         this.context = context.getApplicationContext();
         this.purchaseVerifier = purchaseVerifier;
         this.skuResolver = skuResolver;
@@ -150,7 +150,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
         if (skusDetails == null) {
             response = new SkuDetailsResponse(status, getInfo(), null);
         } else {
-            final List<SkuDetails> revertedSkusDetails = new ArrayList<>(skusDetails.size());
+            final Collection<SkuDetails> revertedSkusDetails = new ArrayList<>(skusDetails.size());
             for (final SkuDetails skuDetails : skusDetails) {
                 revertedSkusDetails.add(OPFIabUtils.revert(skuResolver, skuDetails));
             }
@@ -160,7 +160,7 @@ public abstract class BaseBillingProvider implements BillingProvider {
     }
 
     protected void postInventoryResponse(@NonNull final Status status,
-                                         @Nullable final Iterable<Purchase> inventory,
+                                         @Nullable final Collection<Purchase> inventory,
                                          final boolean hasMore) {
         final InventoryResponse response;
         if (inventory == null) {
@@ -273,28 +273,30 @@ public abstract class BaseBillingProvider implements BillingProvider {
     //CHECKSTYLE:ON
 
 
-    public abstract static class Builder {
+    public abstract static class Builder<RESOLVER extends SkuResolver, VERIFIER extends PurchaseVerifier> {
 
         @NonNull
         protected final Context context;
-        @SuppressFBWarnings({"URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"})
         @NonNull
-        protected PurchaseVerifier purchaseVerifier = PurchaseVerifier.STUB;
-        @SuppressFBWarnings({"URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD"})
+        protected RESOLVER skuResolver;
         @NonNull
-        protected SkuResolver skuResolver = SkuResolver.STUB;
+        protected VERIFIER purchaseVerifier;
 
-        protected Builder(@NonNull final Context context) {
+        protected Builder(@NonNull final Context context,
+                          @NonNull final RESOLVER skuResolver,
+                          @NonNull final VERIFIER purchaseVerifier) {
             this.context = context;
+            this.skuResolver = skuResolver;
+            this.purchaseVerifier = purchaseVerifier;
         }
 
-        protected Builder setPurchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
-            this.purchaseVerifier = purchaseVerifier;
+        protected Builder setSkuResolver(@NonNull final RESOLVER skuResolver) {
+            this.skuResolver = skuResolver;
             return this;
         }
 
-        protected Builder setSkuResolver(@NonNull final SkuResolver skuResolver) {
-            this.skuResolver = skuResolver;
+        protected Builder setPurchaseVerifier(@NonNull final VERIFIER purchaseVerifier) {
+            this.purchaseVerifier = purchaseVerifier;
             return this;
         }
 

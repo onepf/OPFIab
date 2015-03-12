@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.onepf.opfiab.BaseBillingProvider;
+import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
 import org.onepf.opfiab.google.model.ItemType;
 import org.onepf.opfiab.model.BillingProviderInfo;
@@ -37,55 +38,57 @@ import org.onepf.opfutils.OPFLog;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class GoogleBillingProvider extends BaseBillingProvider {
+public class GoogleBillingProvider
+        extends BaseBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
 
-    private static final String NAME = "Google";
-    private static final String PACKAGE_NAME = "com.google.play";
-    private static final String PERMISSION_BILLING = "com.android.vending.BILLING";
+    protected static final String NAME = "Google";
+    protected static final String PACKAGE_NAME = "com.google.play";
+    protected static final String PERMISSION_BILLING = "com.android.vending.BILLING";
 
     static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
 
 
-    private final GoogleSkuResolver googleSkuResolver;
-    private final GoogleBillingHelper helper;
+    protected final GoogleBillingHelper helper;
 
     protected GoogleBillingProvider(
             @NonNull final Context context,
-            @NonNull final PurchaseVerifier purchaseVerifier,
-            @NonNull final GoogleSkuResolver skuResolver) {
-        super(context, purchaseVerifier, skuResolver);
-        this.googleSkuResolver = skuResolver;
+            @NonNull final GoogleSkuResolver skuResolver,
+            @NonNull final PurchaseVerifier purchaseVerifier) {
+        super(context, skuResolver, purchaseVerifier);
         checkRequirements();
         helper = new GoogleBillingHelper(context);
     }
 
-    private void checkRequirements() {
+    protected void checkRequirements() {
         context.enforceCallingOrSelfPermission(PERMISSION_BILLING, null);
     }
 
-    @Nullable
-    private SkuDetails newSkuDetails(@NonNull final String jsonSku) {
-        try {
-            final GoogleSkuDetails googleSkuDetails = new GoogleSkuDetails(jsonSku);
-            final String sku = googleSkuDetails.getProductId();
-            final SkuDetails skuDetails = new SkuDetails.Builder(sku)
-                    .setProviderInfo(getInfo())
-                    .setOriginalJson(jsonSku)
-                    .setType(googleSkuDetails.getItemType() == ItemType.SUBSCRIPTION
-                                     ? SkuType.SUBSCRIPTION
-                                     : googleSkuResolver.resolveType(sku))
-                    .build();
-        } catch (JSONException exception) {
-            OPFLog.e("", exception);
-        }
-        return null;
+    @NonNull
+    private SkuDetails newSkuDetails(@NonNull final GoogleSkuDetails googleSkuDetails) {
+        final String sku = googleSkuDetails.getProductId();
+        return new SkuDetails.Builder(sku)
+                .setType(googleSkuDetails.getItemType() == ItemType.SUBSCRIPTION
+                                 ? SkuType.SUBSCRIPTION
+                                 : skuResolver.resolveType(sku))
+                .setTitle(googleSkuDetails.getTitle())
+                .setDescription(googleSkuDetails.getDescription())
+                .setPrice(googleSkuDetails.getPrice())
+                .setProviderInfo(getInfo())
+                .setOriginalJson(googleSkuDetails.getOriginalJson())
+                .build();
     }
 
     @Nullable
     private Purchase newPurchase(@NonNull final String jsonPurchase) {
+        try {
+            final GooglePurchase googlePurchase = new GooglePurchase(jsonPurchase);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -133,21 +136,31 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     @Override
     public void skuDetails(@NonNull final Set<String> skus) {
         final Bundle result = helper.getSkuDetails(skus);
-        final Response response = GoogleUtils.getResponse(result);
-        final List<String> jsonSkuDetails = GoogleUtils.getSkuDetails(result);
+        final Response response = Utils.getResponse(result);
+        final List<String> jsonSkuDetails = Utils.getSkuDetails(result);
         if (response != Response.OK || jsonSkuDetails == null) {
             postSkuDetailsResponse(handleFailure(response), null);
             return;
         }
 
+        final Collection<String> unresolvedSkus = new LinkedList<>(skus);
         final Collection<SkuDetails> skusDetails = new ArrayList<>();
         for (final String jsonSku : jsonSkuDetails) {
-            final SkuDetails skuDetails = newSkuDetails(jsonSku);
-            if (skuDetails != null) {
+            try {
+                final GoogleSkuDetails googleSkuDetails = new GoogleSkuDetails(jsonSku);
+                final SkuDetails skuDetails = newSkuDetails(googleSkuDetails);
                 skusDetails.add(skuDetails);
+                if (!unresolvedSkus.remove(skuDetails.getSku())) {
+                    OPFLog.e("Sku was not requested, yet it's returned by Google Play.");
+                }
+            } catch (JSONException exception) {
+                OPFLog.e("Failed to parse sku details.", exception);
             }
         }
-        final Collection<String> unresolvedSkus = new ArrayList<>();
+        for (final String sku : unresolvedSkus) {
+            skusDetails.add(new SkuDetails(sku));
+        }
+        postSkuDetailsResponse(Status.SUCCESS, skusDetails);
     }
 
     @Override
@@ -162,28 +175,26 @@ public class GoogleBillingProvider extends BaseBillingProvider {
     }
 
 
-    public static class Builder extends BaseBillingProvider.Builder {
-
-        private GoogleSkuResolver googleSkuResolver = GoogleSkuResolver.STUB;
+    public static class Builder
+            extends BaseBillingProvider.Builder<GoogleSkuResolver, PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
-            super(context);
-        }
-
-        public Builder setSkuResolver(@NonNull final GoogleSkuResolver skuResolver) {
-            this.googleSkuResolver = skuResolver;
-            return this;
+            super(context, GoogleSkuResolver.STUB, PurchaseVerifier.STUB);
         }
 
         @Override
         public GoogleBillingProvider build() {
-            return new GoogleBillingProvider(context, purchaseVerifier, googleSkuResolver);
+            return new GoogleBillingProvider(context, skuResolver, purchaseVerifier);
+        }
+
+        @Override
+        public Builder setSkuResolver(@NonNull final GoogleSkuResolver skuResolver) {
+            return (Builder) super.setSkuResolver(skuResolver);
         }
 
         @Override
         public Builder setPurchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
-            super.setPurchaseVerifier(purchaseVerifier);
-            return this;
+            return (Builder) super.setPurchaseVerifier(purchaseVerifier);
         }
     }
 }
