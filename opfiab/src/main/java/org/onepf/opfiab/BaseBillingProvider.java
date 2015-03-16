@@ -77,11 +77,11 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
                                   @NonNull final RESOLVER skuResolver,
                                   @NonNull final VERIFIER purchaseVerifier,
                                   @Nullable final Integer requestCode) {
-        checkRequirements();
         this.context = context.getApplicationContext();
         this.purchaseVerifier = purchaseVerifier;
         this.skuResolver = skuResolver;
         this.requestCode = requestCode != null ? requestCode : DEFAULT_REQUEST_CODE;
+        checkRequirements();
     }
 
     protected BaseBillingProvider(@NonNull final Context context,

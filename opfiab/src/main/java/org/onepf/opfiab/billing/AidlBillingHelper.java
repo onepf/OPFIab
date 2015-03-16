@@ -88,13 +88,14 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         final Collection<ResolveInfo> infos = packageManager.queryIntentServices(serviceIntent, 0);
         if (infos == null || infos.isEmpty()
                 || !context.bindService(getServiceIntent(), this, Context.BIND_AUTO_CREATE)) {
+            OPFLog.d("Can't bind to service: %s", asInterface.getDeclaringClass());
             return null;
         }
         serviceSemaphore.drainPermits();
         try {
             serviceSemaphore.tryAcquire(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException exception) {
-            OPFLog.e("", exception);
+            OPFLog.d("", exception);
         }
         return this.service;
     }

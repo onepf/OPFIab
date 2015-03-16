@@ -30,8 +30,10 @@ import org.onepf.opfiab.billing.AidlBillingHelper;
 import org.onepf.opfiab.google.model.ItemType;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
+import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -61,6 +63,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
 
     @Nullable
     Response isBillingSupported() {
+        OPFLog.methodD();
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -69,33 +72,40 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
             for (final ItemType itemType : ItemType.values()) {
                 final int code = service.isBillingSupported(API, packageName, itemType.toString());
                 final Response response = Response.fromCode(code);
+                OPFLog.d("Response: %s", response);
                 if (response != Response.OK) {
                     return response;
                 }
             }
             return Response.OK;
         } catch (RemoteException exception) {
-            OPFLog.e("Billing check failed.", exception);
+            OPFLog.d("Billing check failed.", exception);
         }
         return null;
     }
 
     @Nullable
     Bundle getBuyIntent(@NonNull final String sku, @NonNull final ItemType itemType) {
+        OPFLog.methodD(sku, itemType);
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
         }
         try {
-            return service.getBuyIntent(API, packageName, sku, itemType.toString(), null);
+            final String type = itemType.toString();
+            final Bundle result = service.getBuyIntent(API, packageName, sku, type, "");
+            final Response response = GoogleUtils.getResponse(result);
+            OPFLog.d("Response: %s. Result: %s", response, OPFUtils.toString(result));
+            return result;
         } catch (RemoteException exception) {
-            OPFLog.e("getBuyIntent request failed.", exception);
+            OPFLog.d("getBuyIntent request failed.", exception);
         }
         return null;
     }
 
     @Nullable
     Response consumePurchase(@NonNull final String token) {
+        OPFLog.methodD(token);
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -103,7 +113,9 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
 
         try {
             final int code = service.consumePurchase(API, packageName, token);
-            return Response.fromCode(code);
+            final Response response = Response.fromCode(code);
+            OPFLog.d("Response: %s", response);
+            return response;
         } catch (RemoteException exception) {
             OPFLog.e("consumePurchase request failed.", exception);
         }
@@ -112,6 +124,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
 
     @Nullable
     Bundle getSkuDetails(@NonNull final Collection<String> skus) {
+        OPFLog.methodD(Arrays.toString(skus.toArray()));
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -128,11 +141,14 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
                 final Bundle bundle = GoogleUtils.putSkuList(new Bundle(), batch);
                 for (final ItemType itemType : ItemType.values()) {
                     final String type = itemType.toString();
-                    final Bundle response = service.getSkuDetails(API, packageName, type, bundle);
-                    if (GoogleUtils.getResponse(response) != Response.OK) {
-                        return response;
+                    final Bundle details = service.getSkuDetails(API, packageName, type, bundle);
+                    final Response response = GoogleUtils.getResponse(details);
+                    OPFLog.d("From %d to %d. Type: %s. Response: %s. Details: %s.",
+                             first, last, itemType, response, OPFUtils.toString(details));
+                    if (response != Response.OK) {
+                        return details;
                     } else {
-                        final ArrayList<String> skuDetails = GoogleUtils.getSkuDetails(response);
+                        final ArrayList<String> skuDetails = GoogleUtils.getSkuDetails(details);
                         GoogleUtils.addSkuDetails(result, skuDetails);
                     }
                 }
@@ -146,6 +162,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
 
     @Nullable
     Bundle getPurchases(final boolean startOver) {
+        OPFLog.methodD(startOver);
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -156,15 +173,17 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
                 final String type = itemType.toString();
                 final String key = KEY_CONTINUATION_TOKEN + type;
                 final String token = startOver ? null : preferences.getString(key);
-                final Bundle response = service.getPurchases(API, packageName, type, token);
-                if (GoogleUtils.getResponse(response) != Response.OK) {
-                    return response;
+                final Bundle purchases = service.getPurchases(API, packageName, type, token);
+                final Response response = GoogleUtils.getResponse(purchases);
+                OPFLog.d("Type: %s. Response: %s. Purchases: %s.",
+                         itemType, response, OPFUtils.toString(purchases));
+                if (response != Response.OK) {
+                    return purchases;
                 } else {
-                    final ArrayList<String> purchaseDataList = GoogleUtils.getDataList(
-                            response);
-                    final ArrayList<String> itemList = GoogleUtils.getItemList(response);
-                    final ArrayList<String> signatureList = GoogleUtils.getSignatureList(response);
-                    final String newToken = GoogleUtils.getContinuationToken(response);
+                    final ArrayList<String> purchaseDataList = GoogleUtils.getDataList(purchases);
+                    final ArrayList<String> itemList = GoogleUtils.getItemList(purchases);
+                    final ArrayList<String> signatureList = GoogleUtils.getSignatureList(purchases);
+                    final String newToken = GoogleUtils.getContinuationToken(purchases);
                     GoogleUtils.addDataList(result, purchaseDataList);
                     GoogleUtils.addItemList(result, itemList);
                     GoogleUtils.addSignatureList(result, signatureList);
