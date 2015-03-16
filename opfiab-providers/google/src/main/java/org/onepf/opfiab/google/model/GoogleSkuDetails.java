@@ -40,17 +40,18 @@ public class GoogleSkuDetails extends GoogleModel {
     private final String description;
     private final long micros;
 
-    public GoogleSkuDetails(@NonNull final JSONObject json) throws JSONException {
-        super(json);
-        this.price = json.getString(NAME_PRICE);
-        this.micros = json.getLong(NAME_MICROS);
-        this.currency = json.getString(NAME_CURRENCY);
-        this.title = json.getString(NAME_TITLE);
-        this.description = json.getString(NAME_DESCRIPTION);
+    public GoogleSkuDetails(@NonNull final String originalJson,
+                            @NonNull final JSONObject jsonObject) throws JSONException {
+        super(originalJson, jsonObject);
+        this.price = jsonObject.getString(NAME_PRICE);
+        this.micros = jsonObject.getLong(NAME_MICROS);
+        this.currency = jsonObject.getString(NAME_CURRENCY);
+        this.title = jsonObject.getString(NAME_TITLE);
+        this.description = jsonObject.getString(NAME_DESCRIPTION);
     }
 
-    public GoogleSkuDetails(@NonNull final String json) throws JSONException {
-        this(new JSONObject(json));
+    public GoogleSkuDetails(@NonNull final String originalJson) throws JSONException {
+        this(originalJson, new JSONObject(originalJson));
     }
 
     @NonNull

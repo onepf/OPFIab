@@ -16,13 +16,15 @@
 
 package org.onepf.opfiab.google;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
-final class Utils {
+public final class GoogleUtils {
 
     private static final String RESPONSE_CODE = "RESPONSE_CODE";
     private static final String SKU_DETAILS_LIST = "DETAILS_LIST";
@@ -85,13 +87,13 @@ final class Utils {
     }
 
     @NonNull
-    static Bundle addPurchaseDataList(@NonNull final Bundle bundle,
-                                      @Nullable final ArrayList<String> purchaseData) {
+    static Bundle addDataList(@NonNull final Bundle bundle,
+                              @Nullable final ArrayList<String> purchaseData) {
         return addList(bundle, purchaseData, PURCHASE_DATA_LIST);
     }
 
     @Nullable
-    static ArrayList<String> getPurchaseDataList(@Nullable final Bundle bundle) {
+    static ArrayList<String> getDataList(@Nullable final Bundle bundle) {
         return getList(bundle, PURCHASE_DATA_LIST);
     }
 
@@ -147,8 +149,32 @@ final class Utils {
         return null;
     }
 
+    @Nullable
+    static PendingIntent getBuyIntent(@Nullable final Bundle bundle) {
+        if (bundle != null && bundle.containsKey(BUY_INTENT)) {
+            return bundle.getParcelable(BUY_INTENT);
+        }
+        return null;
+    }
 
-    private Utils() {
+    @Nullable
+    static String getPurchaseData(@Nullable final Intent intent) {
+        if (intent != null && intent.hasExtra(PURCHASE_DATA)) {
+            return intent.getStringExtra(PURCHASE_DATA);
+        }
+        return null;
+    }
+
+    @Nullable
+    static String getSignature(@Nullable final Intent intent) {
+        if (intent != null && intent.hasExtra(SIGNATURE)) {
+            return intent.getStringExtra(SIGNATURE);
+        }
+        return null;
+    }
+
+
+    private GoogleUtils() {
         throw new UnsupportedOperationException();
     }
 }

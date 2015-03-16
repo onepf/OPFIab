@@ -18,30 +18,36 @@ package org.onepf.opfiab.verification;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfutils.OPFLog;
 
 public abstract class PublicKeyPurchaseVerifier implements PurchaseVerifier {
 
     @NonNull
-    private final String publicKey;
+    protected abstract String getPublicKey();
 
-    public PublicKeyPurchaseVerifier(@NonNull final String publicKey) {
-        this.publicKey = publicKey;
-    }
+    @Nullable
+    protected abstract String getData(@NonNull final Purchase purchase);
 
     @Nullable
     protected abstract String getSignature(@NonNull final Purchase purchase);
 
     @NonNull
-    protected final VerificationResult verify(@Nullable final String signature) {
-
+    protected final VerificationResult verify(@Nullable final String data,
+                                              @Nullable final String signature) {
+        if (TextUtils.isEmpty(data) || TextUtils.isEmpty(signature)) {
+            OPFLog.e("Either data or signature is empty.");
+            return VerificationResult.ERROR;
+        }
+        //TODO
         return VerificationResult.SUCCESS;
     }
 
     @NonNull
     @Override
     public VerificationResult verify(@NonNull final Purchase purchase) {
-        return verify(getSignature(purchase));
+        return verify(getData(purchase), getSignature(purchase));
     }
 }

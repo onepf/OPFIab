@@ -17,27 +17,19 @@
 package org.onepf.opfiab.google;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.google.model.SignedPurchase;
-import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
+public class SimpleGooglePurchaseVerifier extends GooglePurchaseVerifier {
 
-public abstract class GooglePurchaseVerifier extends PublicKeyPurchaseVerifier {
+    @NonNull
+    private final String publicKey;
 
-    @Nullable
-    @Override
-    protected String getData(@NonNull final Purchase purchase) {
-        return purchase.getOriginalJson();
+    public SimpleGooglePurchaseVerifier(@NonNull final String publicKey) {
+        this.publicKey = publicKey;
     }
 
-    @Nullable
+    @NonNull
     @Override
-    protected String getSignature(@NonNull final Purchase purchase) {
-        if (purchase instanceof SignedPurchase) {
-            final SignedPurchase signedPurchase = (SignedPurchase) purchase;
-            return signedPurchase.getSignature();
-        }
-        return null;
+    protected String getPublicKey() {
+        return publicKey;
     }
 }

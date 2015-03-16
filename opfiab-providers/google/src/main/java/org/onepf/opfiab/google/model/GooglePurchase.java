@@ -46,16 +46,17 @@ public class GooglePurchase extends GoogleModel {
     private final boolean autoRenewing;
 
 
-    public GooglePurchase(@NonNull final JSONObject json) throws JSONException {
-        super(json);
-        this.orderId = json.getString(NAME_ORDER_ID);
-        this.packageName = json.getString(NAME_PACKAGE_NAME);
-        this.developerPayload = json.getString(NAME_DEVELOPER_PAYLOAD);
-        this.purchaseToken = json.getString(NAME_PURCHASE_TOKEN);
-        this.purchaseTime = json.getLong(NAME_PURCHASE_TIME);
-        this.autoRenewing = json.getBoolean(NAME_AUTO_RENEWING);
+    public GooglePurchase(@NonNull final String originalJson, @NonNull final JSONObject jsonObject)
+            throws JSONException {
+        super(originalJson, jsonObject);
+        this.orderId = jsonObject.getString(NAME_ORDER_ID);
+        this.packageName = jsonObject.getString(NAME_PACKAGE_NAME);
+        this.developerPayload = jsonObject.getString(NAME_DEVELOPER_PAYLOAD);
+        this.purchaseToken = jsonObject.getString(NAME_PURCHASE_TOKEN);
+        this.purchaseTime = jsonObject.getLong(NAME_PURCHASE_TIME);
+        this.autoRenewing = jsonObject.getBoolean(NAME_AUTO_RENEWING);
 
-        final int purchaseStateCode = json.getInt(NAME_PURCHASE_STATE);
+        final int purchaseStateCode = jsonObject.getInt(NAME_PURCHASE_STATE);
         final PurchaseState purchaseState = PurchaseState.fromCode(purchaseStateCode);
         if (purchaseState == null) {
             throw new JSONException("Unrecognized purchase state: " + purchaseStateCode);
@@ -63,9 +64,11 @@ public class GooglePurchase extends GoogleModel {
         this.purchaseState = purchaseState;
     }
 
-    public GooglePurchase(@NonNull final String json) throws JSONException {
-        this(new JSONObject(json));
+    public GooglePurchase(@NonNull final String originalJson)
+            throws JSONException {
+        this(originalJson, new JSONObject(originalJson));
     }
+
 
     @NonNull
     public String getOrderId() {

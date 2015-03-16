@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.google;
+package org.onepf.opfiab.google.model;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.google.model.SignedPurchase;
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 
-public abstract class GooglePurchaseVerifier extends PublicKeyPurchaseVerifier {
+public class SignedPurchase extends Purchase {
 
-    @Nullable
-    @Override
-    protected String getData(@NonNull final Purchase purchase) {
-        return purchase.getOriginalJson();
+    @NonNull
+    private final String signature;
+
+    public SignedPurchase(@NonNull final Purchase purchase, @NonNull final String signature) {
+        super(purchase.getSku(),
+              purchase.getType(),
+              purchase.getProviderInfo(),
+              purchase.getOriginalJson(),
+              purchase.getToken(),
+              purchase.getPurchaseTime(),
+              purchase.isCanceled());
+        this.signature = signature;
     }
 
-    @Nullable
-    @Override
-    protected String getSignature(@NonNull final Purchase purchase) {
-        if (purchase instanceof SignedPurchase) {
-            final SignedPurchase signedPurchase = (SignedPurchase) purchase;
-            return signedPurchase.getSignature();
-        }
-        return null;
+    @NonNull
+    public String getSignature() {
+        return signature;
     }
 }

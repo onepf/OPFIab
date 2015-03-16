@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-abstract class GoogleModel {
+public class GoogleModel {
 
     private static final String NAME_PRODUCT_ID = "productId";
     private static final String NAME_TYPE = "itemType";
@@ -34,12 +34,13 @@ abstract class GoogleModel {
     @NonNull
     private final ItemType itemType;
 
-    protected GoogleModel(@NonNull final JSONObject json) throws JSONException {
+    protected GoogleModel(@NonNull final String originalJson, @NonNull final JSONObject jsonObject)
+            throws JSONException {
         super();
-        this.originalJson = json.toString();
-        this.productId = json.getString(NAME_PRODUCT_ID);
+        this.originalJson = originalJson;
+        this.productId = jsonObject.getString(NAME_PRODUCT_ID);
 
-        final String itemTypeCode = json.getString(NAME_TYPE);
+        final String itemTypeCode = jsonObject.getString(NAME_TYPE);
         final ItemType itemType = ItemType.fromCode(itemTypeCode);
         if (itemType == null) {
             throw new JSONException("Unrecognized itemType: " + itemTypeCode);

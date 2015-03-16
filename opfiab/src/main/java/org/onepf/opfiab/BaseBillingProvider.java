@@ -63,7 +63,7 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     /**
      * <a href="http://imgs.xkcd.com/comics/random_number.png">http://imgs.xkcd.com/comics/random_number.png</a>
      */
-    protected static final int REQUEST_CODE = 19685093;
+    private static final int DEFAULT_REQUEST_CODE = 13685093;
 
     @NonNull
     protected final Context context;
@@ -71,14 +71,23 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     protected final RESOLVER skuResolver;
     @NonNull
     protected final VERIFIER purchaseVerifier;
+    protected final int requestCode;
 
-    protected BaseBillingProvider(
-            @NonNull final Context context,
-            @NonNull final RESOLVER skuResolver,
-            @NonNull final VERIFIER purchaseVerifier) {
+    protected BaseBillingProvider(@NonNull final Context context,
+                                  @NonNull final RESOLVER skuResolver,
+                                  @NonNull final VERIFIER purchaseVerifier,
+                                  @Nullable final Integer requestCode) {
+        checkRequirements();
         this.context = context.getApplicationContext();
         this.purchaseVerifier = purchaseVerifier;
         this.skuResolver = skuResolver;
+        this.requestCode = requestCode != null ? requestCode : DEFAULT_REQUEST_CODE;
+    }
+
+    protected BaseBillingProvider(@NonNull final Context context,
+                                  @NonNull final RESOLVER skuResolver,
+                                  @NonNull final VERIFIER purchaseVerifier) {
+        this(context, skuResolver, purchaseVerifier, null);
     }
 
     protected abstract void skuDetails(@NonNull final Set<String> skus);
@@ -88,6 +97,10 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     protected abstract void purchase(@NonNull final Activity activity, @NonNull final String sku);
 
     protected abstract void consume(@NonNull final Purchase purchase);
+
+    protected void checkRequirements(){
+        // Nothing to check by default
+    }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
@@ -160,7 +173,7 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     }
 
     protected void postInventoryResponse(@NonNull final Status status,
-                                         @Nullable final Collection<Purchase> inventory,
+                                         @Nullable final Iterable<Purchase> inventory,
                                          final boolean hasMore) {
         final InventoryResponse response;
         if (inventory == null) {
@@ -209,7 +222,7 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     @Override
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
         final int requestCode = event.getRequestCode();
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == this.requestCode) {
             final Activity activity = event.getActivity();
             final int resultCode = event.getResultCode();
             final Intent data = event.getData();
@@ -281,6 +294,8 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
         protected RESOLVER skuResolver;
         @NonNull
         protected VERIFIER purchaseVerifier;
+        @Nullable
+        protected Integer requestCode;
 
         protected Builder(@NonNull final Context context,
                           @NonNull final RESOLVER skuResolver,
@@ -297,6 +312,11 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
 
         protected Builder setPurchaseVerifier(@NonNull final VERIFIER purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;
+            return this;
+        }
+
+        protected Builder setRequestCode(final int requestCode) {
+            this.requestCode = requestCode;
             return this;
         }
 

@@ -74,25 +74,8 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             @NonNull final SkuResolver skuResolver,
             @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
-        checkRequirements();
         // Register Amazon callbacks handler
         PurchasingService.registerListener(context, billingHelper);
-    }
-
-    @SuppressFBWarnings({"EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"})
-    protected void checkRequirements() {
-        // Check if application is suited to use Amazon
-        final PackageManager packageManager = context.getPackageManager();
-        final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
-        try {
-            if (!packageManager.getReceiverInfo(componentName, 0).exported) {
-                throw new IllegalStateException("Amazon receiver must be exported.");
-            }
-        } catch (PackageManager.NameNotFoundException exception) {
-            throw new IllegalStateException(
-                    "You must declare Amazon receiver to use Amazon billing provider.", exception);
-        }
-        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
     }
 
     protected SkuDetails newSkuDetails(@NonNull final Product product) {
@@ -221,6 +204,23 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             default:
                 throw new IllegalStateException();
         }
+    }
+
+    @SuppressFBWarnings({"EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"})
+    @Override
+    protected void checkRequirements() {
+        // Check if application is suited to use Amazon
+        final PackageManager packageManager = context.getPackageManager();
+        final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
+        try {
+            if (!packageManager.getReceiverInfo(componentName, 0).exported) {
+                throw new IllegalStateException("Amazon receiver must be exported.");
+            }
+        } catch (PackageManager.NameNotFoundException exception) {
+            throw new IllegalStateException(
+                    "You must declare Amazon receiver to use Amazon billing provider.", exception);
+        }
+        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
     }
 
     @Override
