@@ -24,25 +24,23 @@ import java.util.Map;
 
 public class MapSkuResolver implements SkuResolver {
 
-    @NonNull
     protected final Map<String, String> direct = new HashMap<>();
-    @NonNull
     protected final Map<String, String> reverse = new HashMap<>();
 
     public MapSkuResolver() {
         super();
     }
 
-    public void add(@NonNull final Map<String, String> map) {
-        direct.putAll(map);
-        for (final Map.Entry<String, String> entry : map.entrySet()) {
-            final String value = entry.getValue();
-            if (value == null) {
-                throw new IllegalArgumentException("Mapped sku can't be null.");
-            }
-            reverse.put(value, entry.getKey());
-        }
-    }
+//    public void add(@NonNull final Map<String, String> map) {
+//        direct.putAll(map);
+//        for (final Map.Entry<String, String> entry : map.entrySet()) {
+//            final String value = entry.getValue();
+//            if (value == null) {
+//                throw new IllegalArgumentException("Mapped sku can't be null.");
+//            }
+//            reverse.put(value, entry.getKey());
+//        }
+//    }
 
     public void add(@NonNull final String sku, @NonNull final String resolvedSku) {
         direct.put(sku, resolvedSku);

@@ -21,16 +21,29 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.sku.MapSkuResolver;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class GoogleMapSkuResolver extends MapSkuResolver implements GoogleSkuResolver {
+
+    protected final Map<String, SkuType> typeMap = new HashMap<>();
 
     public GoogleMapSkuResolver() {
         super();
     }
 
+    public void add(@NonNull final String sku,
+                    @NonNull final String resolvedSku,
+                    @NonNull final SkuType skuType) {
+        super.add(sku, resolvedSku);
+        typeMap.put(sku, skuType);
+        typeMap.put(resolvedSku, skuType);
+    }
+
     @NonNull
     @Override
     public SkuType resolveType(@NonNull final String sku) {
-        //TODO
-        return null;
+        final SkuType skuType = typeMap.get(sku);
+        return skuType != null ? skuType : SkuType.UNKNOWN;
     }
 }
