@@ -16,7 +16,10 @@
 
 package org.onepf.opfiab.google.model;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import org.onepf.opfiab.model.billing.SkuType;
 
 public enum ItemType {
 
@@ -36,6 +39,18 @@ public enum ItemType {
         return null;
     }
 
+    @Nullable
+    public static ItemType fromSkuType(@NonNull final SkuType skuType) {
+        switch (skuType) {
+            case SUBSCRIPTION:
+                return SUBSCRIPTION;
+            case CONSUMABLE:
+            case ENTITLEMENT:
+                return CONSUMABLE_OR_ENTITLEMENT;
+            default:
+                return null;
+        }
+    }
 
     private final String code;
 

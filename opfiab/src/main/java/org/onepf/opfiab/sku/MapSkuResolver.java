@@ -17,6 +17,7 @@
 package org.onepf.opfiab.sku;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,18 +32,10 @@ public class MapSkuResolver implements SkuResolver {
         super();
     }
 
-//    public void add(@NonNull final Map<String, String> map) {
-//        direct.putAll(map);
-//        for (final Map.Entry<String, String> entry : map.entrySet()) {
-//            final String value = entry.getValue();
-//            if (value == null) {
-//                throw new IllegalArgumentException("Mapped sku can't be null.");
-//            }
-//            reverse.put(value, entry.getKey());
-//        }
-//    }
-
     public void add(@NonNull final String sku, @NonNull final String resolvedSku) {
+        if (TextUtils.equals(sku, resolvedSku)) {
+            throw new IllegalArgumentException("No need to resolve unchanged sku.");
+        }
         direct.put(sku, resolvedSku);
         reverse.put(resolvedSku, sku);
     }
@@ -52,7 +45,7 @@ public class MapSkuResolver implements SkuResolver {
     public String resolve(@NonNull final String sku) {
         return direct.containsKey(sku)
                 ? direct.get(sku)
-                : STUB.resolve(sku);
+                : DEFAULT.resolve(sku);
     }
 
     @NonNull
@@ -60,6 +53,6 @@ public class MapSkuResolver implements SkuResolver {
     public String revert(@NonNull final String resolvedSku) {
         return reverse.containsKey(resolvedSku)
                 ? reverse.get(resolvedSku)
-                : STUB.revert(resolvedSku);
+                : DEFAULT.revert(resolvedSku);
     }
 }

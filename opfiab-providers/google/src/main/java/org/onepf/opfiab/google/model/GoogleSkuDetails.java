@@ -23,13 +23,15 @@ import org.json.JSONObject;
 
 public class GoogleSkuDetails extends GoogleModel {
 
+    private static final String NAME_TYPE = "type";
     private static final String NAME_PRICE = "price";
     private static final String NAME_CURRENCY = "price_currency_code";
     private static final String NAME_TITLE = "title";
     private static final String NAME_DESCRIPTION = "description";
     private static final String NAME_MICROS = "price_amount_micros";
 
-
+    @NonNull
+    private final ItemType itemType;
     @NonNull
     private final String price;
     @NonNull
@@ -43,6 +45,13 @@ public class GoogleSkuDetails extends GoogleModel {
     public GoogleSkuDetails(@NonNull final String originalJson,
                             @NonNull final JSONObject jsonObject) throws JSONException {
         super(originalJson, jsonObject);
+        final String itemTypeCode = jsonObject.getString(NAME_TYPE);
+        final ItemType itemType = ItemType.fromCode(itemTypeCode);
+        if (itemType == null) {
+            throw new JSONException("Unrecognized itemType: " + itemTypeCode);
+        }
+        this.itemType = itemType;
+
         this.price = jsonObject.getString(NAME_PRICE);
         this.micros = jsonObject.getLong(NAME_MICROS);
         this.currency = jsonObject.getString(NAME_CURRENCY);
@@ -52,6 +61,11 @@ public class GoogleSkuDetails extends GoogleModel {
 
     public GoogleSkuDetails(@NonNull final String originalJson) throws JSONException {
         this(originalJson, new JSONObject(originalJson));
+    }
+
+    @NonNull
+    public ItemType getItemType() {
+        return itemType;
     }
 
     @NonNull

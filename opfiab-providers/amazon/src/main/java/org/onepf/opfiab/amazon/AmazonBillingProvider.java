@@ -263,7 +263,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     public static class Builder extends BaseBillingProvider.Builder<SkuResolver, PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
-            super(context, SkuResolver.STUB, PurchaseVerifier.STUB);
+            super(context, SkuResolver.DEFAULT, PurchaseVerifier.DEFAULT);
         }
 
         @Override

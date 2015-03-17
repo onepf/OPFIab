@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.onepf.opfiab.model.billing.Purchase;
 public interface PurchaseVerifier {
 
     @NonNull
-    PurchaseVerifier STUB = new PurchaseVerifier() {
+    PurchaseVerifier DEFAULT = new PurchaseVerifier() {
 
         @NonNull
         @Override

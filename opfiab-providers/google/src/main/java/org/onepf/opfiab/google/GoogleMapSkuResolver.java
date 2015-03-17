@@ -24,8 +24,9 @@ import org.onepf.opfiab.sku.MapSkuResolver;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GoogleMapSkuResolver extends MapSkuResolver implements GoogleSkuResolver {
+public class GoogleMapSkuResolver implements GoogleSkuResolver {
 
+    protected final MapSkuResolver mapSkuResolver = new MapSkuResolver();
     protected final Map<String, SkuType> typeMap = new HashMap<>();
 
     public GoogleMapSkuResolver() {
@@ -35,9 +36,21 @@ public class GoogleMapSkuResolver extends MapSkuResolver implements GoogleSkuRes
     public void add(@NonNull final String sku,
                     @NonNull final String resolvedSku,
                     @NonNull final SkuType skuType) {
-        super.add(sku, resolvedSku);
+        mapSkuResolver.add(sku, resolvedSku);
         typeMap.put(sku, skuType);
         typeMap.put(resolvedSku, skuType);
+    }
+
+    @NonNull
+    @Override
+    public String resolve(@NonNull final String sku) {
+        return mapSkuResolver.resolve(sku);
+    }
+
+    @NonNull
+    @Override
+    public String revert(@NonNull final String resolvedSku) {
+        return mapSkuResolver.revert(resolvedSku);
     }
 
     @NonNull
