@@ -85,7 +85,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
             jsonObject.put(NAME_SKU, sku);
             jsonObject.put(NAME_TYPE, type);
             jsonObject.put(NAME_PROVIDER_INFO, providerInfo == null ? NULL : providerInfo.toJson());
-            jsonObject.put(NAME_ORIGINAL_JSON, new JSONObject(originalJson));
+            jsonObject.put(NAME_ORIGINAL_JSON, originalJson == null ? NULL : new JSONObject(originalJson));
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }
