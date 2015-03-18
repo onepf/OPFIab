@@ -49,6 +49,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+@SuppressWarnings("PMD.GodClass")
 public class GoogleBillingProvider
         extends BaseBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
 

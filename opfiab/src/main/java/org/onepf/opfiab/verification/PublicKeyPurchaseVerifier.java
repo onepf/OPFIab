@@ -33,6 +33,8 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 public abstract class PublicKeyPurchaseVerifier implements PurchaseVerifier {
 
     protected static final String KEY_FACTORY_ALGORITHM = "RSA";
@@ -62,6 +64,7 @@ public abstract class PublicKeyPurchaseVerifier implements PurchaseVerifier {
         }
     }
 
+    @SuppressFBWarnings({"DM_DEFAULT_ENCODING", "MDM_STRING_BYTES_ENCODING"})
     @NonNull
     private Signature signature(@NonNull final String data) {
         try {

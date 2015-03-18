@@ -22,7 +22,7 @@ public enum PurchaseState {
 
     PURCHASED(0),
     CANCELED(1),
-    REFUNDED(2),;
+    REFUNDED(2);
 
     @Nullable
     public static PurchaseState fromCode(final int code) {
@@ -35,7 +35,7 @@ public enum PurchaseState {
     }
 
 
-    public final int code;
+    private final int code;
 
     private PurchaseState(final int code) {
         this.code = code;

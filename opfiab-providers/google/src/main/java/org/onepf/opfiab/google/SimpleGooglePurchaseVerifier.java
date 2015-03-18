@@ -24,6 +24,7 @@ public class SimpleGooglePurchaseVerifier extends GooglePurchaseVerifier {
     private final String publicKey;
 
     public SimpleGooglePurchaseVerifier(@NonNull final String publicKey) {
+        super();
         this.publicKey = publicKey;
     }
 

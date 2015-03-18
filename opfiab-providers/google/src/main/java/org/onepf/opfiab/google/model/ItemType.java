@@ -24,7 +24,7 @@ import org.onepf.opfiab.model.billing.SkuType;
 public enum ItemType {
 
     SUBSCRIPTION("subs"),
-    CONSUMABLE_OR_ENTITLEMENT("inapp"),;
+    CONSUMABLE_OR_ENTITLEMENT("inapp");
 
     @Nullable
     public static ItemType fromCode(@Nullable final String code) {
