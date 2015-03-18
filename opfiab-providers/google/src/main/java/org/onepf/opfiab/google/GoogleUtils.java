@@ -24,6 +24,10 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+@SuppressFBWarnings({"CFS_CONFUSING_FUNCTION_SEMANTICS"})
+@SuppressWarnings("PMD.LooseCoupling")
 public final class GoogleUtils {
 
     private static final String RESPONSE_CODE = "RESPONSE_CODE";
@@ -137,7 +141,7 @@ public final class GoogleUtils {
     @NonNull
     static Bundle putResponse(@NonNull final Bundle bundle,
                               @NonNull final Response response) {
-        bundle.putInt(RESPONSE_CODE, response.code);
+        bundle.putInt(RESPONSE_CODE, response.code());
         return bundle;
     }
 

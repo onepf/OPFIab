@@ -57,27 +57,27 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
     @Override
     public void onActivityCreated(final Activity activity, final Bundle savedInstanceState) {
-        STATE_MAP.put(activity, ComponentState.CREATE);
+        setState(activity, ComponentState.CREATE);
     }
 
     @Override
     public void onActivityStarted(final Activity activity) {
-        STATE_MAP.put(activity, ComponentState.START);
+        setState(activity, ComponentState.START);
     }
 
     @Override
     public void onActivityResumed(final Activity activity) {
-        STATE_MAP.put(activity, ComponentState.RESUME);
+        setState(activity, ComponentState.RESUME);
     }
 
     @Override
     public void onActivityPaused(final Activity activity) {
-        STATE_MAP.put(activity, ComponentState.PAUSE);
+        setState(activity, ComponentState.PAUSE);
     }
 
     @Override
     public void onActivityStopped(final Activity activity) {
-        STATE_MAP.put(activity, ComponentState.STOP);
+        setState(activity, ComponentState.STOP);
     }
 
     @Override
@@ -87,6 +87,6 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
     @Override
     public void onActivityDestroyed(final Activity activity) {
-        STATE_MAP.put(activity, ComponentState.DESTROY);
+        setState(activity, ComponentState.DESTROY);
     }
 }

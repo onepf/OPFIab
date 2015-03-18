@@ -30,6 +30,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AidlBillingHelper<AIDL extends IInterface> implements ServiceConnection {
 
-    private static final int CONNECTION_TIMEOUT = 3000;
-    private static final int DISCONNECT_DELAY = 1 * 60 * 1000;
+    private static final int CONNECTION_TIMEOUT = 3000; // 3 seconds
+    private static final int DISCONNECT_DELAY = 60000; // 1 minute
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     private final Semaphore serviceSemaphore = new Semaphore(0);
@@ -64,7 +65,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         this.context = context.getApplicationContext();
         final Class<?>[] classes = clazz.getDeclaredClasses();
         for (final Class<?> declaredClass : classes) {
-            if (declaredClass.getSimpleName().equals("Stub") &&
+            if ("Stub".equals(declaredClass.getSimpleName()) &&
                     clazz.isAssignableFrom(declaredClass)) {
                 try {
                     asInterface = declaredClass.getDeclaredMethod("asInterface", IBinder.class);
@@ -103,7 +104,9 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         }
         serviceSemaphore.drainPermits();
         try {
-            serviceSemaphore.tryAcquire(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
+            if (!serviceSemaphore.tryAcquire(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
+                OPFLog.e("AIDL service connection timeout: %s", OPFUtils.toString(serviceIntent));
+            }
         } catch (InterruptedException exception) {
             OPFLog.d("", exception);
         }

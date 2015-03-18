@@ -28,7 +28,7 @@ enum Response {
     DEVELOPER_ERROR(5),
     ERROR(6),
     ITEM_ALREADY_OWNED(7),
-    ITEM_NOT_OWNED(8),;
+    ITEM_NOT_OWNED(8);
 
     @Nullable
     static Response fromCode(final int code) {
@@ -41,9 +41,13 @@ enum Response {
     }
 
 
-    final int code;
+    private final int code;
 
     private Response(final int code) {
         this.code = code;
+    }
+
+    public int code() {
+        return code;
     }
 }
