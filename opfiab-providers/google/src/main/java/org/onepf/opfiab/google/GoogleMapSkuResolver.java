@@ -41,6 +41,11 @@ public class GoogleMapSkuResolver implements GoogleSkuResolver {
         typeMap.put(resolvedSku, skuType);
     }
 
+    public void add(@NonNull final String sku,
+                    @NonNull final SkuType skuType) {
+        typeMap.put(sku, skuType);
+    }
+
     @NonNull
     @Override
     public String resolve(@NonNull final String sku) {

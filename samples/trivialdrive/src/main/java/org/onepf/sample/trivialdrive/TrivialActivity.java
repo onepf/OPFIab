@@ -28,7 +28,7 @@ import org.onepf.opfiab.listener.SimpleBillingListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
-import static org.onepf.sample.trivialdrive.TrivialConstants.SKU;
+import static org.onepf.sample.trivialdrive.TrivialConstants.SKU_GAS;
 
 public class TrivialActivity extends ActionBarActivity {
 
@@ -64,14 +64,14 @@ public class TrivialActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                iabHelper.purchase(SKU);
+                iabHelper.purchase(SKU_GAS);
             }
         });
 
         iabHelper.addBillingListener(billingListener);
 
         if (savedInstanceState == null) {
-            iabHelper.skuDetails(SKU);
+            iabHelper.skuDetails(SKU_GAS);
         }
     }
 }
