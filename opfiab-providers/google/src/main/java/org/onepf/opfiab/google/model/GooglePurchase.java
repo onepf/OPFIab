@@ -26,11 +26,11 @@ public class GooglePurchase extends GoogleModel {
 
     private static final String NAME_ORDER_ID = "orderId";
     private static final String NAME_PACKAGE_NAME = "packageName";
-    private static final String NAME_DEVELOPER_PAYLOAD = "purchaseTime";
-    private static final String NAME_PURCHASE_TOKEN = "purchaseState";
-    private static final String NAME_PURCHASE_STATE = "productId";
-    private static final String NAME_PURCHASE_TIME = "developerPayload";
+    private static final String NAME_PURCHASE_TOKEN = "purchaseToken";
+    private static final String NAME_PURCHASE_STATE = "purchaseState";
+    private static final String NAME_PURCHASE_TIME = "purchaseTime";
     private static final String NAME_AUTO_RENEWING = "autoRenewing";
+    private static final String NAME_DEVELOPER_PAYLOAD = "developerPayload";
 
 
     @NonNull
