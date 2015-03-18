@@ -31,7 +31,7 @@ android {
         applicationId "org.onepf.sample.trivialdrive"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
+        versionCode 22
         versionName "1.0"
     }
 
