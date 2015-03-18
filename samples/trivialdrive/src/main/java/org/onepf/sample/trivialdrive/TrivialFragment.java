@@ -30,7 +30,7 @@ import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
-import static org.onepf.sample.trivialdrive.TrivialConstants.SKU;
+import static org.onepf.sample.trivialdrive.TrivialConstants.SKU_GAS;
 
 
 public class TrivialFragment extends Fragment
@@ -70,7 +70,7 @@ public class TrivialFragment extends Fragment
         iabHelper.addSetupListener(this);
         iabHelper.addSkuDetailsListener(this);
         if (savedInstanceState == null) {
-            iabHelper.skuDetails(SKU);
+            iabHelper.skuDetails(SKU_GAS);
         }
     }
 
@@ -83,7 +83,7 @@ public class TrivialFragment extends Fragment
 
     @Override
     public void onClick(final View v) {
-        iabHelper.purchase(SKU);
+        iabHelper.purchase(SKU_GAS);
     }
 
     @Override

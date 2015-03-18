@@ -22,13 +22,18 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
+import org.onepf.opfiab.google.GoogleMapSkuResolver;
+import org.onepf.opfiab.google.SimpleGooglePurchaseVerifier;
 import org.onepf.opfiab.listener.SimpleGlobalBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfutils.OPFLog;
 
+import static org.onepf.sample.trivialdrive.TrivialConstants.SKU_GAS;
+import static org.onepf.sample.trivialdrive.TrivialConstants.GOOGLE_SKU_GAS;
+import static org.onepf.sample.trivialdrive.TrivialConstants.GOOGLE_PLAY_KEY;
+
 
 public class TrivialApplication extends Application {
-
 
     @Override
     public void onCreate() {
@@ -37,14 +42,22 @@ public class TrivialApplication extends Application {
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(newGoogleBillingProvider())
                 .addBillingProvider(newAmazonBillingProvider())
-                .setBillingListener(new SimpleGlobalBillingListener())
+                .setBillingListener(new SimpleGlobalBillingListener(){
+
+                })
                 .build();
         OPFIab.init(this, configuration);
         OPFIab.setup();
     }
 
     private BillingProvider newGoogleBillingProvider() {
+        final GoogleMapSkuResolver skuResolver = new GoogleMapSkuResolver();
+
+        skuResolver.add(SKU_GAS, GOOGLE_SKU_GAS);
+
         return new GoogleBillingProvider.Builder(this)
+                .setPurchaseVerifier(new SimpleGooglePurchaseVerifier(GOOGLE_PLAY_KEY))
+                .setSkuResolver(skuResolver)
                 .build();
     }
 
