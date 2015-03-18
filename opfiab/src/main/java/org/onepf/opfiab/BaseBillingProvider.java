@@ -81,7 +81,6 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
         this.purchaseVerifier = purchaseVerifier;
         this.skuResolver = skuResolver;
         this.requestCode = requestCode != null ? requestCode : DEFAULT_REQUEST_CODE;
-        checkRequirements();
     }
 
     protected BaseBillingProvider(@NonNull final Context context,
@@ -97,10 +96,6 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     protected abstract void purchase(@NonNull final Activity activity, @NonNull final String sku);
 
     protected abstract void consume(@NonNull final Purchase purchase);
-
-    protected void checkRequirements(){
-        // Nothing to check by default
-    }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {

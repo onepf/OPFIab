@@ -208,8 +208,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     @SuppressFBWarnings({"EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"})
     @Override
-    protected void checkRequirements() {
-        // Check if application is suited to use Amazon
+    public void checkManifest() {
         final PackageManager packageManager = context.getPackageManager();
         final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
         try {

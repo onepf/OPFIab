@@ -129,7 +129,7 @@ public class GoogleBillingProvider
     }
 
     @Override
-    protected void checkRequirements() {
+    public void checkManifest() {
         context.enforceCallingOrSelfPermission(PERMISSION_BILLING, null);
     }
 
@@ -231,7 +231,7 @@ public class GoogleBillingProvider
     public void inventory(final boolean startOver) {
         final Bundle result = helper.getPurchases(startOver);
         final Response response = GoogleUtils.getResponse(result);
-        if (response != Response.OK || result == null){
+        if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve purchase data.");
             postInventoryResponse(handleFailure(response), null, false);
             return;

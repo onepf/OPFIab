@@ -64,7 +64,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         try {
             asInterface = clazz.getDeclaredMethod("asInterface", IBinder.class);
         } catch (NoSuchMethodException e) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(e);
         }
     }
 
