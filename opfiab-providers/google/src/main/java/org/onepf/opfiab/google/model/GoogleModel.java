@@ -24,38 +24,24 @@ import org.json.JSONObject;
 public class GoogleModel {
 
     private static final String NAME_PRODUCT_ID = "productId";
-    private static final String NAME_TYPE = "itemType";
 
 
     @NonNull
     private final String originalJson;
     @NonNull
     private final String productId;
-    @NonNull
-    private final ItemType itemType;
+
 
     protected GoogleModel(@NonNull final String originalJson, @NonNull final JSONObject jsonObject)
             throws JSONException {
         super();
         this.originalJson = originalJson;
         this.productId = jsonObject.getString(NAME_PRODUCT_ID);
-
-        final String itemTypeCode = jsonObject.getString(NAME_TYPE);
-        final ItemType itemType = ItemType.fromCode(itemTypeCode);
-        if (itemType == null) {
-            throw new JSONException("Unrecognized itemType: " + itemTypeCode);
-        }
-        this.itemType = itemType;
     }
 
     @NonNull
     public String getOriginalJson() {
         return originalJson;
-    }
-
-    @NonNull
-    public ItemType getItemType() {
-        return itemType;
     }
 
     @NonNull

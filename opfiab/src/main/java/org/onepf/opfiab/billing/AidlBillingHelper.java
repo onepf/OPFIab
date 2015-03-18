@@ -49,6 +49,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         public void run() {
             if (service != null) {
                 context.unbindService(AidlBillingHelper.this);
+                service = null;
             }
         }
     };
@@ -61,11 +62,19 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
 
     protected AidlBillingHelper(@NonNull final Context context, @NonNull final Class<AIDL> clazz) {
         this.context = context.getApplicationContext();
-        try {
-            asInterface = clazz.getDeclaredMethod("asInterface", IBinder.class);
-        } catch (NoSuchMethodException e) {
-            throw new IllegalStateException();
+        final Class<?>[] classes = clazz.getDeclaredClasses();
+        for (final Class<?> declaredClass : classes) {
+            if (declaredClass.getSimpleName().equals("Stub") &&
+                    clazz.isAssignableFrom(declaredClass)) {
+                try {
+                    asInterface = declaredClass.getDeclaredMethod("asInterface", IBinder.class);
+                    return;
+                } catch (NoSuchMethodException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
         }
+        throw new IllegalStateException("Couldn't extract Stub implementation from AIDL class.");
     }
 
     private void scheduleDisconnect() {
@@ -83,6 +92,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
             scheduleDisconnect();
             return service;
         }
+
         final Intent serviceIntent = getServiceIntent();
         final PackageManager packageManager = context.getPackageManager();
         final Collection<ResolveInfo> infos = packageManager.queryIntentServices(serviceIntent, 0);

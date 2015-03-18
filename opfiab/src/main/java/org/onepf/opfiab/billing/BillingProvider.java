@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,13 @@ public interface BillingProvider {
 
     @NonNull
     BillingProviderInfo getInfo();
+
+    /**
+     * Check if Manifest contains all necessary entries.
+     *
+     * @throws java.lang.IllegalStateException if manifest doesn't contain all necessary entries.
+     */
+    void checkManifest();
 
     /**
      * Indicates whether this provider is available on the system.

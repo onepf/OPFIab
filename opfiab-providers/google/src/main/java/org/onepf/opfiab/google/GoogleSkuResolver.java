@@ -23,7 +23,7 @@ import org.onepf.opfiab.sku.SkuResolver;
 
 public interface GoogleSkuResolver extends SkuResolver {
 
-    GoogleSkuResolver STUB = new GoogleSkuResolver() {
+    GoogleSkuResolver DEFAULT = new GoogleSkuResolver() {
         @NonNull
         @Override
         public SkuType resolveType(@NonNull final String sku) {
@@ -33,13 +33,13 @@ public interface GoogleSkuResolver extends SkuResolver {
         @NonNull
         @Override
         public String resolve(@NonNull final String sku) {
-            return SkuResolver.STUB.resolve(sku);
+            return SkuResolver.DEFAULT.resolve(sku);
         }
 
         @NonNull
         @Override
         public String revert(@NonNull final String resolvedSku) {
-            return SkuResolver.STUB.revert(resolvedSku);
+            return SkuResolver.DEFAULT.revert(resolvedSku);
         }
     };
 

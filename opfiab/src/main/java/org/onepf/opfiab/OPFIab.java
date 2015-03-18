@@ -24,6 +24,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
@@ -31,6 +32,7 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
 
+import java.util.Collection;
 import java.util.concurrent.Executors;
 
 import de.greenrobot.event.EventBus;
@@ -171,6 +173,13 @@ public final class OPFIab {
         if (baseIabHelper != null) {
             throw new InitException(true);
         }
+
+        // Check manifest satisfies all billing providers.
+        final Collection<BillingProvider> providers = configuration.getProviders();
+        for (final BillingProvider provider : providers) {
+            provider.checkManifest();
+        }
+
         OPFIab.configuration = configuration;
         OPFIab.context = application.getApplicationContext();
 

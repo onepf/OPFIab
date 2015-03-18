@@ -39,7 +39,7 @@ import java.util.List;
 
 import static org.onepf.opfiab.google.GoogleBillingProvider.PACKAGE_NAME;
 
-class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
+class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     private static final String INTENT_ACTION = "com.android.vending.billing.InAppBillingService.BIND";
     private static final String INTENT_PACKAGE = "com.android.vending";
@@ -56,7 +56,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService.Stub> {
     private final OPFPreferences preferences;
 
     GoogleBillingHelper(@NonNull final Context context) {
-        super(context, IInAppBillingService.Stub.class);
+        super(context, IInAppBillingService.class);
         this.packageName = context.getPackageName();
         this.preferences = new OPFPreferences(context, GoogleBillingProvider.NAME);
     }
