@@ -17,6 +17,7 @@
 package org.onepf.opfiab.google.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,11 +38,11 @@ public class GooglePurchase extends GoogleModel {
     @NonNull
     private final String packageName;
     @NonNull
-    private final String developerPayload;
-    @NonNull
     private final String purchaseToken;
     @NonNull
     private final PurchaseState purchaseState;
+    @Nullable
+    private final String developerPayload;
     private final long purchaseTime;
     private final boolean autoRenewing;
 
@@ -51,10 +52,12 @@ public class GooglePurchase extends GoogleModel {
         super(originalJson, jsonObject);
         this.orderId = jsonObject.getString(NAME_ORDER_ID);
         this.packageName = jsonObject.getString(NAME_PACKAGE_NAME);
-        this.developerPayload = jsonObject.getString(NAME_DEVELOPER_PAYLOAD);
         this.purchaseToken = jsonObject.getString(NAME_PURCHASE_TOKEN);
         this.purchaseTime = jsonObject.getLong(NAME_PURCHASE_TIME);
         this.autoRenewing = jsonObject.getBoolean(NAME_AUTO_RENEWING);
+        this.developerPayload = jsonObject.has(NAME_DEVELOPER_PAYLOAD)
+                ? jsonObject.optString(NAME_DEVELOPER_PAYLOAD)
+                : null;
 
         final int purchaseStateCode = jsonObject.getInt(NAME_PURCHASE_STATE);
         final PurchaseState purchaseState = PurchaseState.fromCode(purchaseStateCode);
@@ -81,11 +84,6 @@ public class GooglePurchase extends GoogleModel {
     }
 
     @NonNull
-    public String getDeveloperPayload() {
-        return developerPayload;
-    }
-
-    @NonNull
     public String getPurchaseToken() {
         return purchaseToken;
     }
@@ -93,6 +91,11 @@ public class GooglePurchase extends GoogleModel {
     @NonNull
     public PurchaseState getPurchaseState() {
         return purchaseState;
+    }
+
+    @Nullable
+    public String getDeveloperPayload() {
+        return developerPayload;
     }
 
     public long getPurchaseTime() {
