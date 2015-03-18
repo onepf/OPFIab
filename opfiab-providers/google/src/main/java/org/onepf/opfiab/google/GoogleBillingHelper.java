@@ -194,9 +194,9 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
                     }
                 }
             }
-            return result;
         } catch (RemoteException exception) {
             OPFLog.e("getPurchases request failed.", exception);
+            return null;
         }
         return GoogleUtils.putResponse(result, Response.OK);
     }
