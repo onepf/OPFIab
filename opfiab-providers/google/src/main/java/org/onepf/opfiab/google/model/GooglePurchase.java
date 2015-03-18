@@ -29,8 +29,8 @@ public class GooglePurchase extends GoogleModel {
     private static final String NAME_PURCHASE_TOKEN = "purchaseToken";
     private static final String NAME_PURCHASE_STATE = "purchaseState";
     private static final String NAME_PURCHASE_TIME = "purchaseTime";
-    private static final String NAME_AUTO_RENEWING = "autoRenewing";
     private static final String NAME_DEVELOPER_PAYLOAD = "developerPayload";
+    private static final String NAME_AUTO_RENEWING = "autoRenewing";
 
 
     @NonNull
@@ -53,11 +53,9 @@ public class GooglePurchase extends GoogleModel {
         this.orderId = jsonObject.getString(NAME_ORDER_ID);
         this.packageName = jsonObject.getString(NAME_PACKAGE_NAME);
         this.purchaseToken = jsonObject.getString(NAME_PURCHASE_TOKEN);
+        this.developerPayload = jsonObject.optString(NAME_DEVELOPER_PAYLOAD, null);
         this.purchaseTime = jsonObject.getLong(NAME_PURCHASE_TIME);
-        this.autoRenewing = jsonObject.getBoolean(NAME_AUTO_RENEWING);
-        this.developerPayload = jsonObject.has(NAME_DEVELOPER_PAYLOAD)
-                ? jsonObject.optString(NAME_DEVELOPER_PAYLOAD)
-                : null;
+        this.autoRenewing = jsonObject.optBoolean(NAME_AUTO_RENEWING, false);
 
         final int purchaseStateCode = jsonObject.getInt(NAME_PURCHASE_STATE);
         final PurchaseState purchaseState = PurchaseState.fromCode(purchaseStateCode);
