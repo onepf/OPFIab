@@ -18,6 +18,8 @@
 
 
 
+
+
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
@@ -36,23 +38,12 @@ android {
     }
 
     signingConfigs {
-        opf {
-            storeFile rootProject.file("onepf.keystore")
-            storePassword "_OnePlatform789"
-            keyAlias "one platform foundation production .apk key"
-            keyPassword "_OnePlatform789"
-        }
     }
 
     buildTypes {
         release {
-            signingConfig signingConfigs.opf
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-
-        debug {
-            signingConfig signingConfigs.opf
         }
     }
 
