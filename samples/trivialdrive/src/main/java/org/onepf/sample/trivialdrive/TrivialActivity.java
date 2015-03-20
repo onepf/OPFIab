@@ -85,6 +85,4 @@ public class TrivialActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         iabHelper.onActivityResult(this, requestCode, resultCode, data);
     }
-
-
 }

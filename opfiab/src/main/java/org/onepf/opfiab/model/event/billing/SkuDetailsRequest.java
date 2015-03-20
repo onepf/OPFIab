@@ -38,6 +38,9 @@ public class SkuDetailsRequest extends BillingRequest {
 
     public SkuDetailsRequest(@NonNull final Set<String> skus) {
         super(Type.SKU_DETAILS);
+        if (skus.isEmpty()) {
+            throw new IllegalArgumentException("Sku list is empty.");
+        }
         this.skus = new HashSet<>(skus);
     }
 

@@ -27,19 +27,19 @@ import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
-public abstract class ActivityDependantBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
+public abstract class ActivityBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         extends BaseBillingProvider<R, V> {
 
-    protected ActivityDependantBillingProvider(@NonNull final Context context,
-                                               @NonNull final R skuResolver,
-                                               @NonNull final V purchaseVerifier,
-                                               @Nullable final Integer requestCode) {
+    protected ActivityBillingProvider(@NonNull final Context context,
+                                      @NonNull final R skuResolver,
+                                      @NonNull final V purchaseVerifier,
+                                      @Nullable final Integer requestCode) {
         super(context, skuResolver, purchaseVerifier, requestCode);
     }
 
-    protected ActivityDependantBillingProvider(@NonNull final Context context,
-                                               @NonNull final R skuResolver,
-                                               @NonNull final V purchaseVerifier) {
+    protected ActivityBillingProvider(@NonNull final Context context,
+                                      @NonNull final R skuResolver,
+                                      @NonNull final V purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
     }
 

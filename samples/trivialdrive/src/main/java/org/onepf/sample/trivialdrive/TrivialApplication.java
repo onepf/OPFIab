@@ -41,8 +41,8 @@ public class TrivialApplication extends Application {
         super.onCreate();
         OPFLog.setEnabled(true);
         final Configuration configuration = new Configuration.Builder()
-                .addBillingProvider(newAmazonBillingProvider())
                 .addBillingProvider(newGoogleBillingProvider())
+                .addBillingProvider(newAmazonBillingProvider())
                 .setBillingListener(new DefaultBillingListener())
                 .setAutoRecover(true)
                 .setSkipUnauthorised(false)

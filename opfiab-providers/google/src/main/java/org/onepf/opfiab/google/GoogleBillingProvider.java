@@ -16,6 +16,8 @@
 
 package org.onepf.opfiab.google;
 
+import android.Manifest;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -27,7 +29,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
-import org.onepf.opfiab.billing.ActivityDependantBillingProvider;
+import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
@@ -52,13 +54,14 @@ import java.util.Set;
 
 @SuppressWarnings("PMD.GodClass")
 public class GoogleBillingProvider
-        extends ActivityDependantBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
+        extends ActivityBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
 
     protected static final String NAME = "Google";
     protected static final String PACKAGE_NAME = "com.google.play";
     protected static final String PERMISSION_BILLING = "com.android.vending.BILLING";
 
     static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
+    public static final String ACCOUNT_TYPE_GOOGLE = "com.google";
 
 
     protected final GoogleBillingHelper helper;
@@ -112,11 +115,13 @@ public class GoogleBillingProvider
                 .build();
     }
 
-    protected Status handleFailure(@Nullable final Response response) {
+    protected Status getStatus(@Nullable final Response response) {
         if (response == null) {
             return Status.UNKNOWN_ERROR;
         }
         switch (response) {
+            case OK:
+                return Status.SUCCESS;
             case USER_CANCELED:
                 return Status.USER_CANCELED;
             case SERVICE_UNAVAILABLE:
@@ -125,6 +130,8 @@ public class GoogleBillingProvider
                 return Status.ITEM_UNAVAILABLE;
             case ITEM_ALREADY_OWNED:
                 return Status.ITEM_ALREADY_OWNED;
+            case BILLING_UNAVAILABLE:
+                return isAuthorised() ? Status.BILLING_UNAVAILABLE : Status.UNAUTHORISED;
             default:
                 return Status.UNKNOWN_ERROR;
         }
@@ -132,6 +139,7 @@ public class GoogleBillingProvider
 
     @Override
     public void checkManifest() {
+        context.enforceCallingOrSelfPermission(Manifest.permission.GET_ACCOUNTS, null);
         context.enforceCallingOrSelfPermission(PERMISSION_BILLING, null);
     }
 
@@ -139,7 +147,15 @@ public class GoogleBillingProvider
     public boolean isAvailable() {
         final Response response = helper.isBillingSupported();
         OPFLog.d("Check if billing supported: %s", response);
-        return response == Response.OK;
+        final Status status = getStatus(response);
+        return status == Status.SUCCESS || status == Status.UNAUTHORISED;
+    }
+
+    @Override
+    public boolean isAuthorised() {
+        final Object service = context.getSystemService(Context.ACCOUNT_SERVICE);
+        final AccountManager accountManager = (AccountManager) service;
+        return accountManager.getAccountsByType(ACCOUNT_TYPE_GOOGLE).length > 0;
     }
 
     @NonNull
@@ -163,7 +179,7 @@ public class GoogleBillingProvider
         final PendingIntent intent = GoogleUtils.getBuyIntent(result);
         if (response != Response.OK || intent == null) {
             OPFLog.e("Failed to retrieve buy intent.");
-            postPurchaseResponse(handleFailure(response), null);
+            postPurchaseResponse(getStatus(response), null);
             return;
         }
 
@@ -188,7 +204,7 @@ public class GoogleBillingProvider
         final Response response = helper.consumePurchase(token);
         if (response != Response.OK) {
             OPFLog.e("Consume failed.");
-            postConsumeResponse(handleFailure(response), purchase);
+            postConsumeResponse(getStatus(response), purchase);
             return;
         }
 
@@ -201,7 +217,7 @@ public class GoogleBillingProvider
         final Response response = GoogleUtils.getResponse(result);
         if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve sku details.");
-            postSkuDetailsResponse(handleFailure(response), null);
+            postSkuDetailsResponse(getStatus(response), null);
             return;
         }
 
@@ -235,7 +251,7 @@ public class GoogleBillingProvider
         final Response response = GoogleUtils.getResponse(result);
         if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve purchase data.");
-            postInventoryResponse(handleFailure(response), null, false);
+            postInventoryResponse(getStatus(response), null, false);
             return;
         }
 
@@ -283,7 +299,7 @@ public class GoogleBillingProvider
         if (resultCode != Activity.RESULT_OK || response != Response.OK || purchaseData == null || signature == null) {
             OPFLog.e("Failed to handle activity result. Code:%s, Data:%s",
                      resultCode, OPFUtils.toString(data));
-            postPurchaseResponse(handleFailure(response), null);
+            postPurchaseResponse(getStatus(response), null);
             return;
         }
 
