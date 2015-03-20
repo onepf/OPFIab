@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 
@@ -29,7 +30,7 @@ import java.util.LinkedHashSet;
 final class BillingRequestScheduler {
 
     private final long requestDelay = OPFIab.getConfiguration().getSubsequentRequestDelay();
-    private final IabHelperBase helperBase = OPFIab.getBase();
+    private final BillingBase billingBase = OPFIab.getBase();
     private final Collection<AdvancedIabHelper> helpersQueue = new LinkedHashSet<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable handleNextRequest = new Runnable() {
@@ -51,9 +52,9 @@ final class BillingRequestScheduler {
 
     private void handleOrSchedule() {
         handler.removeCallbacks(handleNextRequest);
-        if (helperBase.getSetupResponse() == null) {
+        if (billingBase.getSetupResponse() == null) {
             OPFIab.setup();
-        } else if (!helperBase.isBusy()) {
+        } else if (!billingBase.isBusy()) {
             handleNextRequest.run();
         } else {
             handler.postDelayed(handleNextRequest, requestDelay);

@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
+import org.onepf.opfiab.misc.ActivityMonitor;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfutils.OPFChecks;
@@ -44,7 +45,7 @@ public final class OPFIab {
     private static volatile EventBus eventBus;
     private static volatile Context context;
 
-    private static IabHelperBase iabHelperBase;
+    private static BillingBase billingBase;
     private static BillingEventDispatcher eventDispatcher;
     private static BillingRequestScheduler requestScheduler;
 
@@ -55,7 +56,7 @@ public final class OPFIab {
 
     private static void checkInit() {
         OPFChecks.checkThread(true);
-        if (iabHelperBase == null) {
+        if (billingBase == null) {
             throw new InitException(false);
         }
     }
@@ -94,9 +95,9 @@ public final class OPFIab {
     }
 
     @NonNull
-    static IabHelperBase getBase() {
+    static BillingBase getBase() {
         checkInit();
-        return iabHelperBase;
+        return billingBase;
     }
 
     @NonNull
@@ -123,7 +124,7 @@ public final class OPFIab {
     }
 
     @NonNull
-    public static IabHelper getSimpleHelper() {
+    public static IabHelper getHelper() {
         return new IabHelper();
     }
 
@@ -133,23 +134,25 @@ public final class OPFIab {
     }
 
     @NonNull
-    public static ActivityIabHelper getHelper(@NonNull final FragmentActivity fragmentActivity) {
+    public static ActivityIabHelper getActivityHelper(
+            @NonNull final FragmentActivity fragmentActivity) {
         return new ActivityIabHelper(fragmentActivity);
     }
 
     @NonNull
-    public static ActivityIabHelper getHelper(@NonNull final Activity activity) {
+    public static ActivityIabHelper getActivityHelper(@NonNull final Activity activity) {
         return new ActivityIabHelper(activity);
     }
 
     @NonNull
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public static FragmentIabHelper getHelper(@NonNull final android.app.Fragment fragment) {
+    public static FragmentIabHelper getFragmentHelper(
+            @NonNull final android.app.Fragment fragment) {
         return new FragmentIabHelper(fragment);
     }
 
     @NonNull
-    public static FragmentIabHelper getHelper(
+    public static FragmentIabHelper getFragmentHelper(
             @NonNull final android.support.v4.app.Fragment fragment) {
         return new FragmentIabHelper(fragment);
     }
@@ -174,7 +177,7 @@ public final class OPFIab {
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
-        if (iabHelperBase != null) {
+        if (billingBase != null) {
             throw new InitException(true);
         }
 
@@ -187,13 +190,13 @@ public final class OPFIab {
         OPFIab.configuration = configuration;
         OPFIab.context = application.getApplicationContext();
         OPFIab.eventBus = newBus();
-        OPFIab.iabHelperBase = new IabHelperBase();
+        OPFIab.billingBase = new BillingBase();
         final BillingListener billingListener = configuration.getBillingListener();
         OPFIab.eventDispatcher = new BillingEventDispatcher(billingListener);
         OPFIab.requestScheduler = new BillingRequestScheduler();
 
         int priority = Integer.MAX_VALUE;
-        register(iabHelperBase, priority);
+        register(billingBase, priority);
         register(new SetupManager(), --priority);
         register(eventDispatcher, --priority);
         register(requestScheduler, --priority);

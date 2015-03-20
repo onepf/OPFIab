@@ -27,7 +27,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
-import org.onepf.opfiab.BaseBillingProvider;
+import org.onepf.opfiab.billing.ActivityDependantBillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
 import org.onepf.opfiab.google.model.ItemType;
@@ -51,7 +52,7 @@ import java.util.Set;
 
 @SuppressWarnings("PMD.GodClass")
 public class GoogleBillingProvider
-        extends BaseBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
+        extends ActivityDependantBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
 
     protected static final String NAME = "Google";
     protected static final String PACKAGE_NAME = "com.google.play";

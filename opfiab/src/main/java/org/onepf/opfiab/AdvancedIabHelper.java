@@ -24,6 +24,7 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
+import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -66,7 +67,7 @@ public class AdvancedIabHelper extends IabHelper {
 
     @Override
     public void postRequest(@NonNull final BillingRequest billingRequest) {
-        if (!billingRequest.equals(helperBase.getPendingRequest())) {
+        if (!billingRequest.equals(billingBase.getPendingRequest())) {
             requestQueue.add(billingRequest);
             scheduler.schedule(this);
         }
@@ -108,7 +109,7 @@ public class AdvancedIabHelper extends IabHelper {
         OPFChecks.checkThread(true);
         setupListeners.add(setupListener);
         // Deliver last setup even right away
-        final SetupResponse setupResponse = helperBase.getSetupResponse();
+        final SetupResponse setupResponse = billingBase.getSetupResponse();
         if (setupResponse != null) {
             setupListener.onSetup(setupResponse);
         }

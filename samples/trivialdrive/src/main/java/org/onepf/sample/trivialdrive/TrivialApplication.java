@@ -23,7 +23,7 @@ import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.google.GoogleMapSkuResolver;
-import org.onepf.opfiab.listener.SimpleGlobalBillingListener;
+import org.onepf.opfiab.listener.DefaultBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.sku.MapSkuResolver;
@@ -41,9 +41,9 @@ public class TrivialApplication extends Application {
         super.onCreate();
         OPFLog.setEnabled(true);
         final Configuration configuration = new Configuration.Builder()
-                .addBillingProvider(newGoogleBillingProvider())
                 .addBillingProvider(newAmazonBillingProvider())
-                .setBillingListener(new SimpleGlobalBillingListener())
+                .addBillingProvider(newGoogleBillingProvider())
+                .setBillingListener(new DefaultBillingListener())
                 .setAutoRecover(true)
                 .setSkipUnauthorised(false)
                 .build();

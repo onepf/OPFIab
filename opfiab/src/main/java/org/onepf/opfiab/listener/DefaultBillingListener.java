@@ -29,13 +29,13 @@ import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.Map;
 
-public class SimpleGlobalBillingListener extends SimpleBillingListener {
+public class DefaultBillingListener extends SimpleBillingListener {
 
     @Nullable
     private IabHelper iabHelper;
 
     @NonNull
-    protected IabHelper getIabHelper() {
+    protected IabHelper getHelper() {
         if (iabHelper == null) {
             iabHelper = OPFIab.getAdvancedHelper();
         }
@@ -46,7 +46,7 @@ public class SimpleGlobalBillingListener extends SimpleBillingListener {
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
         super.onPurchase(purchaseResponse);
         if (purchaseResponse.isSuccessful()) {
-            getIabHelper().inventory(true);
+            getHelper().inventory(true);
         }
     }
 
@@ -61,12 +61,12 @@ public class SimpleGlobalBillingListener extends SimpleBillingListener {
                     final Purchase purchase = entry.getKey();
                     if (purchase.getType() == SkuType.CONSUMABLE
                             && entry.getValue() == VerificationResult.SUCCESS) {
-                        getIabHelper().consume(purchase);
+                        getHelper().consume(purchase);
                     }
                 }
             }
             if (inventoryResponse.hasMore()) {
-                getIabHelper().inventory(false);
+                getHelper().inventory(false);
             }
         }
     }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.misc;
 
 import android.app.Activity;
 import android.os.Bundle;

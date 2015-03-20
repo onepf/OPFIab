@@ -35,14 +35,14 @@ import java.util.Set;
 
 public class IabHelper {
 
-    protected final IabHelperBase helperBase = OPFIab.getBase();
+    protected final BillingBase billingBase = OPFIab.getBase();
 
     IabHelper() {
         super();
     }
 
     protected void postRequest(@NonNull final BillingRequest billingRequest) {
-        helperBase.postRequest(billingRequest);
+        billingBase.postRequest(billingRequest);
     }
 
     public void purchase(@NonNull final Activity activity, @NonNull final String sku) {

@@ -27,9 +27,8 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.ComponentState;
-import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
-import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.misc.OPFIabUtils;
+import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfutils.OPFLog;
 
@@ -75,12 +74,25 @@ public class OPFIabActivity extends Activity {
         }
     };
 
+    protected IabHelper iabHelper;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handler.postDelayed(finishTask, FINISH_DELAY);
+        iabHelper = OPFIab.getHelper();
         if (savedInstanceState == null) {
-            OPFIab.post(new ActivityLifecycleEvent(ComponentState.CREATE, this));
+            onNewIntent(getIntent());
+        }
+    }
+
+    @Override
+    protected void onNewIntent(final Intent intent) {
+        super.onNewIntent(intent);
+        final BillingRequest billingRequest = OPFIabUtils.getRequest(intent.getExtras());
+        if (billingRequest != null) {
+            OPFIab.post(new RequestHandledEvent(billingRequest));
+            iabHelper.postRequest(OPFIabUtils.withActivity(billingRequest, this));
         }
     }
 
@@ -132,7 +144,7 @@ public class OPFIabActivity extends Activity {
                                     final int resultCode,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
+        iabHelper.onActivityResult(this, requestCode, resultCode, data);
         finish();
     }
 

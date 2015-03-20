@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,11 @@ public class PurchaseResponse extends BillingResponse {
     @Nullable
     public VerificationResult getVerificationResult() {
         return verificationResult;
+    }
+
+    @Override
+    public boolean isSuccessful() {
+        return super.isSuccessful() && verificationResult == VerificationResult.SUCCESS;
     }
 
     @NonNull

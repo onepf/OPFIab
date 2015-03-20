@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.OPFIabUtils;
+import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;

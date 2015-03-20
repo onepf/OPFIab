@@ -57,7 +57,7 @@ public class TrivialActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        iabHelper = OPFIab.getHelper(this);
+        iabHelper = OPFIab.getActivityHelper(this);
         setContentView(R.layout.trivial_layout);
 
         button = findViewById(R.id.btn_buy);
@@ -66,7 +66,9 @@ public class TrivialActivity extends ActionBarActivity {
             @Override
             public void onClick(final View v) {
 //                iabHelper.purchase(SKU_GAS);
-                OPFIab.getSimpleHelper().purchase(SKU_GAS);
+                OPFIab.getHelper().purchase(SKU_GAS);
+//                OPFIab.getAdvancedHelper().purchase(SKU_GAS);
+//                OPFIab.getActivityHelper(TrivialActivity.this);
             }
         });
 

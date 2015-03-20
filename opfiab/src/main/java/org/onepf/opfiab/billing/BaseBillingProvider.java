@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.billing;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,7 +23,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.OPFIabActivity;
+import org.onepf.opfiab.misc.ActivityMonitor;
+import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -57,7 +60,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
-public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER extends PurchaseVerifier>
+public abstract class BaseBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         implements BillingProvider {
 
     /**
@@ -68,14 +71,14 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     @NonNull
     protected final Context context;
     @NonNull
-    protected final RESOLVER skuResolver;
+    protected final R skuResolver;
     @NonNull
-    protected final VERIFIER purchaseVerifier;
+    protected final V purchaseVerifier;
     protected final int requestCode;
 
     protected BaseBillingProvider(@NonNull final Context context,
-                                  @NonNull final RESOLVER skuResolver,
-                                  @NonNull final VERIFIER purchaseVerifier,
+                                  @NonNull final R skuResolver,
+                                  @NonNull final V purchaseVerifier,
                                   @Nullable final Integer requestCode) {
         this.context = context.getApplicationContext();
         this.purchaseVerifier = purchaseVerifier;
@@ -84,8 +87,8 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     }
 
     protected BaseBillingProvider(@NonNull final Context context,
-                                  @NonNull final RESOLVER skuResolver,
-                                  @NonNull final VERIFIER purchaseVerifier) {
+                                  @NonNull final R skuResolver,
+                                  @NonNull final V purchaseVerifier) {
         this(context, skuResolver, purchaseVerifier, null);
     }
 
@@ -93,7 +96,7 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
 
     protected abstract void inventory(final boolean startOver);
 
-    protected abstract void purchase(@NonNull final Activity activity, @NonNull final String sku);
+    protected abstract void purchase(@Nullable final Activity activity, @NonNull final String sku);
 
     protected abstract void consume(@NonNull final Purchase purchase);
 
@@ -112,7 +115,8 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
                 final Activity activity = purchaseRequest.getActivity();
-                if (activity == null || !ActivityMonitor.isResumed(activity)) {
+                if (activity != null && !(activity instanceof OPFIabActivity)
+                        && !ActivityMonitor.isResumed(activity)) {
                     postEmptyResponse(billingRequest, USER_CANCELED);
                     break;
                 }
@@ -204,7 +208,7 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     }
 
     @Override
-    public final void onEventAsync(@NonNull final BillingRequest billingRequest) {
+    public void onEventAsync(@NonNull final BillingRequest billingRequest) {
         if (!isAvailable()) {
             postEmptyResponse(billingRequest, BILLING_UNAVAILABLE);
         } else {
@@ -280,31 +284,31 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
     //CHECKSTYLE:ON
 
 
-    public abstract static class Builder<RESOLVER extends SkuResolver, VERIFIER extends PurchaseVerifier> {
+    public abstract static class Builder<R extends SkuResolver, V extends PurchaseVerifier> {
 
         @NonNull
         protected final Context context;
         @NonNull
-        protected RESOLVER skuResolver;
+        protected R skuResolver;
         @NonNull
-        protected VERIFIER purchaseVerifier;
+        protected V purchaseVerifier;
         @Nullable
         protected Integer requestCode;
 
         protected Builder(@NonNull final Context context,
-                          @NonNull final RESOLVER skuResolver,
-                          @NonNull final VERIFIER purchaseVerifier) {
+                          @NonNull final R skuResolver,
+                          @NonNull final V purchaseVerifier) {
             this.context = context;
             this.skuResolver = skuResolver;
             this.purchaseVerifier = purchaseVerifier;
         }
 
-        protected Builder setSkuResolver(@NonNull final RESOLVER skuResolver) {
+        protected Builder setSkuResolver(@NonNull final R skuResolver) {
             this.skuResolver = skuResolver;
             return this;
         }
 
-        protected Builder setPurchaseVerifier(@NonNull final VERIFIER purchaseVerifier) {
+        protected Builder setPurchaseVerifier(@NonNull final V purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;
             return this;
         }

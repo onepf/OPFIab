@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.misc;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
 
 import static org.onepf.opfiab.model.ComponentState.ATTACH;
 import static org.onepf.opfiab.model.ComponentState.CREATE;
@@ -37,73 +39,74 @@ import static org.onepf.opfiab.model.ComponentState.RESUME;
 import static org.onepf.opfiab.model.ComponentState.START;
 import static org.onepf.opfiab.model.ComponentState.STOP;
 
-public class OPFIabSupportFragment extends Fragment {
+public class OPFIabFragment extends Fragment {
 
     @NonNull
-    public static OPFIabSupportFragment newInstance() {
-        return new OPFIabSupportFragment();
+    public static OPFIabFragment newInstance() {
+        return new OPFIabFragment();
     }
 
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        OPFIab.post(new SupportFragmentLifecycleEvent(ATTACH, this));
+        OPFIab.post(new FragmentLifecycleEvent(ATTACH, this));
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OPFIab.post(new SupportFragmentLifecycleEvent(CREATE, this));
+        OPFIab.post(new FragmentLifecycleEvent(CREATE, this));
     }
 
+    @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
         final View view = super.onCreateView(inflater, container, savedInstanceState);
-        OPFIab.post(new SupportFragmentLifecycleEvent(CREATE_VIEW, this));
+        OPFIab.post(new FragmentLifecycleEvent(CREATE_VIEW, this));
         return view;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        OPFIab.post(new SupportFragmentLifecycleEvent(START, this));
+        OPFIab.post(new FragmentLifecycleEvent(START, this));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        OPFIab.post(new SupportFragmentLifecycleEvent(RESUME, this));
+        OPFIab.post(new FragmentLifecycleEvent(RESUME, this));
     }
 
     @Override
     public void onPause() {
-        OPFIab.post(new SupportFragmentLifecycleEvent(PAUSE, this));
+        OPFIab.post(new FragmentLifecycleEvent(PAUSE, this));
         super.onPause();
     }
 
     @Override
     public void onStop() {
-        OPFIab.post(new SupportFragmentLifecycleEvent(STOP, this));
+        OPFIab.post(new FragmentLifecycleEvent(STOP, this));
         super.onStop();
     }
 
     @Override
     public void onDestroyView() {
-        OPFIab.post(new SupportFragmentLifecycleEvent(DESTROY_VIEW, this));
+        OPFIab.post(new FragmentLifecycleEvent(DESTROY_VIEW, this));
         super.onDestroyView();
     }
 
     @Override
     public void onDestroy() {
-        OPFIab.post(new SupportFragmentLifecycleEvent(DESTROY, this));
+        OPFIab.post(new FragmentLifecycleEvent(DESTROY, this));
         super.onDestroy();
     }
 
     @Override
     public void onDetach() {
-        OPFIab.post(new SupportFragmentLifecycleEvent(DETACH, this));
+        OPFIab.post(new FragmentLifecycleEvent(DETACH, this));
         super.onDetach();
     }
 }

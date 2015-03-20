@@ -66,7 +66,7 @@ public class TrivialFragment extends Fragment
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        iabHelper = OPFIab.getHelper(this);
+        iabHelper = OPFIab.getFragmentHelper(this);
         iabHelper.addSetupListener(this);
         iabHelper.addSkuDetailsListener(this);
         if (savedInstanceState == null) {

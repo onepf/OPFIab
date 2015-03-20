@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.model.JsonCompatible;
-import org.onepf.opfiab.OPFIabUtils;
+import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfutils.OPFLog;
 
