@@ -138,6 +138,11 @@ public final class GoogleUtils {
         return null;
     }
 
+    @Nullable
+    static Response getResponse(@Nullable final Intent intent) {
+        return getResponse(intent == null ? null : intent.getExtras());
+    }
+
     @NonNull
     static Bundle putResponse(@NonNull final Bundle bundle,
                               @NonNull final Response response) {

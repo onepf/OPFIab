@@ -19,7 +19,7 @@ package org.onepf.sample.trivialdrive;
 public final class TrivialConstants {
 
     public static final String SKU_GAS = "sku_gas";
-    public static final String GOOGLE_SKU_GAS = "sku_gas";
+    public static final String GOOGLE_SKU_GAS = "android.test.purchased";
     public static final String AMAZON_SKU_GAS = "org.onepf.sample.trivialdrive.sku_gas";
 
     public static final String GOOGLE_PLAY_KEY

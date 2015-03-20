@@ -112,8 +112,7 @@ public abstract class BaseBillingProvider<RESOLVER extends SkuResolver, VERIFIER
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
                 final Activity activity = purchaseRequest.getActivity();
-                final boolean activityFake = purchaseRequest.isActivityFake();
-                if (activity == null || !activityFake && !ActivityMonitor.isResumed(activity)) {
+                if (activity == null || !ActivityMonitor.isResumed(activity)) {
                     postEmptyResponse(billingRequest, USER_CANCELED);
                     break;
                 }

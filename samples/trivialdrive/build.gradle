@@ -16,29 +16,43 @@
 
 
 
+
+
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 apply plugin: 'com.noveogroup.android.check'
 
 android {
-    //noinspection GroovyAssignabilityCheck
     compileSdkVersion project.compileSdkVersion
-    //noinspection GroovyAssignabilityCheck
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
         applicationId "org.onepf.sample.trivialdrive"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode 22
+        versionName "0.1"
+    }
+
+    signingConfigs {
+        opf {
+            storeFile rootProject.file("onepf.keystore")
+            storePassword "_OnePlatform789"
+            keyAlias "one platform foundation production .apk key"
+            keyPassword "_OnePlatform789"
+        }
     }
 
     buildTypes {
         release {
+            signingConfig signingConfigs.opf
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            signingConfig signingConfigs.opf
         }
     }
 

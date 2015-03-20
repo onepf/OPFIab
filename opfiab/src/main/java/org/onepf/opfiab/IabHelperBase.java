@@ -16,11 +16,14 @@
 
 package org.onepf.opfiab;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
@@ -33,7 +36,7 @@ import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.BUSY;
 import static org.onepf.opfiab.model.event.billing.Status.NO_BILLING_PROVIDER;
 
-final class BaseIabHelper extends IabHelper {
+final class IabHelperBase {
 
     private final Configuration configuration = OPFIab.getConfiguration();
     @Nullable
@@ -43,7 +46,7 @@ final class BaseIabHelper extends IabHelper {
     @Nullable
     private BillingRequest pendingRequest;
 
-    BaseIabHelper() {
+    IabHelperBase() {
         super();
     }
 
@@ -68,13 +71,18 @@ final class BaseIabHelper extends IabHelper {
         return setupResponse;
     }
 
+    @Nullable
+    BillingRequest getPendingRequest() {
+        OPFChecks.checkThread(true);
+        return pendingRequest;
+    }
+
     boolean isBusy() {
         OPFChecks.checkThread(true);
         return pendingRequest != null;
     }
 
-    @Override
-    protected void postRequest(@NonNull final BillingRequest billingRequest) {
+    void postRequest(@NonNull final BillingRequest billingRequest) {
         OPFChecks.checkThread(true);
         final SetupResponse setupResponse;
         if (isBusy()) {
@@ -84,14 +92,17 @@ final class BaseIabHelper extends IabHelper {
             // Setup was not started, is in progress or failed
             postEmptyResponse(billingRequest, NO_BILLING_PROVIDER);
         } else {
-            // Send request to be handled by BillingProvider
             pendingRequest = billingRequest;
-            OPFIab.post(billingRequest);
+            final PurchaseRequest purchaseRequest;
+            if (billingRequest.getType() == BillingRequest.Type.PURCHASE
+                    && (purchaseRequest = (PurchaseRequest) billingRequest).needsFakeActivity()) {
+                // We have to start OPFIabActivity to properly handle this request
+                OPFIabActivity.start(purchaseRequest.getActivity(), purchaseRequest);
+            } else {
+                // Send request to be handled by BillingProvider
+                OPFIab.post(billingRequest);
+            }
         }
-    }
-
-    public void purchase(@NonNull final String sku) {
-        OPFIabActivity.start(new PurchaseRequest(null, sku));
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
@@ -99,16 +110,11 @@ final class BaseIabHelper extends IabHelper {
         if (setupResponse.isSuccessful()) {
             setCurrentProvider(setupResponse.getBillingProvider());
         }
-        if (pendingRequest != null) {
-            final BillingRequest billingRequest = pendingRequest;
-            pendingRequest = null;
-            postRequest(billingRequest);
-        }
     }
 
     public void onEventMainThread(@NonNull final RequestHandledEvent event) {
         // At this point request should be handled by BillingProvider
-        if (pendingRequest != event.getBillingRequest()) {
+        if (!event.getBillingRequest().equals(pendingRequest)) {
             throw new IllegalStateException();
         }
         pendingRequest = null;
@@ -125,6 +131,17 @@ final class BaseIabHelper extends IabHelper {
             setCurrentProvider(null);
             setupResponse = null;
             OPFIab.setup();
+        }
+    }
+
+    public void onEventMainThread(@NonNull final ActivityLifecycleEvent event) {
+        if (event.getType() == ComponentState.CREATE) {
+            final Activity activity = event.getActivity();
+            final BillingRequest request = OPFIabUtils.getRequest(activity.getIntent().getExtras());
+            if (request != null) {
+                onEventMainThread(new RequestHandledEvent(request));
+                postRequest(OPFIabUtils.withActivity(request, activity));
+            }
         }
     }
 }

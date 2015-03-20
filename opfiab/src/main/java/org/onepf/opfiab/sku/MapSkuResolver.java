@@ -33,11 +33,10 @@ public class MapSkuResolver implements SkuResolver {
     }
 
     public void add(@NonNull final String sku, @NonNull final String resolvedSku) {
-        if (TextUtils.equals(sku, resolvedSku)) {
-            throw new IllegalArgumentException("No need to resolve unchanged sku.");
+        if (!TextUtils.equals(sku, resolvedSku)) {
+            direct.put(sku, resolvedSku);
+            reverse.put(resolvedSku, sku);
         }
-        direct.put(sku, resolvedSku);
-        reverse.put(resolvedSku, sku);
     }
 
     @NonNull

@@ -17,6 +17,8 @@
 package org.onepf.opfiab.google;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.sku.MapSkuResolver;
@@ -34,16 +36,18 @@ public class GoogleMapSkuResolver implements GoogleSkuResolver {
     }
 
     public void add(@NonNull final String sku,
-                    @NonNull final String resolvedSku,
+                    @Nullable final String resolvedSku,
                     @NonNull final SkuType skuType) {
-        mapSkuResolver.add(sku, resolvedSku);
         typeMap.put(sku, skuType);
-        typeMap.put(resolvedSku, skuType);
+        if (!TextUtils.isEmpty(resolvedSku)) {
+            typeMap.put(resolvedSku, skuType);
+            mapSkuResolver.add(sku, resolvedSku);
+        }
     }
 
     public void add(@NonNull final String sku,
                     @NonNull final SkuType skuType) {
-        typeMap.put(sku, skuType);
+        add(sku, null, skuType);
     }
 
     @NonNull

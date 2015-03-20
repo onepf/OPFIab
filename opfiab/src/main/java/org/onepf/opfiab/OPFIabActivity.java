@@ -27,73 +27,80 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
 import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfutils.OPFLog;
-
-import static org.onepf.opfiab.model.ComponentState.CREATE;
-import static org.onepf.opfiab.model.ComponentState.DESTROY;
-import static org.onepf.opfiab.model.ComponentState.PAUSE;
-import static org.onepf.opfiab.model.ComponentState.RESUME;
-import static org.onepf.opfiab.model.ComponentState.START;
-import static org.onepf.opfiab.model.ComponentState.STOP;
 
 @SuppressLint("Registered")
 public class OPFIabActivity extends Activity {
 
     protected static final int FINISH_DELAY = 3000;
 
-    public static void start(@Nullable final Bundle bundle) {
+    public static void start(@Nullable final Activity activity, @Nullable final Bundle bundle) {
         final Context context = OPFIab.getContext();
         final Intent intent = new Intent(context, OPFIabActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         if (bundle != null) {
             intent.putExtras(bundle);
         }
-        context.startActivity(intent);
+        final int flags = Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+                | Intent.FLAG_ACTIVITY_NO_ANIMATION
+                | Intent.FLAG_ACTIVITY_NO_USER_ACTION;
+        if (activity == null) {
+            intent.setFlags(flags | Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } else {
+            intent.setFlags(flags);
+            activity.startActivity(intent);
+        }
     }
 
-    public static void start(@NonNull final BillingRequest request) {
+    public static void start(@Nullable final Activity activity,
+                             @NonNull final BillingRequest request) {
         final Bundle bundle = new Bundle();
         OPFIabUtils.putRequest(bundle, request);
-        start(bundle);
-    }
-
-    public static void start() {
-        start((Bundle) null);
+        start(activity, bundle);
     }
 
 
-    @NonNull
     protected final Handler handler = new Handler(Looper.getMainLooper());
-    @NonNull
     protected final Runnable finishTask = new Runnable() {
         @Override
         public void run() {
-            OPFLog.e("OPFIabActivity wasn't utilised! Finishing...");
-            finish();
+            if (!isFinishing()) {
+                OPFLog.e("OPFIabActivity wasn't utilised! Finishing...");
+                finish();
+            }
         }
     };
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final BillingRequest billingRequest = OPFIabUtils.getRequest(getIntent().getExtras());
-        if (billingRequest != null) {
-            final BillingRequest request = OPFIabUtils.withActivity(billingRequest, this);
-            OPFIab.getBaseHelper().postRequest(request);
-            finish();
-        } else {
-            handler.postDelayed(finishTask, FINISH_DELAY);
-            OPFIab.post(new ActivityLifecycleEvent(CREATE, this));
+        handler.postDelayed(finishTask, FINISH_DELAY);
+        if (savedInstanceState == null) {
+            OPFIab.post(new ActivityLifecycleEvent(ComponentState.CREATE, this));
         }
+    }
+
+    @Override
+    public void finish() {
+        handler.removeCallbacks(finishTask);
+        super.finish();
     }
 
     @Override
     public void startActivityForResult(final Intent intent, final int requestCode) {
         handler.removeCallbacks(finishTask);
         super.startActivityForResult(intent, requestCode);
+    }
+
+    @Override
+    public void startActivityForResult(final Intent intent, final int requestCode,
+                                       final Bundle options) {
+        handler.removeCallbacks(finishTask);
+        super.startActivityForResult(intent, requestCode, options);
     }
 
     @Override
@@ -110,34 +117,14 @@ public class OPFIabActivity extends Activity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        OPFIab.post(new ActivityLifecycleEvent(START, this));
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        OPFIab.post(new ActivityLifecycleEvent(RESUME, this));
-    }
-
-    @Override
-    protected void onPause() {
-        OPFIab.post(new ActivityLifecycleEvent(PAUSE, this));
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        OPFIab.post(new ActivityLifecycleEvent(STOP, this));
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
+    public void startIntentSenderForResult(final IntentSender intent, final int requestCode,
+                                           final Intent fillInIntent, final int flagsMask,
+                                           final int flagsValues,
+                                           final int extraFlags, final Bundle options)
+            throws IntentSender.SendIntentException {
         handler.removeCallbacks(finishTask);
-        OPFIab.post(new ActivityLifecycleEvent(DESTROY, this));
-        super.onDestroy();
+        super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
+                                         extraFlags, options);
     }
 
     @Override
@@ -147,5 +134,10 @@ public class OPFIabActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // ignore
     }
 }

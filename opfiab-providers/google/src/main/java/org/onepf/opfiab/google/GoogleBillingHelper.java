@@ -72,7 +72,6 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
             for (final ItemType itemType : ItemType.values()) {
                 final int code = service.isBillingSupported(API, packageName, itemType.toString());
                 final Response response = Response.fromCode(code);
-                OPFLog.d("Response: %s", response);
                 if (response != Response.OK) {
                     return response;
                 }

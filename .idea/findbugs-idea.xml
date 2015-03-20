@@ -221,7 +221,7 @@
         <entry key="NeedlessCustomSerialization" value="true" />
         <entry key="NeedlessInstanceRetrieval" value="true" />
         <entry key="NeedlessMemberCollectionSynchronization" value="true" />
-        <entry key="Noise" value="true" />
+        <entry key="Noise" value="false" />
         <entry key="NoiseNullDeref" value="true" />
         <entry key="NonCollectionMethodUse" value="true" />
         <entry key="NonFunctionalField" value="true" />

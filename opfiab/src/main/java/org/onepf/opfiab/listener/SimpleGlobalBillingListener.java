@@ -17,9 +17,10 @@
 package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.IabHelper;
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.ScheduledIabHelper;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
@@ -30,11 +31,22 @@ import java.util.Map;
 
 public class SimpleGlobalBillingListener extends SimpleBillingListener {
 
+    @Nullable
+    private IabHelper iabHelper;
+
+    @NonNull
+    protected IabHelper getIabHelper() {
+        if (iabHelper == null) {
+            iabHelper = OPFIab.getAdvancedHelper();
+        }
+        return iabHelper;
+    }
+
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
         super.onPurchase(purchaseResponse);
         if (purchaseResponse.isSuccessful()) {
-            OPFIab.getScheduledHelper().inventory(true);
+            getIabHelper().inventory(true);
         }
     }
 
@@ -43,19 +55,18 @@ public class SimpleGlobalBillingListener extends SimpleBillingListener {
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         super.onInventory(inventoryResponse);
         if (inventoryResponse.isSuccessful()) {
-            final ScheduledIabHelper helper = OPFIab.getScheduledHelper();
             final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
             if (inventory != null) {
                 for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
                     final Purchase purchase = entry.getKey();
                     if (purchase.getType() == SkuType.CONSUMABLE
                             && entry.getValue() == VerificationResult.SUCCESS) {
-                        helper.consume(purchase);
+                        getIabHelper().consume(purchase);
                     }
                 }
             }
             if (inventoryResponse.hasMore()) {
-                helper.inventory(false);
+                getIabHelper().inventory(false);
             }
         }
     }

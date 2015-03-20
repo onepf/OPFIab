@@ -25,6 +25,7 @@ import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
@@ -34,24 +35,41 @@ import org.onepf.opfutils.OPFChecks;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class ManagedIabHelper extends ScheduledIabHelper {
+public class AdvancedIabHelper extends IabHelper {
 
-    @NonNull
-    private final Collection<OnSetupListener> setupListeners = new HashSet<>();
-    @NonNull
-    private final Collection<OnPurchaseListener> purchaseListeners = new HashSet<>();
-    @NonNull
-    private final Collection<OnInventoryListener> inventoryListeners = new HashSet<>();
-    @NonNull
-    private final Collection<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
-    @NonNull
-    private final Collection<OnConsumeListener> consumeListeners = new HashSet<>();
+    private final Collection<BillingRequest> requestQueue = new LinkedHashSet<>();
+    private final BillingEventDispatcher eventDispatcher = OPFIab.getBillingEventDispatcher();
+    private final BillingRequestScheduler scheduler = OPFIab.getRequestScheduler();
 
-    ManagedIabHelper(@NonNull final BaseIabHelper baseIabHelper) {
-        super(baseIabHelper);
+    protected final Collection<OnSetupListener> setupListeners = new HashSet<>();
+    protected final Collection<OnPurchaseListener> purchaseListeners = new HashSet<>();
+    protected final Collection<OnInventoryListener> inventoryListeners = new HashSet<>();
+    protected final Collection<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
+    protected final Collection<OnConsumeListener> consumeListeners = new HashSet<>();
+
+    AdvancedIabHelper() {
+        super();
+    }
+
+    boolean postNextRequest() {
+        final BillingRequest billingRequest = OPFIabUtils.poll(requestQueue);
+        if (billingRequest != null) {
+            super.postRequest(billingRequest);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void postRequest(@NonNull final BillingRequest billingRequest) {
+        if (!billingRequest.equals(helperBase.getPendingRequest())) {
+            requestQueue.add(billingRequest);
+            scheduler.schedule(this);
+        }
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
@@ -90,7 +108,7 @@ public class ManagedIabHelper extends ScheduledIabHelper {
         OPFChecks.checkThread(true);
         setupListeners.add(setupListener);
         // Deliver last setup even right away
-        final SetupResponse setupResponse = OPFIab.getBaseHelper().getSetupResponse();
+        final SetupResponse setupResponse = helperBase.getSetupResponse();
         if (setupResponse != null) {
             setupListener.onSetup(setupResponse);
         }
@@ -125,11 +143,11 @@ public class ManagedIabHelper extends ScheduledIabHelper {
     }
 
     public void subscribe() {
-        OPFIab.register(this);
+        eventDispatcher.register(this);
     }
 
     public void unsubscribe() {
-        OPFIab.unregister(this);
-        flush();
+        eventDispatcher.unregister(this);
+        requestQueue.clear();
     }
 }

@@ -39,21 +39,25 @@ public class PurchaseRequest extends BillingRequest {
     private final transient Reference<Activity> activityReference;
     @NonNull
     private final String sku;
-    private final boolean activityFake;
+    private final boolean needsFakeActivity;
 
     @SuppressFBWarnings({"SE_NO_SERIALVERSIONID"})
     public PurchaseRequest(@Nullable final Activity activity,
                            @NonNull final String sku,
-                           final boolean activityFake) {
+                           final boolean needsFakeActivity) {
         super(Type.PURCHASE);
-        this.activityFake = activityFake;
+        this.needsFakeActivity = needsFakeActivity;
         this.activityReference = activity == null ? null : new WeakReference<>(activity);
         this.sku = sku;
     }
 
-    public PurchaseRequest(@Nullable final Activity activity,
+    public PurchaseRequest(@NonNull final Activity activity,
                            @NonNull final String sku) {
-        this(activity, sku, activity == null);
+        this(activity, sku, false);
+    }
+
+    public PurchaseRequest(@NonNull final String sku) {
+        this(null, sku, true);
     }
 
     @Nullable
@@ -66,8 +70,8 @@ public class PurchaseRequest extends BillingRequest {
         return sku;
     }
 
-    public boolean isActivityFake() {
-        return activityFake;
+    public boolean needsFakeActivity() {
+        return needsFakeActivity;
     }
 
     @NonNull

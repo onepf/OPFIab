@@ -17,7 +17,6 @@
 package org.onepf.opfiab;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -25,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
 
 import static org.onepf.opfiab.model.ComponentState.ATTACH;
@@ -56,7 +54,6 @@ public class OPFIabSupportFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         OPFIab.post(new SupportFragmentLifecycleEvent(CREATE, this));
     }
 
@@ -108,11 +105,5 @@ public class OPFIabSupportFragment extends Fragment {
     public void onDetach() {
         OPFIab.post(new SupportFragmentLifecycleEvent(DETACH, this));
         super.onDetach();
-    }
-
-    @Override
-    public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        OPFIab.post(new ActivityResultEvent(getActivity(), requestCode, resultCode, data));
     }
 }

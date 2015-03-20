@@ -33,47 +33,36 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class IabHelper {
+public class IabHelper {
+
+    protected final IabHelperBase helperBase = OPFIab.getBase();
 
     IabHelper() {
         super();
     }
 
-    protected abstract void postRequest(@NonNull final BillingRequest billingRequest);
-
-    protected BillingRequest newPurchaseRequest(@NonNull final Activity activity,
-                                                @NonNull final String sku) {
-        return new PurchaseRequest(activity, sku);
+    protected void postRequest(@NonNull final BillingRequest billingRequest) {
+        helperBase.postRequest(billingRequest);
     }
 
-    protected BillingRequest newConsumeRequest(@NonNull final Purchase purchase) {
-        return new ConsumeRequest(purchase);
+    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
+        postRequest(new PurchaseRequest(activity, sku));
     }
 
-    protected BillingRequest newInventoryRequest(final boolean startOver) {
-        return new InventoryRequest(startOver);
+    public void purchase(@NonNull final String sku) {
+        postRequest(new PurchaseRequest(sku));
     }
 
-    protected BillingRequest newSkuDetailsRequest(@NonNull final Set<String> skus) {
-        return new SkuDetailsRequest(skus);
+    public void consume(@NonNull final Purchase purchase) {
+        postRequest(new ConsumeRequest(purchase));
     }
 
-    public final void purchase(@NonNull final Activity activity,
-                               @NonNull final String sku) {
-        postRequest(newPurchaseRequest(activity, sku));
+    public void inventory(final boolean startOver) {
+        postRequest(new InventoryRequest(startOver));
     }
 
-    public final void consume(@NonNull final Purchase purchase) {
-        postRequest(newConsumeRequest(purchase));
-    }
-
-
-    public final void inventory(final boolean startOver) {
-        postRequest(newInventoryRequest(startOver));
-    }
-
-    public final void skuDetails(@NonNull final Set<String> skus) {
-        postRequest(newSkuDetailsRequest(skus));
+    public void skuDetails(@NonNull final Set<String> skus) {
+        postRequest(new SkuDetailsRequest(skus));
     }
 
     public final void skuDetails(@NonNull final String... skus) {

@@ -16,13 +16,14 @@
 
 package org.onepf.sample.trivialdrive;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
+import org.onepf.opfiab.ActivityIabHelper;
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.SelfManagedIabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.SimpleBillingListener;
 import org.onepf.opfiab.model.event.SetupResponse;
@@ -33,7 +34,7 @@ import static org.onepf.sample.trivialdrive.TrivialConstants.SKU_GAS;
 public class TrivialActivity extends ActionBarActivity {
 
     @NonNull
-    private SelfManagedIabHelper iabHelper;
+    private ActivityIabHelper iabHelper;
     @NonNull
     private View button;
     private final BillingListener billingListener = new SimpleBillingListener() {
@@ -64,7 +65,8 @@ public class TrivialActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                iabHelper.purchase(SKU_GAS);
+//                iabHelper.purchase(SKU_GAS);
+                OPFIab.getSimpleHelper().purchase(SKU_GAS);
             }
         });
 
@@ -74,4 +76,13 @@ public class TrivialActivity extends ActionBarActivity {
             iabHelper.skuDetails(SKU_GAS);
         }
     }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode,
+                                    final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        iabHelper.onActivityResult(this, requestCode, resultCode, data);
+    }
+
+
 }

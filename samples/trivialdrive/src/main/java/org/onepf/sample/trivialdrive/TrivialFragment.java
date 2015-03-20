@@ -23,8 +23,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.onepf.opfiab.FragmentIabHelper;
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.SelfManagedIabHelper;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
@@ -41,7 +41,7 @@ public class TrivialFragment extends Fragment
     }
 
 
-    private SelfManagedIabHelper iabHelper;
+    private FragmentIabHelper iabHelper;
     private View btnBuy;
 
     public TrivialFragment() {

@@ -39,7 +39,9 @@ import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfutils.OPFLog;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -98,9 +100,8 @@ public final class OPFIabUtils {
                                               @NonNull final Activity activity) {
         if (billingRequest.getType() == BillingRequest.Type.PURCHASE) {
             final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
-            final boolean fake = purchaseRequest.isActivityFake();
             final String sku = purchaseRequest.getSku();
-            return new PurchaseRequest(activity, sku, fake);
+            return new PurchaseRequest(activity, sku);
         }
         return billingRequest;
     }
@@ -170,5 +171,16 @@ public final class OPFIabUtils {
             return (BillingRequest) bundle.getSerializable(KEY_REQUEST);
         }
         return null;
+    }
+
+    @Nullable
+    public static <E> E poll(@NonNull final Collection<E> collection) {
+        if (collection.isEmpty()) {
+            return null;
+        }
+        final Iterator<E> iterator = collection.iterator();
+        final E e = iterator.next();
+        iterator.remove();
+        return e;
     }
 }

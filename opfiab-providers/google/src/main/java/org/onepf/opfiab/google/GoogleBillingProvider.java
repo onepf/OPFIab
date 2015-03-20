@@ -276,12 +276,13 @@ public class GoogleBillingProvider
                                  final int requestCode,
                                  final int resultCode,
                                  @Nullable final Intent data) {
+        final Response response = GoogleUtils.getResponse(data);
         final String purchaseData = GoogleUtils.getPurchaseData(data);
         final String signature = GoogleUtils.getSignature(data);
-        if (resultCode != Activity.RESULT_OK || purchaseData == null || signature == null) {
+        if (resultCode != Activity.RESULT_OK || response != Response.OK || purchaseData == null || signature == null) {
             OPFLog.e("Failed to handle activity result. Code:%s, Data:%s",
                      resultCode, OPFUtils.toString(data));
-            postPurchaseResponse(Status.UNKNOWN_ERROR, null);
+            postPurchaseResponse(handleFailure(response), null);
             return;
         }
 

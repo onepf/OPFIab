@@ -44,7 +44,9 @@ public final class OPFIab {
     private static volatile EventBus eventBus;
     private static volatile Context context;
 
-    private static BaseIabHelper baseIabHelper;
+    private static IabHelperBase iabHelperBase;
+    private static BillingEventDispatcher eventDispatcher;
+    private static BillingRequestScheduler requestScheduler;
 
 
     private OPFIab() {
@@ -53,7 +55,7 @@ public final class OPFIab {
 
     private static void checkInit() {
         OPFChecks.checkThread(true);
-        if (baseIabHelper == null) {
+        if (iabHelperBase == null) {
             throw new InitException(false);
         }
     }
@@ -92,9 +94,21 @@ public final class OPFIab {
     }
 
     @NonNull
-    static BaseIabHelper getBaseHelper() {
+    static IabHelperBase getBase() {
         checkInit();
-        return baseIabHelper;
+        return iabHelperBase;
+    }
+
+    @NonNull
+    static BillingEventDispatcher getBillingEventDispatcher() {
+        checkInit();
+        return eventDispatcher;
+    }
+
+    @NonNull
+    static BillingRequestScheduler getRequestScheduler() {
+        checkInit();
+        return requestScheduler;
     }
 
     /**
@@ -109,40 +123,35 @@ public final class OPFIab {
     }
 
     @NonNull
-    public static IabHelper getHelper() {
-        return getBaseHelper();
+    public static IabHelper getSimpleHelper() {
+        return new IabHelper();
     }
 
     @NonNull
-    public static ScheduledIabHelper getScheduledHelper() {
-        return new ScheduledIabHelper(getBaseHelper());
+    public static AdvancedIabHelper getAdvancedHelper() {
+        return new AdvancedIabHelper();
     }
 
     @NonNull
-    public static ManagedIabHelper getManagedHelper() {
-        return new ManagedIabHelper(getBaseHelper());
+    public static ActivityIabHelper getHelper(@NonNull final FragmentActivity fragmentActivity) {
+        return new ActivityIabHelper(fragmentActivity);
     }
 
     @NonNull
-    public static SelfManagedIabHelper getHelper(@NonNull final Activity activity) {
-        return new ActivityIabHelper(getManagedHelper(), activity);
-    }
-
-    @NonNull
-    public static SelfManagedIabHelper getHelper(@NonNull final FragmentActivity fragmentActivity) {
-        return new ActivityIabHelper(getManagedHelper(), fragmentActivity);
+    public static ActivityIabHelper getHelper(@NonNull final Activity activity) {
+        return new ActivityIabHelper(activity);
     }
 
     @NonNull
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    public static SelfManagedIabHelper getHelper(@NonNull final android.app.Fragment fragment) {
-        return new FragmentIabHelper(getManagedHelper(), fragment);
+    public static FragmentIabHelper getHelper(@NonNull final android.app.Fragment fragment) {
+        return new FragmentIabHelper(fragment);
     }
 
     @NonNull
-    public static SelfManagedIabHelper getHelper(
+    public static FragmentIabHelper getHelper(
             @NonNull final android.support.v4.app.Fragment fragment) {
-        return new FragmentIabHelper(getManagedHelper(), fragment);
+        return new FragmentIabHelper(fragment);
     }
 
     @NonNull
@@ -161,20 +170,15 @@ public final class OPFIab {
         return configuration;
     }
 
-
-    public static void purchase(@NonNull final String sku) {
-        getBaseHelper().purchase(sku);
-    }
-
     @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC"})
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
-        if (baseIabHelper != null) {
+        if (iabHelperBase != null) {
             throw new InitException(true);
         }
 
-        // Check manifest satisfies all billing providers.
+        // Check if manifest satisfies all billing providers.
         final Collection<BillingProvider> providers = configuration.getProviders();
         for (final BillingProvider provider : providers) {
             provider.checkManifest();
@@ -182,21 +186,19 @@ public final class OPFIab {
 
         OPFIab.configuration = configuration;
         OPFIab.context = application.getApplicationContext();
-
         OPFIab.eventBus = newBus();
-        OPFIab.baseIabHelper = new BaseIabHelper();
-
-        application.registerActivityLifecycleCallbacks(new ActivityMonitor());
+        OPFIab.iabHelperBase = new IabHelperBase();
+        final BillingListener billingListener = configuration.getBillingListener();
+        OPFIab.eventDispatcher = new BillingEventDispatcher(billingListener);
+        OPFIab.requestScheduler = new BillingRequestScheduler();
 
         int priority = Integer.MAX_VALUE;
+        register(iabHelperBase, priority);
+        register(new SetupManager(), --priority);
+        register(eventDispatcher, --priority);
+        register(requestScheduler, --priority);
 
-        register(baseIabHelper, priority);
-
-        final SetupManager setupManager = new SetupManager();
-        register(setupManager, --priority);
-
-        final BillingListener billingListener = configuration.getBillingListener();
-        register(new GlobalBillingListener(billingListener), --priority);
+        application.registerActivityLifecycleCallbacks(new ActivityMonitor());
     }
 
     public static void setup() {

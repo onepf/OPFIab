@@ -65,8 +65,8 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         this.context = context.getApplicationContext();
         final Class<?>[] classes = clazz.getDeclaredClasses();
         for (final Class<?> declaredClass : classes) {
-            if ("Stub".equals(declaredClass.getSimpleName()) &&
-                    clazz.isAssignableFrom(declaredClass)) {
+            if ("Stub".equals(declaredClass.getSimpleName())
+                    && clazz.isAssignableFrom(declaredClass)) {
                 try {
                     asInterface = declaredClass.getDeclaredMethod("asInterface", IBinder.class);
                     return;
