@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event;
+package org.onepf.opfiab.model.event.android;
 
+import android.app.Fragment;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 
 import org.onepf.opfiab.model.ComponentState;
 
-public class SupportFragmentLifecycleEvent extends LifecycleEvent {
+public class FragmentLifecycleEvent extends LifecycleEvent {
 
     @NonNull
     private final Fragment fragment;
 
-    public SupportFragmentLifecycleEvent(
-            @NonNull final ComponentState type, @NonNull final Fragment fragment) {
+    public FragmentLifecycleEvent(@NonNull final ComponentState type, @NonNull final Fragment fragment) {
         super(type);
         this.fragment = fragment;
     }

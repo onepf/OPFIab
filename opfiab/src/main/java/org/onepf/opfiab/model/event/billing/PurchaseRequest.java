@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.misc.OPFIabActivity;
 import org.onepf.opfutils.OPFLog;
 
 import java.lang.ref.Reference;
@@ -72,6 +73,10 @@ public class PurchaseRequest extends BillingRequest {
 
     public boolean needsFakeActivity() {
         return needsFakeActivity;
+    }
+
+    public boolean isActivityFake() {
+        return getActivity() instanceof OPFIabActivity;
     }
 
     @NonNull

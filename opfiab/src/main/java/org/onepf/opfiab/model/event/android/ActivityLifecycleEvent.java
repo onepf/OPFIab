@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event;
+package org.onepf.opfiab.model.event.android;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;

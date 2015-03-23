@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event;
+package org.onepf.opfiab.model.event.android;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.ComponentState;
-
-public class LifecycleEvent {
+abstract class ActivityEvent {
 
     @NonNull
-    private final ComponentState type;
+    protected final Activity activity;
 
-    public LifecycleEvent(@NonNull final ComponentState type) {
-        this.type = type;
+    protected ActivityEvent(@NonNull final Activity activity) {
+        this.activity = activity;
     }
 
     @NonNull
-    public ComponentState getType() {
-        return type;
+    public Activity getActivity() {
+        return activity;
     }
 }

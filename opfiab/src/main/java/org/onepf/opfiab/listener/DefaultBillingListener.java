@@ -28,21 +28,26 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.verification.VerificationResult;
 
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 
 public class DefaultBillingListener extends SimpleBillingListener {
 
+    // WeakReference allows to reuse this listener with different config.
     @Nullable
-    private IabHelper iabHelper;
+    private Reference<IabHelper> helperReference;
 
     @NonNull
     protected IabHelper getHelper() {
-        if (iabHelper == null) {
-            final AdvancedIabHelper advancedIabHelper = OPFIab.getAdvancedHelper();
-            advancedIabHelper.register();
-            iabHelper = advancedIabHelper;
+        final IabHelper iabHelper;
+        if (helperReference != null && (iabHelper = helperReference.get()) != null) {
+            return iabHelper;
         }
-        return iabHelper;
+        final AdvancedIabHelper advancedIabHelper = OPFIab.getAdvancedHelper();
+        advancedIabHelper.register();
+        helperReference = new WeakReference<IabHelper>(advancedIabHelper);
+        return advancedIabHelper;
     }
 
     @Override

@@ -24,14 +24,13 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.OPFIabActivity;
 import org.onepf.opfiab.misc.ActivityMonitor;
 import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
@@ -115,7 +114,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
                 final Activity activity = purchaseRequest.getActivity();
-                if (activity != null && !(activity instanceof OPFIabActivity)
+                if (activity != null && !purchaseRequest.isActivityFake()
                         && !ActivityMonitor.isResumed(activity)) {
                     postEmptyResponse(billingRequest, USER_CANCELED);
                     break;

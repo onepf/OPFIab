@@ -77,7 +77,9 @@ final class SetupManager {
 
     public void onEvent(@NonNull final SetupRequest setupRequest) {
         OPFChecks.checkThread(true);
+        // Guaranteed to be called before any scheduled event delivery
         if (state == State.PROGRESS) {
+            // Setup is in progress, halt setup request delivery
             OPFIab.cancelEventDelivery(setupRequest);
         } else {
             state = State.PROGRESS;

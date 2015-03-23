@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.model.event;
+package org.onepf.opfiab.model.event.android;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class ActivityResultEvent {
-
-    @NonNull
-    private final Activity activity;
+public class ActivityResultEvent extends ActivityEvent {
 
     private final int requestCode;
 
@@ -33,18 +30,14 @@ public class ActivityResultEvent {
     @Nullable
     private final Intent data;
 
-    public ActivityResultEvent(@NonNull final Activity activity, final int requestCode,
+    public ActivityResultEvent(@NonNull final Activity activity,
+                               final int requestCode,
                                final int resultCode,
                                @Nullable final Intent data) {
-        this.activity = activity;
+        super(activity);
         this.requestCode = requestCode;
         this.resultCode = resultCode;
         this.data = data;
-    }
-
-    @NonNull
-    public Activity getActivity() {
-        return activity;
     }
 
     public int getRequestCode() {

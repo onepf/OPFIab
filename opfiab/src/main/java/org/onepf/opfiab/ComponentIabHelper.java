@@ -22,8 +22,8 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.misc.OPFIabFragment;
 import org.onepf.opfiab.misc.OPFIabSupportFragment;
 import org.onepf.opfiab.model.ComponentState;
-import org.onepf.opfiab.model.event.FragmentLifecycleEvent;
-import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
+import org.onepf.opfiab.model.event.android.FragmentLifecycleEvent;
+import org.onepf.opfiab.model.event.android.SupportFragmentLifecycleEvent;
 
 abstract class ComponentIabHelper extends AdvancedIabHelper {
 

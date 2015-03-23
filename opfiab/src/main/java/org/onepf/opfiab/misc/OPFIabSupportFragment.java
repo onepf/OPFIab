@@ -25,7 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.model.event.SupportFragmentLifecycleEvent;
+import org.onepf.opfiab.model.event.android.SupportFragmentLifecycleEvent;
 
 import static org.onepf.opfiab.model.ComponentState.ATTACH;
 import static org.onepf.opfiab.model.ComponentState.CREATE;

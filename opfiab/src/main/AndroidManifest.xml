@@ -19,8 +19,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
+
+        <!--android:theme="@android:style/Theme.NoDisplay" seems to be too slow-->
         <activity
-            android:name=".OPFIabActivity"
+            android:name=".misc.OPFIabActivity"
             android:configChanges="fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>

@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.ActivityResultEvent;
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;

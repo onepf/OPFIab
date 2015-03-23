@@ -14,32 +14,39 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.misc;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.WindowManager;
 
-import org.onepf.opfiab.misc.OPFIabUtils;
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.ComponentState;
-import org.onepf.opfiab.model.event.ActivityLifecycleEvent;
-import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.android.ActivityIntentEvent;
+import org.onepf.opfiab.model.event.android.ActivityLifecycleEvent;
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfutils.OPFLog;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressLint("Registered")
 public class OPFIabActivity extends Activity {
 
-    protected static final int FINISH_DELAY = 3000;
+    protected static final int FINISH_DELAY = 1000; // 1 second
+
+    // don't have to be atomic, but oh well...
+    private final AtomicInteger expectedResultsCounter = new AtomicInteger(0);
 
     public static void start(@Nullable final Activity activity, @Nullable final Bundle bundle) {
-        final Context context = OPFIab.getContext();
+        final Context context = activity == null ? OPFIab.getContext() : activity;
         final Intent intent = new Intent(context, OPFIabActivity.class);
         if (bundle != null) {
             intent.putExtras(bundle);
@@ -49,18 +56,8 @@ public class OPFIabActivity extends Activity {
                 | Intent.FLAG_ACTIVITY_NO_USER_ACTION;
         if (activity == null) {
             intent.setFlags(flags | Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        } else {
-            intent.setFlags(flags);
-            activity.startActivity(intent);
         }
-    }
-
-    public static void start(@Nullable final Activity activity,
-                             @NonNull final BillingRequest request) {
-        final Bundle bundle = new Bundle();
-        OPFIabUtils.putRequest(bundle, request);
-        start(activity, bundle);
+        context.startActivity(intent);
     }
 
 
@@ -75,9 +72,18 @@ public class OPFIabActivity extends Activity {
         }
     };
 
+    private void expectResult() {
+        expectedResultsCounter.incrementAndGet();
+        handler.removeCallbacks(finishTask);
+    }
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        OPFLog.d("onCreate: %s, task: %d", this, getTaskId());
+        start(null, null);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
         OPFIab.post(new ActivityLifecycleEvent(ComponentState.CREATE, this));
         handler.postDelayed(finishTask, FINISH_DELAY);
         if (savedInstanceState == null) {
@@ -88,28 +94,29 @@ public class OPFIabActivity extends Activity {
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
-        final BillingRequest billingRequest = OPFIabUtils.getRequest(intent.getExtras());
-        if (billingRequest != null) {
-            OPFIab.post(OPFIabUtils.withActivity(billingRequest, this));
-        }
+        OPFLog.d("onNewIntent: %s, Intent: %s", this, intent);
+        OPFIab.post(new ActivityIntentEvent(this, intent));
     }
 
     @Override
     public void finish() {
+        OPFLog.d("finish: %s", this);
         handler.removeCallbacks(finishTask);
         super.finish();
     }
 
     @Override
     public void startActivityForResult(final Intent intent, final int requestCode) {
-        handler.removeCallbacks(finishTask);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            expectResult();
+        }
         super.startActivityForResult(intent, requestCode);
     }
 
     @Override
     public void startActivityForResult(final Intent intent, final int requestCode,
                                        final Bundle options) {
-        handler.removeCallbacks(finishTask);
+        expectResult();
         super.startActivityForResult(intent, requestCode, options);
     }
 
@@ -121,7 +128,9 @@ public class OPFIabActivity extends Activity {
                                            final int flagsValues,
                                            final int extraFlags)
             throws IntentSender.SendIntentException {
-        handler.removeCallbacks(finishTask);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+            expectResult();
+        }
         super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
                                          extraFlags);
     }
@@ -132,7 +141,7 @@ public class OPFIabActivity extends Activity {
                                            final int flagsValues,
                                            final int extraFlags, final Bundle options)
             throws IntentSender.SendIntentException {
-        handler.removeCallbacks(finishTask);
+        expectResult();
         super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
                                          extraFlags, options);
     }
@@ -142,8 +151,10 @@ public class OPFIabActivity extends Activity {
                                     final int resultCode,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        OPFIab.getBase().onActivityResult(this, requestCode, resultCode, data);
-        finish();
+        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
+        if (expectedResultsCounter.decrementAndGet() == 0) {
+            finish();
+        }
     }
 
     @Override

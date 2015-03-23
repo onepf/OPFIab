@@ -24,7 +24,6 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -36,13 +35,11 @@ import org.onepf.opfutils.OPFChecks;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class AdvancedIabHelper extends SimpleIabHelper {
 
-    private final Collection<BillingRequest> requestQueue = new LinkedHashSet<>();
     private final BillingEventDispatcher billingEventDispatcher = OPFIab.getBillingEventDispatcher();
     private final BillingRequestScheduler scheduler = OPFIab.getRequestScheduler();
 
@@ -56,20 +53,18 @@ public class AdvancedIabHelper extends SimpleIabHelper {
         super();
     }
 
-    boolean postNextRequest() {
-        final BillingRequest billingRequest = OPFIabUtils.poll(requestQueue);
-        if (billingRequest != null) {
-            super.postRequest(billingRequest);
-            return true;
-        }
-        return false;
-    }
-
     @Override
     protected void postRequest(@NonNull final BillingRequest billingRequest) {
-        if (!billingRequest.equals(billingBase.getPendingRequest())) {
-            requestQueue.add(billingRequest);
-            scheduler.handleNextOrSchedule();
+        if (billingBase.getSetupResponse() == null) {
+            // Lazy setup
+            OPFIab.setup();
+            scheduler.schedule(this, billingRequest);
+        } else if (!billingBase.isBusy()) {
+            // No need to schedule anything
+            super.postRequest(billingRequest);
+        } else if (!billingRequest.equals(billingBase.getPendingRequest())) {
+            // If request is not already being precessed, schedule it for later
+            scheduler.schedule(this, billingRequest);
         }
     }
 
@@ -145,12 +140,10 @@ public class AdvancedIabHelper extends SimpleIabHelper {
 
     public void register() {
         billingEventDispatcher.register(this);
-        scheduler.register(this);
     }
 
     public void unregister() {
         billingEventDispatcher.unregister(this);
-        scheduler.unregister(this);
-        requestQueue.clear();
+        scheduler.dropQueue(this);
     }
 }
