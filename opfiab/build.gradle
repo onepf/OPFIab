@@ -16,6 +16,8 @@
 
 
 
+
+
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
@@ -29,7 +31,7 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
         versionName "0.1-SNAPSHOT"
     }

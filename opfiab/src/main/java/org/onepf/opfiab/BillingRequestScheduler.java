@@ -20,9 +20,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -31,14 +31,13 @@ final class BillingRequestScheduler {
 
     private final long requestDelay = OPFIab.getConfiguration().getSubsequentRequestDelay();
     private final BillingBase billingBase = OPFIab.getBase();
-    private final Collection<AdvancedIabHelper> helpersQueue = new LinkedHashSet<>();
+    private final Collection<AdvancedIabHelper> helpers = new LinkedHashSet<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable handleNextRequest = new Runnable() {
         @Override
         public void run() {
-            AdvancedIabHelper advancedIabHelper;
-            while ((advancedIabHelper = OPFIabUtils.poll(helpersQueue)) != null) {
-                if (advancedIabHelper.postNextRequest()) {
+            for (final AdvancedIabHelper iabHelper : helpers) {
+                if (iabHelper.postNextRequest()) {
                     return;
                 }
             }
@@ -50,30 +49,38 @@ final class BillingRequestScheduler {
         super();
     }
 
-    private void handleOrSchedule() {
+    void handleNextOrSchedule() {
         handler.removeCallbacks(handleNextRequest);
         if (billingBase.getSetupResponse() == null) {
             OPFIab.setup();
-        } else if (!billingBase.isBusy()) {
-            handleNextRequest.run();
-        } else {
+        } else if (billingBase.isBusy()) {
             handler.postDelayed(handleNextRequest, requestDelay);
+        } else {
+            handleNextRequest.run();
         }
     }
 
-    void schedule(@NonNull final AdvancedIabHelper helper) {
-        helpersQueue.add(helper);
-        handleOrSchedule();
+    void register(@NonNull final AdvancedIabHelper iabHelper) {
+        helpers.add(iabHelper);
+    }
+
+    void unregister(@NonNull final AdvancedIabHelper iabHelper) {
+        helpers.remove(iabHelper);
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
         if (setupResponse.isSuccessful()) {
-            handleOrSchedule();
+            handleNextOrSchedule();
         }
     }
 
     @SuppressWarnings("UnusedParameters")
     public void onEventMainThread(@NonNull final RequestHandledEvent event) {
-        handleOrSchedule();
+        handleNextOrSchedule();
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    public void onEventMainThread(@NonNull final BillingResponse event) {
+        handleNextOrSchedule();
     }
 }

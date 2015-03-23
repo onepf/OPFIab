@@ -21,9 +21,9 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfutils.OPFLog;
 
 import java.io.Serializable;
@@ -85,7 +85,8 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
             jsonObject.put(NAME_SKU, sku);
             jsonObject.put(NAME_TYPE, type);
             jsonObject.put(NAME_PROVIDER_INFO, providerInfo == null ? NULL : providerInfo.toJson());
-            jsonObject.put(NAME_ORIGINAL_JSON, originalJson == null ? NULL : new JSONObject(originalJson));
+            jsonObject.put(NAME_ORIGINAL_JSON,
+                           originalJson == null ? NULL : new JSONObject(originalJson));
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }
@@ -96,6 +97,33 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     public String toString() {
         return OPFIabUtils.toString(this);
     }
+
+    //CHECKSTYLE:OFF
+    @SuppressWarnings({"PMD", "RedundantIfStatement"})
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BillingModel)) return false;
+
+        final BillingModel that = (BillingModel) o;
+
+        if (providerInfo != null ? !providerInfo.equals(
+                that.providerInfo) : that.providerInfo != null)
+            return false;
+        if (!sku.equals(that.sku)) return false;
+        if (type != that.type) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = sku.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + (providerInfo != null ? providerInfo.hashCode() : 0);
+        return result;
+    }
+    //CHECKSTYLE:ON
 
     abstract static class Builder {
 

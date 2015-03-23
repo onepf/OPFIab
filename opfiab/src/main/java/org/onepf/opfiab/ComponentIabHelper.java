@@ -42,7 +42,7 @@ abstract class ComponentIabHelper extends AdvancedIabHelper {
                     .findFragmentByTag(FRAGMENT_TAG);
             if (existingFragment != null) {
                 opfFragment = existingFragment;
-                subscribe();
+                register();
                 return;
             }
             final android.support.v4.app.Fragment fragment = OPFIabSupportFragment.newInstance();
@@ -59,7 +59,7 @@ abstract class ComponentIabHelper extends AdvancedIabHelper {
                     .findFragmentByTag(FRAGMENT_TAG);
             if (existingFragment != null) {
                 opfFragment = existingFragment;
-                subscribe();
+                register();
                 return;
             }
             final android.app.Fragment fragment = OPFIabFragment.newInstance();

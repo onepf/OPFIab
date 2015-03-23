@@ -65,8 +65,8 @@ public class TrivialActivity extends ActionBarActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-//                iabHelper.purchase(SKU_GAS);
-                OPFIab.getHelper().purchase(SKU_GAS);
+                iabHelper.purchase(SKU_GAS);
+//                OPFIab.getHelper().purchase(SKU_GAS);
 //                OPFIab.getAdvancedHelper().purchase(SKU_GAS);
 //                OPFIab.getActivityHelper(TrivialActivity.this);
             }

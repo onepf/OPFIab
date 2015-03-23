@@ -16,12 +16,15 @@
 
 package org.onepf.opfiab;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
@@ -93,6 +96,13 @@ final class BillingBase {
             // Send request to be handled by BillingProvider
             OPFIab.post(billingRequest);
         }
+    }
+
+    void onActivityResult(@NonNull final Activity activity,
+                          final int requestCode,
+                          final int resultCode,
+                          @Nullable final Intent data) {
+        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {

@@ -40,10 +40,10 @@ import java.util.LinkedHashSet;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class AdvancedIabHelper extends IabHelper {
+public class AdvancedIabHelper extends SimpleIabHelper {
 
     private final Collection<BillingRequest> requestQueue = new LinkedHashSet<>();
-    private final BillingEventDispatcher eventDispatcher = OPFIab.getBillingEventDispatcher();
+    private final BillingEventDispatcher billingEventDispatcher = OPFIab.getBillingEventDispatcher();
     private final BillingRequestScheduler scheduler = OPFIab.getRequestScheduler();
 
     protected final Collection<OnSetupListener> setupListeners = new HashSet<>();
@@ -66,10 +66,10 @@ public class AdvancedIabHelper extends IabHelper {
     }
 
     @Override
-    public void postRequest(@NonNull final BillingRequest billingRequest) {
+    protected void postRequest(@NonNull final BillingRequest billingRequest) {
         if (!billingRequest.equals(billingBase.getPendingRequest())) {
             requestQueue.add(billingRequest);
-            scheduler.schedule(this);
+            scheduler.handleNextOrSchedule();
         }
     }
 
@@ -143,12 +143,14 @@ public class AdvancedIabHelper extends IabHelper {
         addConsumeListener(billingListener);
     }
 
-    public void subscribe() {
-        eventDispatcher.register(this);
+    public void register() {
+        billingEventDispatcher.register(this);
+        scheduler.register(this);
     }
 
-    public void unsubscribe() {
-        eventDispatcher.unregister(this);
+    public void unregister() {
+        billingEventDispatcher.unregister(this);
+        scheduler.unregister(this);
         requestQueue.clear();
     }
 }

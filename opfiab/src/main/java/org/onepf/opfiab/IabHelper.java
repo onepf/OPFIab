@@ -16,13 +16,9 @@
 
 package org.onepf.opfiab;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.model.event.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.InventoryRequest;
@@ -45,10 +41,6 @@ public class IabHelper {
         billingBase.postRequest(billingRequest);
     }
 
-    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
-        postRequest(new PurchaseRequest(activity, sku));
-    }
-
     public void purchase(@NonNull final String sku) {
         postRequest(new PurchaseRequest(sku));
     }
@@ -67,12 +59,5 @@ public class IabHelper {
 
     public final void skuDetails(@NonNull final String... skus) {
         skuDetails(new HashSet<>(Arrays.asList(skus)));
-    }
-
-    public void onActivityResult(@NonNull final Activity activity,
-                                 final int requestCode,
-                                 final int resultCode,
-                                 @Nullable final Intent data) {
-        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
     }
 }

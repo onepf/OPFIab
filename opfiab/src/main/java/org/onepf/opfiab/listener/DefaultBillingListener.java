@@ -19,6 +19,7 @@ package org.onepf.opfiab.listener;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.AdvancedIabHelper;
 import org.onepf.opfiab.IabHelper;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.billing.Purchase;
@@ -37,7 +38,9 @@ public class DefaultBillingListener extends SimpleBillingListener {
     @NonNull
     protected IabHelper getHelper() {
         if (iabHelper == null) {
-            iabHelper = OPFIab.getAdvancedHelper();
+            final AdvancedIabHelper advancedIabHelper = OPFIab.getAdvancedHelper();
+            advancedIabHelper.register();
+            iabHelper = advancedIabHelper;
         }
         return iabHelper;
     }

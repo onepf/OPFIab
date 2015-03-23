@@ -17,29 +17,15 @@
 package org.onepf.opfiab;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.ComponentState;
-import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+public class FragmentIabHelper extends AdvancedIabHelperAdapter {
 
-public class FragmentIabHelper extends ComponentIabHelper {
-
-    @Nullable
-    private final android.app.Fragment fragment;
-    @Nullable
-    private final android.support.v4.app.Fragment supportFragment;
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private FragmentIabHelper(@Nullable final android.support.v4.app.Fragment supportFragment,
-                              @Nullable final android.app.Fragment fragment) {
-        super(supportFragment == null ? null : supportFragment.getChildFragmentManager(),
-              fragment == null ? null : fragment.getChildFragmentManager());
-        this.fragment = fragment;
-        this.supportFragment = supportFragment;
+    FragmentIabHelper(@Nullable final android.support.v4.app.Fragment supportFragment,
+                      @Nullable final android.app.Fragment fragment) {
+        super(new FragmentIabHelperInternal(supportFragment, fragment));
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -51,50 +37,8 @@ public class FragmentIabHelper extends ComponentIabHelper {
         this(null, fragment);
     }
 
-    @NonNull
-    protected Activity getActivity() {
-        final Activity activity;
-        if (supportFragment != null) {
-            activity = supportFragment.getActivity();
-        } else if (fragment != null) {
-            activity = fragment.getActivity();
-        } else {
-            throw new IllegalStateException("Fragment is detached!");
-        }
-        return activity;
-    }
-
-    @Override
-    protected void handleState(@NonNull final ComponentState type) {
-        // Handle billing events depending on fragment lifecycle
-        if (type == ComponentState.ATTACH || type == ComponentState.CREATE_VIEW) {
-            // Attach - subscribe for billing events right away when helper is created
-            // CreateView - subscribe after view is recreated
-            subscribe();
-        } else if (type == ComponentState.DESTROY_VIEW) {
-            // DestroyView - don't handle any callbacks if fragment view is destroyed
-            unsubscribe();
-        } else if (type == ComponentState.DESTROY) {
-            // Destroy - fragment is being destroyed, unsubscribe from everything
-            unsubscribe();
-            OPFIab.unregister(this);
-        }
-    }
-
     @Override
     public void purchase(@NonNull final String sku) {
-        purchase(getActivity(), sku);
-    }
-
-    @Override
-    public void purchase(@Nullable final Activity activity, @NonNull final String sku) {
-        postRequest(new PurchaseRequest(activity, sku, true));
-    }
-
-    @Override
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode, @Nullable final Intent data) {
-        throw new UnsupportedOperationException(
-                "Unfortunately onActivityResult() can't be properly handled from fragment.");
+        advancedIabHelper.purchase(sku);
     }
 }

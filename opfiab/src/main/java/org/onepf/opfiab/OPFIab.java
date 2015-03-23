@@ -124,8 +124,8 @@ public final class OPFIab {
     }
 
     @NonNull
-    public static IabHelper getHelper() {
-        return new IabHelper();
+    public static SimpleIabHelper getSimpleHelper() {
+        return new SimpleIabHelper();
     }
 
     @NonNull
