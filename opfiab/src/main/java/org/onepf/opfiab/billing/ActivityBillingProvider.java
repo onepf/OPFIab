@@ -19,7 +19,6 @@ package org.onepf.opfiab.billing;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -27,7 +26,8 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.misc.OPFIabActivity;
 import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
-import org.onepf.opfiab.model.event.android.ActivityIntentEvent;
+import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.Status;
@@ -63,6 +63,11 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         super(context, skuResolver, purchaseVerifier);
     }
 
+    protected abstract void onActivityResult(@NonNull final Activity activity,
+                                             final int requestCode,
+                                             final int resultCode,
+                                             @NonNull final Intent data);
+
     @Override
     protected abstract void purchase(
             @SuppressWarnings("NullableProblems") @NonNull final Activity activity,
@@ -77,18 +82,19 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
             return;
         }
         // We have to start OPFIabActivity to properly handle this request
-        final Bundle bundle = new Bundle();
-        OPFIabUtils.putRequest(bundle, billingRequest);
         semaphore.drainPermits();
         pendingRequest = billingRequest;
         activityRequest = null;
-        OPFIabActivity.start(purchaseRequest.getActivity(), bundle);
+        OPFIabActivity.start(purchaseRequest.getActivity(), null);
         try {
             // Wait for activity to start
-            semaphore.tryAcquire(ACTIVITY_TIMEOUT, TimeUnit.MILLISECONDS);
+            if (!semaphore.tryAcquire(ACTIVITY_TIMEOUT, TimeUnit.MILLISECONDS)) {
+                OPFLog.e("Fake activity start time out. Request: %s", billingRequest);
+            }
         } catch (InterruptedException exception) {
             OPFLog.e("", exception);
         }
+        pendingRequest = null;
         final BillingRequest activityRequest = this.activityRequest;
         if (activityRequest == null) {
             // Can't process request without activity
@@ -100,13 +106,22 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         }
     }
 
-    public void onEventMainThread(@NonNull final ActivityIntentEvent activityIntentEvent) {
-        final Intent intent = activityIntentEvent.getIntent();
-        final BillingRequest billingRequest = OPFIabUtils.getRequest(intent.getExtras());
-        if (billingRequest != null && billingRequest.equals(pendingRequest)) {
-            final Activity activity = activityIntentEvent.getActivity();
-            activityRequest = OPFIabUtils.withActivity(billingRequest, activity);
+    public void onEventMainThread(@NonNull final ActivityNewIntentEvent intentEvent) {
+        final BillingRequest pendingRequest = this.pendingRequest;
+        if (pendingRequest != null) {
+            final Activity activity = intentEvent.getActivity();
+            activityRequest = OPFIabUtils.withActivity(pendingRequest, activity);
             semaphore.release();
+        }
+    }
+
+    public final void onEventAsync(@NonNull final ActivityResultEvent event) {
+        final int requestCode = event.getRequestCode();
+        final Intent data;
+        if (requestCode == this.requestCode && (data = event.getData()) != null) {
+            final int resultCode = event.getResultCode();
+            final Activity activity = event.getActivity();
+            onActivityResult(activity, requestCode, resultCode, data);
         }
     }
 }

@@ -19,7 +19,7 @@ package org.onepf.opfiab.model.event.android;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
-abstract class ActivityEvent {
+class ActivityEvent {
 
     @NonNull
     protected final Activity activity;

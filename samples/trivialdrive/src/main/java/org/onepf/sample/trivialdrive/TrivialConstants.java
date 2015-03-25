@@ -22,6 +22,7 @@ public final class TrivialConstants {
     public static final String GOOGLE_SKU_GAS = "android.test.purchased";
     public static final String AMAZON_SKU_GAS = "org.onepf.sample.trivialdrive.sku_gas";
 
+    @SuppressWarnings("SpellCheckingInspection")
     public static final String GOOGLE_PLAY_KEY
             = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5F8fASyrDFdaXrkoW8kNtwH5JIkLnNuTD5uE1a37TbI5LDZR" +
             "VgvMIYAtZ9CAHAfLnJ6OEZt0lvLLJSKVuS47VqYVhGZciOkX8TEihONBRwis6i9A3JnKfyqm0iiT+P0CEktOLuFLROIo13" +

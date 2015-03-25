@@ -20,13 +20,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-public class ActivityIntentEvent extends ActivityEvent {
+public class ActivityNewIntentEvent extends ActivityEvent {
 
     @NonNull
     private final Intent intent;
 
-    public ActivityIntentEvent(@NonNull final Activity activity,
-                               @NonNull final Intent intent) {
+    public ActivityNewIntentEvent(@NonNull final Activity activity,
+                                  @NonNull final Intent intent) {
         super(activity);
         this.intent = intent;
     }

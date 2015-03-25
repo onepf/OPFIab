@@ -16,6 +16,8 @@
 
 
 
+
+
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
@@ -68,6 +70,8 @@ check {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    //noinspection GradleDynamicVersion
+    provided 'org.onepf:opfutils:+'
     provided 'com.amazon:in-app-purchasing:2.0.61'
 
     compile project(':opfiab')

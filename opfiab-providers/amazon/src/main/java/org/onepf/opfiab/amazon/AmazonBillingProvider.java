@@ -21,6 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.amazon.device.iap.PurchasingService;
 import com.amazon.device.iap.ResponseReceiver;
@@ -243,7 +244,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     @Override
-    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
+    public void purchase(@Nullable final Activity activity, @NonNull final String sku) {
         PurchasingService.purchase(sku);
     }
 

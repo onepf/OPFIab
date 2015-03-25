@@ -78,7 +78,7 @@ final class AmazonBillingHelper implements PurchasingListener {
 
     @Override
     public void onUserDataResponse(@NonNull final UserDataResponse userDataResponse) {
-        OPFLog.methodD(userDataResponse);
+        OPFLog.logMethod(userDataResponse);
         switch (userDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
                 userData = userDataResponse.getUserData();

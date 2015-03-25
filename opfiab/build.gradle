@@ -18,6 +18,8 @@
 
 
 
+
+
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
@@ -71,7 +73,7 @@ check {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //noinspection GradleDynamicVersion
-    compile 'org.onepf:opfutils:+'
+    provided 'org.onepf:opfutils:+'
     compile 'de.greenrobot:eventbus:2.4.0'
 
     compile 'com.google.code.findbugs:annotations:3.0.0'

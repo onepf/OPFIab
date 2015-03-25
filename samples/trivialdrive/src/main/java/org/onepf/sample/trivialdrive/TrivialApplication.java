@@ -39,7 +39,7 @@ public class TrivialApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        OPFLog.setEnabled(true);
+        OPFLog.setEnabled(BuildConfig.DEBUG, true);
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(newGoogleBillingProvider())
                 .addBillingProvider(newAmazonBillingProvider())

@@ -30,7 +30,6 @@ import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
@@ -101,7 +100,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
-        OPFLog.methodD(billingRequest);
+        OPFLog.logMethod(billingRequest);
 
         final String resolvedSku;
         switch (billingRequest.getType()) {
@@ -136,13 +135,6 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             default:
                 throw new IllegalStateException();
         }
-    }
-
-    @SuppressFBWarnings({"ACEM_ABSTRACT_CLASS_EMPTY_METHODS"})
-    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
-    protected void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                    final int resultCode, @Nullable final Intent data) {
-        // Ignore by default
     }
 
     protected void postResponse(@NonNull final BillingResponse billingResponse) {
@@ -214,17 +206,6 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             handleRequest(billingRequest);
         }
         OPFIab.post(new RequestHandledEvent(billingRequest));
-    }
-
-    @Override
-    public final void onEventAsync(@NonNull final ActivityResultEvent event) {
-        final int requestCode = event.getRequestCode();
-        if (requestCode == this.requestCode) {
-            final Activity activity = event.getActivity();
-            final int resultCode = event.getResultCode();
-            final Intent data = event.getData();
-            onActivityResult(activity, requestCode, resultCode, data);
-        }
     }
 
     @Override

@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,21 +29,20 @@ import android.view.WindowManager;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.ComponentState;
-import org.onepf.opfiab.model.event.android.ActivityIntentEvent;
 import org.onepf.opfiab.model.event.android.ActivityLifecycleEvent;
+import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
 import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfutils.OPFLog;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @SuppressLint("Registered")
 public class OPFIabActivity extends Activity {
 
     protected static final int FINISH_DELAY = 1000; // 1 second
 
-    // don't have to be atomic, but oh well...
-    private final AtomicInteger expectedResultsCounter = new AtomicInteger(0);
 
+    @SuppressFBWarnings({"OCP_OVERLY_CONCRETE_PARAMETER"})
     public static void start(@Nullable final Activity activity, @Nullable final Bundle bundle) {
         final Context context = activity == null ? OPFIab.getContext() : activity;
         final Intent intent = new Intent(context, OPFIabActivity.class);
@@ -56,6 +54,8 @@ public class OPFIabActivity extends Activity {
                 | Intent.FLAG_ACTIVITY_NO_USER_ACTION;
         if (activity == null) {
             intent.setFlags(flags | Intent.FLAG_ACTIVITY_NEW_TASK);
+        } else {
+            intent.setFlags(flags);
         }
         context.startActivity(intent);
     }
@@ -72,51 +72,54 @@ public class OPFIabActivity extends Activity {
         }
     };
 
-    private void expectResult() {
-        expectedResultsCounter.incrementAndGet();
+
+    private void scheduleFinish(final boolean schedule) {
         handler.removeCallbacks(finishTask);
+        if (schedule) {
+            handler.postDelayed(finishTask, FINISH_DELAY);
+        }
     }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         OPFLog.d("onCreate: %s, task: %d", this, getTaskId());
-        start(null, null);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
         OPFIab.post(new ActivityLifecycleEvent(ComponentState.CREATE, this));
-        handler.postDelayed(finishTask, FINISH_DELAY);
-        if (savedInstanceState == null) {
-            onNewIntent(getIntent());
-        }
+        onNewIntent(getIntent());
     }
 
     @Override
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
-        OPFLog.d("onNewIntent: %s, Intent: %s", this, intent);
-        OPFIab.post(new ActivityIntentEvent(this, intent));
+        OPFLog.d("onNewIntent: %s, task: %d, Intent: %s", this, getTaskId(), intent);
+        scheduleFinish(true);
+        OPFIab.post(new ActivityNewIntentEvent(this, intent));
+    }
+
+    @Override
+    protected void onDestroy() {
+        OPFLog.d("onDestroy: %s, task: %d", this, getTaskId());
+        super.onDestroy();
     }
 
     @Override
     public void finish() {
-        OPFLog.d("finish: %s", this);
-        handler.removeCallbacks(finishTask);
+        OPFLog.d("finish: %s, task: %d", this, getTaskId());
+        scheduleFinish(false);
         super.finish();
     }
 
     @Override
     public void startActivityForResult(final Intent intent, final int requestCode) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            expectResult();
-        }
+        scheduleFinish(false);
         super.startActivityForResult(intent, requestCode);
     }
 
     @Override
     public void startActivityForResult(final Intent intent, final int requestCode,
                                        final Bundle options) {
-        expectResult();
+        scheduleFinish(false);
         super.startActivityForResult(intent, requestCode, options);
     }
 
@@ -128,9 +131,7 @@ public class OPFIabActivity extends Activity {
                                            final int flagsValues,
                                            final int extraFlags)
             throws IntentSender.SendIntentException {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-            expectResult();
-        }
+        scheduleFinish(false);
         super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
                                          extraFlags);
     }
@@ -141,7 +142,7 @@ public class OPFIabActivity extends Activity {
                                            final int flagsValues,
                                            final int extraFlags, final Bundle options)
             throws IntentSender.SendIntentException {
-        expectResult();
+        scheduleFinish(false);
         super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
                                          extraFlags, options);
     }
@@ -151,9 +152,12 @@ public class OPFIabActivity extends Activity {
                                     final int resultCode,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
         OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
-        if (expectedResultsCounter.decrementAndGet() == 0) {
+        if (data != null || resultCode == RESULT_OK) {
             finish();
+        } else {
+            scheduleFinish(true);
         }
     }
 

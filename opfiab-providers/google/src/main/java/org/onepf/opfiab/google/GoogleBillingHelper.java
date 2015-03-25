@@ -63,7 +63,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     @Nullable
     Response isBillingSupported() {
-        OPFLog.methodD();
+        OPFLog.logMethod();
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -85,7 +85,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     @Nullable
     Bundle getBuyIntent(@NonNull final String sku, @NonNull final ItemType itemType) {
-        OPFLog.methodD(sku, itemType);
+        OPFLog.logMethod(sku, itemType);
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -104,7 +104,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     @Nullable
     Response consumePurchase(@NonNull final String token) {
-        OPFLog.methodD(token);
+        OPFLog.logMethod(token);
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -123,7 +123,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     @Nullable
     Bundle getSkuDetails(@NonNull final Collection<String> skus) {
-        OPFLog.methodD(Arrays.toString(skus.toArray()));
+        OPFLog.logMethod(Arrays.toString(skus.toArray()));
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
@@ -161,7 +161,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     @Nullable
     Bundle getPurchases(final boolean startOver) {
-        OPFLog.methodD(startOver);
+        OPFLog.logMethod(startOver);
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;

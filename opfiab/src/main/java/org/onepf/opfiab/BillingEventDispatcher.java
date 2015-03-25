@@ -45,8 +45,10 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     private final Collection<AdvancedIabHelper> helpers = new HashSet<>();
 
-    BillingEventDispatcher(@Nullable final BillingListener... billingListeners) {
-        super(billingListeners == null ? new BillingListener[0] : billingListeners);
+    BillingEventDispatcher(@Nullable final BillingListener billingListener) {
+        super(billingListener == null
+                      ? new BillingListener[0]
+                      : new BillingListener[]{billingListener});
     }
 
     void register(@NonNull final AdvancedIabHelper helper) {
@@ -90,19 +92,19 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onRequest(@NonNull final BillingRequest billingRequest) {
-        OPFLog.methodD(billingRequest);
+        OPFLog.logMethod(billingRequest);
         super.onRequest(billingRequest);
     }
 
     @Override
     public void onResponse(@NonNull final BillingResponse billingResponse) {
-        OPFLog.methodD(billingResponse);
+        OPFLog.logMethod(billingResponse);
         super.onResponse(billingResponse);
     }
 
     @Override
     public void onSetup(@NonNull final SetupResponse setupResponse) {
-        OPFLog.methodD(setupResponse);
+        OPFLog.logMethod(setupResponse);
         super.onSetup(setupResponse);
         for (final AdvancedIabHelper helper : helpers) {
             for (final OnSetupListener listener : helper.setupListeners) {

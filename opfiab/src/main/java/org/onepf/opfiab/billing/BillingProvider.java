@@ -21,7 +21,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 
 public interface BillingProvider {
@@ -47,8 +46,6 @@ public interface BillingProvider {
     boolean isAuthorised();
 
     void onEventAsync(@NonNull final BillingRequest billingRequest);
-
-    void onEventAsync(@NonNull final ActivityResultEvent activityResultEvent);
 
     @Nullable
     Intent getStorePageIntent();
