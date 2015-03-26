@@ -17,24 +17,25 @@
 package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFPreferences;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-
 import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
+import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
-import static org.onepf.opfiab.model.event.SetupResponse.Status.UNAUTHORISED;
 
 final class SetupManager {
 
-    private static final String KEY_LAST_PROVIDER = "last_provider";
+    private static final String KEY_LAST_PROVIDER = SetupManager.class.getName() + ".last_provider";
     private static final OPFPreferences PREFERENCES = new OPFPreferences(OPFIab.getContext());
 
     static enum State {
@@ -50,28 +51,59 @@ final class SetupManager {
         super();
     }
 
-    @NonNull
-    private Iterable<BillingProvider> getAvailableProviders(
-            @NonNull final Iterable<BillingProvider> providers) {
-        final Collection<BillingProvider> availableProviders = new LinkedHashSet<>();
-        for (final BillingProvider provider : providers) {
-            if (provider.isAvailable()) {
-                availableProviders.add(provider);
-            }
+    @Nullable
+    private SetupResponse withProvider(@NonNull final Configuration configuration,
+                                       @NonNull final BillingProvider billingProvider,
+                                       final boolean providerChanged) {
+        final boolean authorized = billingProvider.isAuthorised();
+        if (authorized || !configuration.skipUnauthorised()) {
+            final SetupResponse.Status status = providerChanged ? PROVIDER_CHANGED : SUCCESS;
+            return new SetupResponse(status, billingProvider, authorized);
         }
-        return availableProviders;
+        return null;
     }
 
     @NonNull
     private SetupResponse newResponse(@NonNull final SetupRequest setupRequest) {
-        //TODO utilize shared preferences
         final Configuration configuration = setupRequest.getConfiguration();
-        for (final BillingProvider provider : getAvailableProviders(configuration.getProviders())) {
-            final boolean authorised = provider.isAuthorised();
-            if (authorised || !configuration.skipUnauthorised()) {
-                return new SetupResponse(authorised ? SUCCESS : UNAUTHORISED, provider);
+        final Iterable<BillingProvider> providers = configuration.getProviders();
+        final Iterable<BillingProvider> availableProviders = OPFIabUtils.getAvailable(providers);
+
+        final boolean hadProvider = PREFERENCES.contains(KEY_LAST_PROVIDER);
+        // Try previously used provider
+        if (hadProvider) {
+            final String lastProvider = PREFERENCES.getString(KEY_LAST_PROVIDER, "");
+            final BillingProviderInfo info = BillingProviderInfo.fromJson(lastProvider);
+            final BillingProvider provider;
+            final SetupResponse setupResponse;
+            if (info != null
+                    && (provider = OPFIabUtils.findWithInfo(availableProviders, info)) != null
+                    && (setupResponse = withProvider(configuration, provider, false)) != null) {
+                return setupResponse;
             }
         }
+
+        final String packageInstaller = OPFIabUtils.getPackageInstaller(OPFIab.getContext());
+        // If package installer is set, try it before anything else
+        if (!TextUtils.isEmpty(packageInstaller)) {
+            final BillingProvider installerProvider =
+                    OPFIabUtils.withPackage(availableProviders, packageInstaller);
+            final SetupResponse setupResponse;
+            if (installerProvider != null
+                    && (setupResponse = withProvider(configuration, installerProvider,
+                                                     hadProvider)) != null) {
+                return setupResponse;
+            }
+        }
+
+        // Pick first available provider that satisfies current configuration
+        for (final BillingProvider provider : availableProviders) {
+            final SetupResponse setupResponse = withProvider(configuration, provider, hadProvider);
+            if (setupResponse != null) {
+                return setupResponse;
+            }
+        }
+
         return new SetupResponse(FAILED, null);
     }
 
@@ -93,6 +125,12 @@ final class SetupManager {
 
     public void onEventAsync(@NonNull final SetupRequest setupRequest) {
         final SetupResponse setupResponse = newResponse(setupRequest);
+        if (setupResponse.isSuccessful()) {
+            final BillingProvider provider = setupResponse.getBillingProvider();
+            //noinspection ConstantConditions
+            final BillingProviderInfo info = provider.getInfo();
+            PREFERENCES.put(KEY_LAST_PROVIDER, info.toJson().toString());
+        }
         OPFIab.post(setupResponse);
     }
 }

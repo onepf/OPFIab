@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.misc.OPFIabUtils;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
@@ -30,6 +30,20 @@ public final class BillingProviderInfo implements JsonCompatible {
 
     private static final String NAME_NAME = "name";
     private static final String NAME_PACKAGE = "package_name";
+
+
+    @Nullable
+    public static BillingProviderInfo fromJson(@NonNull final String json) {
+        try {
+            final JSONObject jsonObject = new JSONObject(json);
+            final String name = jsonObject.getString(NAME_NAME);
+            final String packageName = jsonObject.getString(NAME_PACKAGE);
+            return new BillingProviderInfo(name, packageName);
+        } catch (JSONException e) {
+            OPFLog.e("", e);
+        }
+        return null;
+    }
 
 
     @NonNull

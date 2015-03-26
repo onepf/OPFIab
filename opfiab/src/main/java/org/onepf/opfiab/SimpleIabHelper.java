@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 
 public class SimpleIabHelper extends IabHelper {
@@ -31,6 +32,6 @@ public class SimpleIabHelper extends IabHelper {
 
     public void onActivityResult(@NonNull final Activity activity, final int requestCode,
                                  final int resultCode, @Nullable final Intent data) {
-        billingBase.onActivityResult(activity, requestCode, resultCode, data);
+        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
     }
 }

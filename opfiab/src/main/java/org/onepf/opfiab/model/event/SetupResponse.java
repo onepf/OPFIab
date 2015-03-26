@@ -21,9 +21,9 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.model.JsonCompatible;
-import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.JsonCompatible;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Arrays;
@@ -32,38 +32,45 @@ import java.util.Collection;
 import static org.json.JSONObject.NULL;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
-import static org.onepf.opfiab.model.event.SetupResponse.Status.UNAUTHORISED;
 
 
 public class SetupResponse implements JsonCompatible {
 
     private static final String NAME_STATUS = "status";
-    private static final String NAME_PROVIDER_INFO = "provider_info";
+    private static final String NAME_PROVIDER = "provider";
+    private static final String NAME_AUTHORIZED = "authorized";
 
     public static enum Status {
 
         SUCCESS,
         PROVIDER_CHANGED,
-        UNAUTHORISED,
         FAILED,
     }
 
     private static final Collection<Status> SUCCESSFUL =
-            Arrays.asList(SUCCESS, PROVIDER_CHANGED, UNAUTHORISED);
+            Arrays.asList(SUCCESS, PROVIDER_CHANGED);
 
 
     @NonNull
     private final Status status;
     @Nullable
     private final BillingProvider billingProvider;
+    private final boolean authorized;
 
     public SetupResponse(@NonNull final Status status,
-                         @Nullable final BillingProvider billingProvider) {
+                         @Nullable final BillingProvider billingProvider,
+                         final boolean authorized) {
         this.status = status;
         this.billingProvider = billingProvider;
+        this.authorized = authorized;
         if (billingProvider == null && isSuccessful()) {
             throw new IllegalArgumentException();
         }
+    }
+
+    public SetupResponse(@NonNull final Status status,
+                         @Nullable final BillingProvider billingProvider) {
+        this(status, billingProvider, billingProvider != null && billingProvider.isAuthorised());
     }
 
     @Nullable
@@ -76,6 +83,10 @@ public class SetupResponse implements JsonCompatible {
         return status;
     }
 
+    public boolean isAuthorized() {
+        return authorized;
+    }
+
     public final boolean isSuccessful() {
         return SUCCESSFUL.contains(status);
     }
@@ -86,7 +97,10 @@ public class SetupResponse implements JsonCompatible {
         final JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(NAME_STATUS, status);
-            jsonObject.put(NAME_PROVIDER_INFO, billingProvider == null ? NULL : billingProvider);
+            jsonObject.put(NAME_PROVIDER, billingProvider == null
+                    ? NULL
+                    : billingProvider.getInfo().toJson());
+            jsonObject.put(NAME_AUTHORIZED, authorized);
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }

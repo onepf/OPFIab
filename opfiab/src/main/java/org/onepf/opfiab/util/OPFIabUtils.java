@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.misc;
+package org.onepf.opfiab.util;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.model.billing.Purchase;
@@ -42,6 +45,7 @@ import org.onepf.opfutils.OPFLog;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -66,6 +70,49 @@ public final class OPFIabUtils {
             OPFLog.e("", exception);
         }
         return "";
+    }
+
+    @NonNull
+    public static Iterable<BillingProvider> getAvailable(
+            @NonNull final Iterable<BillingProvider> providers) {
+        final Collection<BillingProvider> availableProviders = new LinkedHashSet<>();
+        for (final BillingProvider provider : providers) {
+            if (provider.isAvailable()) {
+                availableProviders.add(provider);
+            }
+        }
+        return availableProviders;
+    }
+
+    @Nullable
+    public static BillingProvider findWithInfo(@NonNull final Iterable<BillingProvider> providers,
+                                               @NonNull final BillingProviderInfo info) {
+        for (final BillingProvider billingProvider : providers) {
+            if (info.equals(billingProvider.getInfo())) {
+                return billingProvider;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static BillingProvider withPackage(
+            @NonNull final Iterable<BillingProvider> providers,
+            @NonNull final String packageName) {
+        for (final BillingProvider billingProvider : providers) {
+            final BillingProviderInfo info = billingProvider.getInfo();
+            if (packageName.equals(info.getPackageName())) {
+                return billingProvider;
+            }
+        }
+        return null;
+    }
+
+    //TODO move to OPFUtils
+    @Nullable
+    public static String getPackageInstaller(@NonNull final Context context) {
+        final PackageManager packageManager = context.getPackageManager();
+        return packageManager.getInstallerPackageName(context.getPackageName());
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})

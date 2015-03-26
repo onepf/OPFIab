@@ -201,7 +201,10 @@ public final class OPFIab {
         register(eventDispatcher, --priority);
         register(requestScheduler, --priority);
 
-        application.registerActivityLifecycleCallbacks(new ActivityMonitor());
+        final ActivityMonitor monitor = ActivityMonitor.getInstance();
+        // Make sure instance registered only once.
+        application.unregisterActivityLifecycleCallbacks(monitor);
+        application.registerActivityLifecycleCallbacks(monitor);
     }
 
     public static void setup() {

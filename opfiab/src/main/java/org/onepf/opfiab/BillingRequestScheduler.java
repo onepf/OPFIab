@@ -20,7 +20,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.misc.OPFIabUtils;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;

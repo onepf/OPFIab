@@ -23,6 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.model.ComponentState;
+import org.onepf.opfutils.OPFChecks;
 
 import java.util.Collections;
 import java.util.Map;
@@ -35,6 +36,17 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
     @SuppressFBWarnings({"PMB_POSSIBLE_MEMORY_BLOAT"})
     private static final Map<Activity, ComponentState> STATE_MAP =
             Collections.synchronizedMap(new WeakHashMap<Activity, ComponentState>());
+    private static ActivityMonitor instance;
+
+
+    @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
+    public static ActivityMonitor getInstance() {
+        OPFChecks.checkThread(true);
+        if (instance == null) {
+            instance = new ActivityMonitor();
+        }
+        return instance;
+    }
 
     public static void setState(@NonNull final Activity activity,
                                 @NonNull final ComponentState componentState) {
@@ -51,7 +63,7 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
     }
 
 
-    public ActivityMonitor() {
+    private ActivityMonitor() {
         super();
     }
 

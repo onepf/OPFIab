@@ -25,7 +25,6 @@ import android.text.TextUtils;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.misc.ActivityMonitor;
-import org.onepf.opfiab.misc.OPFIabUtils;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -42,6 +41,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFLog;
@@ -259,7 +259,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     @Override
     public String toString() {
-        return getInfo().getName();
+        return getInfo().toString();
     }
     //CHECKSTYLE:ON
 

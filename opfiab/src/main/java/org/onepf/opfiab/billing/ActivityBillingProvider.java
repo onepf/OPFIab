@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.misc.OPFIabActivity;
-import org.onepf.opfiab.misc.OPFIabUtils;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
 import org.onepf.opfiab.model.event.android.ActivityResultEvent;
