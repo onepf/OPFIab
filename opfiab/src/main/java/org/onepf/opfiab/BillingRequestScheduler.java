@@ -19,11 +19,13 @@ package org.onepf.opfiab;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfutils.OPFChecks;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,18 +34,30 @@ import java.util.Map;
 
 final class BillingRequestScheduler {
 
-    private final long requestDelay = OPFIab.getConfiguration().getSubsequentRequestDelay();
-    private final BillingBase billingBase = OPFIab.getBase();
+    @Nullable
+    private static BillingRequestScheduler instance;
+
+    @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
+    public static BillingRequestScheduler getInstance() {
+        OPFChecks.checkThread(true);
+        if (instance == null) {
+            instance = new BillingRequestScheduler();
+        }
+        return instance;
+    }
+
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Map<IabHelper, Collection<BillingRequest>> helpers = new HashMap<>();
     @SuppressWarnings("OverlyComplexAnonymousInnerClass")
     private final Runnable handleNextRequest = new Runnable() {
         @Override
         public void run() {
-            if (billingBase.isBusy()) {
-                return;
-            }
             for (final Map.Entry<IabHelper, Collection<BillingRequest>> entry : helpers.entrySet()) {
+                final IabHelper helper = entry.getKey();
+                if (helper.getBillingBase().isBusy()) {
+                    return;
+                }
                 final BillingRequest request = OPFIabUtils.poll(entry.getValue());
                 if (request != null) {
                     entry.getKey().postRequest(request);
@@ -54,13 +68,14 @@ final class BillingRequestScheduler {
     };
 
 
-    BillingRequestScheduler() {
+    private BillingRequestScheduler() {
         super();
     }
 
     private void schedule() {
         handler.removeCallbacks(handleNextRequest);
-        handler.postDelayed(handleNextRequest, requestDelay);
+        final long delay = OPFIab.getConfiguration().getSubsequentRequestDelay();
+        handler.postDelayed(handleNextRequest, delay);
     }
 
     void schedule(@NonNull final IabHelper helper, @NonNull final BillingRequest request) {
@@ -83,6 +98,11 @@ final class BillingRequestScheduler {
 
     void dropQueue(@NonNull final AdvancedIabHelper iabHelper) {
         helpers.remove(iabHelper);
+    }
+
+    void dropQueue() {
+        handler.removeCallbacks(handleNextRequest);
+        helpers.clear();
     }
 
     @SuppressWarnings("UnusedParameters")

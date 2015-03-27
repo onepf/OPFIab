@@ -22,7 +22,7 @@
 
         <!--android:theme="@android:style/Theme.NoDisplay" seems to be too slow-->
         <activity
-            android:name=".misc.OPFIabActivity"
+            android:name=".android.OPFIabActivity"
             android:configChanges="fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|touchscreen|uiMode"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>

@@ -40,6 +40,7 @@ import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -210,6 +211,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     @SuppressFBWarnings({"EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"})
     @Override
     public void checkManifest() {
+        //TODO OPFCheck.checkReceiver
         final PackageManager packageManager = context.getPackageManager();
         final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
         try {
@@ -220,7 +222,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             throw new IllegalStateException(
                     "You must declare Amazon receiver to use Amazon billing provider.", exception);
         }
-        context.enforceCallingOrSelfPermission(ACCESS_NETWORK_STATE, null);
+        OPFChecks.checkPermission(context, ACCESS_NETWORK_STATE);
     }
 
     @Override

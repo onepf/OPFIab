@@ -19,14 +19,12 @@ package org.onepf.opfiab;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.misc.ActivityMonitor;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfutils.OPFChecks;
@@ -43,11 +41,8 @@ public final class OPFIab {
 
     private static volatile Configuration configuration;
     private static volatile EventBus eventBus;
-    private static volatile Context context;
 
     private static BillingBase billingBase;
-    private static BillingEventDispatcher eventDispatcher;
-    private static BillingRequestScheduler requestScheduler;
 
 
     private OPFIab() {
@@ -73,24 +68,28 @@ public final class OPFIab {
     }
 
     static void register(@NonNull final Object subscriber) {
+        OPFChecks.checkThread(true);
         if (!eventBus.isRegistered(subscriber)) {
             eventBus.register(subscriber);
         }
     }
 
     static void register(@NonNull final Object subscriber, final int priority) {
+        OPFChecks.checkThread(true);
         if (!eventBus.isRegistered(subscriber)) {
             eventBus.register(subscriber, priority);
         }
     }
 
     static void unregister(@NonNull final Object subscriber) {
+        OPFChecks.checkThread(true);
         if (eventBus.isRegistered(subscriber)) {
             eventBus.unregister(subscriber);
         }
     }
 
     static void cancelEventDelivery(@NonNull final Object event) {
+        OPFChecks.checkThread(true);
         eventBus.cancelEventDelivery(event);
     }
 
@@ -100,24 +99,16 @@ public final class OPFIab {
         return billingBase;
     }
 
-    @NonNull
-    static BillingEventDispatcher getBillingEventDispatcher() {
-        checkInit();
-        return eventDispatcher;
-    }
-
-    @NonNull
-    static BillingRequestScheduler getRequestScheduler() {
-        checkInit();
-        return requestScheduler;
-    }
-
     /**
      * Post an event to deliver to all subscribers. Intend to be used by {@link org.onepf.opfiab.billing.BillingProvider} implementations.
      *
      * @param event Event object to deliver.
      */
-    public static void post(final Object event) {
+    public static void post(@NonNull final Object event) {
+        final EventBus eventBus = OPFIab.eventBus;
+        if (eventBus == null) {
+            throw new InitException(false);
+        }
         if (eventBus.hasSubscriberForEvent(event.getClass())) {
             eventBus.post(event);
         }
@@ -158,15 +149,8 @@ public final class OPFIab {
     }
 
     @NonNull
-    public static Context getContext() {
-        if (context == null) {
-            throw new IllegalStateException();
-        }
-        return context;
-    }
-
-    @NonNull
     public static Configuration getConfiguration() {
+        final Configuration configuration = OPFIab.configuration;
         if (configuration == null) {
             throw new IllegalStateException();
         }
@@ -177,9 +161,6 @@ public final class OPFIab {
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
-        if (billingBase != null) {
-            throw new InitException(true);
-        }
 
         // Check if manifest satisfies all billing providers.
         final Collection<BillingProvider> providers = configuration.getProviders();
@@ -188,23 +169,33 @@ public final class OPFIab {
         }
 
         OPFIab.configuration = configuration;
-        OPFIab.context = application.getApplicationContext();
-        OPFIab.eventBus = newBus();
-        OPFIab.billingBase = new BillingBase();
+        if (billingBase == null) {
+            // first init
+            application.registerActivityLifecycleCallbacks(ActivityMonitor.getInstance());
+        } else {
+            billingBase.dispose();
+        }
+
+        final EventBus eventBus = newBus();
+        final BillingBase billingBase = new BillingBase(configuration);
+        final SetupManager setupManager = SetupManager.getInstance(application);
+
         final BillingListener billingListener = configuration.getBillingListener();
-        OPFIab.eventDispatcher = new BillingEventDispatcher(billingListener);
-        OPFIab.requestScheduler = new BillingRequestScheduler();
+        BillingEventDispatcher.init(billingListener);
+        final BillingEventDispatcher eventDispatcher = BillingEventDispatcher.getInstance();
 
-        int priority = Integer.MAX_VALUE;
-        register(billingBase, priority);
-        register(new SetupManager(), --priority);
-        register(eventDispatcher, --priority);
-        register(requestScheduler, --priority);
+        final BillingRequestScheduler scheduler = BillingRequestScheduler.getInstance();
+        scheduler.dropQueue();
 
-        final ActivityMonitor monitor = ActivityMonitor.getInstance();
-        // Make sure instance registered only once.
-        application.unregisterActivityLifecycleCallbacks(monitor);
-        application.registerActivityLifecycleCallbacks(monitor);
+        eventBus.register(billingBase, Integer.MAX_VALUE);
+        eventBus.register(setupManager);
+        eventBus.register(eventDispatcher);
+        eventBus.register(scheduler);
+
+        OPFIab.billingBase = billingBase;
+        // Must be assigned last
+        // All events posted asynchronously before this point will be ignored
+        OPFIab.eventBus = eventBus;
     }
 
     public static void setup() {

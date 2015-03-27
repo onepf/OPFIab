@@ -35,6 +35,7 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.exception.InitException;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -43,9 +44,30 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 final class BillingEventDispatcher extends BillingListenerCompositor {
 
+    @Nullable
+    private static BillingEventDispatcher instance;
+
+    static void init(@Nullable final BillingListener billingListener) {
+        OPFChecks.checkThread(true);
+        final BillingEventDispatcher newInstance = new BillingEventDispatcher(billingListener);
+        if (instance != null) {
+            newInstance.helpers.addAll(instance.helpers);
+        }
+        instance = newInstance;
+    }
+
+    static BillingEventDispatcher getInstance() {
+        OPFChecks.checkThread(true);
+        if (instance == null) {
+            throw new InitException(false);
+        }
+        return instance;
+    }
+
+
     private final Collection<AdvancedIabHelper> helpers = new HashSet<>();
 
-    BillingEventDispatcher(@Nullable final BillingListener billingListener) {
+    private BillingEventDispatcher(@Nullable final BillingListener billingListener) {
         super(billingListener == null
                       ? new BillingListener[0]
                       : new BillingListener[]{billingListener});

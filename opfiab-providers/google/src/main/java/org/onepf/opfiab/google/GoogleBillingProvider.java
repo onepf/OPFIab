@@ -16,7 +16,6 @@
 
 package org.onepf.opfiab.google;
 
-import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -42,6 +41,7 @@ import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
@@ -51,6 +51,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import static android.Manifest.permission.GET_ACCOUNTS;
 
 @SuppressWarnings("PMD.GodClass")
 public class GoogleBillingProvider
@@ -139,8 +141,8 @@ public class GoogleBillingProvider
 
     @Override
     public void checkManifest() {
-        context.enforceCallingOrSelfPermission(Manifest.permission.GET_ACCOUNTS, null);
-        context.enforceCallingOrSelfPermission(PERMISSION_BILLING, null);
+        OPFChecks.checkPermission(context, GET_ACCOUNTS);
+        OPFChecks.checkPermission(context, PERMISSION_BILLING);
     }
 
     @Override

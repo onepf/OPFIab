@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.misc.OPFIabActivity;
+import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfutils.OPFLog;
 
 import java.lang.ref.Reference;

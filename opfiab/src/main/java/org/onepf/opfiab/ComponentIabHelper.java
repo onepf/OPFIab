@@ -19,8 +19,8 @@ package org.onepf.opfiab;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.misc.OPFIabFragment;
-import org.onepf.opfiab.misc.OPFIabSupportFragment;
+import org.onepf.opfiab.android.OPFIabFragment;
+import org.onepf.opfiab.android.OPFIabSupportFragment;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.android.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.android.SupportFragmentLifecycleEvent;

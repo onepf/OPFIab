@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.misc;
+package org.onepf.opfiab.android;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -24,6 +24,7 @@ import android.content.IntentSender;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
@@ -39,12 +40,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @SuppressLint("Registered")
 public class OPFIabActivity extends Activity {
 
-    protected static final int FINISH_DELAY = 1000; // 1 second
+    protected static final int FINISH_DELAY = 300; // 0.3 second
 
 
     @SuppressFBWarnings({"OCP_OVERLY_CONCRETE_PARAMETER"})
-    public static void start(@Nullable final Activity activity, @Nullable final Bundle bundle) {
-        final Context context = activity == null ? OPFIab.getContext() : activity;
+    public static void start(@NonNull final Context context, @Nullable final Bundle bundle) {
         final Intent intent = new Intent(context, OPFIabActivity.class);
         if (bundle != null) {
             intent.putExtras(bundle);
@@ -52,10 +52,10 @@ public class OPFIabActivity extends Activity {
         final int flags = Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
                 | Intent.FLAG_ACTIVITY_NO_ANIMATION
                 | Intent.FLAG_ACTIVITY_NO_USER_ACTION;
-        if (activity == null) {
-            intent.setFlags(flags | Intent.FLAG_ACTIVITY_NEW_TASK);
-        } else {
+        if (context instanceof Activity) {
             intent.setFlags(flags);
+        } else {
+            intent.setFlags(flags | Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         context.startActivity(intent);
     }

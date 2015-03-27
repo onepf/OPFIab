@@ -31,14 +31,21 @@ import java.util.Set;
 
 public class IabHelper {
 
-    protected final BillingBase billingBase = OPFIab.getBase();
+    private BillingBase billingBase = OPFIab.getBase();
 
     IabHelper() {
         super();
     }
 
+    protected final BillingBase getBillingBase() {
+        if (billingBase.isDisposed()) {
+            billingBase = OPFIab.getBase();
+        }
+        return billingBase;
+    }
+
     protected void postRequest(@NonNull final BillingRequest billingRequest) {
-        billingBase.postRequest(billingRequest);
+        getBillingBase().postRequest(billingRequest);
     }
 
     public void purchase(@NonNull final String sku) {

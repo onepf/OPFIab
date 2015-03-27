@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.misc;
+package org.onepf.opfiab;
 
 import android.app.Activity;
 import android.app.Application;
@@ -36,11 +36,12 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
     @SuppressFBWarnings({"PMB_POSSIBLE_MEMORY_BLOAT"})
     private static final Map<Activity, ComponentState> STATE_MAP =
             Collections.synchronizedMap(new WeakHashMap<Activity, ComponentState>());
+    @Nullable
     private static ActivityMonitor instance;
 
 
     @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
-    public static ActivityMonitor getInstance() {
+    public static Application.ActivityLifecycleCallbacks getInstance() {
         OPFChecks.checkThread(true);
         if (instance == null) {
             instance = new ActivityMonitor();

@@ -23,8 +23,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.misc.OPFIabActivity;
-import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
 import org.onepf.opfiab.model.event.android.ActivityResultEvent;
@@ -32,6 +31,7 @@ import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
 
@@ -85,7 +85,8 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         semaphore.drainPermits();
         pendingRequest = billingRequest;
         activityRequest = null;
-        OPFIabActivity.start(purchaseRequest.getActivity(), null);
+        final Activity activity = purchaseRequest.getActivity();
+        OPFIabActivity.start(activity == null ? context : activity, null);
         try {
             // Wait for activity to start
             if (!semaphore.tryAcquire(ACTIVITY_TIMEOUT, TimeUnit.MILLISECONDS)) {

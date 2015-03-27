@@ -35,16 +35,18 @@ import static org.onepf.opfiab.model.event.billing.Status.NO_BILLING_PROVIDER;
 
 final class BillingBase {
 
-    private final Configuration configuration = OPFIab.getConfiguration();
+    private final Configuration configuration;
     @Nullable
     private SetupResponse setupResponse;
     @Nullable
     private BillingProvider currentProvider;
     @Nullable
     private BillingRequest pendingRequest;
+    private volatile boolean disposed;
 
-    BillingBase() {
+    BillingBase(@NonNull final Configuration configuration) {
         super();
+        this.configuration = configuration;
     }
 
     private void setCurrentProvider(@Nullable final BillingProvider provider) {
@@ -60,6 +62,14 @@ final class BillingBase {
     private void postEmptyResponse(@NonNull final BillingRequest billingRequest,
                                    @NonNull Status status) {
         OPFIab.post(OPFIabUtils.emptyResponse(null, billingRequest, status));
+    }
+
+    void dispose() {
+        disposed = true;
+    }
+
+    boolean isDisposed() {
+        return disposed;
     }
 
     @Nullable
@@ -81,6 +91,9 @@ final class BillingBase {
 
     void postRequest(@NonNull final BillingRequest billingRequest) {
         OPFChecks.checkThread(true);
+        if (disposed) {
+            return;
+        }
         final SetupResponse setupResponse;
         if (isBusy()) {
             // Library is busy with another request
@@ -96,6 +109,9 @@ final class BillingBase {
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
+        if (disposed) {
+            return;
+        }
         this.setupResponse = setupResponse;
         if (setupResponse.isSuccessful()) {
             setCurrentProvider(setupResponse.getBillingProvider());
@@ -103,6 +119,9 @@ final class BillingBase {
     }
 
     public void onEventMainThread(@NonNull final RequestHandledEvent event) {
+        if (disposed) {
+            return;
+        }
         // At this point request should be handled by BillingProvider
         if (!event.getBillingRequest().equals(pendingRequest)) {
             throw new IllegalStateException();
@@ -111,6 +130,9 @@ final class BillingBase {
     }
 
     public void onEventMainThread(@NonNull final BillingResponse billingResponse) {
+        if (disposed) {
+            return;
+        }
         // Current provider is set but is not available
         if (currentProvider != null && billingResponse.getStatus() == BILLING_UNAVAILABLE
                 // However last setup attempt was successful

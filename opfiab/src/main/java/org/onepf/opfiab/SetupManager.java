@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -36,7 +37,8 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 final class SetupManager {
 
     private static final String KEY_LAST_PROVIDER = SetupManager.class.getName() + ".last_provider";
-    private static final OPFPreferences PREFERENCES = new OPFPreferences(OPFIab.getContext());
+
+    private static SetupManager instance;
 
     static enum State {
         INITIAL,
@@ -44,11 +46,25 @@ final class SetupManager {
         FINISHED,
     }
 
+    @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
+    static SetupManager getInstance(@NonNull final Context context) {
+        OPFChecks.checkThread(true);
+        if (instance == null) {
+            instance = new SetupManager(context);
+        }
+        return instance;
+    }
 
+
+    private final Context context;
+    private final OPFPreferences preferences;
+    @NonNull
     private State state = State.INITIAL;
 
-    SetupManager() {
+    private SetupManager(@NonNull final Context context) {
         super();
+        this.context = context.getApplicationContext();
+        preferences = new OPFPreferences(context);
     }
 
     @Nullable
@@ -69,10 +85,10 @@ final class SetupManager {
         final Iterable<BillingProvider> providers = configuration.getProviders();
         final Iterable<BillingProvider> availableProviders = OPFIabUtils.getAvailable(providers);
 
-        final boolean hadProvider = PREFERENCES.contains(KEY_LAST_PROVIDER);
+        final boolean hadProvider = preferences.contains(KEY_LAST_PROVIDER);
         // Try previously used provider
         if (hadProvider) {
-            final String lastProvider = PREFERENCES.getString(KEY_LAST_PROVIDER, "");
+            final String lastProvider = preferences.getString(KEY_LAST_PROVIDER, "");
             final BillingProviderInfo info = BillingProviderInfo.fromJson(lastProvider);
             final BillingProvider provider;
             final SetupResponse setupResponse;
@@ -83,7 +99,7 @@ final class SetupManager {
             }
         }
 
-        final String packageInstaller = OPFIabUtils.getPackageInstaller(OPFIab.getContext());
+        final String packageInstaller = OPFIabUtils.getPackageInstaller(context);
         // If package installer is set, try it before anything else
         if (!TextUtils.isEmpty(packageInstaller)) {
             final BillingProvider installerProvider =
@@ -129,7 +145,7 @@ final class SetupManager {
             final BillingProvider provider = setupResponse.getBillingProvider();
             //noinspection ConstantConditions
             final BillingProviderInfo info = provider.getInfo();
-            PREFERENCES.put(KEY_LAST_PROVIDER, info.toJson().toString());
+            preferences.put(KEY_LAST_PROVIDER, info.toJson().toString());
         }
         OPFIab.post(setupResponse);
     }

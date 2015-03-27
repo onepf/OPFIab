@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.misc.ActivityMonitor;
+import org.onepf.opfiab.ActivityMonitor;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -215,7 +215,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             throw new UnsupportedOperationException(
                     "You must override this method for packageless Billing Providers.");
         }
-        return OPFUtils.isInstalled(OPFIab.getContext(), packageName);
+        return OPFUtils.isInstalled(context, packageName);
     }
 
     @Override

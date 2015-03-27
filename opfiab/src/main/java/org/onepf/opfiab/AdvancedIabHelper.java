@@ -40,8 +40,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public class AdvancedIabHelper extends SimpleIabHelper {
 
-    private final BillingEventDispatcher billingEventDispatcher = OPFIab.getBillingEventDispatcher();
-    private final BillingRequestScheduler scheduler = OPFIab.getRequestScheduler();
+    private final BillingRequestScheduler scheduler = BillingRequestScheduler.getInstance();
 
     protected final Collection<OnSetupListener> setupListeners = new HashSet<>();
     protected final Collection<OnPurchaseListener> purchaseListeners = new HashSet<>();
@@ -55,6 +54,7 @@ public class AdvancedIabHelper extends SimpleIabHelper {
 
     @Override
     protected void postRequest(@NonNull final BillingRequest billingRequest) {
+        final BillingBase billingBase = getBillingBase();
         if (billingBase.getSetupResponse() == null) {
             // Lazy setup
             OPFIab.setup();
@@ -101,7 +101,7 @@ public class AdvancedIabHelper extends SimpleIabHelper {
     }
 
     public void addSetupListener(@NonNull final OnSetupListener setupListener) {
-        OPFChecks.checkThread(true);
+        final BillingBase billingBase = getBillingBase();
         setupListeners.add(setupListener);
         // Deliver last setup even right away
         final SetupResponse setupResponse = billingBase.getSetupResponse();
@@ -139,11 +139,11 @@ public class AdvancedIabHelper extends SimpleIabHelper {
     }
 
     public void register() {
-        billingEventDispatcher.register(this);
+        BillingEventDispatcher.getInstance().register(this);
     }
 
     public void unregister() {
-        billingEventDispatcher.unregister(this);
+        BillingEventDispatcher.getInstance().unregister(this);
         scheduler.dropQueue(this);
     }
 }
