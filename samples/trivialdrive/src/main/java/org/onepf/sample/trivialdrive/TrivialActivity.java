@@ -26,6 +26,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.SimpleBillingListener;
+import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
@@ -40,8 +41,14 @@ public class TrivialActivity extends ActionBarActivity {
     private final BillingListener billingListener = new SimpleBillingListener() {
 
         @Override
-        public void onSetup(@NonNull final SetupResponse setupResponse) {
-            super.onSetup(setupResponse);
+        public void onSetupRequest(@NonNull final SetupRequest setupRequest) {
+            super.onSetupRequest(setupRequest);
+            button.setEnabled(false);
+        }
+
+        @Override
+        public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
+            super.onSetupResponse(setupResponse);
             button.setEnabled(setupResponse.isSuccessful());
         }
 
@@ -66,9 +73,9 @@ public class TrivialActivity extends ActionBarActivity {
             @Override
             public void onClick(final View v) {
                 iabHelper.purchase(SKU_GAS);
-//                OPFIab.getHelper().purchase(SKU_GAS);
-//                OPFIab.getAdvancedHelper().purchase(SKU_GAS);
-//                OPFIab.getActivityHelper(TrivialActivity.this);
+                //                OPFIab.getHelper().purchase(SKU_GAS);
+                //                OPFIab.getAdvancedHelper().purchase(SKU_GAS);
+                //                OPFIab.getActivityHelper(TrivialActivity.this);
             }
         });
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -30,7 +31,10 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 public class SimpleBillingListener implements BillingListener {
 
     @Override
-    public void onSetup(@NonNull final SetupResponse setupResponse) { }
+    public void onSetupRequest(@NonNull final SetupRequest setupRequest) { }
+
+    @Override
+    public void onSetupResponse(@NonNull final SetupResponse setupResponse) { }
 
     @Override
     public void onRequest(@NonNull final BillingRequest billingRequest) { }

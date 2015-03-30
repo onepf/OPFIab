@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,12 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
 
 public interface OnSetupListener {
 
-    void onSetup(@NonNull final SetupResponse setupResponse);
+    void onSetupRequest(@NonNull final SetupRequest setupRequest);
+
+    void onSetupResponse(@NonNull final SetupResponse setupResponse);
 }

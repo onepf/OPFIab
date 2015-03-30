@@ -27,6 +27,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
+import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
@@ -87,8 +88,17 @@ public class TrivialFragment extends Fragment
     }
 
     @Override
-    public void onSetup(@NonNull final SetupResponse setupResponse) {
-        btnBuy.setEnabled(setupResponse.isSuccessful());
+    public void onSetupRequest(@NonNull final SetupRequest setupRequest) {
+        btnBuy.setEnabled(false);
+    }
+
+    @Override
+    public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
+        final boolean successful = setupResponse.isSuccessful();
+        btnBuy.setEnabled(successful);
+        if (successful) {
+            iabHelper.skuDetails(SKU_GAS);
+        }
     }
 
     @Override

@@ -44,7 +44,7 @@ class AdvancedIabHelperImpl extends SimpleIabHelperImpl implements AdvancedIabHe
     private void deliverLastSetupEvent(@NonNull final OnSetupListener setupListener) {
         final SetupResponse setupResponse = billingBase.getSetupResponse();
         if (setupResponse != null) {
-            setupListener.onSetup(setupResponse);
+            setupListener.onSetupResponse(setupResponse);
         }
     }
 

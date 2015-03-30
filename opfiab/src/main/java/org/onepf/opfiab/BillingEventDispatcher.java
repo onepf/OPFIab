@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerCompositor;
+import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -69,8 +70,12 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
         skuDetailsListeners.remove(billingListener);
     }
 
+    public void onEventMainThread(@NonNull final SetupRequest setupRequest) {
+        onSetupRequest(setupRequest);
+    }
+
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
-        onSetup(setupResponse);
+        onSetupResponse(setupResponse);
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
@@ -119,13 +124,13 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
     }
 
     @Override
-    public void onSetup(@NonNull final SetupResponse setupResponse) {
+    public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         OPFLog.logMethod(setupResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
-            billingListener.onSetup(setupResponse);
+            billingListener.onSetupResponse(setupResponse);
         }
-        super.onSetup(setupResponse);
+        super.onSetupResponse(setupResponse);
     }
 
     @Override

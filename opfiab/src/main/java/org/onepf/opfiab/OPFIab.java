@@ -62,7 +62,6 @@ public final class OPFIab {
                 .executorService(Executors.newSingleThreadExecutor())
                 .throwSubscriberException(true)
                 .eventInheritance(true)
-                .logNoSubscriberMessages(OPFLog.isEnabled())
                 .logSubscriberExceptions(OPFLog.isEnabled())
                 .build();
     }
