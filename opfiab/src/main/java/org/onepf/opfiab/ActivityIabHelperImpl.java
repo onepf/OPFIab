@@ -21,9 +21,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
+import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.model.ComponentState;
 
-class ActivityIabHelperInternal extends ComponentIabHelper {
+class ActivityIabHelperImpl extends ComponentIabHelper implements ActivityIabHelper {
 
     @Nullable
     private final Activity activity;
@@ -31,8 +32,8 @@ class ActivityIabHelperInternal extends ComponentIabHelper {
     private final FragmentActivity fragmentActivity;
 
 
-    ActivityIabHelperInternal(@Nullable final FragmentActivity fragmentActivity,
-                                      @Nullable final Activity activity) {
+    ActivityIabHelperImpl(@Nullable final FragmentActivity fragmentActivity,
+                          @Nullable final Activity activity) {
         super(fragmentActivity == null ? null : fragmentActivity.getSupportFragmentManager(),
               activity == null ? null : activity.getFragmentManager());
         this.activity = activity;
@@ -51,6 +52,7 @@ class ActivityIabHelperInternal extends ComponentIabHelper {
         throw new IllegalStateException();
     }
 
+    @Override
     protected void handleState(@NonNull final ComponentState type) {
         // Handle billing events depending on fragment lifecycle
         if (type == ComponentState.ATTACH || type == ComponentState.START || type == ComponentState.RESUME) {

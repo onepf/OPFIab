@@ -22,8 +22,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 
-import org.onepf.opfiab.ActivityIabHelper;
 import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.SimpleBillingListener;
 import org.onepf.opfiab.model.event.SetupResponse;

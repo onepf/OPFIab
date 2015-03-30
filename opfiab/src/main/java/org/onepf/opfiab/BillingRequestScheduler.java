@@ -38,7 +38,7 @@ final class BillingRequestScheduler {
     private static BillingRequestScheduler instance;
 
     @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
-    public static BillingRequestScheduler getInstance() {
+    static BillingRequestScheduler getInstance() {
         OPFChecks.checkThread(true);
         if (instance == null) {
             instance = new BillingRequestScheduler();
@@ -48,14 +48,14 @@ final class BillingRequestScheduler {
 
 
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private final Map<IabHelper, Collection<BillingRequest>> helpers = new HashMap<>();
+    private final Map<IabHelperImpl, Collection<BillingRequest>> helpers = new HashMap<>();
     @SuppressWarnings("OverlyComplexAnonymousInnerClass")
     private final Runnable handleNextRequest = new Runnable() {
         @Override
         public void run() {
-            for (final Map.Entry<IabHelper, Collection<BillingRequest>> entry : helpers.entrySet()) {
-                final IabHelper helper = entry.getKey();
-                if (helper.getBillingBase().isBusy()) {
+            for (final Map.Entry<IabHelperImpl, Collection<BillingRequest>> entry : helpers.entrySet()) {
+                final IabHelperImpl helper = entry.getKey();
+                if (helper.billingBase.isBusy()) {
                     return;
                 }
                 final BillingRequest request = OPFIabUtils.poll(entry.getValue());
@@ -78,7 +78,7 @@ final class BillingRequestScheduler {
         handler.postDelayed(handleNextRequest, delay);
     }
 
-    void schedule(@NonNull final IabHelper helper, @NonNull final BillingRequest request) {
+    void schedule(@NonNull final IabHelperImpl helper, @NonNull final BillingRequest request) {
         for (final Collection<BillingRequest> requests : helpers.values()) {
             if (requests.contains(request)) {
                 // Request is already in queue.
@@ -96,7 +96,7 @@ final class BillingRequestScheduler {
         schedule();
     }
 
-    void dropQueue(@NonNull final AdvancedIabHelper iabHelper) {
+    void dropQueue(@NonNull final AdvancedIabHelperImpl iabHelper) {
         helpers.remove(iabHelper);
     }
 

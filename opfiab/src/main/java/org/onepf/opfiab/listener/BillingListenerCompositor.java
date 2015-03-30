@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 One Platform Foundation
+ * Copyright 2012-2015 One Platform Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,64 +26,99 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 
 public class BillingListenerCompositor implements BillingListener {
 
-    @NonNull
-    private final List<BillingListener> listeners;
+    protected final Collection<BillingListener> billingListeners = new HashSet<>();
 
-    public BillingListenerCompositor(@NonNull final BillingListener... billingListeners) {
-        this.listeners = Arrays.asList(billingListeners);
+    protected final Collection<OnSetupListener> setupListeners = new HashSet<>();
+    protected final Collection<OnPurchaseListener> purchaseListeners = new HashSet<>();
+    protected final Collection<OnInventoryListener> inventoryListeners = new HashSet<>();
+    protected final Collection<OnSkuDetailsListener> skuDetailsListeners = new HashSet<>();
+    protected final Collection<OnConsumeListener> consumeListeners = new HashSet<>();
+
+    public BillingListenerCompositor() {
+        super();
     }
 
-    @Override
-    public void onSetup(@NonNull final SetupResponse setupResponse) {
-        for (final BillingListener billingListener : listeners) {
-            billingListener.onSetup(setupResponse);
-        }
+    public void addSetupListener(@NonNull final OnSetupListener setupListener) {
+        setupListeners.add(setupListener);
+    }
+
+    public void addPurchaseListener(@NonNull final OnPurchaseListener purchaseListener) {
+        purchaseListeners.add(purchaseListener);
+    }
+
+    public void addInventoryListener(@NonNull final OnInventoryListener inventoryListener) {
+        inventoryListeners.add(inventoryListener);
+    }
+
+    public void addSkuDetailsListener(@NonNull final OnSkuDetailsListener skuInfoListener) {
+        skuDetailsListeners.add(skuInfoListener);
+    }
+
+    public void addConsumeListener(@NonNull final OnConsumeListener consumeListener) {
+        consumeListeners.add(consumeListener);
+    }
+
+    public void addBillingListener(@NonNull final BillingListener billingListener) {
+        billingListeners.add(billingListener);
+
+        addSetupListener(billingListener);
+        addPurchaseListener(billingListener);
+        addInventoryListener(billingListener);
+        addSkuDetailsListener(billingListener);
+        addConsumeListener(billingListener);
     }
 
     @Override
     public void onRequest(@NonNull final BillingRequest billingRequest) {
-        for (final BillingListener billingListener : listeners) {
+        for (final BillingListener billingListener : billingListeners) {
             billingListener.onRequest(billingRequest);
         }
     }
 
     @Override
     public void onResponse(@NonNull final BillingResponse billingResponse) {
-        for (final BillingListener billingListener : listeners) {
+        for (final BillingListener billingListener : billingListeners) {
             billingListener.onResponse(billingResponse);
         }
     }
 
     @Override
+    public void onSetup(@NonNull final SetupResponse setupResponse) {
+        for (final OnSetupListener setupListener : setupListeners) {
+            setupListener.onSetup(setupResponse);
+        }
+    }
+
+    @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-        for (final BillingListener billingListener : listeners) {
-            billingListener.onPurchase(purchaseResponse);
+        for (final OnPurchaseListener purchaseListener : purchaseListeners) {
+            purchaseListener.onPurchase(purchaseResponse);
         }
     }
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
-        for (final BillingListener billingListener : listeners) {
-            billingListener.onConsume(consumeResponse);
+        for (final OnConsumeListener consumeListener : consumeListeners) {
+            consumeListener.onConsume(consumeResponse);
         }
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        for (final BillingListener billingListener : listeners) {
-            billingListener.onInventory(inventoryResponse);
+        for (final OnInventoryListener inventoryListener : inventoryListeners) {
+            inventoryListener.onInventory(inventoryResponse);
         }
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        for (final BillingListener billingListener : listeners) {
-            billingListener.onSkuDetails(skuDetailsResponse);
+        for (final OnSkuDetailsListener skuDetailsListener : skuDetailsListeners) {
+            skuDetailsListener.onSkuDetails(skuDetailsResponse);
         }
     }
 }

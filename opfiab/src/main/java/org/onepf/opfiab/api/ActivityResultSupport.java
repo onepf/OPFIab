@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab;
+package org.onepf.opfiab.api;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
-import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+interface ActivityResultSupport {
 
-public class SimpleIabHelper extends IabHelper {
-
-    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
-        postRequest(new PurchaseRequest(activity, sku));
-    }
-
-    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                 final int resultCode, @Nullable final Intent data) {
-        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
-    }
+    void onActivityResult(@NonNull final Activity activity, final int requestCode,
+                          final int resultCode, @Nullable final Intent data);
 }

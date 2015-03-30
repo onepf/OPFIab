@@ -18,6 +18,7 @@ package org.onepf.opfiab;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
@@ -29,41 +30,39 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class IabHelper {
+class IabHelperImpl implements IabHelper {
 
-    private BillingBase billingBase = OPFIab.getBase();
+    protected final BillingBase billingBase = BillingBase.getInstance();
 
-    IabHelper() {
+    IabHelperImpl() {
         super();
     }
 
-    protected final BillingBase getBillingBase() {
-        if (billingBase.isDisposed()) {
-            billingBase = OPFIab.getBase();
-        }
-        return billingBase;
-    }
-
     protected void postRequest(@NonNull final BillingRequest billingRequest) {
-        getBillingBase().postRequest(billingRequest);
+        billingBase.postRequest(billingRequest);
     }
 
+    @Override
     public void purchase(@NonNull final String sku) {
         postRequest(new PurchaseRequest(sku));
     }
 
+    @Override
     public void consume(@NonNull final Purchase purchase) {
         postRequest(new ConsumeRequest(purchase));
     }
 
+    @Override
     public void inventory(final boolean startOver) {
         postRequest(new InventoryRequest(startOver));
     }
 
+    @Override
     public void skuDetails(@NonNull final Set<String> skus) {
         postRequest(new SkuDetailsRequest(skus));
     }
 
+    @Override
     public final void skuDetails(@NonNull final String... skus) {
         skuDetails(new HashSet<>(Arrays.asList(skus)));
     }

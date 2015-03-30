@@ -16,6 +16,8 @@
 
 package org.onepf.opfiab;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -25,15 +27,16 @@ import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.android.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.android.SupportFragmentLifecycleEvent;
 
-abstract class ComponentIabHelper extends AdvancedIabHelper {
+abstract class ComponentIabHelper extends AdvancedIabHelperImpl {
 
     protected static final String FRAGMENT_TAG = "OPFIabFragment";
 
     @NonNull
-    private final Object opfFragment;
+    protected final Object opfFragment;
 
-    ComponentIabHelper(@Nullable final android.support.v4.app.FragmentManager supportFragmentManager,
-                       @Nullable final android.app.FragmentManager fragmentManager) {
+    ComponentIabHelper(
+            @Nullable final android.support.v4.app.FragmentManager supportFragmentManager,
+            @Nullable final android.app.FragmentManager fragmentManager) {
         super();
         OPFIab.register(this);
 
@@ -76,6 +79,7 @@ abstract class ComponentIabHelper extends AdvancedIabHelper {
 
     protected abstract void handleState(@NonNull final ComponentState type);
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void onEventMainThread(@NonNull final FragmentLifecycleEvent event) {
         if (opfFragment == event.getFragment()) {
             handleState(event.getType());

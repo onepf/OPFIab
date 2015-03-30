@@ -21,11 +21,6 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerCompositor;
-import org.onepf.opfiab.listener.OnConsumeListener;
-import org.onepf.opfiab.listener.OnInventoryListener;
-import org.onepf.opfiab.listener.OnPurchaseListener;
-import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -35,10 +30,6 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.exception.InitException;
-
-import java.util.Collection;
-import java.util.HashSet;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -47,40 +38,35 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
     @Nullable
     private static BillingEventDispatcher instance;
 
-    static void init(@Nullable final BillingListener billingListener) {
-        OPFChecks.checkThread(true);
-        final BillingEventDispatcher newInstance = new BillingEventDispatcher(billingListener);
-        if (instance != null) {
-            newInstance.helpers.addAll(instance.helpers);
-        }
-        instance = newInstance;
-    }
-
+    @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
     static BillingEventDispatcher getInstance() {
         OPFChecks.checkThread(true);
         if (instance == null) {
-            throw new InitException(false);
+            instance = new BillingEventDispatcher();
         }
         return instance;
     }
 
 
-    private final Collection<AdvancedIabHelper> helpers = new HashSet<>();
-
-    private BillingEventDispatcher(@Nullable final BillingListener billingListener) {
-        super(billingListener == null
-                      ? new BillingListener[0]
-                      : new BillingListener[]{billingListener});
+    private BillingEventDispatcher() {
+        super();
     }
 
-    void register(@NonNull final AdvancedIabHelper helper) {
-        OPFChecks.checkThread(true);
-        helpers.add(helper);
+    void register(@NonNull final BillingListener billingListener) {
+        addBillingListener(billingListener);
     }
 
-    void unregister(@NonNull final AdvancedIabHelper helper) {
-        OPFChecks.checkThread(true);
-        helpers.remove(helper);
+    void unregister(@NonNull final BillingListener billingListener) {
+        removeBillingListener(billingListener);
+    }
+
+    protected void removeBillingListener(@NonNull final BillingListener billingListener) {
+        billingListeners.remove(billingListener);
+        setupListeners.remove(billingListener);
+        purchaseListeners.remove(billingListener);
+        consumeListeners.remove(billingListener);
+        inventoryListeners.remove(billingListener);
+        skuDetailsListeners.remove(billingListener);
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
@@ -115,63 +101,66 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
     @Override
     public void onRequest(@NonNull final BillingRequest billingRequest) {
         OPFLog.logMethod(billingRequest);
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onRequest(billingRequest);
+        }
         super.onRequest(billingRequest);
     }
 
     @Override
     public void onResponse(@NonNull final BillingResponse billingResponse) {
         OPFLog.logMethod(billingResponse);
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onResponse(billingResponse);
+        }
         super.onResponse(billingResponse);
     }
 
     @Override
     public void onSetup(@NonNull final SetupResponse setupResponse) {
         OPFLog.logMethod(setupResponse);
-        super.onSetup(setupResponse);
-        for (final AdvancedIabHelper helper : helpers) {
-            for (final OnSetupListener listener : helper.setupListeners) {
-                listener.onSetup(setupResponse);
-            }
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onSetup(setupResponse);
         }
+        super.onSetup(setupResponse);
     }
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-        super.onPurchase(purchaseResponse);
-        for (final AdvancedIabHelper helper : helpers) {
-            for (final OnPurchaseListener listener : helper.purchaseListeners) {
-                listener.onPurchase(purchaseResponse);
-            }
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onPurchase(purchaseResponse);
         }
+        super.onPurchase(purchaseResponse);
     }
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
-        super.onConsume(consumeResponse);
-        for (final AdvancedIabHelper helper : helpers) {
-            for (final OnConsumeListener listener : helper.consumeListeners) {
-                listener.onConsume(consumeResponse);
-            }
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onConsume(consumeResponse);
         }
+        super.onConsume(consumeResponse);
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        super.onInventory(inventoryResponse);
-        for (final AdvancedIabHelper helper : helpers) {
-            for (final OnInventoryListener listener : helper.inventoryListeners) {
-                listener.onInventory(inventoryResponse);
-            }
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onInventory(inventoryResponse);
         }
+        super.onInventory(inventoryResponse);
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        super.onSkuDetails(skuDetailsResponse);
-        for (final AdvancedIabHelper helper : helpers) {
-            for (final OnSkuDetailsListener listener : helper.skuDetailsListeners) {
-                listener.onSkuDetails(skuDetailsResponse);
-            }
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onSkuDetails(skuDetailsResponse);
         }
+        super.onSkuDetails(skuDetailsResponse);
     }
 }

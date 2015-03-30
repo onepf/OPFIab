@@ -23,8 +23,11 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
+import org.onepf.opfiab.api.ActivityIabHelper;
+import org.onepf.opfiab.api.AdvancedIabHelper;
+import org.onepf.opfiab.api.FragmentIabHelper;
+import org.onepf.opfiab.api.SimpleIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfutils.OPFChecks;
@@ -39,11 +42,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public final class OPFIab {
 
-    private static volatile Configuration configuration;
     private static volatile EventBus eventBus;
-
-    private static BillingBase billingBase;
-
+    private static Configuration configuration;
 
     private OPFIab() {
         throw new UnsupportedOperationException();
@@ -51,7 +51,7 @@ public final class OPFIab {
 
     private static void checkInit() {
         OPFChecks.checkThread(true);
-        if (billingBase == null) {
+        if (configuration == null) {
             throw new InitException(false);
         }
     }
@@ -93,71 +93,67 @@ public final class OPFIab {
         eventBus.cancelEventDelivery(event);
     }
 
-    @NonNull
-    static BillingBase getBase() {
-        checkInit();
-        return billingBase;
-    }
-
     /**
      * Post an event to deliver to all subscribers. Intend to be used by {@link org.onepf.opfiab.billing.BillingProvider} implementations.
      *
      * @param event Event object to deliver.
      */
     public static void post(@NonNull final Object event) {
-        final EventBus eventBus = OPFIab.eventBus;
-        if (eventBus == null) {
-            throw new InitException(false);
-        }
         if (eventBus.hasSubscriberForEvent(event.getClass())) {
             eventBus.post(event);
+        } else {
+            OPFLog.d("Skipping event delivery: %s", event);
         }
     }
 
     @NonNull
     public static SimpleIabHelper getSimpleHelper() {
-        return new SimpleIabHelper();
+        checkInit();
+        return new SimpleIabHelperImpl();
     }
 
     @NonNull
     public static AdvancedIabHelper getAdvancedHelper() {
-        return new AdvancedIabHelper();
+        checkInit();
+        return new AdvancedIabHelperImpl();
     }
 
     @NonNull
     public static ActivityIabHelper getActivityHelper(
             @NonNull final FragmentActivity fragmentActivity) {
-        return new ActivityIabHelper(fragmentActivity);
+        checkInit();
+        return new ActivityIabHelperImpl(fragmentActivity, null);
     }
 
     @NonNull
     public static ActivityIabHelper getActivityHelper(@NonNull final Activity activity) {
-        return new ActivityIabHelper(activity);
+        checkInit();
+        return new ActivityIabHelperImpl(null, activity);
+    }
+
+    @NonNull
+    public static FragmentIabHelper getFragmentHelper(
+            @NonNull final android.support.v4.app.Fragment fragment) {
+        checkInit();
+        return new FragmentIabHelperImpl(fragment, null);
     }
 
     @NonNull
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public static FragmentIabHelper getFragmentHelper(
             @NonNull final android.app.Fragment fragment) {
-        return new FragmentIabHelper(fragment);
-    }
-
-    @NonNull
-    public static FragmentIabHelper getFragmentHelper(
-            @NonNull final android.support.v4.app.Fragment fragment) {
-        return new FragmentIabHelper(fragment);
+        checkInit();
+        return new FragmentIabHelperImpl(null, fragment);
     }
 
     @NonNull
     public static Configuration getConfiguration() {
-        final Configuration configuration = OPFIab.configuration;
-        if (configuration == null) {
-            throw new IllegalStateException();
-        }
+        checkInit();
         return configuration;
     }
 
     @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC"})
+    // Avoid posting events asynchronously during initialization
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
@@ -168,34 +164,26 @@ public final class OPFIab {
             provider.checkManifest();
         }
 
-        OPFIab.configuration = configuration;
-        if (billingBase == null) {
-            // first init
-            application.registerActivityLifecycleCallbacks(ActivityMonitor.getInstance());
-        } else {
-            billingBase.dispose();
-        }
-
-        final EventBus eventBus = newBus();
-        final BillingBase billingBase = new BillingBase(configuration);
-        final SetupManager setupManager = SetupManager.getInstance(application);
-
-        final BillingListener billingListener = configuration.getBillingListener();
-        BillingEventDispatcher.init(billingListener);
-        final BillingEventDispatcher eventDispatcher = BillingEventDispatcher.getInstance();
+        final BillingBase billingBase = BillingBase.getInstance();
+        billingBase.setConfiguration(configuration);
 
         final BillingRequestScheduler scheduler = BillingRequestScheduler.getInstance();
         scheduler.dropQueue();
 
-        eventBus.register(billingBase, Integer.MAX_VALUE);
-        eventBus.register(setupManager);
-        eventBus.register(eventDispatcher);
-        eventBus.register(scheduler);
+        final EventBus eventBus = OPFIab.eventBus;
+        if (eventBus == null) {
+            // first init
+            OPFIab.eventBus = newBus();
 
-        OPFIab.billingBase = billingBase;
-        // Must be assigned last
-        // All events posted asynchronously before this point will be ignored
-        OPFIab.eventBus = eventBus;
+            register(billingBase, Integer.MAX_VALUE);
+            register(scheduler);
+            register(SetupManager.getInstance(application));
+            register(BillingEventDispatcher.getInstance());
+
+            application.registerActivityLifecycleCallbacks(ActivityMonitor.getInstance());
+        }
+
+        OPFIab.configuration = configuration;
     }
 
     public static void setup() {

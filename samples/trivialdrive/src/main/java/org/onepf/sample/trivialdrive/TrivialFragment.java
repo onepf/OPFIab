@@ -23,8 +23,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.onepf.opfiab.FragmentIabHelper;
 import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;

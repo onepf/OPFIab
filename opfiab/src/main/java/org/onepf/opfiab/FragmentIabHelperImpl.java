@@ -22,10 +22,11 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 
-class FragmentIabHelperInternal extends ComponentIabHelper {
+class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHelper {
 
     @Nullable
     private final android.app.Fragment fragment;
@@ -33,7 +34,7 @@ class FragmentIabHelperInternal extends ComponentIabHelper {
     private final android.support.v4.app.Fragment supportFragment;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    FragmentIabHelperInternal(
+    FragmentIabHelperImpl(
             @Nullable final android.support.v4.app.Fragment supportFragment,
             @Nullable final android.app.Fragment fragment) {
         super(supportFragment == null ? null : supportFragment.getChildFragmentManager(),

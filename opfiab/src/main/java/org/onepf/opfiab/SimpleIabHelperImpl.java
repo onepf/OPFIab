@@ -16,29 +16,25 @@
 
 package org.onepf.opfiab;
 
-import android.annotation.TargetApi;
-import android.os.Build;
+import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class FragmentIabHelper extends AdvancedIabHelperAdapter {
+import org.onepf.opfiab.api.SimpleIabHelper;
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 
-    FragmentIabHelper(@Nullable final android.support.v4.app.Fragment supportFragment,
-                      @Nullable final android.app.Fragment fragment) {
-        super(new FragmentIabHelperInternal(supportFragment, fragment));
-    }
+class SimpleIabHelperImpl extends IabHelperImpl implements SimpleIabHelper {
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    FragmentIabHelper(@NonNull final android.support.v4.app.Fragment supportFragment) {
-        this(supportFragment, null);
-    }
-
-    FragmentIabHelper(@NonNull final android.app.Fragment fragment) {
-        this(null, fragment);
+    @Override
+    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
+        postRequest(new PurchaseRequest(activity, sku));
     }
 
     @Override
-    public void purchase(@NonNull final String sku) {
-        advancedIabHelper.purchase(sku);
+    public void onActivityResult(@NonNull final Activity activity, final int requestCode,
+                                 final int resultCode, @Nullable final Intent data) {
+        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
     }
 }
