@@ -17,8 +17,6 @@
 package org.onepf.opfiab.util;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -106,13 +104,6 @@ public final class OPFIabUtils {
             }
         }
         return null;
-    }
-
-    //TODO move to OPFUtils
-    @Nullable
-    public static String getPackageInstaller(@NonNull final Context context) {
-        final PackageManager packageManager = context.getPackageManager();
-        return packageManager.getInstallerPackageName(context.getPackageName());
     }
 
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})

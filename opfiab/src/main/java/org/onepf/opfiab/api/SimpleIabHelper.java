@@ -17,9 +17,22 @@
 package org.onepf.opfiab.api;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 
+/**
+ * Version of {@link IabHelper} featuring {@link #purchase(String)} with activity.
+ *
+ * @see #purchase(Activity, String)
+ */
 public interface SimpleIabHelper extends IabHelper, ActivityResultSupport {
 
+    /**
+     * Same as {@link #purchase(String)} except passed activity <b>must</b> override {@link Activity#onActivityResult(int, int, Intent)}.
+     *
+     * @param activity Activity object used to start other activities if necessary.
+     * @param sku      Stock Keeping Unit - unique product ID to purchase.
+     * @see #onActivityResult(Activity, int, int, Intent)
+     */
     void purchase(@NonNull final Activity activity, @NonNull final String sku);
 }

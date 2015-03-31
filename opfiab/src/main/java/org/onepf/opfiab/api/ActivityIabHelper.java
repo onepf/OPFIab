@@ -16,4 +16,10 @@
 
 package org.onepf.opfiab.api;
 
+import android.app.Activity;
+
+/**
+ * Version of {@link IabHelper} designed to be used from {@link Activity}.
+ * Has all {@link AdvancedIabHelper} features.
+ */
 public interface ActivityIabHelper extends IabHelper, ActivityResultSupport, ListenersSupport {}

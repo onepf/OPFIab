@@ -115,10 +115,14 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
 
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
+        //https://code.google.com/p/android/issues/detail?id=153406
+        //noinspection TryWithIdenticalCatches
         try {
             //noinspection unchecked
             this.service = (AIDL) asInterface.invoke(null, service);
-        } catch (IllegalAccessException | InvocationTargetException exception) {
+        } catch (IllegalAccessException exception) {
+            OPFLog.e("", exception);
+        } catch (InvocationTargetException exception) {
             OPFLog.e("", exception);
         }
         scheduleDisconnect();

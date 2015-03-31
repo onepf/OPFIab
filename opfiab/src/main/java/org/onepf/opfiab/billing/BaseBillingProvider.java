@@ -23,8 +23,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.ActivityMonitor;
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -56,6 +56,7 @@ import java.util.Set;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
 public abstract class BaseBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
@@ -107,6 +108,13 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
                 final Purchase purchase = consumeRequest.getPurchase();
+                final BillingProviderInfo providerInfo = purchase.getProviderInfo();
+                if (!getInfo().equals(providerInfo)) {
+                    OPFLog.e("Attempt to consume purchase from wrong provider: %s.\n" +
+                                     "Current provider: %s", providerInfo, getInfo());
+                    postEmptyResponse(billingRequest, ITEM_UNAVAILABLE);
+                    break;
+                }
                 resolvedSku = skuResolver.resolve(purchase.getSku());
                 consume(OPFIabUtils.substituteSku(purchase, resolvedSku));
                 break;

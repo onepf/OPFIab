@@ -38,6 +38,9 @@ import static org.onepf.opfiab.model.ComponentState.RESUME;
 import static org.onepf.opfiab.model.ComponentState.START;
 import static org.onepf.opfiab.model.ComponentState.STOP;
 
+/**
+ * Support version of {@link org.onepf.opfiab.android.OPFIabFragment}
+ */
 public class OPFIabSupportFragment extends Fragment {
 
     @NonNull

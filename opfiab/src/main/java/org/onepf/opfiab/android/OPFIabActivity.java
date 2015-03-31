@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.WindowManager;
 
 import org.onepf.opfiab.OPFIab;
@@ -35,23 +34,32 @@ import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
 import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfutils.OPFLog;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
+/**
+ * Untouchable activity without UI.
+ * <p/>
+ * Intended to intercept {@link Activity#onActivityResult(int, int, Intent)} callback,
+ * or to be used as Activity {@link Context} when one is not available.
+ */
 @SuppressLint("Registered")
 public class OPFIabActivity extends Activity {
 
+    /**
+     * If activity is not expecting {@link #onActivityResult(int, int, Intent)} call, it will auto-finish after this timeout.
+     */
     protected static final int FINISH_DELAY = 300; // 0.3 second
 
 
-    @SuppressFBWarnings({"OCP_OVERLY_CONCRETE_PARAMETER"})
-    public static void start(@NonNull final Context context, @Nullable final Bundle bundle) {
+    /**
+     * Start new instance of this activity.
+     *
+     * @param context Can be null. Context object witch will be used to start new instance of {@link OPFIabActivity}.
+     *                If passed object is not {@code instanceof} {@link Activity},
+     *                new activity will be started with {@link Intent#FLAG_ACTIVITY_NEW_TASK} flag.
+     */
+    public static void start(@NonNull final Context context) {
         final Intent intent = new Intent(context, OPFIabActivity.class);
-        if (bundle != null) {
-            intent.putExtras(bundle);
-        }
         final int flags = Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-                | Intent.FLAG_ACTIVITY_NO_ANIMATION
-                | Intent.FLAG_ACTIVITY_NO_USER_ACTION;
+                | Intent.FLAG_ACTIVITY_NO_ANIMATION;
         if (context instanceof Activity) {
             intent.setFlags(flags);
         } else {
@@ -66,14 +74,14 @@ public class OPFIabActivity extends Activity {
         @Override
         public void run() {
             if (!isFinishing()) {
-                OPFLog.e("OPFIabActivity wasn't utilised! Finishing...");
+                OPFLog.e("OPFIabActivity wasn't utilised! Finishing: %s", OPFIabActivity.this);
                 finish();
             }
         }
     };
 
 
-    private void scheduleFinish(final boolean schedule) {
+    protected void scheduleFinish(final boolean schedule) {
         handler.removeCallbacks(finishTask);
         if (schedule) {
             handler.postDelayed(finishTask, FINISH_DELAY);
@@ -101,6 +109,20 @@ public class OPFIabActivity extends Activity {
     protected void onDestroy() {
         OPFLog.d("onDestroy: %s, task: %d", this, getTaskId());
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode,
+                                    final int resultCode,
+                                    final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
+        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
+        if (data != null || resultCode == RESULT_OK) {
+            finish();
+        } else {
+            scheduleFinish(true);
+        }
     }
 
     @Override
@@ -145,20 +167,6 @@ public class OPFIabActivity extends Activity {
         scheduleFinish(false);
         super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
                                          extraFlags, options);
-    }
-
-    @Override
-    protected void onActivityResult(final int requestCode,
-                                    final int resultCode,
-                                    final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
-        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
-        if (data != null || resultCode == RESULT_OK) {
-            finish();
-        } else {
-            scheduleFinish(true);
-        }
     }
 
     @Override

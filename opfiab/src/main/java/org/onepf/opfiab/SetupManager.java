@@ -29,6 +29,7 @@ import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFPreferences;
+import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
@@ -99,7 +100,7 @@ final class SetupManager {
             }
         }
 
-        final String packageInstaller = OPFIabUtils.getPackageInstaller(context);
+        final String packageInstaller = OPFUtils.getPackageInstaller(context);
         // If package installer is set, try it before anything else
         if (!TextUtils.isEmpty(packageInstaller)) {
             final BillingProvider installerProvider =

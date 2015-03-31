@@ -39,6 +39,10 @@ import static org.onepf.opfiab.model.ComponentState.RESUME;
 import static org.onepf.opfiab.model.ComponentState.START;
 import static org.onepf.opfiab.model.ComponentState.STOP;
 
+
+/**
+ * Invisible fragment which monitors lifecycle state of parent.
+ */
 public class OPFIabFragment extends Fragment {
 
     @NonNull

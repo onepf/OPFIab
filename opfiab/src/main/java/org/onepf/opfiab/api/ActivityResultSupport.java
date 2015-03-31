@@ -23,6 +23,13 @@ import android.support.annotation.Nullable;
 
 interface ActivityResultSupport {
 
+    /**
+     * Notifies library about received result.
+     * </p>
+     * Intended to be called from {@link Activity} used in {@link SimpleIabHelper#purchase(Activity, String)}.
+     *
+     * @param activity Activity object which received {@link Activity#onActivityResult(int, int, Intent)} call.
+     */
     void onActivityResult(@NonNull final Activity activity, final int requestCode,
                           final int resultCode, @Nullable final Intent data);
 }

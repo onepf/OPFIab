@@ -86,7 +86,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         pendingRequest = billingRequest;
         activityRequest = null;
         final Activity activity = purchaseRequest.getActivity();
-        OPFIabActivity.start(activity == null ? context : activity, null);
+        OPFIabActivity.start(activity == null ? context : activity);
         try {
             // Wait for activity to start
             if (!semaphore.tryAcquire(ACTIVITY_TIMEOUT, TimeUnit.MILLISECONDS)) {

@@ -16,5 +16,10 @@
 
 package org.onepf.opfiab.api;
 
-public interface FragmentIabHelper extends IabHelper, ListenersSupport {
-}
+import android.app.Fragment;
+
+/**
+ * Version of {@link IabHelper} designed to be used from {@link Fragment}.
+ * Has all {@link AdvancedIabHelper} features.
+ */
+public interface FragmentIabHelper extends IabHelper, ListenersSupport {}
