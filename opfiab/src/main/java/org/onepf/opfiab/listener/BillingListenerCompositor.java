@@ -18,7 +18,7 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.SetupRequest;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -89,9 +89,9 @@ public class BillingListenerCompositor implements BillingListener {
     }
 
     @Override
-    public void onSetupRequest(@NonNull final SetupRequest setupRequest) {
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
         for (final OnSetupListener setupListener : setupListeners) {
-            setupListener.onSetupRequest(setupRequest);
+            setupListener.onSetupStarted(setupStartedEvent);
         }
     }
 

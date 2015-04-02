@@ -27,7 +27,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.event.SetupRequest;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
@@ -88,7 +88,7 @@ public class TrivialFragment extends Fragment
     }
 
     @Override
-    public void onSetupRequest(@NonNull final SetupRequest setupRequest) {
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
         btnBuy.setEnabled(false);
     }
 

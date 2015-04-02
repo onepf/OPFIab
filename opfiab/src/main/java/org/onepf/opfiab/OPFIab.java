@@ -32,7 +32,6 @@ import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.api.SimpleIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.SetupRequest;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
@@ -72,6 +71,7 @@ public final class OPFIab {
             .logSubscriberExceptions(OPFLog.isEnabled())
             .build();
 
+    private static Context context;
     private static Configuration configuration;
 
     private static void checkInit() {
@@ -97,10 +97,6 @@ public final class OPFIab {
         if (EVENT_BUS.isRegistered(subscriber)) {
             EVENT_BUS.unregister(subscriber);
         }
-    }
-
-    static void cancelEventDelivery(@NonNull final Object event) {
-        EVENT_BUS.cancelEventDelivery(event);
     }
 
     /**
@@ -215,10 +211,11 @@ public final class OPFIab {
      *                      use as {@link Context}.
      * @param configuration Configuration object to use.
      */
-    @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC"})
+    @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC", "LI_LAZY_INIT_STATIC"})
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
+        context = application.getApplicationContext();
 
         // Check if manifest satisfies all billing providers.
         final Collection<BillingProvider> providers = configuration.getProviders();
@@ -250,7 +247,7 @@ public final class OPFIab {
      */
     public static void setup() {
         checkInit();
-        post(new SetupRequest(configuration));
+        SetupManager.getInstance(context).startSetup(configuration);
     }
 
 

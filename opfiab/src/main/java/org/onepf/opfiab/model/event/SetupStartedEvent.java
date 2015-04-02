@@ -20,12 +20,12 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.Configuration;
 
-public class SetupRequest {
+public class SetupStartedEvent {
 
     @NonNull
     private final Configuration configuration;
 
-    public SetupRequest(@NonNull final Configuration configuration) {
+    public SetupStartedEvent(@NonNull final Configuration configuration) {
         this.configuration = configuration;
     }
 

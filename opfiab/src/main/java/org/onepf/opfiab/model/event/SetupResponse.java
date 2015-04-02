@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
@@ -52,14 +53,18 @@ public class SetupResponse implements JsonCompatible {
 
 
     @NonNull
+    private final Configuration configuration;
+    @NonNull
     private final Status status;
     @Nullable
     private final BillingProvider billingProvider;
     private final boolean authorized;
 
-    public SetupResponse(@NonNull final Status status,
+    public SetupResponse(final @NonNull Configuration configuration,
+                         @NonNull final Status status,
                          @Nullable final BillingProvider billingProvider,
                          final boolean authorized) {
+        this.configuration = configuration;
         this.status = status;
         this.billingProvider = billingProvider;
         this.authorized = authorized;
@@ -68,19 +73,26 @@ public class SetupResponse implements JsonCompatible {
         }
     }
 
-    public SetupResponse(@NonNull final Status status,
+    public SetupResponse(final Configuration configuration,
+                         @NonNull final Status status,
                          @Nullable final BillingProvider billingProvider) {
-        this(status, billingProvider, billingProvider != null && billingProvider.isAuthorised());
+        this(configuration, status, billingProvider,
+             billingProvider != null && billingProvider.isAuthorised());
     }
 
-    @Nullable
-    public BillingProvider getBillingProvider() {
-        return billingProvider;
+    @NonNull
+    public Configuration getConfiguration() {
+        return configuration;
     }
 
     @NonNull
     public Status getStatus() {
         return status;
+    }
+
+    @Nullable
+    public BillingProvider getBillingProvider() {
+        return billingProvider;
     }
 
     public boolean isAuthorized() {

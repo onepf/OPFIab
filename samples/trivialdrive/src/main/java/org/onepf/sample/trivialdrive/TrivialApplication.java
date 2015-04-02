@@ -48,7 +48,7 @@ public class TrivialApplication extends Application {
                 .setSkipUnauthorised(false)
                 .build();
         OPFIab.init(this, configuration);
-        //        OPFIab.setup();
+        OPFIab.setup();
     }
 
     private BillingProvider newGoogleBillingProvider() {

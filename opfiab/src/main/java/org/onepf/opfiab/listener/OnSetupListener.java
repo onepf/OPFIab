@@ -18,12 +18,12 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.SetupRequest;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 
 public interface OnSetupListener {
 
-    void onSetupRequest(@NonNull final SetupRequest setupRequest);
+    void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent);
 
     void onSetupResponse(@NonNull final SetupResponse setupResponse);
 }

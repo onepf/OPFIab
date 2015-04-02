@@ -24,7 +24,7 @@ import android.text.TextUtils;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.SetupRequest;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
@@ -41,12 +41,6 @@ final class SetupManager {
 
     private static SetupManager instance;
 
-    static enum State {
-        INITIAL,
-        PROGRESS,
-        FINISHED,
-    }
-
     @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
     static SetupManager getInstance(@NonNull final Context context) {
         OPFChecks.checkThread(true);
@@ -59,8 +53,9 @@ final class SetupManager {
 
     private final Context context;
     private final OPFPreferences preferences;
-    @NonNull
-    private State state = State.INITIAL;
+    private boolean setupInProgress;
+    @Nullable
+    private Configuration lastConfiguration;
 
     private SetupManager(@NonNull final Context context) {
         super();
@@ -75,14 +70,14 @@ final class SetupManager {
         final boolean authorized = billingProvider.isAuthorised();
         if (authorized || !configuration.skipUnauthorised()) {
             final SetupResponse.Status status = providerChanged ? PROVIDER_CHANGED : SUCCESS;
-            return new SetupResponse(status, billingProvider, authorized);
+            return new SetupResponse(configuration, status, billingProvider, authorized);
         }
         return null;
     }
 
     @NonNull
-    private SetupResponse newResponse(@NonNull final SetupRequest setupRequest) {
-        final Configuration configuration = setupRequest.getConfiguration();
+    private SetupResponse newResponse(@NonNull final SetupStartedEvent setupStartedEvent) {
+        final Configuration configuration = setupStartedEvent.getConfiguration();
         final Iterable<BillingProvider> providers = configuration.getProviders();
         final Iterable<BillingProvider> availableProviders = OPFIabUtils.getAvailable(providers);
 
@@ -121,27 +116,33 @@ final class SetupManager {
             }
         }
 
-        return new SetupResponse(FAILED, null);
+        return new SetupResponse(configuration, FAILED, null);
     }
 
-    public void onEvent(@NonNull final SetupRequest setupRequest) {
+    void startSetup(@NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
-        // Guaranteed to be called before any scheduled event delivery
-        if (state == State.PROGRESS) {
-            // Setup is in progress, halt setup request delivery
-            OPFIab.cancelEventDelivery(setupRequest);
-        } else {
-            state = State.PROGRESS;
+        lastConfiguration = configuration;
+        if (setupInProgress) {
+            return;
         }
+
+        setupInProgress = true;
+        OPFIab.post(new SetupStartedEvent(configuration));
     }
 
     @SuppressWarnings("UnusedParameters")
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
-        state = State.FINISHED;
+        setupInProgress = false;
+        if (lastConfiguration != null && lastConfiguration != setupResponse.getConfiguration()) {
+            // If someone requested setup with different configuration
+            startSetup(lastConfiguration);
+        } else {
+            lastConfiguration = null;
+        }
     }
 
-    public void onEventAsync(@NonNull final SetupRequest setupRequest) {
-        final SetupResponse setupResponse = newResponse(setupRequest);
+    public void onEventAsync(@NonNull final SetupStartedEvent setupStartedEvent) {
+        final SetupResponse setupResponse = newResponse(setupStartedEvent);
         if (setupResponse.isSuccessful()) {
             final BillingProvider provider = setupResponse.getBillingProvider();
             //noinspection ConstantConditions

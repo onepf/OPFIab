@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerCompositor;
-import org.onepf.opfiab.model.event.SetupRequest;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -70,8 +70,8 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
         skuDetailsListeners.remove(billingListener);
     }
 
-    public void onEventMainThread(@NonNull final SetupRequest setupRequest) {
-        onSetupRequest(setupRequest);
+    public void onEventMainThread(@NonNull final SetupStartedEvent setupStartedEvent) {
+        onSetupStarted(setupStartedEvent);
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {

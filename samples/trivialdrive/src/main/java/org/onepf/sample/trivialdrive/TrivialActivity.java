@@ -26,7 +26,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.SimpleBillingListener;
-import org.onepf.opfiab.model.event.SetupRequest;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
@@ -41,8 +41,8 @@ public class TrivialActivity extends ActionBarActivity {
     private final BillingListener billingListener = new SimpleBillingListener() {
 
         @Override
-        public void onSetupRequest(@NonNull final SetupRequest setupRequest) {
-            super.onSetupRequest(setupRequest);
+        public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
+            super.onSetupStarted(setupStartedEvent);
             button.setEnabled(false);
         }
 
