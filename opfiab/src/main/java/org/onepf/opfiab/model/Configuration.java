@@ -41,9 +41,9 @@ public final class Configuration {
     private final boolean autoRecover;
 
     Configuration(@NonNull final Set<BillingProvider> providers,
-                          @Nullable final BillingListener billingListener,
-                          final long subsequentRequestDelay, final boolean skipUnauthorised,
-                          final boolean autoRecover) {
+                  @Nullable final BillingListener billingListener,
+                  final long subsequentRequestDelay, final boolean skipUnauthorised,
+                  final boolean autoRecover) {
         this.subsequentRequestDelay = subsequentRequestDelay;
         this.autoRecover = autoRecover;
         this.providers = Collections.unmodifiableSet(providers);
@@ -66,6 +66,7 @@ public final class Configuration {
      * Minimal time gap between requests with the same type.
      *
      * @return time gap in milliseconds.
+     * @see Builder#setSubsequentRequestDelay(long)
      */
     public long getSubsequentRequestDelay() {
         return subsequentRequestDelay;
@@ -101,9 +102,10 @@ public final class Configuration {
 
         /**
          * Set time gap between attempts to execute enqueued requests.<br>
-         * Default valued is 300ms.
+         * Default valued is 500ms.
          *
          * @param subsequentRequestDelay time gap in milliseconds.
+         * @see #getSubsequentRequestDelay()
          */
         public Builder setSubsequentRequestDelay(final long subsequentRequestDelay) {
             this.subsequentRequestDelay = subsequentRequestDelay;

@@ -40,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AidlBillingHelper<AIDL extends IInterface> implements ServiceConnection {
 
-    private static final int CONNECTION_TIMEOUT = 3000; // 3 seconds
-    private static final int DISCONNECT_DELAY = 60000; // 1 minute
+    private static final long CONNECTION_TIMEOUT = 3000L; // 3 seconds
+    private static final long DISCONNECT_DELAY = 60000L; // 1 minute
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     private final Semaphore serviceSemaphore = new Semaphore(0);
