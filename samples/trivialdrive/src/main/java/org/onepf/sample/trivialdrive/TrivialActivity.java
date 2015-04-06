@@ -37,19 +37,20 @@ public class TrivialActivity extends ActionBarActivity {
     @NonNull
     private ActivityIabHelper iabHelper;
     @NonNull
-    private View button;
+    private TrivialDriveLayout trivialDriveLayout;
+
     private final BillingListener billingListener = new SimpleBillingListener() {
 
         @Override
         public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
             super.onSetupStarted(setupStartedEvent);
-            button.setEnabled(false);
+            trivialDriveLayout.setEnabledBillingButtons(false);
         }
 
         @Override
         public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
             super.onSetupResponse(setupResponse);
-            button.setEnabled(setupResponse.isSuccessful());
+            trivialDriveLayout.setEnabledBillingButtons(setupResponse.isSuccessful());
         }
 
         @Override
@@ -67,15 +68,13 @@ public class TrivialActivity extends ActionBarActivity {
         iabHelper = OPFIab.getActivityHelper(this);
         setContentView(R.layout.trivial_layout);
 
-        button = findViewById(R.id.btn_buy);
-        button.setEnabled(false);
-        button.setOnClickListener(new View.OnClickListener() {
+        trivialDriveLayout = (TrivialDriveLayout) findViewById(R.id.trivial_drive);
+
+        trivialDriveLayout.setEnabledBillingButtons(false);
+        trivialDriveLayout.setBuyGasClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 iabHelper.purchase(SKU_GAS);
-                //                OPFIab.getHelper().purchase(SKU_GAS);
-                //                OPFIab.getAdvancedHelper().purchase(SKU_GAS);
-                //                OPFIab.getActivityHelper(TrivialActivity.this);
             }
         });
 
