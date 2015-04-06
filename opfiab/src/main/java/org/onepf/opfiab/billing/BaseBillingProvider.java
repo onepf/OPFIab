@@ -59,13 +59,24 @@ import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
+/**
+ * Base implementation of {@link BillingProvider}.
+ * <br>
+ * Most implementations should extend this one, unless implementation from scratch is absolutely necessary.
+ *
+ * @param <R> {@link SkuResolver} subclass to use with this BillingProvider.
+ * @param <V> {@link PurchaseVerifier} subclass to use with this BillingProvider.
+ */
 public abstract class BaseBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         implements BillingProvider {
 
     /**
-     * <a href="http://imgs.xkcd.com/comics/random_number.png">http://imgs.xkcd.com/comics/random_number.png</a>
+     * <a href="http://imgs.xkcd.com/comics/random_number.png">Random Number</a>
+     * <p/>
+     * Use reflection if you absolutely need to change it.
      */
-    private static final int DEFAULT_REQUEST_CODE = 13685093;
+    @SuppressWarnings({"UnnecessaryBoxing", "MagicNumber"})
+    protected static final int REQUEST_CODE = Integer.valueOf(13685093);
 
     @NonNull
     protected final Context context;
@@ -73,22 +84,13 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     protected final R skuResolver;
     @NonNull
     protected final V purchaseVerifier;
-    protected final int requestCode;
-
-    protected BaseBillingProvider(@NonNull final Context context,
-                                  @NonNull final R skuResolver,
-                                  @NonNull final V purchaseVerifier,
-                                  @Nullable final Integer requestCode) {
-        this.context = context.getApplicationContext();
-        this.purchaseVerifier = purchaseVerifier;
-        this.skuResolver = skuResolver;
-        this.requestCode = requestCode != null ? requestCode : DEFAULT_REQUEST_CODE;
-    }
 
     protected BaseBillingProvider(@NonNull final Context context,
                                   @NonNull final R skuResolver,
                                   @NonNull final V purchaseVerifier) {
-        this(context, skuResolver, purchaseVerifier, null);
+        this.context = context.getApplicationContext();
+        this.purchaseVerifier = purchaseVerifier;
+        this.skuResolver = skuResolver;
     }
 
     protected abstract void skuDetails(@NonNull final Set<String> skus);
@@ -272,6 +274,12 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     //CHECKSTYLE:ON
 
 
+    /**
+     * Builder class for this BillingProvider.
+     *
+     * @param <R> {@link SkuResolver} subclass to use with this BillingProvider.
+     * @param <V> {@link PurchaseVerifier} subclass to use with this BillingProvider.
+     */
     public abstract static class Builder<R extends SkuResolver, V extends PurchaseVerifier> {
 
         @NonNull
@@ -280,8 +288,6 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         protected R skuResolver;
         @NonNull
         protected V purchaseVerifier;
-        @Nullable
-        protected Integer requestCode;
 
         protected Builder(@NonNull final Context context,
                           @NonNull final R skuResolver,
@@ -291,21 +297,33 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             this.purchaseVerifier = purchaseVerifier;
         }
 
+        /**
+         * Set {@link SkuResolver} to use with this BillingProvider.
+         *
+         * @param skuResolver SkuResolver to use with this BillingProvider.
+         * @return this object.
+         */
         protected Builder setSkuResolver(@NonNull final R skuResolver) {
             this.skuResolver = skuResolver;
             return this;
         }
 
+        /**
+         * Set {@link PurchaseVerifier} to use with this BillingProvider.
+         *
+         * @param purchaseVerifier PurchaseVerifier to use with this BillingProvider.
+         * @return this object.
+         */
         protected Builder setPurchaseVerifier(@NonNull final V purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;
             return this;
         }
 
-        protected Builder setRequestCode(final int requestCode) {
-            this.requestCode = requestCode;
-            return this;
-        }
-
+        /**
+         * Construct new {@link BillingProvider} object.
+         *
+         * @return new BillingProvider.
+         */
         public abstract BaseBillingProvider build();
     }
 }

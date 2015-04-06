@@ -20,6 +20,7 @@ import android.app.Fragment;
 
 /**
  * Version of {@link IabHelper} designed to be used from {@link Fragment}.
- * Has all {@link AdvancedIabHelper} features.
+ * <br>
+ * Supports all {@link AdvancedIabHelper} features.
  */
 public interface FragmentIabHelper extends IabHelper, ListenersSupport {}

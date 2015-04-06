@@ -41,7 +41,7 @@ import static org.onepf.opfiab.model.ComponentState.STOP;
 
 
 /**
- * Invisible fragment which monitors lifecycle state of parent.
+ * Invisible fragment intended to monitor parent lifecycle.
  */
 public class OPFIabFragment extends Fragment {
 

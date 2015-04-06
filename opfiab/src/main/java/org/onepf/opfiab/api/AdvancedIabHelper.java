@@ -37,9 +37,9 @@ import org.onepf.opfiab.model.event.billing.Status;
 /**
  * Advanced version of {@link SimpleIabHelper} with following features:
  * <ul>
- * <li>Request queue: if {@link BillingProvider} is busy with another request, new request will
+ * <li>Request queue: If {@link BillingProvider} is busy with another request, new request will
  * be enqueued instead of immediately returning {@link Status#BUSY}.
- * <li>Lazy setup: if {@link OPFIab#setup()} wasn't called up to the point when this helper tries to
+ * <li>Lazy setup: If {@link OPFIab#setup()} wasn't called up to the point when this helper tries to
  * send {@link BillingRequest} - request will be enqueued and setup() will be called instead.
  * <li>Listeners API for handling {@link BillingResponse}s as well as setup events.
  * </ul>
@@ -54,20 +54,26 @@ import org.onepf.opfiab.model.event.billing.Status;
 public interface AdvancedIabHelper extends SimpleIabHelper, ListenersSupport {
 
     /**
-     * Registers all listeners associated with this helper for received appropriate callbacks.
+     * Registers all listeners associated with this helper to receive appropriate callbacks.
      * <p/>
      * In case of activity best called from {@link Activity#onCreate(Bundle)}
+     * <br>
      * In case of fragment best called from {@link Fragment#onCreateView(LayoutInflater, ViewGroup, Bundle)}
+     *
+     * @see #unregister()
      */
     void register();
 
     /**
-     * Unregisters all listeners associated with this helpers from receiving any callback.
+     * Unregisters all listeners associated with this helpers from receiving any callbacks.
      * <p/>
      * All pending requests from this helper <b>will be dropped</b>.
      * <p/>
      * In case of activity best called from {@link Activity#onDestroy()}
+     * <br>
      * In case of fragment best called from {@link Fragment#onDestroyView()}
+     *
+     * @see #register()
      */
     void unregister();
 }

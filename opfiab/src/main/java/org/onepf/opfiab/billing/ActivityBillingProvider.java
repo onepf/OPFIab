@@ -38,10 +38,15 @@ import org.onepf.opfutils.OPFLog;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Extension of {@link BillingProvider} which guarantees non-null {@link Activity} object in {@link #purchase(Activity, String)}.
+ * <br>
+ * New instance of {@link OPFIabActivity} will be launched if necessary.
+ */
 public abstract class ActivityBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         extends BaseBillingProvider<R, V> {
 
-    private static final int ACTIVITY_TIMEOUT = 1000; // 1 second
+    private static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
 
 
     private final Semaphore semaphore = new Semaphore(0);
@@ -49,13 +54,6 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     private volatile BillingRequest pendingRequest;
     @Nullable
     private volatile BillingRequest activityRequest;
-
-    protected ActivityBillingProvider(@NonNull final Context context,
-                                      @NonNull final R skuResolver,
-                                      @NonNull final V purchaseVerifier,
-                                      @Nullable final Integer requestCode) {
-        super(context, skuResolver, purchaseVerifier, requestCode);
-    }
 
     protected ActivityBillingProvider(@NonNull final Context context,
                                       @NonNull final R skuResolver,
@@ -119,7 +117,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
         final int requestCode = event.getRequestCode();
         final Intent data;
-        if (requestCode == this.requestCode && (data = event.getData()) != null) {
+        if (requestCode == REQUEST_CODE && (data = event.getData()) != null) {
             final int resultCode = event.getResultCode();
             final Activity activity = event.getActivity();
             onActivityResult(activity, requestCode, resultCode, data);

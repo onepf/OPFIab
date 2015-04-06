@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab.billing;
 
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -38,11 +39,16 @@ import java.util.Collection;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Helper class intended to simplify interaction with {@link Service} declared using Android Interface Definition Language (AIDL).
+ *
+ * @param <AIDL> AIDL class to bind to.
+ */
 public abstract class AidlBillingHelper<AIDL extends IInterface> implements ServiceConnection {
 
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
     private static final long CONNECTION_TIMEOUT = 3000L; // 3 seconds
     private static final long DISCONNECT_DELAY = 60000L; // 1 minute
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     private final Semaphore serviceSemaphore = new Semaphore(0);
     private final Runnable disconnect = new Runnable() {
@@ -83,9 +89,19 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         HANDLER.postDelayed(disconnect, DISCONNECT_DELAY);
     }
 
+    /**
+     * Acquire intent to start {@link Service} with.
+     *
+     * @return new Intent suitable for {@link Context#startService(Intent)}.
+     */
     @NonNull
     protected abstract Intent getServiceIntent();
 
+    /**
+     * Blocking call to retrieve {@link IInterface} instance to interact with {@link Service}.
+     *
+     * @return {@link IInterface} instance if {@link Service} connection was successful, null otherwise.
+     */
     @Nullable
     public AIDL getService() {
         final AIDL service = this.service;
