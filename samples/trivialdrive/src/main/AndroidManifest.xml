@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
   ~ Copyright 2012-2015 One Platform Foundation
   ~
@@ -14,6 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <manifest
     package="org.onepf.sample.trivialdrive"
     xmlns:android="http://schemas.android.com/apk/res/android">
