@@ -43,7 +43,7 @@ public class TrivialFragment extends Fragment
 
 
     private FragmentIabHelper iabHelper;
-    private View btnBuy;
+    private TrivialDriveLayout trivialDriveLayout;
 
     public TrivialFragment() {
         super();
@@ -59,9 +59,9 @@ public class TrivialFragment extends Fragment
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        btnBuy = view.findViewById(R.id.btn_buy);
-        btnBuy.setEnabled(false);
-        btnBuy.setOnClickListener(this);
+        trivialDriveLayout = (TrivialDriveLayout) view.findViewById(R.id.trivial_drive);
+        trivialDriveLayout.setEnabledBillingButtons(false);
+        trivialDriveLayout.setBuyGasClickListener(this);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class TrivialFragment extends Fragment
     @Override
     public void onDestroyView() {
         //noinspection AssignmentToNull
-        btnBuy = null;
+        trivialDriveLayout = null;
         super.onDestroyView();
     }
 
@@ -89,13 +89,13 @@ public class TrivialFragment extends Fragment
 
     @Override
     public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
-        btnBuy.setEnabled(false);
+        trivialDriveLayout.setEnabledBillingButtons(false);
     }
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         final boolean successful = setupResponse.isSuccessful();
-        btnBuy.setEnabled(successful);
+        trivialDriveLayout.setEnabledBillingButtons(successful);
         if (successful) {
             iabHelper.skuDetails(SKU_GAS);
         }

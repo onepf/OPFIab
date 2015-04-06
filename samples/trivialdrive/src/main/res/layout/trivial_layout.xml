@@ -24,13 +24,9 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btn_buy"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/btn_buy"/>
+    <org.onepf.sample.trivialdrive.TrivialDriveLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/trivial_drive"/>
 
 </RelativeLayout>
