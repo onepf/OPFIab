@@ -44,13 +44,13 @@ public class TrivialActivity extends ActionBarActivity {
         @Override
         public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
             super.onSetupStarted(setupStartedEvent);
-            trivialDriveLayout.setEnabled(false);
+            trivialDriveLayout.setEnabledBillingButtons(false);
         }
 
         @Override
         public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
             super.onSetupResponse(setupResponse);
-            trivialDriveLayout.setEnabled(setupResponse.isSuccessful());
+            trivialDriveLayout.setEnabledBillingButtons(setupResponse.isSuccessful());
         }
 
         @Override
@@ -70,7 +70,7 @@ public class TrivialActivity extends ActionBarActivity {
 
         trivialDriveLayout = (TrivialDriveLayout) findViewById(R.id.trivial_drive);
 
-        trivialDriveLayout.setEnabled(false);
+        trivialDriveLayout.setEnabledBillingButtons(false);
         trivialDriveLayout.setBuyGasClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
