@@ -17,6 +17,7 @@
 package org.onepf.sample.trivialdrive;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
@@ -29,16 +30,38 @@ import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.sku.MapSkuResolver;
 import org.onepf.opfutils.OPFLog;
 
-import static org.onepf.sample.trivialdrive.TrivialConstants.AMAZON_SKU_GAS;
-import static org.onepf.sample.trivialdrive.TrivialConstants.GOOGLE_SKU_GAS;
-import static org.onepf.sample.trivialdrive.TrivialConstants.SKU_GAS;
+import static org.onepf.sample.trivialdrive.TrivialUtils.AMAZON_SKU_GAS;
+import static org.onepf.sample.trivialdrive.TrivialUtils.GOOGLE_SKU_GAS;
+import static org.onepf.sample.trivialdrive.TrivialUtils.SKU_GAS;
 
 
 public class TrivialApplication extends Application {
 
+    private static final String KEY_FIRST_LAUNCH = "first_launch";
+    private static final int INITIAL_FUEL = 2;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        checkFirstLaunch();
+        initOPFIab();
+    }
+
+    private void checkFirstLaunch() {
+        final SharedPreferences preferences = TrivialUtils.getPreferences(this);
+        if (!preferences.getBoolean(KEY_FIRST_LAUNCH, true)) {
+            return;
+        }
+
+        final SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(KEY_FIRST_LAUNCH, false);
+        editor.putInt(TrivialUtils.KEY_GAS, INITIAL_FUEL);
+        editor.apply();
+    }
+
+    private void initOPFIab() {
         OPFLog.setEnabled(BuildConfig.DEBUG, true);
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(newGoogleBillingProvider())

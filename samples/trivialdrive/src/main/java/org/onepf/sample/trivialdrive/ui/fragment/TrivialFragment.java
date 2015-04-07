@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive;
+package org.onepf.sample.trivialdrive.ui.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
@@ -27,11 +27,13 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.sample.trivialdrive.R;
+import org.onepf.sample.trivialdrive.ui.view.TrivialView;
 
-import static org.onepf.sample.trivialdrive.TrivialConstants.SKU_GAS;
+import static org.onepf.sample.trivialdrive.TrivialUtils.SKU_GAS;
 
 
 public class TrivialFragment extends Fragment
@@ -43,7 +45,7 @@ public class TrivialFragment extends Fragment
 
 
     private FragmentIabHelper iabHelper;
-    private TrivialDriveLayout trivialDriveLayout;
+    private TrivialView trivialView;
 
     public TrivialFragment() {
         super();
@@ -53,15 +55,15 @@ public class TrivialFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.trivial_layout, container, false);
+        return inflater.inflate(R.layout.fragment_trivial, container, false);
     }
 
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        trivialDriveLayout = (TrivialDriveLayout) view.findViewById(R.id.trivial_drive);
-        trivialDriveLayout.setEnabledBillingButtons(false);
-        trivialDriveLayout.setBuyGasClickListener(this);
+        trivialView = (TrivialView) view.findViewById(R.id.trivial_drive);
+        trivialView.setButtonsEnabled(false);
+        trivialView.setBuyGasClickListener(this);
     }
 
     @Override
@@ -78,7 +80,7 @@ public class TrivialFragment extends Fragment
     @Override
     public void onDestroyView() {
         //noinspection AssignmentToNull
-        trivialDriveLayout = null;
+        trivialView = null;
         super.onDestroyView();
     }
 
@@ -89,13 +91,13 @@ public class TrivialFragment extends Fragment
 
     @Override
     public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
-        trivialDriveLayout.setEnabledBillingButtons(false);
+        trivialView.setButtonsEnabled(false);
     }
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         final boolean successful = setupResponse.isSuccessful();
-        trivialDriveLayout.setEnabledBillingButtons(successful);
+        trivialView.setButtonsEnabled(successful);
         if (successful) {
             iabHelper.skuDetails(SKU_GAS);
         }

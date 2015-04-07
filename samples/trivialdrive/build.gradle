@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-
-
-
-
-
-
-
-
-
-
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
@@ -61,7 +51,7 @@ android {
         checkAllWarnings true
         warningsAsErrors true
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
-                'IconMissingDensityFolder'
+                'IconMissingDensityFolder', 'RtlSymmetry'
     }
 }
 

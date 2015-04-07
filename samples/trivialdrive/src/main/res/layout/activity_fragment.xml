@@ -15,14 +15,11 @@
   ~ limitations under the License.
   -->
 
-<resources>
-
-    <string name="app_name">Trivial Drive</string>
-
-    <string name="btn_activity">ActivityHelper</string>
-    <string name="btn_fragment">FragmentHelper</string>
-    <string name="btn_buy">Buy</string>
-
-    <string name="msg_drive_success">You drove a few miles!</string>
-    <string name="msg_drive_failed">Out of fuel, try buying some.</string>
-</resources>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:id="@android:id/content"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:paddingBottom="@dimen/act_vertical_margin"
+             android:paddingLeft="@dimen/act_horizontal_margin"
+             android:paddingRight="@dimen/act_horizontal_margin"
+             android:paddingTop="@dimen/act_vertical_margin"/>

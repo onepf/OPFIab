@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive;
+package org.onepf.sample.trivialdrive.ui.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
+import org.onepf.sample.trivialdrive.R;
+import org.onepf.sample.trivialdrive.ui.fragment.TrivialFragment;
 
-public class TrivialFragmentActivity extends ActionBarActivity {
+
+public class FragmentHelperActivity extends TrivialActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

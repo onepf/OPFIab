@@ -15,11 +15,9 @@
   ~ limitations under the License.
   -->
 
-<level-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:maxLevel="0" android:drawable="@drawable/gas0" />
-    <item android:maxLevel="1" android:drawable="@drawable/gas1" />
-    <item android:maxLevel="2" android:drawable="@drawable/gas2" />
-    <item android:maxLevel="3" android:drawable="@drawable/gas3" />
-    <item android:maxLevel="4" android:drawable="@drawable/gas4" />
-    <item android:maxLevel="5" android:drawable="@drawable/gas_inf" />
-</level-list>
+<org.onepf.sample.trivialdrive.ui.view.TrivialView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+</org.onepf.sample.trivialdrive.ui.view.TrivialView>

@@ -61,7 +61,7 @@ public class DefaultBillingListener extends SimpleBillingListener {
                     final Purchase purchase = entry.getKey();
                     if (purchase.getType() == SkuType.CONSUMABLE
                             && entry.getValue() == VerificationResult.SUCCESS) {
-                        getHelper().consume(purchase);
+                        consume(purchase);
                     }
                 }
             }
@@ -69,5 +69,9 @@ public class DefaultBillingListener extends SimpleBillingListener {
                 getHelper().inventory(false);
             }
         }
+    }
+
+    protected void consume(final Purchase purchase) {
+        getHelper().consume(purchase);
     }
 }
