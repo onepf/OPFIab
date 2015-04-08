@@ -27,22 +27,17 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.onepf.sample.trivialdrive.R;
-import org.onepf.sample.trivialdrive.TrivialUtils;
-
-import static org.onepf.sample.trivialdrive.TrivialUtils.KEY_GAS;
-import static org.onepf.sample.trivialdrive.TrivialUtils.KEY_PREMIUM;
+import org.onepf.sample.trivialdrive.TrivialData;
 
 public class TrivialView extends RelativeLayout
         implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-    private SharedPreferences preferences;
 
     private View btnBuyGas;
     private View btnBuyPremium;
     private View btnBuySubscription;
 
-    private ImageView imgCar;
-    private ImageView imgGas;
+    private ImageView ivCar;
+    private ImageView ivGas;
 
     private boolean hasSubscription;
 
@@ -74,14 +69,12 @@ public class TrivialView extends RelativeLayout
             return;
         }
 
-        preferences = TrivialUtils.getPreferences(context);
-
         btnBuyGas = findViewById(R.id.btn_buy_gas);
         btnBuyPremium = findViewById(R.id.btn_buy_premium);
         btnBuySubscription = findViewById(R.id.btn_buy_subscription);
 
-        imgGas = (ImageView) findViewById(R.id.img_gas);
-        imgCar = (ImageView) findViewById(R.id.img_car);
+        ivGas = (ImageView) findViewById(R.id.img_gas);
+        ivCar = (ImageView) findViewById(R.id.img_car);
 
         findViewById(R.id.btn_drive).setOnClickListener(new OnClickListener() {
             @Override
@@ -90,35 +83,34 @@ public class TrivialView extends RelativeLayout
             }
         });
 
-        setButtonsEnabled(false);
         setHasSubscription(false);
         updateGas();
-        updatePremium();
 
-        preferences.registerOnSharedPreferenceChangeListener(this);
+        TrivialData.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    private boolean canBuyGas() {
+        return !hasSubscription && TrivialData.canAddGas();
     }
 
     private void drive() {
-        final int gas = preferences.getInt(KEY_GAS, 0);
-        final int msgId;
-        if (!hasSubscription && gas <= 0) {
-            msgId = R.string.msg_drive_failed;
+        if (!hasSubscription && !TrivialData.canSpendGas()
+                && btnBuyGas.isEnabled()) {
+            btnBuyGas.callOnClick();
         } else {
-            preferences.edit().putInt(KEY_GAS, gas - 1).apply();
-            updateGas();
-            msgId = R.string.msg_drive_success;
+            TrivialData.spendGas();
+            Toast.makeText(getContext(), R.string.msg_drive_success, Toast.LENGTH_SHORT).show();
         }
-        Toast.makeText(getContext(), msgId, Toast.LENGTH_SHORT).show();
     }
 
     private void updateGas() {
-        final int level = preferences.getInt(KEY_GAS, 0);
-        imgGas.getDrawable().setLevel(level);
-    }
-
-    private void updatePremium() {
-        final boolean hasPremium = preferences.getBoolean(KEY_PREMIUM, false);
-        imgCar.setImageResource(hasPremium ? R.drawable.img_car_premium : R.drawable.img_car);
+        if (hasSubscription) {
+            ivGas.setImageResource(R.drawable.img_gas_inf);
+        } else {
+            ivGas.setImageResource(R.drawable.img_gas_level);
+            ivGas.getDrawable().setLevel(TrivialData.getGas());
+        }
+        btnBuyGas.setEnabled(canBuyGas());
     }
 
     public void setBuyGasClickListener(final OnClickListener listener) {
@@ -133,39 +125,32 @@ public class TrivialView extends RelativeLayout
         btnBuyPremium.setOnClickListener(listener);
     }
 
-    public void setButtonsEnabled(final boolean enabled) {
-        btnBuyGas.setEnabled(enabled);
-        btnBuyPremium.setEnabled(enabled);
-        btnBuySubscription.setEnabled(enabled);
+    public void setHasPremium(final boolean hasPremium) {
+        ivCar.setImageResource(hasPremium ? R.drawable.img_car_premium : R.drawable.img_car);
     }
 
     public void setHasSubscription(final boolean hasSubscription) {
         this.hasSubscription = hasSubscription;
-        if (hasSubscription) {
-            imgGas.setImageResource(R.drawable.img_gas_inf);
-        } else {
-            imgGas.setImageResource(R.drawable.img_gas_level);
-            updateGas();
-        }
+        updateGas();
+    }
+
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        btnBuyGas.setEnabled(enabled && canBuyGas());
+        btnBuyPremium.setEnabled(enabled);
+        btnBuySubscription.setEnabled(enabled);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        preferences.unregisterOnSharedPreferenceChangeListener(this);
+        TrivialData.unregisterOnSharedPreferenceChangeListener(this);
         super.onDetachedFromWindow();
     }
 
     @Override
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
                                           final String key) {
-        switch (key) {
-            case KEY_GAS:
-                updateGas();
-                break;
-            case KEY_PREMIUM:
-                updatePremium();
-                break;
-            default:
-        }
+        updateGas();
     }
 }

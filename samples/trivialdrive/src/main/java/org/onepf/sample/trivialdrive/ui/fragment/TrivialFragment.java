@@ -33,11 +33,9 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.sample.trivialdrive.R;
 import org.onepf.sample.trivialdrive.ui.view.TrivialView;
 
-import static org.onepf.sample.trivialdrive.TrivialUtils.SKU_GAS;
-
 
 public class TrivialFragment extends Fragment
-        implements View.OnClickListener, OnSetupListener, OnSkuDetailsListener {
+        implements OnSetupListener, OnSkuDetailsListener {
 
     public static TrivialFragment newInstance() {
         return new TrivialFragment();
@@ -62,8 +60,6 @@ public class TrivialFragment extends Fragment
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         trivialView = (TrivialView) view.findViewById(R.id.trivial_drive);
-        trivialView.setButtonsEnabled(false);
-        trivialView.setBuyGasClickListener(this);
     }
 
     @Override
@@ -73,7 +69,7 @@ public class TrivialFragment extends Fragment
         iabHelper.addSetupListener(this);
         iabHelper.addSkuDetailsListener(this);
         if (savedInstanceState == null) {
-            iabHelper.skuDetails(SKU_GAS);
+
         }
     }
 
@@ -85,28 +81,14 @@ public class TrivialFragment extends Fragment
     }
 
     @Override
-    public void onClick(final View v) {
-        iabHelper.purchase(SKU_GAS);
-    }
-
-    @Override
     public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
-        trivialView.setButtonsEnabled(false);
     }
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        final boolean successful = setupResponse.isSuccessful();
-        trivialView.setButtonsEnabled(successful);
-        if (successful) {
-            iabHelper.skuDetails(SKU_GAS);
-        }
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        if (skuDetailsResponse.isSuccessful()) {
-            iabHelper.inventory(true);
-        }
     }
 }

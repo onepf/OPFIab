@@ -16,7 +16,6 @@
 
 package org.onepf.sample.trivialdrive;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.listener.DefaultBillingListener;
@@ -25,15 +24,9 @@ import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 
 public class TrivialBillingListener extends DefaultBillingListener {
 
-    private final Context context;
-
-    public TrivialBillingListener(final Context context) {
-        this.context = context;
-    }
-
     @Override
     protected void consume(final Purchase purchase) {
-        if (TrivialUtils.canAddGas(context)) {
+        if (TrivialData.canAddGas()) {
             super.consume(purchase);
         }
     }
@@ -41,8 +34,9 @@ public class TrivialBillingListener extends DefaultBillingListener {
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
         super.onConsume(consumeResponse);
-        if (consumeResponse.isSuccessful()) {
-//            TrivialUtils.
+        if (consumeResponse.isSuccessful()
+                && TrivialData.canAddGas()) {
+            TrivialData.addGas();
         }
     }
 }

@@ -280,7 +280,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      * @param <R> {@link SkuResolver} subclass to use with this BillingProvider.
      * @param <V> {@link PurchaseVerifier} subclass to use with this BillingProvider.
      */
-    public abstract static class Builder<R extends SkuResolver, V extends PurchaseVerifier> {
+    protected abstract static class Builder<R extends SkuResolver, V extends PurchaseVerifier> {
 
         @NonNull
         protected final Context context;

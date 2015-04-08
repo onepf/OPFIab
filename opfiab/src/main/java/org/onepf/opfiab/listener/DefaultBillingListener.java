@@ -55,12 +55,15 @@ public class DefaultBillingListener extends SimpleBillingListener {
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         super.onInventory(inventoryResponse);
         if (inventoryResponse.isSuccessful()) {
+            // Inventory request was successful
             final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
             if (inventory != null) {
+                // Inventory is not empty
                 for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
                     final Purchase purchase = entry.getKey();
                     if (purchase.getType() == SkuType.CONSUMABLE
                             && entry.getValue() == VerificationResult.SUCCESS) {
+                        // Purchase is consumable and it was successfully verified
                         consume(purchase);
                     }
                 }

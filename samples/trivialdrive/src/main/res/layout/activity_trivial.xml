@@ -14,16 +14,12 @@
   ~ limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingBottom="@dimen/act_vertical_margin"
-                android:paddingLeft="@dimen/act_horizontal_margin"
-                android:paddingRight="@dimen/act_horizontal_margin"
-                android:paddingTop="@dimen/act_vertical_margin">
-
-    <org.onepf.sample.trivialdrive.ui.view.TrivialView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/trivial_drive"/>
-</RelativeLayout>
+<org.onepf.sample.trivialdrive.ui.view.TrivialView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/trivial_drive"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/act_vertical_margin"
+    android:paddingLeft="@dimen/act_horizontal_margin"
+    android:paddingRight="@dimen/act_horizontal_margin"
+    android:paddingTop="@dimen/act_vertical_margin"/>

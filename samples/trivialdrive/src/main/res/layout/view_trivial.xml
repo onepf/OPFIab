@@ -18,7 +18,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
        xmlns:tools="http://schemas.android.com/tools">
 
-    <ImageButton
+    <ImageView
         android:id="@+id/img_car"
         android:src="@drawable/img_car"
         android:layout_width="wrap_content"
@@ -48,18 +48,21 @@
         <ImageView
             android:id="@+id/btn_drive"
             android:src="@drawable/btn_drive"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
 
         <Space
             android:layout_width="@dimen/padding_normal"
-            android:layout_height="0dip"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="0"/>
 
         <ImageView
             android:id="@+id/btn_buy_gas"
             android:src="@drawable/btn_buy_gas"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
     </LinearLayout>
 
     <LinearLayout
@@ -73,17 +76,20 @@
         <ImageView
             android:id="@+id/btn_buy_premium"
             android:src="@drawable/btn_buy_premium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
 
         <Space
             android:layout_width="@dimen/padding_normal"
-            android:layout_height="0dip"/>
+            android:layout_height="wrap_content"
+            android:layout_weight="0"/>
 
         <ImageView
             android:id="@+id/btn_buy_subscription"
             android:src="@drawable/btn_buy_subscription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
     </LinearLayout>
 </merge>
