@@ -227,7 +227,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     @Override
     public boolean isAvailable() {
-        return PurchasingService.IS_SANDBOX_MODE || super.isAvailable();
+        return super.isAvailable();
     }
 
     @Override
