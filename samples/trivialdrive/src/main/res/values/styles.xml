@@ -17,6 +17,7 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat">
+        <!--<item name="android:background">@color/material_deep_teal_500</item>-->
+        <!--<item name="android:divider">@drawable/abc_list_divider_mtrl_alpha</item>-->
     </style>
-
 </resources>

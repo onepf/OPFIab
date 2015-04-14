@@ -20,13 +20,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import org.onepf.sample.trivialdrive.Helper;
+import org.onepf.sample.trivialdrive.TrivialBilling;
+
 
 public class LauncherActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(this, ActivityHelperActivity.class));
+        final Helper helper = TrivialBilling.getHelper();
+        startActivity(new Intent(this, helper.getActivityClass()));
         finish();
     }
 }

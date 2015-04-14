@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.fragment;
+package org.onepf.sample.trivialdrive;
 
-import android.support.v4.app.Fragment;
+public interface OnProviderPickerListener {
 
-public class DrawerFragment extends Fragment {
+    void onProviderPicked(final Provider provider);
 }

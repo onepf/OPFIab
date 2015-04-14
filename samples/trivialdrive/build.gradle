@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
+apply plugin: 'idea'
 apply plugin: 'com.noveogroup.android.check'
 
 android {
@@ -71,12 +71,17 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
     compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.amazon:in-app-purchasing:2.0.61'
+    compile 'com.android.support:recyclerview-v7:22.0.0'
+
+    compile 'com.makeramen:dragsortadapter:1.1.0'
 
     //noinspection GradleDynamicVersion
     compile 'org.onepf:opfutils:+'
 
-    compile project(':opfiab')
-    compile project(':google')
     compile project(':amazon')
+    compile 'com.amazon:in-app-purchasing:2.0.61'
+
+    compile project(':opfiab')
+
+    compile project(':google')
 }

@@ -17,7 +17,6 @@
 package org.onepf.sample.trivialdrive.ui.activity;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 
 import org.onepf.sample.trivialdrive.R;
 import org.onepf.sample.trivialdrive.ui.fragment.TrivialFragment;
@@ -28,10 +27,10 @@ public class FragmentHelperActivity extends TrivialActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trivial);
+        setContentView(R.layout.include_content);
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, TrivialFragment.newInstance())
+                    .replace(R.id.content, TrivialFragment.newInstance())
                     .commit();
         }
     }

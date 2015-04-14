@@ -18,10 +18,13 @@ package org.onepf.sample.trivialdrive.ui.activity;
 
 import android.os.Bundle;
 
+import org.onepf.sample.trivialdrive.R;
+
 public class SimpleHelperActivity extends TrivialActivity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.include_trivial);
     }
 }

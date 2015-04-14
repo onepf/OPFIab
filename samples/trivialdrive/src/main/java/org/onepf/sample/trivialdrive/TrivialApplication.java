@@ -32,6 +32,5 @@ public class TrivialApplication extends Application {
 
         OPFLog.setEnabled(BuildConfig.DEBUG, true);
         OPFIab.init(this, TrivialBilling.getRelevantConfiguration());
-        OPFIab.setup();
     }
 }

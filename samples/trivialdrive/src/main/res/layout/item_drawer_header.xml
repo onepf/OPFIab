@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2012-2015 One Platform Foundation
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:dividerPadding="@dimen/padding_small"
+             android:showDividers="middle">
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="@dimen/drawer_row_height"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/label_helper"/>
+
+        <Spinner
+            android:id="@+id/spin_helper"
+            android:layout_width="0dip"
+            android:layout_height="@dimen/drawer_row_height"
+            android:layout_weight="2"
+            android:paddingLeft="@dimen/padding_normal"
+            android:gravity="center"/>
+    </TableRow>
+
+    <TableRow>
+
+        <TextView
+            android:layout_width="0dip"
+            android:layout_height="@dimen/drawer_row_height"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/label_setup"/>
+
+        <FrameLayout
+            android:layout_width="0dip"
+            android:layout_height="@dimen/drawer_row_height"
+            android:layout_weight="2"
+            android:paddingLeft="@dimen/padding_normal"
+            android:animateLayoutChanges="true">
+
+            <ProgressBar
+                android:id="@+id/pg_setup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                style="?android:progressBarStyleSmall"/>
+
+            <TextView
+                android:id="@+id/tv_setup"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                tools:text="Loreum Impsum"/>
+        </FrameLayout>
+    </TableRow>
+
+    <TableRow>
+
+        <Space
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_init"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/btn_init"/>
+
+        <Space
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/btn_setup"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/btn_setup"/>
+
+        <Space
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+    </TableRow>
+
+    <CheckedTextView
+        android:id="@+id/ctv_auto_recover"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drawer_row_height"
+        android:gravity="center_vertical"
+        android:text="@string/btn_auto_recover"
+        android:checkMark="@drawable/tv_check"
+        tools:checked="true"/>
+
+    <CheckedTextView
+        android:id="@+id/ctv_skip_unauthorized"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/drawer_row_height"
+        android:gravity="center_vertical"
+        android:text="@string/btn_skip_unauthorized"
+        android:checkMark="@drawable/tv_check"
+        tools:checked="true"/>
+</TableLayout>

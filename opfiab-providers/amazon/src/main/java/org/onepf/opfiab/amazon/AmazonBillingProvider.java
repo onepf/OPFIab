@@ -65,7 +65,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     protected static final String NAME = "Amazon";
     protected static final String PACKAGE_NAME = "com.amazon.venezia";
 
-    static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
+    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
 
 
     @NonNull

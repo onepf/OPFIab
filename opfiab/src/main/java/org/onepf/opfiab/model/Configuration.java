@@ -42,7 +42,8 @@ public final class Configuration {
 
     Configuration(@NonNull final Set<BillingProvider> providers,
                   @Nullable final BillingListener billingListener,
-                  final long subsequentRequestDelay, final boolean skipUnauthorised,
+                  final long subsequentRequestDelay,
+                  final boolean skipUnauthorised,
                   final boolean autoRecover) {
         this.subsequentRequestDelay = subsequentRequestDelay;
         this.autoRecover = autoRecover;
