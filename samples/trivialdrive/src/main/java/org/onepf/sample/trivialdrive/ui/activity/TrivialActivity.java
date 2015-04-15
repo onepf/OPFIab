@@ -29,7 +29,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +59,7 @@ import org.onepf.sample.trivialdrive.ui.fragment.ProviderPickerDialogFragment;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 abstract class TrivialActivity extends ActionBarActivity
@@ -139,9 +139,11 @@ abstract class TrivialActivity extends ActionBarActivity
 
     private class Adapter extends DragSortAdapter<DragSortAdapter.ViewHolder> {
 
-        private static final int TYPE_HEADER = 0;
-        private static final int TYPE_FOOTER = 1;
-        private static final int TYPE_ITEM = 2;
+        private static final int TYPE_HEADER = -1;
+        private static final int TYPE_FOOTER = -2;
+        private static final int TYPE_ITEM = 0;
+
+        private final int headerCount = 1;
 
         private final List<Provider> items;
         private final LayoutInflater inflater;
@@ -156,17 +158,13 @@ abstract class TrivialActivity extends ActionBarActivity
             return items.size() < Provider.values().length;
         }
 
-        private void update() {
-            TrivialBilling.setProviders(items);
-            notifyDataSetChanged();
-        }
-
         private void addItem(final Provider provider) {
             if (items.contains(provider)) {
                 return;
             }
             items.add(provider);
-            update();
+            TrivialBilling.setProviders(items);
+            notifyItemInserted(headerCount + items.size());
         }
 
         private void deleteItem(final Provider provider) {
@@ -175,7 +173,8 @@ abstract class TrivialActivity extends ActionBarActivity
                 return;
             }
             items.remove(index);
-            update();
+            TrivialBilling.setProviders(items);
+            notifyItemRemoved(headerCount + index);
         }
 
         @Override
@@ -201,19 +200,28 @@ abstract class TrivialActivity extends ActionBarActivity
         public void onBindViewHolder(final DragSortAdapter.ViewHolder holder, final int position) {
             if (getItemViewType(position) == TYPE_ITEM) {
                 final ItemViewHolder viewHolder = (ItemViewHolder) holder;
-                final Provider provider = items.get(position - 1);
+                final Provider provider = items.get(position - headerCount);
                 viewHolder.setProvider(provider);
+                final boolean isDragged = getDraggingId() == getItemId(position);
+                viewHolder.itemView.setVisibility(isDragged ? View.INVISIBLE : View.VISIBLE);
             }
         }
 
         @Override
         public int getItemCount() {
-            return items.size() + 1 + (showFooter() ? 1 : 0);
+            return headerCount + items.size() + (showFooter() ? 1 : 0);
         }
 
         @Override
         public long getItemId(final int position) {
-            return position;
+            switch (getItemViewType(position)) {
+                case TYPE_HEADER:
+                    return TYPE_HEADER;
+                case TYPE_FOOTER:
+                    return TYPE_FOOTER;
+                default:
+                    return items.get(position - headerCount).ordinal();
+            }
         }
 
         @Override
@@ -221,17 +229,22 @@ abstract class TrivialActivity extends ActionBarActivity
             if (position == 0) {
                 return TYPE_HEADER;
             }
-
-            if (position == items.size() + 1) {
+            if (position >= headerCount + items.size()) {
                 return TYPE_FOOTER;
             }
-
             return TYPE_ITEM;
         }
 
         @Override
         public int getPositionForId(final long l) {
-            return (int) l;
+            switch ((int) l) {
+                case TYPE_HEADER:
+                    return 0;
+                case TYPE_FOOTER:
+                    return items.size();
+                default:
+                    return headerCount + items.indexOf(Provider.values()[(int) l]);
+            }
         }
 
         @Override
@@ -239,7 +252,8 @@ abstract class TrivialActivity extends ActionBarActivity
             if (getItemViewType(to) != TYPE_ITEM) {
                 return false;
             }
-            items.add(from, items.remove(to));
+            Collections.swap(items, from - headerCount, to - headerCount);
+            TrivialBilling.setProviders(items);
             return true;
         }
     }
@@ -364,7 +378,7 @@ abstract class TrivialActivity extends ActionBarActivity
     }
 
     private class ItemViewHolder extends DragSortAdapter.ViewHolder
-            implements View.OnClickListener {
+            implements View.OnClickListener, View.OnLongClickListener {
 
         private final View btnDelete;
         private final TextView tvProvider;
@@ -375,7 +389,7 @@ abstract class TrivialActivity extends ActionBarActivity
             btnDelete = itemView.findViewById(R.id.btn_delete);
             tvProvider = (TextView) itemView.findViewById(R.id.tv_provider);
             btnDelete.setOnClickListener(this);
-            tvProvider.setOnClickListener(this);
+            tvProvider.setOnLongClickListener(this);
         }
 
         public void setProvider(final Provider provider) {
@@ -385,11 +399,13 @@ abstract class TrivialActivity extends ActionBarActivity
 
         @Override
         public void onClick(final View v) {
-            if (v == btnDelete) {
-                adapter.deleteItem(provider);
-            } else if (v == tvProvider) {
-                startDrag();
-            }
+            adapter.deleteItem(provider);
+        }
+
+        @Override
+        public boolean onLongClick(final View v) {
+            startDrag();
+            return true;
         }
 
         @Override

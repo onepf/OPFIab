@@ -15,8 +15,15 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:drawable="@drawable/ic_check_on" android:state_checked="true"/>
-    <item android:drawable="@drawable/ic_check_off"/>
-</selector>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+       android:insetLeft="@dimen/padding_small"
+       android:insetRight="@dimen/padding_small"
+       android:insetTop="@dimen/padding_small"
+       android:insetBottom="@dimen/padding_small">
+    <selector>
+        <item
+            android:drawable="@drawable/ic_check_on"
+            android:state_checked="true"/>
+        <item android:drawable="@drawable/ic_check_off"/>
+    </selector>
+</inset>

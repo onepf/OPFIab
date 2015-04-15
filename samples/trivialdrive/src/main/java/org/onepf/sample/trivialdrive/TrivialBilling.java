@@ -23,7 +23,6 @@ import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.google.GoogleMapSkuResolver;
-import org.onepf.opfiab.google.SimpleGooglePurchaseVerifier;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.sku.MapSkuResolver;
@@ -87,7 +86,7 @@ public final class TrivialBilling {
 
         return new GoogleBillingProvider.Builder(context)
                 //TODO
-//                .setPurchaseVerifier(new SimpleGooglePurchaseVerifier(GOOGLE_PLAY_KEY))
+                //                .setPurchaseVerifier(new SimpleGooglePurchaseVerifier(GOOGLE_PLAY_KEY))
                 .setSkuResolver(skuResolver)
                 .build();
     }

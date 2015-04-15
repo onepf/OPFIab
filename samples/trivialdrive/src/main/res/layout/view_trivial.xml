@@ -16,7 +16,8 @@
   -->
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools">
+       xmlns:tools="http://schemas.android.com/tools"
+       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/img_car"
@@ -47,10 +48,10 @@
 
         <ImageView
             android:id="@+id/btn_drive"
-            android:src="@drawable/btn_drive"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:src="@drawable/btn_drive"/>
 
         <Space
             android:layout_width="@dimen/padding_normal"
@@ -59,10 +60,10 @@
 
         <ImageView
             android:id="@+id/btn_buy_gas"
-            android:src="@drawable/btn_buy_gas"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:src="@drawable/btn_buy_gas"/>
     </LinearLayout>
 
     <LinearLayout
@@ -75,10 +76,10 @@
 
         <ImageView
             android:id="@+id/btn_buy_premium"
-            android:src="@drawable/btn_buy_premium"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:src="@drawable/btn_buy_premium"/>
 
         <Space
             android:layout_width="@dimen/padding_normal"
@@ -87,9 +88,9 @@
 
         <ImageView
             android:id="@+id/btn_buy_subscription"
-            android:src="@drawable/btn_buy_subscription"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:src="@drawable/btn_buy_subscription"/>
     </LinearLayout>
 </merge>
