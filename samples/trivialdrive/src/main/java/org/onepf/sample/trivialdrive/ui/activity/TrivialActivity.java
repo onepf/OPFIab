@@ -17,15 +17,20 @@
 package org.onepf.sample.trivialdrive.ui.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -65,7 +70,9 @@ abstract class TrivialActivity extends ActionBarActivity
 
     private AdvancedIabHelper iabHelper;
 
+    private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
     private RecyclerView recyclerView;
     private Adapter adapter;
 
@@ -83,11 +90,21 @@ abstract class TrivialActivity extends ActionBarActivity
     }
 
     @Override
+    protected void onDestroy() {
+        iabHelper.unregister();
+        super.onDestroy();
+    }
+
+    @Override
     public void setContentView(final int layoutResID) {
         super.setContentView(R.layout.activity_trivial);
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         final View view = getLayoutInflater().inflate(layoutResID, drawerLayout, false);
         drawerLayout.addView(view, 0);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, 0, 0);
+        drawerLayout.setDrawerListener(drawerToggle);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler);
         adapter = new Adapter(recyclerView);
@@ -96,9 +113,23 @@ abstract class TrivialActivity extends ActionBarActivity
     }
 
     @Override
-    protected void onDestroy() {
-        iabHelper.unregister();
-        super.onDestroy();
+    protected void onPostCreate(final Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(final Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
