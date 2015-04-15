@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive;
+package org.onepf.trivialdrive;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -155,7 +155,7 @@ public final class TrivialBilling {
         return providers;
     }
 
-    public static void setProviders(final Collection<Provider> providers) {
+    public static void setProviders(final Iterable<Provider> providers) {
         final Set<String> providersNames = new HashSet<>();
         for (final Provider provider : providers) {
             providersNames.add(provider.name());

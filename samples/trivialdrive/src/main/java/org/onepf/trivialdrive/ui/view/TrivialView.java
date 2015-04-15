@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.view;
+package org.onepf.trivialdrive.ui.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -31,15 +31,12 @@ import android.widget.Toast;
 
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.sample.trivialdrive.R;
-import org.onepf.sample.trivialdrive.TrivialBilling;
-import org.onepf.sample.trivialdrive.TrivialData;
+import org.onepf.trivialdrive.R;
+import org.onepf.trivialdrive.TrivialBilling;
+import org.onepf.trivialdrive.TrivialData;
 
 import static android.view.Gravity.CENTER_HORIZONTAL;
 import static android.view.Gravity.CENTER_VERTICAL;
-import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_GAS;
-import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_PREMIUM;
-import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_SUBSCRIPTION;
 
 public class TrivialView extends LinearLayout
         implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
@@ -156,14 +153,15 @@ public class TrivialView extends LinearLayout
     }
 
     public void setSkuDetailsResponse(final SkuDetailsResponse skuDetailsResponse) {
-        sdvGas.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, SKU_GAS));
-        sdvPremium.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, SKU_PREMIUM));
+        sdvGas.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_GAS));
+        sdvPremium.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_PREMIUM));
         sdvSubscription.setSkuDetails(
-                TrivialBilling.getDetails(skuDetailsResponse, SKU_SUBSCRIPTION));
+                TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_SUBSCRIPTION));
     }
 
     public void requestSkuDetails() {
-        iabHelper.skuDetails(SKU_GAS, SKU_PREMIUM, SKU_SUBSCRIPTION);
+        iabHelper.skuDetails(
+                TrivialBilling.SKU_GAS, TrivialBilling.SKU_PREMIUM, TrivialBilling.SKU_SUBSCRIPTION);
     }
 
     @Override

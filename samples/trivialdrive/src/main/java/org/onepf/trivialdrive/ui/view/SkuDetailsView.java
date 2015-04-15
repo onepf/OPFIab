@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.view;
+package org.onepf.trivialdrive.ui.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.sample.trivialdrive.R;
+import org.onepf.trivialdrive.R;
 
 public class SkuDetailsView extends LinearLayout {
 

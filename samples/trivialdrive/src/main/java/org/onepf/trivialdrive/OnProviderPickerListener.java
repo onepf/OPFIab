@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive;
+package org.onepf.trivialdrive;
 
 public interface OnProviderPickerListener {
 

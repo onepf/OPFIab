@@ -17,7 +17,8 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <!--<item name="android:background">@color/material_deep_teal_500</item>-->
-        <!--<item name="android:divider">@drawable/abc_list_divider_mtrl_alpha</item>-->
+    </style>
+
+    <style name="ToolbarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
     </style>
 </resources>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.view;
+package org.onepf.trivialdrive.ui.view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -29,7 +29,7 @@ import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.sample.trivialdrive.TrivialBilling;
+import org.onepf.trivialdrive.TrivialBilling;
 
 public class AdvancedTrivialView extends TrivialView
         implements OnSetupListener, OnInventoryListener, OnSkuDetailsListener {

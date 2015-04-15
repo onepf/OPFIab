@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.activity;
+package org.onepf.trivialdrive.ui.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -49,12 +49,12 @@ import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
-import org.onepf.sample.trivialdrive.Helper;
-import org.onepf.sample.trivialdrive.OnProviderPickerListener;
-import org.onepf.sample.trivialdrive.Provider;
-import org.onepf.sample.trivialdrive.R;
-import org.onepf.sample.trivialdrive.TrivialBilling;
-import org.onepf.sample.trivialdrive.ui.fragment.ProviderPickerDialogFragment;
+import org.onepf.trivialdrive.Helper;
+import org.onepf.trivialdrive.OnProviderPickerListener;
+import org.onepf.trivialdrive.Provider;
+import org.onepf.trivialdrive.R;
+import org.onepf.trivialdrive.TrivialBilling;
+import org.onepf.trivialdrive.ui.fragment.ProviderPickerDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +99,9 @@ abstract class TrivialActivity extends ActionBarActivity
     public void setContentView(final int layoutResID) {
         super.setContentView(R.layout.activity_trivial);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        toolbar.setLogo(R.drawable.img_logo);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         final View view = getLayoutInflater().inflate(layoutResID, drawerLayout, false);
         drawerLayout.addView(view, 0);

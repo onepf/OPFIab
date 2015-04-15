@@ -24,11 +24,11 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        applicationId "org.onepf.sample.trivialdrive"
+        applicationId "org.onepf.trivialdrive"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 22
-        versionName "0.1"
+        versionName "0.2.0"
     }
 
     signingConfigs {

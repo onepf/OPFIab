@@ -14,37 +14,36 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive;
+package org.onepf.trivialdrive;
 
+import android.app.Activity;
 import android.support.annotation.StringRes;
 
-import org.onepf.opfiab.amazon.AmazonBillingProvider;
-import org.onepf.opfiab.google.GoogleBillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.trivialdrive.R;
+import org.onepf.trivialdrive.ui.activity.ActivityHelperActivity;
+import org.onepf.trivialdrive.ui.activity.FragmentHelperActivity;
+import org.onepf.trivialdrive.ui.activity.AdvancedHelperActivity;
 
-public enum Provider {
-    AMAZON(R.string.name_amazon, AmazonBillingProvider.INFO),
-    GOOGLE(R.string.name_google, GoogleBillingProvider.INFO),;
+public enum Helper {
 
-    public static Provider getByInfo(final BillingProviderInfo info) {
-        for (final Provider provider : values()) {
-            if (provider.info.equals(info)) {
-                return provider;
-            }
-        }
-        return null;
-    }
+    ACTIVITY(R.string.helper_activity, ActivityHelperActivity.class),
+    FRAGMENT(R.string.helper_fragment, FragmentHelperActivity.class),
+    ADVANCED(R.string.helper_advanced, AdvancedHelperActivity.class),;
 
-    private final BillingProviderInfo info;
     @StringRes
     private final int nameId;
+    private final Class<? extends Activity> activityClass;
 
-    Provider(final int nameId, final BillingProviderInfo info) {
+    Helper(final int nameId, final Class<? extends Activity> activityClass) {
         this.nameId = nameId;
-        this.info = info;
+        this.activityClass = activityClass;
     }
 
     public int getNameId() {
         return nameId;
+    }
+
+    public Class<? extends Activity> getActivityClass() {
+        return activityClass;
     }
 }

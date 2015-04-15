@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/abc_action_bar_default_height_material"
-        app:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+        app:theme="@style/ToolbarTheme"/>
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer"

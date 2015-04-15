@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.activity;
+package org.onepf.trivialdrive;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
+import android.app.Application;
 
-import org.onepf.sample.trivialdrive.Helper;
-import org.onepf.sample.trivialdrive.TrivialBilling;
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfutils.OPFLog;
+import org.onepf.trivialdrive.BuildConfig;
 
 
-public class LauncherActivity extends Activity {
+public class TrivialApplication extends Application {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        final Helper helper = TrivialBilling.getHelper();
-        startActivity(new Intent(this, helper.getActivityClass()));
-        finish();
+    public void onCreate() {
+        super.onCreate();
+        TrivialData.init(this);
+        TrivialBilling.init(this);
+
+        OPFLog.setEnabled(BuildConfig.DEBUG, true);
+        OPFIab.init(this, TrivialBilling.getRelevantConfiguration());
     }
 }

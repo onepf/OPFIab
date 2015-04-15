@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive;
+package org.onepf.trivialdrive;
 
 import android.content.Context;
 import android.content.SharedPreferences;

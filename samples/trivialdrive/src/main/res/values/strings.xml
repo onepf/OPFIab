@@ -25,9 +25,6 @@
 
     <string name="btn_init">init()</string>
     <string name="btn_setup">setup()</string>
-    <string name="btn_activity">ActivityHelper</string>
-    <string name="btn_fragment">FragmentHelper</string>
-    <string name="btn_buy">Buy</string>
     <string name="btn_skip_unauthorized">Skip Unauthorized</string>
     <string name="btn_auto_recover">Auto-Recover</string>
 

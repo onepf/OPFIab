@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.fragment;
+package org.onepf.trivialdrive.ui.fragment;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -28,9 +28,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import org.onepf.sample.trivialdrive.OnProviderPickerListener;
-import org.onepf.sample.trivialdrive.Provider;
-import org.onepf.sample.trivialdrive.R;
+import org.onepf.trivialdrive.OnProviderPickerListener;
+import org.onepf.trivialdrive.Provider;
+import org.onepf.trivialdrive.R;
 
 import java.util.ArrayList;
 import java.util.Collection;

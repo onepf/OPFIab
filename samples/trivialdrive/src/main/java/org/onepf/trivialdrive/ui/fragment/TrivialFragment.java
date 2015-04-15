@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.fragment;
+package org.onepf.trivialdrive.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -32,9 +32,9 @@ import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.sample.trivialdrive.R;
-import org.onepf.sample.trivialdrive.TrivialBilling;
-import org.onepf.sample.trivialdrive.ui.view.TrivialView;
+import org.onepf.trivialdrive.R;
+import org.onepf.trivialdrive.TrivialBilling;
+import org.onepf.trivialdrive.ui.view.TrivialView;
 
 
 public class TrivialFragment extends Fragment

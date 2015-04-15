@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package org.onepf.sample.trivialdrive.ui.activity;
+package org.onepf.trivialdrive.ui.activity;
 
 import android.os.Bundle;
 
-import org.onepf.sample.trivialdrive.R;
+import org.onepf.trivialdrive.R;
+import org.onepf.trivialdrive.ui.fragment.TrivialFragment;
 
-public class AdvancedHelperActivity extends TrivialActivity {
+
+public class FragmentHelperActivity extends TrivialActivity {
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.include_trivial_advanced);
+        setContentView(R.layout.include_content);
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content, TrivialFragment.newInstance())
+                    .commit();
+        }
     }
 }
