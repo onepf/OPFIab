@@ -16,26 +16,27 @@
 
 package org.onepf.sample.trivialdrive.ui.fragment;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.FragmentIabHelper;
+import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.sample.trivialdrive.R;
+import org.onepf.sample.trivialdrive.TrivialBilling;
 import org.onepf.sample.trivialdrive.ui.view.TrivialView;
 
 
 public class TrivialFragment extends Fragment
-        implements OnSetupListener, OnSkuDetailsListener {
+        implements OnSetupListener, OnInventoryListener {
 
     public static TrivialFragment newInstance() {
         return new TrivialFragment();
@@ -66,9 +67,12 @@ public class TrivialFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
         iabHelper = OPFIab.getFragmentHelper(this);
         iabHelper.addSetupListener(this);
-        iabHelper.addSkuDetailsListener(this);
-        if (savedInstanceState == null) {
+        iabHelper.addInventoryListener(this);
 
+        trivialView.setIabHelper(iabHelper);
+
+        if (savedInstanceState == null) {
+            iabHelper.inventory(true);
         }
     }
 
@@ -81,13 +85,17 @@ public class TrivialFragment extends Fragment
 
     @Override
     public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
+        trivialView.setEnabled(false);
     }
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
+        trivialView.setEnabled(setupResponse.isSuccessful());
     }
 
     @Override
-    public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+    public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
+        trivialView.setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
+        trivialView.setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
     }
 }

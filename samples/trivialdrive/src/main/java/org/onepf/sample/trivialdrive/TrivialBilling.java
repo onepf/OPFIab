@@ -24,13 +24,17 @@ import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.google.GoogleMapSkuResolver;
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuType;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.sku.MapSkuResolver;
+import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public final class TrivialBilling {
@@ -188,5 +192,33 @@ public final class TrivialBilling {
 
     public static void setSkipUnauthorized(final boolean skipUnauthorized) {
         preferences.edit().putBoolean(KEY_SKIP_UNAUTHORIZED, skipUnauthorized).apply();
+    }
+
+    private static Purchase getPurchase(final InventoryResponse inventoryResponse,
+                                        final String sku) {
+        final Map<Purchase, VerificationResult> inventory;
+        if (inventoryResponse.isSuccessful()
+                && (inventory = inventoryResponse.getInventory()) != null) {
+            for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
+                final VerificationResult verificationResult = entry.getValue();
+                if (verificationResult == VerificationResult.SUCCESS) {
+                    final Purchase purchase = entry.getKey();
+                    if (sku.equals(purchase.getSku())) {
+                        return purchase;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static boolean hasPremium(final InventoryResponse inventoryResponse) {
+        final Purchase premiumPurchase = getPurchase(inventoryResponse, SKU_PREMIUM);
+        return premiumPurchase != null;
+    }
+
+    public static boolean hasValidSubscription(final InventoryResponse inventoryResponse) {
+        final Purchase subscriptionPurchase = getPurchase(inventoryResponse, SKU_SUBSCRIPTION);
+        return subscriptionPurchase != null && !subscriptionPurchase.isCanceled();
     }
 }

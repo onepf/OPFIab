@@ -41,7 +41,7 @@
 
     <string name="helper_activity">Activity Helper</string>
     <string name="helper_fragment">Fragment Helper</string>
-    <string name="helper_simple">Simple Helper</string>
+    <string name="helper_advanced">Advanced Helper</string>
 
     <string name="msg_drive_success">You drove a few miles!</string>
     <string name="msg_drive_failed">Out of fuel, try buying some.</string>

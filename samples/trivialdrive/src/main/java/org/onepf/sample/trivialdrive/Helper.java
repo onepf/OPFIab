@@ -21,13 +21,13 @@ import android.support.annotation.StringRes;
 
 import org.onepf.sample.trivialdrive.ui.activity.ActivityHelperActivity;
 import org.onepf.sample.trivialdrive.ui.activity.FragmentHelperActivity;
-import org.onepf.sample.trivialdrive.ui.activity.SimpleHelperActivity;
+import org.onepf.sample.trivialdrive.ui.activity.AdvancedHelperActivity;
 
 public enum Helper {
 
     ACTIVITY(R.string.helper_activity, ActivityHelperActivity.class),
     FRAGMENT(R.string.helper_fragment, FragmentHelperActivity.class),
-    SIMPLE(R.string.helper_simple, SimpleHelperActivity.class),;
+    ADVANCED(R.string.helper_advanced, AdvancedHelperActivity.class),;
 
     @StringRes
     private final int nameId;

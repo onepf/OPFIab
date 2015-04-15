@@ -29,7 +29,7 @@ public class FragmentHelperActivity extends TrivialActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.include_content);
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content, TrivialFragment.newInstance())
                     .commit();
         }

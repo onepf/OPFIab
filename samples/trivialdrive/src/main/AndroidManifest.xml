@@ -41,7 +41,7 @@
         </activity>
 
         <activity
-            android:name=".ui.activity.SimpleHelperActivity"/>
+            android:name=".ui.activity.AdvancedHelperActivity"/>
 
         <activity
             android:name=".ui.activity.ActivityHelperActivity"/>

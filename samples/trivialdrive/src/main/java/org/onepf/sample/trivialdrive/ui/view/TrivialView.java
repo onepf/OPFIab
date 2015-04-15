@@ -26,12 +26,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.sample.trivialdrive.R;
+import org.onepf.sample.trivialdrive.TrivialBilling;
 import org.onepf.sample.trivialdrive.TrivialData;
 
 public class TrivialView extends RelativeLayout
-        implements SharedPreferences.OnSharedPreferenceChangeListener {
+        implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
+    private View btnDrive;
     private View btnBuyGas;
     private View btnBuyPremium;
     private View btnBuySubscription;
@@ -39,6 +42,7 @@ public class TrivialView extends RelativeLayout
     private ImageView ivCar;
     private ImageView ivGas;
 
+    private IabHelper iabHelper;
     private boolean hasSubscription;
 
     public TrivialView(Context context) {
@@ -62,7 +66,7 @@ public class TrivialView extends RelativeLayout
         init();
     }
 
-    private void init() {
+    protected void init() {
         final Context context = getContext();
         inflate(context, R.layout.view_trivial, this);
         if (isInEditMode()) {
@@ -72,17 +76,18 @@ public class TrivialView extends RelativeLayout
         btnBuyGas = findViewById(R.id.btn_buy_gas);
         btnBuyPremium = findViewById(R.id.btn_buy_premium);
         btnBuySubscription = findViewById(R.id.btn_buy_subscription);
+        btnDrive = findViewById(R.id.btn_drive);
 
         ivGas = (ImageView) findViewById(R.id.img_gas);
         ivCar = (ImageView) findViewById(R.id.img_car);
 
-        findViewById(R.id.btn_drive).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                drive();
-            }
-        });
+        btnDrive.setOnClickListener(this);
+        btnBuyGas.setOnClickListener(this);
+        btnBuyPremium.setOnClickListener(this);
+        btnBuySubscription.setOnClickListener(this);
 
+        setEnabled(false);
+        setHasPremium(false);
         setHasSubscription(false);
         updateGas();
 
@@ -113,18 +118,6 @@ public class TrivialView extends RelativeLayout
         btnBuyGas.setEnabled(canBuyGas());
     }
 
-    public void setBuyGasClickListener(final OnClickListener listener) {
-        btnBuyGas.setOnClickListener(listener);
-    }
-
-    public void setBuySubscriptionListener(final OnClickListener listener) {
-        btnBuySubscription.setOnClickListener(listener);
-    }
-
-    public void setBuyPremiumClickListener(final OnClickListener listener) {
-        btnBuyPremium.setOnClickListener(listener);
-    }
-
     public void setHasPremium(final boolean hasPremium) {
         ivCar.setImageResource(hasPremium ? R.drawable.img_car_premium : R.drawable.img_car);
     }
@@ -132,6 +125,23 @@ public class TrivialView extends RelativeLayout
     public void setHasSubscription(final boolean hasSubscription) {
         this.hasSubscription = hasSubscription;
         updateGas();
+    }
+
+    public void setIabHelper(IabHelper iabHelper) {
+        this.iabHelper = iabHelper;
+    }
+
+    @Override
+    public void onClick(final View v) {
+        if (v == btnDrive) {
+            drive();
+        } else if (v == btnBuyGas) {
+            iabHelper.purchase(TrivialBilling.SKU_GAS);
+        } else if (v == btnBuyPremium) {
+            iabHelper.purchase(TrivialBilling.SKU_PREMIUM);
+        } else if (v == btnBuySubscription) {
+            iabHelper.purchase(TrivialBilling.SKU_SUBSCRIPTION);
+        }
     }
 
     @Override
