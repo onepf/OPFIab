@@ -19,25 +19,22 @@ package org.onepf.sample.trivialdrive.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.View;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnSetupListener;
+import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.sample.trivialdrive.R;
 import org.onepf.sample.trivialdrive.TrivialBilling;
 import org.onepf.sample.trivialdrive.ui.view.TrivialView;
 
-import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_GAS;
-import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_PREMIUM;
-import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_SUBSCRIPTION;
-
 public class ActivityHelperActivity extends TrivialActivity
-        implements OnSetupListener, OnInventoryListener {
+        implements OnSetupListener, OnInventoryListener, OnSkuDetailsListener {
 
     private ActivityIabHelper iabHelper;
     private TrivialView trivialView;
@@ -49,9 +46,10 @@ public class ActivityHelperActivity extends TrivialActivity
         setContentView(R.layout.include_trivial);
         trivialView = (TrivialView) findViewById(R.id.trivial_drive);
         trivialView.setIabHelper(iabHelper);
-        if (savedInstanceState == null) {
-            iabHelper.inventory(true);
-        }
+
+        iabHelper.addInventoryListener(this);
+        iabHelper.addSkuDetailsListener(this);
+        iabHelper.addSetupListener(this, savedInstanceState == null);
     }
 
     @Override
@@ -68,12 +66,24 @@ public class ActivityHelperActivity extends TrivialActivity
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        trivialView.setEnabled(setupResponse.isSuccessful());
+        final boolean successful = setupResponse.isSuccessful();
+        trivialView.setEnabled(successful);
+        if (successful) {
+            iabHelper.inventory(true);
+        }
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         trivialView.setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
         trivialView.setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
+        if (inventoryResponse.isSuccessful()) {
+            trivialView.requestSkuDetails();
+        }
+    }
+
+    @Override
+    public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+        trivialView.setSkuDetailsResponse(skuDetailsResponse);
     }
 }

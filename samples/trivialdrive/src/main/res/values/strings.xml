@@ -16,6 +16,7 @@
   -->
 
 <resources>
+    <string name="loreum">Loreum Impsum</string>
 
     <string name="app_name">Trivial Drive</string>
 
@@ -38,6 +39,8 @@
 
     <string name="setup_authorized">Authorized</string>
     <string name="setup_unauthorized">Unauthorized</string>
+
+    <string name="sku_unknown">Unknown</string>
 
     <string name="helper_activity">Activity Helper</string>
     <string name="helper_fragment">Fragment Helper</string>

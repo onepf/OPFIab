@@ -24,15 +24,26 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
+import org.onepf.opfiab.model.event.SetupResponse;
 
 interface ListenersSupport {
+
+
+    /**
+     * Same as {@code addSetupListener(setupListener, true);}
+     *
+     * @see #addSetupListener(OnSetupListener, boolean)
+     */
+    void addSetupListener(@NonNull final OnSetupListener setupListener);
 
     /**
      * Register callback for setup events.
      *
      * @param setupListener listener to register.
+     * @param deliverLast   if true and setup was already finished, immediately deliver last {@link SetupResponse}
      */
-    void addSetupListener(@NonNull final OnSetupListener setupListener);
+    void addSetupListener(@NonNull final OnSetupListener setupListener,
+                          final boolean deliverLast);
 
     /**
      * Register callback for purchase events.

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2012-2015 One Platform Foundation
   ~
@@ -14,16 +15,20 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <dimen name="padding_act_horizontal">16dp</dimen>
-    <dimen name="padding_act_vertical">16dp</dimen>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:tools="http://schemas.android.com/tools">
 
-    <dimen name="padding_small">5dp</dimen>
-    <dimen name="padding_normal">16dp</dimen>
-    <dimen name="padding_large">40dp</dimen>
+    <TextView
+        android:id="@+id/tv_sku_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sku_unknown"
+        android:textAppearance="?android:textAppearanceMedium"/>
 
-    <dimen name="ic_action">40dp</dimen>
-
-    <dimen name="drawer_row_height">50dp</dimen>
-    <dimen name="drawer_width">320dp</dimen>
-</resources>
+    <TextView
+        android:id="@+id/tv_sku_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:text="@string/loreum"/>
+</merge>

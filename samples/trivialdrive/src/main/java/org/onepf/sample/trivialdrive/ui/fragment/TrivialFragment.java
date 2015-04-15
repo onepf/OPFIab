@@ -27,16 +27,18 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnSetupListener;
+import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.sample.trivialdrive.R;
 import org.onepf.sample.trivialdrive.TrivialBilling;
 import org.onepf.sample.trivialdrive.ui.view.TrivialView;
 
 
 public class TrivialFragment extends Fragment
-        implements OnSetupListener, OnInventoryListener {
+        implements OnSetupListener, OnInventoryListener, OnSkuDetailsListener {
 
     public static TrivialFragment newInstance() {
         return new TrivialFragment();
@@ -66,14 +68,10 @@ public class TrivialFragment extends Fragment
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         iabHelper = OPFIab.getFragmentHelper(this);
-        iabHelper.addSetupListener(this);
-        iabHelper.addInventoryListener(this);
-
         trivialView.setIabHelper(iabHelper);
-
-        if (savedInstanceState == null) {
-            iabHelper.inventory(true);
-        }
+        iabHelper.addInventoryListener(this);
+        iabHelper.addSkuDetailsListener(this);
+        iabHelper.addSetupListener(this, savedInstanceState == null);
     }
 
     @Override
@@ -90,12 +88,24 @@ public class TrivialFragment extends Fragment
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        trivialView.setEnabled(setupResponse.isSuccessful());
+        final boolean successful = setupResponse.isSuccessful();
+        trivialView.setEnabled(successful);
+        if (successful) {
+            iabHelper.inventory(true);
+        }
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         trivialView.setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
         trivialView.setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
+        if (inventoryResponse.isSuccessful()) {
+            trivialView.requestSkuDetails();
+        }
+    }
+
+    @Override
+    public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+        trivialView.setSkuDetailsResponse(skuDetailsResponse);
     }
 }

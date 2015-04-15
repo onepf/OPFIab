@@ -15,21 +15,26 @@
   ~ limitations under the License.
   -->
 
-<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    >
 
-    <item
-        android:maxLevel="0"
-        android:drawable="@drawable/img_gas_0"/>
-    <item
-        android:maxLevel="1"
-        android:drawable="@drawable/img_gas_1"/>
-    <item
-        android:maxLevel="2"
-        android:drawable="@drawable/img_gas_2"/>
-    <item
-        android:maxLevel="3"
-        android:drawable="@drawable/img_gas_3"/>
-    <item
-        android:maxLevel="4"
-        android:drawable="@drawable/img_gas_4"/>
-</level-list>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+    <include
+        layout="@layout/include_trivial_info"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"/>
+
+    <Space
+        android:layout_width="@dimen/padding_normal"
+        android:layout_height="0dip"/>
+
+    <include
+        layout="@layout/include_trivial_billing"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    </LinearLayout>
+</merge>

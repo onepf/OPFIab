@@ -193,7 +193,7 @@ public final class OPFIabUtils {
 
     public static Purchase revert(@NonNull final SkuResolver skuResolver,
                                   @NonNull final Purchase purchase) {
-        final String resolvedSku = skuResolver.resolve(purchase.getSku());
+        final String resolvedSku = skuResolver.revert(purchase.getSku());
         return substituteSku(purchase, resolvedSku);
     }
 

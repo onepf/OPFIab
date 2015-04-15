@@ -24,15 +24,17 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.AdvancedIabHelper;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnSetupListener;
+import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.sample.trivialdrive.TrivialBilling;
 
 public class AdvancedTrivialView extends TrivialView
-        implements OnSetupListener, OnInventoryListener {
+        implements OnSetupListener, OnInventoryListener, OnSkuDetailsListener {
 
-    private AdvancedIabHelper advancedIabHelper;
+    private AdvancedIabHelper iabHelper;
 
     public AdvancedTrivialView(final Context context) {
         super(context);
@@ -55,23 +57,23 @@ public class AdvancedTrivialView extends TrivialView
     @Override
     protected void init() {
         super.init();
-        advancedIabHelper = OPFIab.getAdvancedHelper();
-        advancedIabHelper.addSetupListener(this);
-        advancedIabHelper.addInventoryListener(this);
-        setIabHelper(advancedIabHelper);
-        advancedIabHelper.inventory(true);
+        iabHelper = OPFIab.getAdvancedHelper();
+        setIabHelper(iabHelper);
+        iabHelper.addInventoryListener(this);
+        iabHelper.addSkuDetailsListener(this);
+        iabHelper.addSetupListener(this);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        advancedIabHelper.register();
+        iabHelper.register();
     }
 
     @Override
     protected void onDetachedFromWindow() {
+        iabHelper.unregister();
         super.onDetachedFromWindow();
-        advancedIabHelper.unregister();
     }
 
     @Override
@@ -81,12 +83,24 @@ public class AdvancedTrivialView extends TrivialView
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        setEnabled(setupResponse.isSuccessful());
+        final boolean successful = setupResponse.isSuccessful();
+        setEnabled(successful);
+        if (successful) {
+            iabHelper.inventory(true);
+        }
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
         setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
+        if (inventoryResponse.isSuccessful()) {
+            requestSkuDetails();
+        }
+    }
+
+    @Override
+    public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+        setSkuDetailsResponse(skuDetailsResponse);
     }
 }

@@ -40,8 +40,8 @@
             android:layout_width="@dimen/drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="left"
-            android:paddingLeft="@dimen/padding_normal"
-            android:paddingRight="@dimen/padding_normal"
+            android:paddingLeft="@dimen/padding_act_horizontal"
+            android:paddingRight="@dimen/padding_act_horizontal"
             android:background="?android:colorBackground"/>
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

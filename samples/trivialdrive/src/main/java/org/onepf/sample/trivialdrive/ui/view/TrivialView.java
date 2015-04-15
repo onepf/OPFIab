@@ -19,19 +19,29 @@ package org.onepf.sample.trivialdrive.ui.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.onepf.opfiab.api.IabHelper;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.sample.trivialdrive.R;
 import org.onepf.sample.trivialdrive.TrivialBilling;
 import org.onepf.sample.trivialdrive.TrivialData;
 
-public class TrivialView extends RelativeLayout
+import static android.view.Gravity.CENTER_HORIZONTAL;
+import static android.view.Gravity.CENTER_VERTICAL;
+import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_GAS;
+import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_PREMIUM;
+import static org.onepf.sample.trivialdrive.TrivialBilling.SKU_SUBSCRIPTION;
+
+public class TrivialView extends LinearLayout
         implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
     private View btnDrive;
@@ -42,7 +52,12 @@ public class TrivialView extends RelativeLayout
     private ImageView ivCar;
     private ImageView ivGas;
 
+    private SkuDetailsView sdvGas;
+    private SkuDetailsView sdvPremium;
+    private SkuDetailsView sdvSubscription;
+
     private IabHelper iabHelper;
+    private boolean hasPremium;
     private boolean hasSubscription;
 
     public TrivialView(Context context) {
@@ -68,6 +83,9 @@ public class TrivialView extends RelativeLayout
 
     protected void init() {
         final Context context = getContext();
+        final int orientation = getResources().getConfiguration().orientation;
+        setOrientation(orientation == Configuration.ORIENTATION_PORTRAIT ? VERTICAL : HORIZONTAL);
+        setGravity(getOrientation() == VERTICAL ? CENTER_HORIZONTAL : CENTER_VERTICAL);
         inflate(context, R.layout.view_trivial, this);
         if (isInEditMode()) {
             return;
@@ -80,6 +98,10 @@ public class TrivialView extends RelativeLayout
 
         ivGas = (ImageView) findViewById(R.id.img_gas);
         ivCar = (ImageView) findViewById(R.id.img_car);
+
+        sdvGas = (SkuDetailsView) findViewById(R.id.sdv_gas);
+        sdvPremium = (SkuDetailsView) findViewById(R.id.sdv_premium);
+        sdvSubscription = (SkuDetailsView) findViewById(R.id.sdv_subscription);
 
         btnDrive.setOnClickListener(this);
         btnBuyGas.setOnClickListener(this);
@@ -99,12 +121,13 @@ public class TrivialView extends RelativeLayout
     }
 
     private void drive() {
-        if (!hasSubscription && !TrivialData.canSpendGas()
-                && btnBuyGas.isEnabled()) {
-            btnBuyGas.callOnClick();
-        } else {
-            TrivialData.spendGas();
+        if (hasSubscription || TrivialData.canSpendGas()) {
+            if (!hasSubscription) {
+                TrivialData.spendGas();
+            }
             Toast.makeText(getContext(), R.string.msg_drive_success, Toast.LENGTH_SHORT).show();
+        } else if (btnBuyGas.isEnabled()) {
+            btnBuyGas.callOnClick();
         }
     }
 
@@ -119,6 +142,7 @@ public class TrivialView extends RelativeLayout
     }
 
     public void setHasPremium(final boolean hasPremium) {
+        this.hasPremium = hasPremium;
         ivCar.setImageResource(hasPremium ? R.drawable.img_car_premium : R.drawable.img_car);
     }
 
@@ -127,8 +151,19 @@ public class TrivialView extends RelativeLayout
         updateGas();
     }
 
-    public void setIabHelper(IabHelper iabHelper) {
+    public void setIabHelper(final IabHelper iabHelper) {
         this.iabHelper = iabHelper;
+    }
+
+    public void setSkuDetailsResponse(final SkuDetailsResponse skuDetailsResponse) {
+        sdvGas.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, SKU_GAS));
+        sdvPremium.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, SKU_PREMIUM));
+        sdvSubscription.setSkuDetails(
+                TrivialBilling.getDetails(skuDetailsResponse, SKU_SUBSCRIPTION));
+    }
+
+    public void requestSkuDetails() {
+        iabHelper.skuDetails(SKU_GAS, SKU_PREMIUM, SKU_SUBSCRIPTION);
     }
 
     @Override
@@ -162,5 +197,57 @@ public class TrivialView extends RelativeLayout
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
                                           final String key) {
         updateGas();
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        return new SavedState(super.onSaveInstanceState(), this);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(final Parcelable state) {
+        final SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        setHasPremium(savedState.hasPremium);
+        setHasSubscription(savedState.hasSubscription);
+    }
+
+
+    // hate parcelable bullshit
+    protected static class SavedState extends BaseSavedState {
+
+        private final boolean hasPremium;
+        private final boolean hasSubscription;
+
+        public SavedState(final Parcelable superState,
+                          final TrivialView trivialView) {
+            super(superState);
+            hasPremium = trivialView.hasPremium;
+            hasSubscription = trivialView.hasSubscription;
+        }
+
+        public SavedState(final Parcel source) {
+            super(source);
+            hasPremium = source.readByte() != 0;
+            hasSubscription = source.readByte() != 0;
+        }
+
+        @Override
+        public void writeToParcel(final Parcel dest, final int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeByte((byte) (hasPremium ? 1 : 0));
+            dest.writeByte((byte) (hasSubscription ? 1 : 0));
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
+
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }

@@ -65,9 +65,17 @@ class AdvancedIabHelperImpl extends SimpleIabHelperImpl implements AdvancedIabHe
 
     @Override
     public void addSetupListener(@NonNull final OnSetupListener setupListener) {
+        addSetupListener(setupListener, true);
+    }
+
+    @Override
+    public void addSetupListener(@NonNull final OnSetupListener setupListener,
+                                 final boolean deliverLast) {
         OPFChecks.checkThread(true);
         listenerCompositor.addSetupListener(setupListener);
-        deliverLastSetupEvent(setupListener);
+        if (deliverLast) {
+            deliverLastSetupEvent(setupListener);
+        }
     }
 
     @Override

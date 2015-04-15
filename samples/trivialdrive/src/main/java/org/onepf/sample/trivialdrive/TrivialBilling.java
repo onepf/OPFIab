@@ -25,8 +25,10 @@ import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.google.GoogleMapSkuResolver;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.MapSkuResolver;
 import org.onepf.opfiab.verification.VerificationResult;
 
@@ -52,12 +54,12 @@ public final class TrivialBilling {
     public static final String SKU_SUBSCRIPTION = "sku_subscription";
 
     public static final String AMAZON_SKU_GAS = "org.onepf.sample.trivialdrive.sku_gas";
-    public static final String AMAZON_SKU_PREMIUM = "";
-    public static final String AMAZON_SKU_SUBSCRIPTION = "";
+    public static final String AMAZON_SKU_PREMIUM = "org.onepf.sample.trivialdrive.sku_premium";
+    public static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.sample.trivialdrive.subscription.sku_infinite_gas";
 
     public static final String GOOGLE_SKU_GAS = "android.test.purchased";
-    public static final String GOOGLE_SKU_PREMIUM = "";
-    public static final String GOOGLE_SKU_SUBSCRIPTION = "";
+    public static final String GOOGLE_SKU_PREMIUM = "sku_premium";
+    public static final String GOOGLE_SKU_SUBSCRIPTION = "sku_infinite_gas";
 
     @SuppressWarnings("SpellCheckingInspection")
     public static final String GOOGLE_PLAY_KEY
@@ -128,18 +130,7 @@ public final class TrivialBilling {
         final Configuration.Builder builder = new Configuration.Builder();
         builder.setBillingListener(new TrivialBillingListener());
         for (final Provider provider : getProviders()) {
-            final BillingProvider billingProvider;
-            switch (provider) {
-                case AMAZON:
-                    billingProvider = newAmazonProvider();
-                    break;
-                case GOOGLE:
-                    billingProvider = newGoogleProvider();
-                    break;
-                default:
-                    throw new IllegalStateException();
-            }
-            builder.addBillingProvider(billingProvider);
+            builder.addBillingProvider(newProvider(provider));
         }
         builder.setAutoRecover(preferences.getBoolean(KEY_AUTO_RECOVER, false));
         builder.setSkipUnauthorised(preferences.getBoolean(KEY_SKIP_UNAUTHORIZED, false));
@@ -220,5 +211,19 @@ public final class TrivialBilling {
     public static boolean hasValidSubscription(final InventoryResponse inventoryResponse) {
         final Purchase subscriptionPurchase = getPurchase(inventoryResponse, SKU_SUBSCRIPTION);
         return subscriptionPurchase != null && !subscriptionPurchase.isCanceled();
+    }
+
+    public static SkuDetails getDetails(final SkuDetailsResponse skuDetailsResponse,
+                                        final String sku) {
+        final Collection<SkuDetails> skusDetails;
+        if (skuDetailsResponse.isSuccessful()
+                && (skusDetails = skuDetailsResponse.getSkusDetails()) != null) {
+            for (final SkuDetails skuDetails : skusDetails) {
+                if (sku.equals(skuDetails.getSku())) {
+                    return skuDetails.isEmpty() ? null : skuDetails;
+                }
+            }
+        }
+        return null;
     }
 }
