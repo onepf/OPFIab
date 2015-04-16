@@ -45,6 +45,7 @@
 
     <string name="msg_drive_success">You drove a few miles!</string>
     <string name="msg_drive_failed">Out of fuel, try buying some.</string>
+    <string name="msg_request_failed">%1$s : %2$s</string>
 
     <string name="dialog_providers_title">Pick Provider To Add</string>
 </resources>

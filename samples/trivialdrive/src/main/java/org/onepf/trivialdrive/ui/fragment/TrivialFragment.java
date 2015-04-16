@@ -71,7 +71,14 @@ public class TrivialFragment extends Fragment
         trivialView.setIabHelper(iabHelper);
         iabHelper.addInventoryListener(this);
         iabHelper.addSkuDetailsListener(this);
-        iabHelper.addSetupListener(this, savedInstanceState == null);
+        iabHelper.addSetupListener(this, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        iabHelper.inventory(true);
+        trivialView.requestSkuDetails();
     }
 
     @Override
@@ -82,16 +89,13 @@ public class TrivialFragment extends Fragment
     }
 
     @Override
-    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
-        trivialView.setEnabled(false);
-    }
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) { }
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        final boolean successful = setupResponse.isSuccessful();
-        trivialView.setEnabled(successful);
-        if (successful) {
+        if (setupResponse.isSuccessful()) {
             iabHelper.inventory(true);
+            trivialView.requestSkuDetails();
         }
     }
 
@@ -99,9 +103,6 @@ public class TrivialFragment extends Fragment
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         trivialView.setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
         trivialView.setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
-        if (inventoryResponse.isSuccessful()) {
-            trivialView.requestSkuDetails();
-        }
     }
 
     @Override

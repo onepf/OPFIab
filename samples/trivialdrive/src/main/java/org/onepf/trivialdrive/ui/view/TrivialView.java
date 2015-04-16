@@ -105,7 +105,6 @@ public class TrivialView extends LinearLayout
         btnBuyPremium.setOnClickListener(this);
         btnBuySubscription.setOnClickListener(this);
 
-        setEnabled(false);
         setHasPremium(false);
         setHasSubscription(false);
         updateGas();
@@ -123,7 +122,7 @@ public class TrivialView extends LinearLayout
                 TrivialData.spendGas();
             }
             Toast.makeText(getContext(), R.string.msg_drive_success, Toast.LENGTH_SHORT).show();
-        } else if (btnBuyGas.isEnabled()) {
+        } else {
             btnBuyGas.callOnClick();
         }
     }
@@ -135,7 +134,6 @@ public class TrivialView extends LinearLayout
             ivGas.setImageResource(R.drawable.img_gas_level);
             ivGas.getDrawable().setLevel(TrivialData.getGas());
         }
-        btnBuyGas.setEnabled(canBuyGas());
     }
 
     public void setHasPremium(final boolean hasPremium) {
@@ -154,14 +152,16 @@ public class TrivialView extends LinearLayout
 
     public void setSkuDetailsResponse(final SkuDetailsResponse skuDetailsResponse) {
         sdvGas.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_GAS));
-        sdvPremium.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_PREMIUM));
+        sdvPremium.setSkuDetails(
+                TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_PREMIUM));
         sdvSubscription.setSkuDetails(
                 TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_SUBSCRIPTION));
     }
 
     public void requestSkuDetails() {
         iabHelper.skuDetails(
-                TrivialBilling.SKU_GAS, TrivialBilling.SKU_PREMIUM, TrivialBilling.SKU_SUBSCRIPTION);
+                TrivialBilling.SKU_GAS, TrivialBilling.SKU_PREMIUM,
+                TrivialBilling.SKU_SUBSCRIPTION);
     }
 
     @Override
@@ -175,14 +175,6 @@ public class TrivialView extends LinearLayout
         } else if (v == btnBuySubscription) {
             iabHelper.purchase(TrivialBilling.SKU_SUBSCRIPTION);
         }
-    }
-
-    @Override
-    public void setEnabled(final boolean enabled) {
-        super.setEnabled(enabled);
-        btnBuyGas.setEnabled(enabled && canBuyGas());
-        btnBuyPremium.setEnabled(enabled);
-        btnBuySubscription.setEnabled(enabled);
     }
 
     @Override

@@ -16,13 +16,35 @@
 
 package org.onepf.trivialdrive;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import org.onepf.opfiab.listener.DefaultBillingListener;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.Status;
 
 public class TrivialBillingListener extends DefaultBillingListener {
+
+    private final Context context;
+
+    public TrivialBillingListener(final Context context) {
+        super();
+        this.context = context.getApplicationContext();
+    }
+
+    @Override
+    public void onResponse(@NonNull final BillingResponse billingResponse) {
+        super.onResponse(billingResponse);
+        if (!billingResponse.isSuccessful()) {
+            final BillingResponse.Type type = billingResponse.getType();
+            final Status status = billingResponse.getStatus();
+            final String msg = context.getString(R.string.msg_request_failed, type, status);
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void consume(final Purchase purchase) {

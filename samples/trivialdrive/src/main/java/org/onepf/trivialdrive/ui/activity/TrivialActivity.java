@@ -314,7 +314,8 @@ abstract class TrivialActivity extends ActionBarActivity
         @Override
         public void onClick(final View v) {
             if (v == btnInit) {
-                OPFIab.init(getApplication(), TrivialBilling.getRelevantConfiguration());
+                final TrivialActivity context = TrivialActivity.this;
+                OPFIab.init(getApplication(), TrivialBilling.getRelevantConfiguration(context));
             } else if (v == btnSetup) {
                 OPFIab.setup();
             } else if (v == ctvAutoRecover) {

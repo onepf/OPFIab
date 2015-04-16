@@ -68,6 +68,8 @@ public class AdvancedTrivialView extends TrivialView
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         iabHelper.register();
+        iabHelper.inventory(true);
+        requestSkuDetails();
     }
 
     @Override
@@ -77,16 +79,13 @@ public class AdvancedTrivialView extends TrivialView
     }
 
     @Override
-    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
-        setEnabled(false);
-    }
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) { }
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        final boolean successful = setupResponse.isSuccessful();
-        setEnabled(successful);
-        if (successful) {
+        if (setupResponse.isSuccessful()) {
             iabHelper.inventory(true);
+            requestSkuDetails();
         }
     }
 
@@ -94,9 +93,6 @@ public class AdvancedTrivialView extends TrivialView
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
         setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
         setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
-        if (inventoryResponse.isSuccessful()) {
-            requestSkuDetails();
-        }
     }
 
     @Override

@@ -126,9 +126,9 @@ public final class TrivialBilling {
         }
     }
 
-    public static Configuration getRelevantConfiguration() {
+    public static Configuration getRelevantConfiguration(final Context context) {
         final Configuration.Builder builder = new Configuration.Builder();
-        builder.setBillingListener(new TrivialBillingListener());
+        builder.setBillingListener(new TrivialBillingListener(context));
         for (final Provider provider : getProviders()) {
             builder.addBillingProvider(newProvider(provider));
         }

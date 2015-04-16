@@ -29,7 +29,7 @@ import java.util.Set;
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class Configuration {
 
-    private static final long DEFAULT_REQUEST_DELAY = 500L;
+    private static final long DEFAULT_REQUEST_DELAY = 50L;
 
 
     @NonNull
@@ -103,7 +103,7 @@ public final class Configuration {
 
         /**
          * Set time gap between attempts to execute enqueued requests.<br>
-         * Default valued is 500ms.
+         * Default valued is 50ms.
          *
          * @param subsequentRequestDelay time gap in milliseconds.
          * @see #getSubsequentRequestDelay()

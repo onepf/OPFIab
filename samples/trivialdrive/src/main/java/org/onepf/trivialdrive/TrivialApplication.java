@@ -20,7 +20,6 @@ import android.app.Application;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.trivialdrive.BuildConfig;
 
 
 public class TrivialApplication extends Application {
@@ -32,6 +31,6 @@ public class TrivialApplication extends Application {
         TrivialBilling.init(this);
 
         OPFLog.setEnabled(BuildConfig.DEBUG, true);
-        OPFIab.init(this, TrivialBilling.getRelevantConfiguration());
+        OPFIab.init(this, TrivialBilling.getRelevantConfiguration(this));
     }
 }
