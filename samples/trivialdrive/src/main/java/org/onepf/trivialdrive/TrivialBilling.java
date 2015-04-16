@@ -38,8 +38,7 @@ import org.onepf.opfiab.verification.VerificationResult;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.Collections;
 import java.util.Map;
 
 public final class TrivialBilling {
@@ -158,18 +157,20 @@ public final class TrivialBilling {
             }
             return providers;
         } catch (JSONException e) {
-            return null;
+            return Collections.emptyList();
         }
     }
 
     public static void setProviders(final Iterable<Provider> providers) {
         final JSONObject jsonObject = new JSONObject();
+        final JSONArray jsonArray = new JSONArray();
         for (final Provider provider : providers) {
-            try {
-                jsonObject.accumulate(KEY_PROVIDERS, provider.name());
-            } catch (JSONException ignore) { }
+            jsonArray.put(provider.name());
         }
-        preferences.edit().putString(KEY_PROVIDERS, jsonObject.toString()).apply();
+        try {
+            jsonObject.put(KEY_PROVIDERS, jsonArray);
+            preferences.edit().putString(KEY_PROVIDERS, jsonObject.toString()).apply();
+        } catch (JSONException ignore) { }
     }
 
     public static boolean isAutoRecover() {

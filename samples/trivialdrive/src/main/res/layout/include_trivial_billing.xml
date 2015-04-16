@@ -24,10 +24,13 @@
 
         <ImageView
             android:id="@+id/btn_buy_gas"
-            android:layout_width="0dip"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:src="@drawable/btn_buy_gas"/>
+
+        <Space
+            android:layout_width="@dimen/padding_normal"
+            android:layout_height="wrap_content"/>
 
         <org.onepf.trivialdrive.ui.view.SkuDetailsView
             android:id="@+id/sdv_gas"
@@ -41,10 +44,13 @@
 
         <ImageView
             android:id="@+id/btn_buy_premium"
-            android:layout_width="0dip"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:src="@drawable/btn_buy_premium"/>
+
+        <Space
+            android:layout_width="@dimen/padding_normal"
+            android:layout_height="wrap_content"/>
 
         <org.onepf.trivialdrive.ui.view.SkuDetailsView
             android:id="@+id/sdv_premium"
@@ -58,10 +64,13 @@
 
         <ImageView
             android:id="@+id/btn_buy_subscription"
-            android:layout_width="0dip"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:src="@drawable/btn_buy_subscription"/>
+
+        <Space
+            android:layout_width="@dimen/padding_normal"
+            android:layout_height="wrap_content"/>
 
         <org.onepf.trivialdrive.ui.view.SkuDetailsView
             android:id="@+id/sdv_subscription"

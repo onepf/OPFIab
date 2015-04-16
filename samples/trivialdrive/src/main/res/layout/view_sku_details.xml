@@ -23,12 +23,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sku_unknown"
-        android:textAppearance="?android:textAppearanceMedium"/>
+        android:maxLines="2"
+        android:ellipsize="end"/>
 
     <TextView
         android:id="@+id/tv_sku_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        tools:text="@string/loreum"/>
+        android:singleLine="true"
+        android:ellipsize="end"
+        tools:text="@string/loreum"
+        tools:visibility="visible"/>
 </merge>
