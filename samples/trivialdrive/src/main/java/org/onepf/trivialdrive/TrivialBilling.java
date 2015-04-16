@@ -55,11 +55,11 @@ public final class TrivialBilling {
     public static final String SKU_PREMIUM = "sku_premium";
     public static final String SKU_SUBSCRIPTION = "sku_subscription";
 
-    public static final String AMAZON_SKU_GAS = "org.onepf.sample.trivialdrive.sku_gas";
-    public static final String AMAZON_SKU_PREMIUM = "org.onepf.sample.trivialdrive.sku_premium";
-    public static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.sample.trivialdrive.subscription.sku_infinite_gas";
+    public static final String AMAZON_SKU_GAS = "org.onepf.trivialdrive.sku_gas";
+    public static final String AMAZON_SKU_PREMIUM = "org.onepf.trivialdrive.sku_premium";
+    public static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.trivialdrive.subscription.sku_infinite_gas";
 
-    public static final String GOOGLE_SKU_GAS = "android.test.purchased";
+    public static final String GOOGLE_SKU_GAS = "sku_gas";
     public static final String GOOGLE_SKU_PREMIUM = "sku_premium";
     public static final String GOOGLE_SKU_SUBSCRIPTION = "sku_infinite_gas";
 

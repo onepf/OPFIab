@@ -47,11 +47,11 @@ android {
     }
 
     lintOptions {
-        abortOnError true
+        abortOnError false
         checkAllWarnings true
-        warningsAsErrors true
+        warningsAsErrors false
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
-                'IconMissingDensityFolder', 'RtlSymmetry'
+                'IconMissingDensityFolder', 'IconExpectedSize', 'RtlSymmetry', 'RtlHardcoded', 'IconDensities', 'ButtonStyle'
     }
 }
 
