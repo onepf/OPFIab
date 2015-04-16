@@ -28,6 +28,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,6 +50,7 @@ import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
+import org.onepf.opfutils.OPFPreferences;
 import org.onepf.trivialdrive.Helper;
 import org.onepf.trivialdrive.OnProviderPickerListener;
 import org.onepf.trivialdrive.Provider;
@@ -61,6 +63,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 
 abstract class TrivialActivity extends ActionBarActivity
         implements OnProviderPickerListener {
@@ -99,9 +104,7 @@ abstract class TrivialActivity extends ActionBarActivity
     public void setContentView(final int layoutResID) {
         super.setContentView(R.layout.activity_trivial);
         toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        toolbar.setLogo(R.drawable.img_logo);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         final View view = getLayoutInflater().inflate(layoutResID, drawerLayout, false);
         drawerLayout.addView(view, 0);
@@ -118,6 +121,9 @@ abstract class TrivialActivity extends ActionBarActivity
     protected void onPostCreate(final Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
+        if (savedInstanceState == null) {
+            drawerLayout.openDrawer(Gravity.LEFT);
+        }
     }
 
     @Override
@@ -205,7 +211,7 @@ abstract class TrivialActivity extends ActionBarActivity
                 final Provider provider = items.get(position - headerCount);
                 viewHolder.setProvider(provider);
                 final boolean isDragged = getDraggingId() == getItemId(position);
-                viewHolder.itemView.setVisibility(isDragged ? View.INVISIBLE : View.VISIBLE);
+                viewHolder.itemView.setVisibility(isDragged ? INVISIBLE : VISIBLE);
             }
         }
 
@@ -264,8 +270,11 @@ abstract class TrivialActivity extends ActionBarActivity
             implements View.OnClickListener, OnSetupListener, AdapterView.OnItemSelectedListener {
 
         private final Spinner spinHelper;
-        private final TextView tvSetup;
-        private final ProgressBar pgSetup;
+        private final TextView tvSetupStatus;
+        private final TextView tvSetupProvider;
+        private final TextView tvSetupAuthorisation;
+        private final ProgressBar pbSetup;
+        private final Button btnForget;
         private final Button btnInit;
         private final Button btnSetup;
         private final CheckedTextView ctvSkipUnauthorized;
@@ -274,8 +283,11 @@ abstract class TrivialActivity extends ActionBarActivity
         public HeaderViewHolder(final DragSortAdapter<?> dragSortAdapter, final View itemView) {
             super(dragSortAdapter, itemView);
             spinHelper = (Spinner) itemView.findViewById(R.id.spin_helper);
-            tvSetup = (TextView) itemView.findViewById(R.id.tv_setup);
-            pgSetup = (ProgressBar) itemView.findViewById(R.id.pg_setup);
+            tvSetupStatus = (TextView) itemView.findViewById(R.id.tv_setup_status);
+            tvSetupProvider = (TextView) itemView.findViewById(R.id.tv_setup_provider);
+            tvSetupAuthorisation = (TextView) itemView.findViewById(R.id.tv_setup_authorisation);
+            pbSetup = (ProgressBar) itemView.findViewById(R.id.pb_setup);
+            btnForget = (Button) itemView.findViewById(R.id.btn_forget);
             btnInit = (Button) itemView.findViewById(R.id.btn_init);
             btnSetup = (Button) itemView.findViewById(R.id.btn_setup);
             ctvAutoRecover = (CheckedTextView) itemView.findViewById(R.id.ctv_auto_recover);
@@ -287,6 +299,7 @@ abstract class TrivialActivity extends ActionBarActivity
             spinHelper.setSelection(adapter.getPosition(TrivialBilling.getHelper()));
             spinHelper.setOnItemSelectedListener(this);
 
+            btnForget.setOnClickListener(this);
             btnInit.setOnClickListener(this);
             btnSetup.setOnClickListener(this);
             ctvAutoRecover.setChecked(TrivialBilling.isAutoRecover());
@@ -295,6 +308,30 @@ abstract class TrivialActivity extends ActionBarActivity
             ctvSkipUnauthorized.setChecked(TrivialBilling.isSkipUnauthorized());
 
             iabHelper.addSetupListener(this);
+        }
+
+
+        private void setSetupResponse(final SetupResponse setupResponse) {
+            pbSetup.setVisibility(INVISIBLE);
+            tvSetupProvider.setVisibility(VISIBLE);
+            final boolean setupSuccessful = setupResponse != null && setupResponse.isSuccessful();
+            final int visibility = setupSuccessful ? VISIBLE : INVISIBLE;
+            tvSetupStatus.setVisibility(visibility);
+            tvSetupAuthorisation.setVisibility(visibility);
+            if (setupSuccessful) {
+                //noinspection ConstantConditions
+                final BillingProviderInfo info = setupResponse.getBillingProvider().getInfo();
+                final Provider provider = Provider.getByInfo(info);
+                tvSetupProvider.setText(provider == null
+                                                ? info.getName()
+                                                : getString(provider.getNameId()));
+                tvSetupStatus.setText(setupResponse.getStatus().toString());
+                tvSetupAuthorisation.setText(setupResponse.isAuthorized()
+                                                     ? R.string.setup_authorized
+                                                     : R.string.setup_unauthorized);
+            } else {
+                tvSetupProvider.setText(R.string.setup_no_provider);
+            }
         }
 
         @Override
@@ -313,9 +350,13 @@ abstract class TrivialActivity extends ActionBarActivity
 
         @Override
         public void onClick(final View v) {
-            if (v == btnInit) {
+            if (v == btnForget) {
+                // strictly for demo purposes
+                new OPFPreferences(getApplicationContext()).clear();
+            } else if (v == btnInit) {
                 final TrivialActivity context = TrivialActivity.this;
                 OPFIab.init(getApplication(), TrivialBilling.getRelevantConfiguration(context));
+                setSetupResponse(null);
             } else if (v == btnSetup) {
                 OPFIab.setup();
             } else if (v == ctvAutoRecover) {
@@ -329,28 +370,15 @@ abstract class TrivialActivity extends ActionBarActivity
 
         @Override
         public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
-            tvSetup.setVisibility(View.INVISIBLE);
-            pgSetup.setVisibility(View.VISIBLE);
+            pbSetup.setVisibility(VISIBLE);
+            tvSetupStatus.setVisibility(INVISIBLE);
+            tvSetupProvider.setVisibility(INVISIBLE);
+            tvSetupAuthorisation.setVisibility(INVISIBLE);
         }
 
         @Override
         public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-            tvSetup.setVisibility(View.VISIBLE);
-            pgSetup.setVisibility(View.INVISIBLE);
-            if (setupResponse.isSuccessful()) {
-                //noinspection ConstantConditions
-                final BillingProviderInfo info = setupResponse.getBillingProvider().getInfo();
-                final Provider provider = Provider.getByInfo(info);
-                final String name = provider == null
-                        ? info.getName()
-                        : getString(provider.getNameId());
-                final String authorized = getString(setupResponse.isAuthorized()
-                                                            ? R.string.setup_authorized
-                                                            : R.string.setup_unauthorized);
-                tvSetup.setText(getString(R.string.label_setup_successful, name, authorized));
-            } else {
-                tvSetup.setText(R.string.label_setup_failed);
-            }
+            setSetupResponse(setupResponse);
         }
     }
 

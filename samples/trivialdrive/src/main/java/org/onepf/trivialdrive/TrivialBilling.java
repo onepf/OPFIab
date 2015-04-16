@@ -19,6 +19,9 @@ package org.onepf.trivialdrive;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
@@ -36,8 +39,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 public final class TrivialBilling {
 
@@ -146,21 +149,27 @@ public final class TrivialBilling {
     }
 
     public static Collection<Provider> getProviders() {
-        final Collection<String> providersNames = preferences.getStringSet(KEY_PROVIDERS, null);
-        //noinspection ConstantConditions
-        final Collection<Provider> providers = new ArrayList<>(providersNames.size());
-        for (final String providerName : providersNames) {
-            providers.add(Provider.valueOf(providerName));
+        try {
+            final JSONObject jsonObject = new JSONObject(preferences.getString(KEY_PROVIDERS, ""));
+            final JSONArray jsonArray = jsonObject.getJSONArray(KEY_PROVIDERS);
+            final Collection<Provider> providers = new ArrayList<>(jsonArray.length());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                providers.add(Provider.valueOf(jsonArray.getString(i)));
+            }
+            return providers;
+        } catch (JSONException e) {
+            return null;
         }
-        return providers;
     }
 
     public static void setProviders(final Iterable<Provider> providers) {
-        final Set<String> providersNames = new HashSet<>();
+        final JSONObject jsonObject = new JSONObject();
         for (final Provider provider : providers) {
-            providersNames.add(provider.name());
+            try {
+                jsonObject.accumulate(KEY_PROVIDERS, provider.name());
+            } catch (JSONException ignore) { }
         }
-        preferences.edit().putStringSet(KEY_PROVIDERS, providersNames).apply();
+        preferences.edit().putString(KEY_PROVIDERS, jsonObject.toString()).apply();
     }
 
     public static boolean isAutoRecover() {

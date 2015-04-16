@@ -38,7 +38,9 @@
             android:gravity="center"/>
     </TableRow>
 
-    <TableRow>
+    <TableRow
+        android:paddingTop="@dimen/padding_small"
+        android:paddingBottom="@dimen/padding_small">
 
         <TextView
             android:layout_width="0dip"
@@ -47,63 +49,75 @@
             android:gravity="center_vertical"
             android:text="@string/label_setup"/>
 
-        <FrameLayout
+        <Space
+            android:layout_width="@dimen/padding_normal"
+            android:layout_height="wrap_content"/>
+
+        <RelativeLayout
             android:layout_width="0dip"
             android:layout_height="@dimen/drawer_row_height"
             android:layout_weight="2"
-            android:paddingLeft="@dimen/padding_normal"
             android:animateLayoutChanges="true">
 
-            <ProgressBar
-                android:id="@+id/pg_setup"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/tv_setup_provider"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="invisible"
-                tools:visibility="visible"
-                style="?android:progressBarStyleSmall"/>
+                android:layout_centerInParent="true"
+                android:text="@string/setup_no_provider"/>
 
             <TextView
-                android:id="@+id/tv_setup"
+                android:id="@+id/tv_setup_status"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/tv_setup_provider"
+                android:visibility="invisible"
+                tools:text="@string/loreum"
+                tools:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/tv_setup_authorisation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_setup_provider"
+                android:visibility="invisible"
+                tools:text="@string/loreum"
+                tools:visibility="visible"/>
+
+            <ProgressBar
+                android:id="@+id/pb_setup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:visibility="invisible"
                 tools:visibility="visible"
-                tools:text="@string/loreum"/>
-        </FrameLayout>
+                style="?android:progressBarStyle"/>
+        </RelativeLayout>
     </TableRow>
 
-    <TableRow>
+    <TableRow
+        android:gravity="center_vertical">
 
-        <Space
+        <Button
+            android:id="@+id/btn_forget"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:text="@string/btn_forget"/>
 
         <Button
             android:id="@+id/btn_init"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:text="@string/btn_init"/>
-
-        <Space
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
 
         <Button
             android:id="@+id/btn_setup"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:text="@string/btn_setup"/>
-
-        <Space
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
     </TableRow>
 
     <CheckedTextView

@@ -40,7 +40,7 @@
         android:id="@id/btn_drive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_large"
+        android:layout_marginTop="@dimen/padding_normal"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/btn_drive"/>
 </LinearLayout>
