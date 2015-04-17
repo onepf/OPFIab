@@ -26,6 +26,7 @@ import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.google.GoogleMapSkuResolver;
+import org.onepf.opfiab.google.SimpleGooglePurchaseVerifier;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -65,11 +66,11 @@ public final class TrivialBilling {
 
     @SuppressWarnings("SpellCheckingInspection")
     public static final String GOOGLE_PLAY_KEY
-            = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5F8fASyrDFdaXrkoW8kNtwH5JIkLnNuTD5uE1a37TbI5LDZR" +
-            "VgvMIYAtZ9CAHAfLnJ6OEZt0lvLLJSKVuS47VqYVhGZciOkX8TEihONBRwis6i9A3JnKfyqm0iiT+P0CEktOLuFLROIo13" +
-            "utCIO++6h7A7/WLfxNV+Jnxfs9OEHyyPS+MdHxa0wtZGeAGiaN65BymsBQo7J/ABt2DFyMJP1R/nJM45F8yu4D6wSkUNKz" +
-            "s/QbPfvHJQzq56/B/hbx59EkzkInqC567hrlUlX4bU5IvOTF/B1G+UMuKg80m3I1IcQk4FD2D9oJ3E+8IXG/1UdejrOsmq" +
-            "DAzE7LkMl8xwIDAQAB";
+            = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsTvSvwlDqz/wNr5UXD/rNxl+hs1vbbhta0O3g+NS" +
+            "+jChs9+zhRCZScvQT1QzsAg6GNPCyoDXpYa9WWcZQ7kC4scQYQ6pYUUQDNaTwEqDRbmkesx5iRxEqoD9LUhhaO" +
+            "L55NbFUPhiypkMww0t2768fuyxRnmBl2RZdQvM+paMDEDU2CtUMqrx4St3huGkFSjWlYMrU5vKELoLu9acThoM" +
+            "k9ErEOFBqb4dGBNswH5JRm68r/u7a2XzEoo40dXQQH2/5tMy3AQCzVakHnfcIQcZO0BkQOh4o52ahhy3vcCUha" +
+            "uN61YA492k+DmKT5GgSH+KxwgK5dcorjbh94E9e03dZwIDAQAB";
 
 
     private static Context context;
@@ -93,8 +94,7 @@ public final class TrivialBilling {
         skuResolver.add(SKU_SUBSCRIPTION, GOOGLE_SKU_SUBSCRIPTION, SkuType.SUBSCRIPTION);
 
         return new GoogleBillingProvider.Builder(context)
-                //TODO
-                //                .setPurchaseVerifier(new SimpleGooglePurchaseVerifier(GOOGLE_PLAY_KEY))
+                .setPurchaseVerifier(new SimpleGooglePurchaseVerifier(GOOGLE_PLAY_KEY))
                 .setSkuResolver(skuResolver)
                 .build();
     }
