@@ -206,7 +206,6 @@ public class TrivialView extends LinearLayout
     }
 
 
-    // hate parcelable bullshit
     protected static class SavedState extends BaseSavedState {
 
         private final boolean hasPremium;
