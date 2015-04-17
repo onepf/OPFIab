@@ -54,7 +54,7 @@ import org.onepf.opfutils.OPFPreferences;
 import org.onepf.trivialdrive.Helper;
 import org.onepf.trivialdrive.OnProviderPickerListener;
 import org.onepf.trivialdrive.Provider;
-import org.onepf.trivialdrive.R;
+import org.onepf.opfiab.trivialdrive.R;
 import org.onepf.trivialdrive.TrivialBilling;
 import org.onepf.trivialdrive.ui.fragment.ProviderPickerDialogFragment;
 

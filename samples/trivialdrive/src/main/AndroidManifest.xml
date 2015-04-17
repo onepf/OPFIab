@@ -18,8 +18,7 @@
 
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="org.onepf.trivialdrive"
+    package="org.onepf.opfiab.trivialdrive"
     android:installLocation="auto">
 
     <application
@@ -27,9 +26,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:debuggable="true"
-        tools:ignore="HardcodedDebugMode">
+        android:theme="@style/AppTheme">
 
         <activity
             android:name="org.onepf.trivialdrive.ui.activity.LauncherActivity">

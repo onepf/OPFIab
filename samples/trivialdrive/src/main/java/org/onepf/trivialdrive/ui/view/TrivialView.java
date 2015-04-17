@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.trivialdrive.R;
+import org.onepf.opfiab.trivialdrive.R;
 import org.onepf.trivialdrive.TrivialBilling;
 import org.onepf.trivialdrive.TrivialData;
 

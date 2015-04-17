@@ -18,7 +18,7 @@ package org.onepf.trivialdrive.ui.activity;
 
 import android.os.Bundle;
 
-import org.onepf.trivialdrive.R;
+import org.onepf.opfiab.trivialdrive.R;
 import org.onepf.trivialdrive.ui.fragment.TrivialFragment;
 
 

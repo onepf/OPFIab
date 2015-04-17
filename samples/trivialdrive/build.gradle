@@ -24,7 +24,7 @@ android {
     buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        applicationId "org.onepf.trivialdrive"
+        applicationId "org.onepf.opfiab.trivialdrive"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 22

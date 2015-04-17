@@ -25,6 +25,7 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.Status;
+import org.onepf.opfiab.trivialdrive.R;
 
 public class TrivialBillingListener extends DefaultBillingListener {
 

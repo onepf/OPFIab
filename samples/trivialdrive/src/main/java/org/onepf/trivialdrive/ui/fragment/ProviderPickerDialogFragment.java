@@ -30,7 +30,7 @@ import android.widget.TextView;
 
 import org.onepf.trivialdrive.OnProviderPickerListener;
 import org.onepf.trivialdrive.Provider;
-import org.onepf.trivialdrive.R;
+import org.onepf.opfiab.trivialdrive.R;
 
 import java.util.ArrayList;
 import java.util.Collection;

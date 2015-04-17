@@ -19,6 +19,7 @@ package org.onepf.trivialdrive;
 import android.app.Application;
 
 import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.trivialdrive.BuildConfig;
 import org.onepf.opfutils.OPFLog;
 
 
