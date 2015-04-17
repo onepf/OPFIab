@@ -35,11 +35,20 @@ import org.onepf.opfiab.trivialdrive.R;
 import org.onepf.trivialdrive.TrivialBilling;
 import org.onepf.trivialdrive.TrivialData;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static android.view.Gravity.CENTER_HORIZONTAL;
 import static android.view.Gravity.CENTER_VERTICAL;
 
 public class TrivialView extends LinearLayout
         implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+
+    public static final Set<String> SKUS = new HashSet<>(Arrays.asList(TrivialBilling.SKU_GAS,
+                                                                       TrivialBilling.SKU_PREMIUM,
+                                                                       TrivialBilling.SKU_SUBSCRIPTION));
+
 
     private View btnDrive;
     private View btnBuyGas;
@@ -156,12 +165,6 @@ public class TrivialView extends LinearLayout
                 TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_PREMIUM));
         sdvSubscription.setSkuDetails(
                 TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_SUBSCRIPTION));
-    }
-
-    public void requestSkuDetails() {
-        iabHelper.skuDetails(
-                TrivialBilling.SKU_GAS, TrivialBilling.SKU_PREMIUM,
-                TrivialBilling.SKU_SUBSCRIPTION);
     }
 
     @Override

@@ -69,7 +69,7 @@ public class AdvancedTrivialView extends TrivialView
         super.onAttachedToWindow();
         iabHelper.register();
         iabHelper.inventory(true);
-        requestSkuDetails();
+        iabHelper.skuDetails(TrivialView.SKUS);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class AdvancedTrivialView extends TrivialView
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         if (setupResponse.isSuccessful()) {
             iabHelper.inventory(true);
-            requestSkuDetails();
+            iabHelper.skuDetails(TrivialView.SKUS);
         }
     }
 

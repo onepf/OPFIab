@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import com.amazon.device.iap.PurchasingService;
 import com.amazon.device.iap.ResponseReceiver;
@@ -252,8 +253,13 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     @Override
     public void consume(@NonNull final Purchase purchase) {
-        PurchasingService.notifyFulfillment(purchase.getSku(), FulfillmentResult.FULFILLED);
-        postConsumeResponse(SUCCESS, purchase);
+        final String token = purchase.getToken();
+        if (!TextUtils.isEmpty(token)) {
+            PurchasingService.notifyFulfillment(token, FulfillmentResult.FULFILLED);
+            postConsumeResponse(SUCCESS, purchase);
+        } else {
+            postConsumeResponse(ITEM_UNAVAILABLE, purchase);
+        }
     }
 
     @NonNull

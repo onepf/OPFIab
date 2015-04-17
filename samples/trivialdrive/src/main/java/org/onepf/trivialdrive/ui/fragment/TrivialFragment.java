@@ -78,7 +78,7 @@ public class TrivialFragment extends Fragment
     public void onResume() {
         super.onResume();
         iabHelper.inventory(true);
-        trivialView.requestSkuDetails();
+        iabHelper.skuDetails(TrivialView.SKUS);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class TrivialFragment extends Fragment
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         if (setupResponse.isSuccessful()) {
             iabHelper.inventory(true);
-            trivialView.requestSkuDetails();
+            iabHelper.skuDetails(TrivialView.SKUS);
         }
     }
 
