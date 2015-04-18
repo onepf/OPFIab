@@ -23,16 +23,17 @@ import android.util.AttributeSet;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.AdvancedIabHelper;
 import org.onepf.opfiab.listener.OnInventoryListener;
+import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.trivialdrive.TrivialBilling;
 
 public class AdvancedTrivialView extends TrivialView
-        implements OnSetupListener, OnInventoryListener, OnSkuDetailsListener {
+        implements OnSetupListener, OnPurchaseListener, OnInventoryListener, OnSkuDetailsListener {
 
     private AdvancedIabHelper iabHelper;
 
@@ -59,17 +60,16 @@ public class AdvancedTrivialView extends TrivialView
         super.init();
         iabHelper = OPFIab.getAdvancedHelper();
         setIabHelper(iabHelper);
+        iabHelper.addPurchaseListener(this);
         iabHelper.addInventoryListener(this);
         iabHelper.addSkuDetailsListener(this);
-        iabHelper.addSetupListener(this);
+        iabHelper.addSetupListener(this, false);
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         iabHelper.register();
-        iabHelper.inventory(true);
-        iabHelper.skuDetails(TrivialView.SKUS);
     }
 
     @Override
@@ -79,24 +79,27 @@ public class AdvancedTrivialView extends TrivialView
     }
 
     @Override
-    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) { }
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
+        update();
+    }
 
     @Override
-    public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        if (setupResponse.isSuccessful()) {
-            iabHelper.inventory(true);
-            iabHelper.skuDetails(TrivialView.SKUS);
-        }
+    public void onSetupResponse(@NonNull final SetupResponse setupResponse) { }
+
+    @Override
+    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+        updatePremium();
+        updateSubscription();
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
-        setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
+        updatePremium();
+        updateSubscription();
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        setSkuDetailsResponse(skuDetailsResponse);
+        updateSkuDetails();
     }
 }

@@ -18,14 +18,22 @@ package org.onepf.trivialdrive;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import org.onepf.opfiab.listener.DefaultBillingListener;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.opfiab.verification.VerificationResult;
+import org.onepf.trivialdrive.ui.view.TrivialView;
 
 public class TrivialBillingListener extends DefaultBillingListener {
 
@@ -34,6 +42,22 @@ public class TrivialBillingListener extends DefaultBillingListener {
     public TrivialBillingListener(final Context context) {
         super();
         this.context = context.getApplicationContext();
+    }
+
+    @Override
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
+        super.onSetupStarted(setupStartedEvent);
+        TrivialBilling.updateSetup();
+    }
+
+    @Override
+    public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
+        super.onSetupResponse(setupResponse);
+        if (setupResponse.isSuccessful()) {
+            // update inventory and sku data every time provider is picked
+            getHelper().inventory(true);
+            getHelper().skuDetails(TrivialView.SKUS);
+        }
     }
 
     @Override
@@ -48,17 +72,34 @@ public class TrivialBillingListener extends DefaultBillingListener {
     }
 
     @Override
-    protected void consume(final Purchase purchase) {
-        if (TrivialData.canAddGas()) {
-            super.consume(purchase);
-        }
+    public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+        super.onSkuDetails(skuDetailsResponse);
+        TrivialBilling.updateSkuDetails(skuDetailsResponse);
+    }
+
+    @Override
+    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+        super.onPurchase(purchaseResponse);
+        TrivialBilling.updatePurchase(purchaseResponse);
+    }
+
+    @Override
+    public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
+        super.onInventory(inventoryResponse);
+        TrivialBilling.updateInventory(inventoryResponse);
+    }
+
+    @Override
+    protected boolean canConsume(@Nullable final Purchase purchase,
+                                 @Nullable final VerificationResult verificationResult) {
+        return TrivialData.canAddGas() && super.canConsume(purchase, verificationResult);
     }
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
         super.onConsume(consumeResponse);
-        if (consumeResponse.isSuccessful()
-                && TrivialData.canAddGas()) {
+        // Available gas should be persistent regardless of current billing state
+        if (consumeResponse.isSuccessful()) {
             TrivialData.addGas();
         }
     }

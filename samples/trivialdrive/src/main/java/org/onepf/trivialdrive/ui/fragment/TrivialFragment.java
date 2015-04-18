@@ -26,19 +26,20 @@ import android.view.ViewGroup;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.listener.OnInventoryListener;
+import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.trivialdrive.R;
-import org.onepf.trivialdrive.TrivialBilling;
 import org.onepf.trivialdrive.ui.view.TrivialView;
 
 
 public class TrivialFragment extends Fragment
-        implements OnSetupListener, OnInventoryListener, OnSkuDetailsListener {
+        implements OnSetupListener, OnPurchaseListener, OnInventoryListener, OnSkuDetailsListener {
 
     public static TrivialFragment newInstance() {
         return new TrivialFragment();
@@ -61,7 +62,7 @@ public class TrivialFragment extends Fragment
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        trivialView = (TrivialView) view.findViewById(R.id.trivial_drive);
+        trivialView = (TrivialView) view.findViewById(R.id.trivial);
     }
 
     @Override
@@ -69,6 +70,8 @@ public class TrivialFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
         iabHelper = OPFIab.getFragmentHelper(this);
         trivialView.setIabHelper(iabHelper);
+
+        iabHelper.addPurchaseListener(this);
         iabHelper.addInventoryListener(this);
         iabHelper.addSkuDetailsListener(this);
         iabHelper.addSetupListener(this, false);
@@ -77,8 +80,7 @@ public class TrivialFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-        iabHelper.inventory(true);
-        iabHelper.skuDetails(TrivialView.SKUS);
+        trivialView.update();
     }
 
     @Override
@@ -89,24 +91,27 @@ public class TrivialFragment extends Fragment
     }
 
     @Override
-    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) { }
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
+        trivialView.update();
+    }
 
     @Override
-    public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        if (setupResponse.isSuccessful()) {
-            iabHelper.inventory(true);
-            iabHelper.skuDetails(TrivialView.SKUS);
-        }
+    public void onSetupResponse(@NonNull final SetupResponse setupResponse) { }
+
+    @Override
+    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+        trivialView.updatePremium();
+        trivialView.updateSubscription();
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        trivialView.setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
-        trivialView.setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
+        trivialView.updatePremium();
+        trivialView.updateSubscription();
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        trivialView.setSkuDetailsResponse(skuDetailsResponse);
+        trivialView.updateSkuDetails();
     }
 }

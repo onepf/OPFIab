@@ -32,6 +32,7 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.sku.MapSkuResolver;
 import org.onepf.opfiab.verification.VerificationResult;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class TrivialBilling {
@@ -52,29 +54,33 @@ public final class TrivialBilling {
     private static final String KEY_AUTO_RECOVER = "auto_recover";
     private static final String KEY_SKIP_UNAUTHORIZED = "skip_unauthorized";
 
-    public static final String SKU_GAS = "sku_gas";
-    public static final String SKU_PREMIUM = "sku_premium";
-    public static final String SKU_SUBSCRIPTION = "sku_subscription";
+    private static final String AMAZON_SKU_GAS = "org.onepf.opfiab.trivialdrive.sku_gas";
+    private static final String AMAZON_SKU_PREMIUM = "org.onepf.opfiab.trivialdrive.sku_premium";
+    private static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.opfiab.trivialdrive.sku_infinite_gas";
 
-    public static final String AMAZON_SKU_GAS = "org.onepf.opfiab.trivialdrive.sku_gas";
-    public static final String AMAZON_SKU_PREMIUM = "org.onepf.opfiab.trivialdrive.sku_premium";
-    public static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.opfiab.trivialdrive.sku_infinite_gas.month";
-
-    public static final String GOOGLE_SKU_GAS = "sku_gas";
-    public static final String GOOGLE_SKU_PREMIUM = "sku_premium";
-    public static final String GOOGLE_SKU_SUBSCRIPTION = "sku_infinite_gas";
-
+    private static final String GOOGLE_SKU_GAS = "sku_gas";
+    private static final String GOOGLE_SKU_PREMIUM = "sku_premum";
+    private static final String GOOGLE_SKU_SUBSCRIPTION = "sku_infinite_gas";
     @SuppressWarnings("SpellCheckingInspection")
-    public static final String GOOGLE_PLAY_KEY
+    private static final String GOOGLE_PLAY_KEY
             = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsTvSvwlDqz/wNr5UXD/rNxl+hs1vbbhta0O3g+NS" +
             "+jChs9+zhRCZScvQT1QzsAg6GNPCyoDXpYa9WWcZQ7kC4scQYQ6pYUUQDNaTwEqDRbmkesx5iRxEqoD9LUhhaO" +
             "L55NbFUPhiypkMww0t2768fuyxRnmBl2RZdQvM+paMDEDU2CtUMqrx4St3huGkFSjWlYMrU5vKELoLu9acThoM" +
             "k9ErEOFBqb4dGBNswH5JRm68r/u7a2XzEoo40dXQQH2/5tMy3AQCzVakHnfcIQcZO0BkQOh4o52ahhy3vcCUha" +
             "uN61YA492k+DmKT5GgSH+KxwgK5dcorjbh94E9e03dZwIDAQAB";
 
+    public static final String SKU_GAS = "sku_gas";
+    public static final String SKU_PREMIUM = "sku_premium";
+    public static final String SKU_SUBSCRIPTION = "sku_subscription";
 
     private static Context context;
     private static SharedPreferences preferences;
+
+    // It's probably a good idea to store this values in a more secure way instead of boolean
+    // Maybe some bits in int\long
+    private static boolean premium;
+    private static boolean subscription;
+    private static final Map<String, SkuDetails> DETAILS = new HashMap<>();
 
     private static BillingProvider newProvider(final Provider provider) {
         switch (provider) {
@@ -125,6 +131,7 @@ public final class TrivialBilling {
             setProviders(Arrays.asList(Provider.values()));
             setAutoRecover(true);
             setSkipUnauthorized(false);
+            TrivialData.resetGas();
         }
     }
 
@@ -195,45 +202,76 @@ public final class TrivialBilling {
         preferences.edit().putBoolean(KEY_SKIP_UNAUTHORIZED, skipUnauthorized).apply();
     }
 
-    private static Purchase getPurchase(final InventoryResponse inventoryResponse,
+    public static void updateSetup() {
+        // clear all data if we change billing provider
+        premium = false;
+        subscription = false;
+        DETAILS.clear();
+    }
+
+    private static Purchase getPurchase(final Map<Purchase, VerificationResult> inventory,
                                         final String sku) {
-        final Map<Purchase, VerificationResult> inventory;
-        if (inventoryResponse.isSuccessful()
-                && (inventory = inventoryResponse.getInventory()) != null) {
-            for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
-                final VerificationResult verificationResult = entry.getValue();
-                if (verificationResult == VerificationResult.SUCCESS) {
-                    final Purchase purchase = entry.getKey();
-                    if (sku.equals(purchase.getSku())) {
-                        return purchase;
-                    }
+        for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
+            final VerificationResult verificationResult = entry.getValue();
+            if (verificationResult == VerificationResult.SUCCESS) {
+                final Purchase purchase = entry.getKey();
+                if (sku.equals(purchase.getSku())) {
+                    return purchase;
                 }
             }
         }
         return null;
     }
 
-    public static boolean hasPremium(final InventoryResponse inventoryResponse) {
-        final Purchase premiumPurchase = getPurchase(inventoryResponse, SKU_PREMIUM);
-        return premiumPurchase != null;
+    public static void updateInventory(final InventoryResponse inventoryResponse) {
+        final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
+        if (!inventoryResponse.isSuccessful() || inventory == null) {
+            // Leave current values intact if request failed
+            return;
+        }
+        premium = getPurchase(inventory, SKU_PREMIUM) != null;
+        final Purchase purchase = getPurchase(inventory, SKU_SUBSCRIPTION);
+        subscription = purchase != null && !purchase.isCanceled();
     }
 
-    public static boolean hasValidSubscription(final InventoryResponse inventoryResponse) {
-        final Purchase subscriptionPurchase = getPurchase(inventoryResponse, SKU_SUBSCRIPTION);
-        return subscriptionPurchase != null && !subscriptionPurchase.isCanceled();
+    public static void updatePurchase(final PurchaseResponse purchaseResponse) {
+        final Purchase purchase = purchaseResponse.getPurchase();
+        if (!purchaseResponse.isSuccessful() || purchase == null
+                || purchaseResponse.getVerificationResult() != VerificationResult.SUCCESS) {
+            // Leave current values intact if request failed
+            return;
+        }
+        final String sku = purchase.getSku();
+        if (SKU_PREMIUM.equals(sku)) {
+            premium = true;
+        } else if (SKU_SUBSCRIPTION.equals(sku)) {
+            subscription = !purchase.isCanceled();
+        }
     }
 
-    public static SkuDetails getDetails(final SkuDetailsResponse skuDetailsResponse,
-                                        final String sku) {
-        final Collection<SkuDetails> skusDetails;
-        if (skuDetailsResponse.isSuccessful()
-                && (skusDetails = skuDetailsResponse.getSkusDetails()) != null) {
-            for (final SkuDetails skuDetails : skusDetails) {
-                if (sku.equals(skuDetails.getSku())) {
-                    return skuDetails.isEmpty() ? null : skuDetails;
-                }
+    public static void updateSkuDetails(final SkuDetailsResponse skuDetailsResponse) {
+        final Collection<SkuDetails> skusDetails = skuDetailsResponse.getSkusDetails();
+        if (!skuDetailsResponse.isSuccessful() || skusDetails == null) {
+            // Leave current values intact if request failed
+            return;
+        }
+        for (final SkuDetails skuDetails : skusDetails) {
+            final String sku = skuDetails.getSku();
+            if (!skuDetails.isEmpty()) {
+                DETAILS.put(sku, skuDetails);
             }
         }
-        return null;
+    }
+
+    public static boolean hasPremium() {
+        return premium;
+    }
+
+    public static boolean hasValidSubscription() {
+        return subscription;
+    }
+
+    public static SkuDetails getDetails(final String sku) {
+        return DETAILS.get(sku);
     }
 }
