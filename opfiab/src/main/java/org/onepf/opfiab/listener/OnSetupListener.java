@@ -18,12 +18,25 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 
+/**
+ * Listener for library setup event.
+ */
 public interface OnSetupListener {
 
+    /**
+     * Called when library is being set up.
+     *
+     * @param setupStartedEvent Setup event sent by library.
+     */
     void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent);
 
+    /**
+     * Called when library setup is finished.
+     *
+     * @param setupResponse Setup event sent by library.
+     */
     void onSetupResponse(@NonNull final SetupResponse setupResponse);
 }

@@ -22,6 +22,9 @@ import org.json.JSONObject;
 
 public interface JsonCompatible {
 
+    /**
+     * @return JSON representation of this object data.
+     */
     @NonNull
     JSONObject toJson();
 }

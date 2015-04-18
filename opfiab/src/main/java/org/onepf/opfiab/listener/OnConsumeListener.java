@@ -18,9 +18,19 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 
+/**
+ * Listener for consume billing events.
+ */
 public interface OnConsumeListener {
 
+    /**
+     * Called every time ConsumeResponse is sent by current {@link BillingProvider}.
+     *
+     * @param consumeResponse {@link BillingResponse} object sent by BillingProvider.
+     */
     void onConsume(@NonNull final ConsumeResponse consumeResponse);
 }

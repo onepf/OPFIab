@@ -18,8 +18,8 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
@@ -30,6 +30,10 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import java.util.Collection;
 import java.util.HashSet;
 
+/**
+ * Handy implementation of {@link BillingListener} interface which aggregates multiple listener
+ * objects.
+ */
 public class BillingListenerCompositor implements BillingListener {
 
     protected final Collection<BillingListener> billingListeners = new HashSet<>();

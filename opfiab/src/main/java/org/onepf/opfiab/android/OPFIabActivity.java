@@ -52,8 +52,8 @@ public class OPFIabActivity extends Activity {
     /**
      * Start new instance of this activity.
      *
-     * @param context Can be null. Context object witch will be used to start new instance of {@link OPFIabActivity}.
-     *                If passed object is not {@code instanceof} {@link Activity},
+     * @param context Can't be null. Context object witch will be used to start new instance of {@link OPFIabActivity}.
+     *                If passed object is not <code>instanceof</code> {@link Activity},
      *                new activity will be started with {@link Intent#FLAG_ACTIVITY_NEW_TASK} flag.
      */
     public static void start(@NonNull final Context context) {

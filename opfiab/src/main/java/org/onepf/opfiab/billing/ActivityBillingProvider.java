@@ -66,6 +66,9 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
                                              final int resultCode,
                                              @NonNull final Intent data);
 
+    /**
+     * @param activity can't be null
+     */
     @Override
     protected abstract void purchase(
             @SuppressWarnings("NullableProblems") @NonNull final Activity activity,

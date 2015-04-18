@@ -21,15 +21,19 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.JsonCompatible;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import java.io.Serializable;
 
 import static org.json.JSONObject.NULL;
 
+/**
+ * Parent class for all billing models.
+ */
 public abstract class BillingModel implements JsonCompatible, Serializable {
 
     private static final String NAME_SKU = "sku";
@@ -57,21 +61,41 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         this.originalJson = originalJson;
     }
 
+    /**
+     * Get Store Keeping Unit associated with this billing model.
+     *
+     * @return SKU associated with this billing model.
+     */
     @NonNull
     public String getSku() {
         return sku;
     }
 
+    /**
+     * Get type of this billing model.
+     *
+     * @return Type of this billing model.
+     */
     @NonNull
     public SkuType getType() {
         return type;
     }
 
+    /**
+     * Get info of {@link BillingProvider} associated with this billing model.
+     *
+     * @return BillingProviderInfo associated with this billing model.
+     */
     @Nullable
     public BillingProviderInfo getProviderInfo() {
         return providerInfo;
     }
 
+    /**
+     * Get JSON representation of data from which this billing model was constructed.
+     *
+     * @return JSON representation of data originally returned by {@link BillingProvider}.
+     */
     @Nullable
     public String getOriginalJson() {
         return originalJson;
@@ -125,6 +149,9 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     }
     //CHECKSTYLE:ON
 
+    /**
+     * Parent class for all billing models builders.
+     */
     abstract static class Builder {
 
         @NonNull
@@ -140,21 +167,45 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
             this.sku = sku;
         }
 
+        /**
+         * Set type for new billing model.
+         *
+         * @param type Type to set.
+         * @return this object.
+         */
         protected Builder setType(@Nullable final SkuType type) {
             this.type = type;
             return this;
         }
 
+        /**
+         * Set billing provider info for new billing model.
+         *
+         * @param providerInfo BillingProviderInfo object to set.
+         * @return this object.
+         */
         protected Builder setProviderInfo(@Nullable final BillingProviderInfo providerInfo) {
             this.providerInfo = providerInfo;
             return this;
         }
 
+        /**
+         * Set JSON representation of original data for new billing model.
+         *
+         * @param originalJson JSON data to set.
+         * @return this object.
+         */
         protected Builder setOriginalJson(@Nullable final String originalJson) {
             this.originalJson = originalJson;
             return this;
         }
 
+        /**
+         * Existing billing model to use as base for new billing model.
+         *
+         * @param billingModel BillingModel object to copy data from.
+         * @return this object.
+         */
         protected Builder setBillingModel(@NonNull final BillingModel billingModel) {
             setType(billingModel.getType());
             setOriginalJson(billingModel.getOriginalJson());
@@ -162,6 +213,11 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
             return this;
         }
 
+        /**
+         * Construct new billing model object.
+         *
+         * @return new BillingModer from supplied data.
+         */
         public abstract BillingModel build();
     }
 }

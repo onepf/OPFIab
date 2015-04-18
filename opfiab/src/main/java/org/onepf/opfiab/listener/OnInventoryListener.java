@@ -18,9 +18,19 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 
+/**
+ * Listener for inventory billing events.
+ */
 public interface OnInventoryListener {
 
+    /**
+     * Called every time InventoryResponse is sent by current {@link BillingProvider}.
+     *
+     * @param inventoryResponse {@link BillingResponse} object sent by BillingProvider.
+     */
     void onInventory(@NonNull final InventoryResponse inventoryResponse);
 }

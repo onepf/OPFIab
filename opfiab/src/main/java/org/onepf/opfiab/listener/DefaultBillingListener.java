@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.IabHelper;
+import org.onepf.opfiab.model.Configuration.Builder;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
@@ -29,6 +30,17 @@ import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.Map;
 
+/**
+ * Default implementation of {@link BillingListener} interface.
+ * <br>
+ * Intended to be used in {@link Builder#setBillingListener(BillingListener)}.
+ * <br>
+ * Implements following features:
+ * <ul>
+ * <li>Attempt to consume all consumable, verified purchases.
+ * <li>Attempt to fully load user inventory via subsequently calling {@link IabHelper#inventory(boolean)}.
+ * </ul>
+ */
 public class DefaultBillingListener extends SimpleBillingListener {
 
     @Nullable
