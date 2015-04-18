@@ -94,12 +94,12 @@ public final class OPFIabUtils {
     }
 
     @Nullable
-    public static BillingProvider withPackage(
+    public static BillingProvider withInstaller(
             @NonNull final Iterable<BillingProvider> providers,
             @NonNull final String packageName) {
         for (final BillingProvider billingProvider : providers) {
             final BillingProviderInfo info = billingProvider.getInfo();
-            if (packageName.equals(info.getPackageName())) {
+            if (packageName.equals(info.getInstaller())) {
                 return billingProvider;
             }
         }

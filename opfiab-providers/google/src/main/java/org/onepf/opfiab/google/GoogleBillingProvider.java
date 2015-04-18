@@ -60,10 +60,12 @@ public class GoogleBillingProvider
 
     protected static final String NAME = "Google";
     protected static final String PACKAGE_NAME = "com.google.play";
+    protected static final String INSTALLER = "com.android.vending";
     protected static final String PERMISSION_BILLING = "com.android.vending.BILLING";
     protected static final String ACCOUNT_TYPE_GOOGLE = "com.google";
 
-    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
+    public static final BillingProviderInfo INFO =
+            new BillingProviderInfo(NAME, PACKAGE_NAME, INSTALLER);
 
 
     protected final GoogleBillingHelper helper;

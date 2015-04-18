@@ -24,8 +24,8 @@ import android.text.TextUtils;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFPreferences;
@@ -98,8 +98,8 @@ final class SetupManager {
         final String packageInstaller = OPFUtils.getPackageInstaller(context);
         // If package installer is set, try it before anything else
         if (!TextUtils.isEmpty(packageInstaller)) {
-            final BillingProvider installerProvider =
-                    OPFIabUtils.withPackage(availableProviders, packageInstaller);
+            final BillingProvider installerProvider = OPFIabUtils
+                    .withInstaller(availableProviders, packageInstaller);
             final SetupResponse setupResponse;
             if (installerProvider != null
                     && (setupResponse = withProvider(configuration, installerProvider,
