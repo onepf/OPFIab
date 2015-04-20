@@ -16,17 +16,24 @@
 
 package org.onepf.opfiab.model;
 
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
 
+/**
+ * Model class containing all information which uniquely identifies some {@link BillingProvider}.
+ *
+ * @see BillingProvider#getInfo()
+ */
 public final class BillingProviderInfo implements JsonCompatible {
 
     private static final String NAME_NAME = "name";
@@ -67,16 +74,32 @@ public final class BillingProviderInfo implements JsonCompatible {
         this.installer = TextUtils.isEmpty(installer) ? packageName : installer;
     }
 
+    /**
+     * Get name of corresponding {@link BillingProvider}.
+     *
+     * @return BillingProvider name.
+     */
     @NonNull
     public String getName() {
         return name;
     }
 
+    /**
+     * Get package name of corresponding {@link BillingProvider}.
+     *
+     * @return BillingProvider package. Can be null.
+     */
     @Nullable
     public String getPackageName() {
         return packageName;
     }
 
+    /**
+     * Get installer used by corresponding {@link BillingProvider}.
+     *
+     * @return Installer used by BillingProvider. Can be null.
+     * @see PackageManager#getPackageInstaller()
+     */
     @Nullable
     public String getInstaller() {
         return installer;

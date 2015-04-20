@@ -18,8 +18,14 @@ package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.Configuration;
 
+/**
+ * Class intended to indicate that setup process was started.
+ *
+ * @see OPFIab#setup()
+ */
 public class SetupStartedEvent {
 
     @NonNull
@@ -29,6 +35,11 @@ public class SetupStartedEvent {
         this.configuration = configuration;
     }
 
+    /**
+     * Get configuration used for this setup.
+     *
+     * @return Configuration object.
+     */
     @NonNull
     public Configuration getConfiguration() {
         return configuration;

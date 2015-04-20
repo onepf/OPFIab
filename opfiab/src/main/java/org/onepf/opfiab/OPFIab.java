@@ -204,11 +204,13 @@ public final class OPFIab {
 
     /**
      * Initialize OPFIab library with supplied configuration.
+     * <br>
+     * It's strongly recommended to call this method from {@link Application#onCreate()}.
      * <p/>
-     * Subsequent init() calls are supported.
+     * Subsequent calls are supported.
      *
-     * @param application   Application object to add {@link Application.ActivityLifecycleCallbacks} to and to
-     *                      use as {@link Context}.
+     * @param application   Application object to add {@link Application.ActivityLifecycleCallbacks}
+     *                      to and to use as {@link Context}.
      * @param configuration Configuration object to use.
      */
     @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC", "LI_LAZY_INIT_STATIC"})
@@ -242,8 +244,10 @@ public final class OPFIab {
 
     /**
      * Try to pick one of the {@link BillingProvider}s supplied in {@link Configuration}.
-     * <p/>
+     * <br>
      * {@link #init(Application, Configuration)} must be called prior to this method.
+     * <p/>
+     * Subsequent calls are supported.
      */
     public static void setup() {
         checkInit();

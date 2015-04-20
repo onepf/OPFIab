@@ -49,6 +49,11 @@ import java.util.Set;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
+/**
+ * Collection of handy utility method.
+ * <br>
+ * Intended for internal use.
+ */
 public final class OPFIabUtils {
 
     private static final String KEY_REQUEST = OPFIabUtils.class.getName() + ".request";

@@ -20,9 +20,14 @@ import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfutils.OPFLog;
 
+/**
+ * Request for {@link BillingProvider} to consume {@link Purchase}.
+ * @see ConsumeResponse
+ */
 public class ConsumeRequest extends BillingRequest {
 
     private static final String NAME_PURCHASE = "purchase";
@@ -36,6 +41,11 @@ public class ConsumeRequest extends BillingRequest {
         this.purchase = purchase;
     }
 
+    /**
+     * Get Purchase intended for consumption.
+     *
+     * @return Purchase object.
+     */
     @NonNull
     public Purchase getPurchase() {
         return purchase;

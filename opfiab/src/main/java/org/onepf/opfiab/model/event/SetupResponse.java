@@ -16,11 +16,13 @@
 
 package org.onepf.opfiab.model.event;
 
+import android.app.Application;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.JsonCompatible;
@@ -35,16 +37,37 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 
 
+/**
+ * Class intended to indicate that setup process is finished.
+ *
+ * @see SetupStartedEvent
+ * @see OPFIab#setup()
+ */
 public class SetupResponse implements JsonCompatible {
 
     private static final String NAME_STATUS = "status";
     private static final String NAME_PROVIDER = "provider";
     private static final String NAME_AUTHORIZED = "authorized";
 
-    public static enum Status {
+    /**
+     * Status of corresponding {@link SetupResponse}.
+     */
+    public enum Status {
 
+        /**
+         * {@link BillingProvider} was successfully picked.
+         */
         SUCCESS,
+        /**
+         * Setup resulted in different {@link BillingProvider} being picked then one that was once
+         * already used for this application.
+         * <br>
+         * Some items might be missing form user inventory.
+         */
         PROVIDER_CHANGED,
+        /**
+         * Library failed to pick suitable {@link BillingProvider}.
+         */
         FAILED,
     }
 
@@ -80,25 +103,54 @@ public class SetupResponse implements JsonCompatible {
              billingProvider != null && billingProvider.isAuthorised());
     }
 
+    /**
+     * Get configuration object used for setup.
+     *
+     * @return Configuration object.
+     * @see OPFIab#init(Application, Configuration)
+     */
     @NonNull
     public Configuration getConfiguration() {
         return configuration;
     }
 
+    /**
+     * Get status of this setup event.
+     *
+     * @return Status.
+     */
     @NonNull
     public Status getStatus() {
         return status;
     }
 
+    /**
+     * Get billing provider picked during setup.
+     *
+     * @return BillingProvider object if setup was successful, null otherwise.
+     * @see #isSuccessful()
+     */
     @Nullable
     public BillingProvider getBillingProvider() {
         return billingProvider;
     }
 
+    /**
+     * Indicates whether picked billing provider is authorised or not.
+     *
+     * @return True if BillingProvider was picked and does not require authorisation, false
+     * otherwise.
+     * @see BillingProvider#isAuthorised()
+     */
     public boolean isAuthorized() {
         return authorized;
     }
 
+    /**
+     * Indicates whether billing provider was successfully picked or not.
+     *
+     * @return True if BillingProvider was picked, false otherwise.
+     */
     public final boolean isSuccessful() {
         return SUCCESSFUL.contains(status);
     }

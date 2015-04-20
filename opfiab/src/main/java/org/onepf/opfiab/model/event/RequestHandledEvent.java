@@ -18,8 +18,16 @@ package org.onepf.opfiab.model.event;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 
+/**
+ * Class intended to indicate that {@link BillingProvider} finished handling {@link BillingRequest}.
+ * <br>
+ * Intended for internal usage.
+ *
+ * @see BillingProvider#onEventAsync(BillingRequest)
+ */
 public class RequestHandledEvent {
 
     @NonNull
@@ -29,6 +37,11 @@ public class RequestHandledEvent {
         this.billingRequest = billingRequest;
     }
 
+    /**
+     * Get request handled by {@link BillingProvider}.
+     *
+     * @return BillingRequest object.
+     */
     @NonNull
     public BillingRequest getBillingRequest() {
         return billingRequest;

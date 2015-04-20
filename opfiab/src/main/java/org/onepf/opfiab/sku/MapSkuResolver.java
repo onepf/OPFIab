@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * Simple map-based implementation of {@link SkuResolver} interface.
+ */
 public class MapSkuResolver implements SkuResolver {
 
     protected final Map<String, String> direct = new HashMap<>();
@@ -32,6 +35,12 @@ public class MapSkuResolver implements SkuResolver {
         super();
     }
 
+    /**
+     * Add SKU mapping.
+     *
+     * @param sku         Original SKU value.
+     * @param resolvedSku SKU value to which original one should be mapped.
+     */
     public void add(@NonNull final String sku, @NonNull final String resolvedSku) {
         if (!TextUtils.equals(sku, resolvedSku)) {
             direct.put(sku, resolvedSku);

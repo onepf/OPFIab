@@ -23,6 +23,8 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.android.OPFIabActivity;
+import org.onepf.opfiab.billing.ActivityBillingProvider;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfutils.OPFLog;
 
 import java.lang.ref.Reference;
@@ -30,6 +32,11 @@ import java.lang.ref.WeakReference;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * Request for {@link BillingProvider} to purchase corresponding SKU.
+ *
+ * @see PurchaseResponse
+ */
 public class PurchaseRequest extends BillingRequest {
 
     private static final String NAME_SKU = "sku";
@@ -61,20 +68,46 @@ public class PurchaseRequest extends BillingRequest {
         this(null, sku, true);
     }
 
+    /**
+     * Get Activity object to be used to start other activities if necessary.
+     *
+     * @return Activity object. Can be null.
+     */
     @Nullable
     public Activity getActivity() {
         return activityReference == null ? null : activityReference.get();
     }
 
+    /**
+     * Get SKU intended for purchasing.
+     *
+     * @return SKU.
+     */
     @NonNull
     public String getSku() {
         return sku;
     }
 
+    /**
+     * Indicates whether this request require instance of {@link OPFIabActivity}.
+     * <br>
+     * Intended for internal usage only.
+     *
+     * @return True if this request require {@link OPFIabActivity}, false otherwise.
+     * @see ActivityBillingProvider
+     */
     public boolean needsFakeActivity() {
         return needsFakeActivity;
     }
 
+    /**
+     * Indicates whether this request has instance of {@link OPFIabActivity}.
+     * <br>
+     * Intended for internal usage only.
+     *
+     * @return True if instance of {@link OPFIabActivity} was launched for this request, false
+     * otherwise.
+     */
     public boolean isActivityFake() {
         return getActivity() instanceof OPFIabActivity;
     }

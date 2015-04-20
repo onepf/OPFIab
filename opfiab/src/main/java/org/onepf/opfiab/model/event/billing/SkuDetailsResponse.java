@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfutils.OPFLog;
@@ -30,6 +31,9 @@ import java.util.Collections;
 
 import static org.json.JSONObject.NULL;
 
+/**
+ * Response from {@link BillingProvider} for corresponding {@link SkuDetailsRequest}.
+ */
 public class SkuDetailsResponse extends BillingResponse {
 
     private static final String NAME_SKUS_DETAILS = "skus_details";
@@ -47,6 +51,15 @@ public class SkuDetailsResponse extends BillingResponse {
                 : Collections.unmodifiableCollection(skusDetails);
     }
 
+    /**
+     * Get details for corresponding SKUs.
+     * <br>
+     * Some SKUs might not have been recognized by {@link BillingProvider} and are left empty.
+     *
+     * @return Collection of SkuDetails objects. Can be null.
+     * @see #isSuccessful()
+     * @see SkuDetails#isEmpty()
+     */
     @Nullable
     public Collection<SkuDetails> getSkusDetails() {
         return skusDetails;

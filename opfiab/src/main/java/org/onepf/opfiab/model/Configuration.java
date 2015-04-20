@@ -16,16 +16,24 @@
 
 package org.onepf.opfiab.model;
 
+import android.app.Application;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.api.AdvancedIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
+import org.onepf.opfiab.listener.DefaultBillingListener;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * Model class representing library configuration.
+ *
+ * @see org.onepf.opfiab.OPFIab#init(Application, Configuration)
+ */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class Configuration {
 
@@ -52,35 +60,60 @@ public final class Configuration {
         this.skipUnauthorised = skipUnauthorised;
     }
 
+    /**
+     * Get supported billing provider.
+     *
+     * @return Collection of BillingProvider objects.
+     */
     @SuppressWarnings("TypeMayBeWeakened")
     @NonNull
     public Set<BillingProvider> getProviders() {
         return providers;
     }
 
+    /**
+     * Get persistent listener used to handle all billing events.
+     *
+     * @return BillingListener object. Can be null.
+     */
     @Nullable
     public BillingListener getBillingListener() {
         return billingListener;
     }
 
     /**
-     * Minimal time gap between requests with the same type.
+     * Get minimal time gap between requests with the same type.
      *
-     * @return time gap in milliseconds.
-     * @see Builder#setSubsequentRequestDelay(long)
+     * @return Time gap in milliseconds.
      */
     public long getSubsequentRequestDelay() {
         return subsequentRequestDelay;
     }
 
+    /**
+     * Indicates whether unauthorized {@link BillingProvider}s should be skipped during setup
+     * process.
+     *
+     * @return True if unauthorized BillingProviders should be skipped. False otherwise.
+     * @see BillingProvider#isAuthorised()
+     */
     public boolean skipUnauthorised() {
         return skipUnauthorised;
     }
 
+    /**
+     * Indicates whether library should attempt to pick another suitable {@link BillingProvider} if
+     * current one become unavailable.
+     *
+     * @return True if library will attempt to pick another BillingProvider. False otherwise.
+     */
     public boolean autoRecover() {
         return autoRecover;
     }
 
+    /**
+     * Builder class for {@link Configuration} object.
+     */
     public static class Builder {
 
         @NonNull
@@ -91,38 +124,78 @@ public final class Configuration {
         private boolean skipUnauthorised;
         private boolean autoRecover;
 
+        /**
+         * Add supported billing provider.
+         * <br>
+         * During setup process billing providers will be considered in order they were added.
+         *
+         * @param provider BillingProvider object to add.
+         * @return this object.
+         */
         public Builder addBillingProvider(@NonNull final BillingProvider provider) {
             providers.add(provider);
             return this;
         }
 
+        /**
+         * Set global listener to handle all billing events.
+         * <br>
+         * This listener will be stored in static reference.
+         *
+         * @param billingListener BillingListener object to use.
+         * @return this object.
+         * @see DefaultBillingListener
+         */
         public Builder setBillingListener(@Nullable final BillingListener billingListener) {
             this.billingListener = billingListener;
             return this;
         }
 
         /**
-         * Set time gap between attempts to execute enqueued requests.<br>
+         * Set time gap between attempts to execute enqueued requests.
+         * <br>
          * Default valued is 50ms.
          *
-         * @param subsequentRequestDelay time gap in milliseconds.
+         * @param subsequentRequestDelay Time gap in milliseconds.
          * @see #getSubsequentRequestDelay()
+         * @see AdvancedIabHelper
          */
         public Builder setSubsequentRequestDelay(final long subsequentRequestDelay) {
             this.subsequentRequestDelay = subsequentRequestDelay;
             return this;
         }
 
+        /**
+         * Set flag indicating whether unauthorized {@link BillingProvider}s should be skipped
+         * during setup.
+         *
+         * @param skipUnauthorised True to skip unauthorized BillingProviders.
+         * @return this object.
+         * @see BillingProvider#isAuthorised()
+         */
         public Builder setSkipUnauthorised(final boolean skipUnauthorised) {
             this.skipUnauthorised = skipUnauthorised;
             return this;
         }
 
+        /**
+         * Set flag indicating whether library should attempt to substitute current
+         * {@link BillingProvider} is it becomes unavailable.
+         *
+         * @param autoRecover True to attempt substitution of unavailable provider.
+         * @return this object.
+         * @see BillingProvider#isAvailable()
+         */
         public Builder setAutoRecover(final boolean autoRecover) {
             this.autoRecover = autoRecover;
             return this;
         }
 
+        /**
+         * Construct new configuration object.
+         *
+         * @return Newly constructed Configuration instance.
+         */
         public Configuration build() {
             return new Configuration(providers, billingListener, subsequentRequestDelay,
                                      skipUnauthorised, autoRecover);

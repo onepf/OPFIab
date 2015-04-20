@@ -18,8 +18,18 @@ package org.onepf.opfiab.sku;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
+
+/**
+ * Interface intended to help resole {@link BillingProvider} specific SKUs.
+ */
 public interface SkuResolver {
 
+    /**
+     * Default implementation of {@link SkuResolver}.
+     * <br>
+     * Maps all SKUs to themselves.
+     */
     @NonNull
     SkuResolver DEFAULT = new SkuResolver() {
         @NonNull
@@ -36,9 +46,21 @@ public interface SkuResolver {
     };
 
 
+    /**
+     * Get {@link BillingProvider} specific SKU value.
+     *
+     * @param sku SKU to resolve.
+     * @return Resolved SKU value.
+     */
     @NonNull
     String resolve(@NonNull final String sku);
 
+    /**
+     * Get original SKU value from {@link BillingProvider} specific one.
+     *
+     * @param resolvedSku SKU to revert.
+     * @return Reverted SKU value.
+     */
     @NonNull
     String revert(@NonNull final String resolvedSku);
 }

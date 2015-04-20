@@ -18,7 +18,16 @@ package org.onepf.opfiab.verification;
 
 public enum VerificationResult {
 
+    /**
+     * Purchase is legitimate.
+     */
     SUCCESS,
+    /**
+     * Purchase is fake and wasn't acquired legitimately.
+     */
     FAILED,
+    /**
+     * There was an error during verification process.
+     */
     ERROR,
 }

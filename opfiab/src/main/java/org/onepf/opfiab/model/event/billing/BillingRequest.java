@@ -18,6 +18,14 @@ package org.onepf.opfiab.model.event.billing;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
+
+/**
+ * Model class representing request of some action from {@link BillingProvider}.
+ * <br>
+ * Please not that not every request will cause corresponding {@link BillingResponse}, different
+ * {@link BillingProvider}s can behave differently.
+ */
 public abstract class BillingRequest extends BillingEvent {
 
     protected BillingRequest(@NonNull final Type type) {

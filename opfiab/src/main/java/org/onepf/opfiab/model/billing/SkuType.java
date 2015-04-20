@@ -16,6 +16,9 @@
 
 package org.onepf.opfiab.model.billing;
 
+/**
+ * SKU type represented by {@link BillingModel}.
+ */
 public enum SkuType {
 
     CONSUMABLE,

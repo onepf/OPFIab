@@ -21,10 +21,14 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfutils.OPFLog;
 
+/**
+ * Response from {@link BillingProvider} for corresponding {@link ConsumeRequest}.
+ */
 public class ConsumeResponse extends BillingResponse {
 
     private static final String NAME_PURCHASE = "purchase";
@@ -39,6 +43,11 @@ public class ConsumeResponse extends BillingResponse {
         this.purchase = purchase;
     }
 
+    /**
+     * Get Purchase intended for consumption.
+     *
+     * @return Purchase object. Can't be null.
+     */
     @NonNull
     public Purchase getPurchase() {
         return purchase;
