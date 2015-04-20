@@ -32,7 +32,6 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.trivialdrive.R;
-import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.trivialdrive.ui.view.TrivialView;
 
 public class TrivialBillingListener extends DefaultBillingListener {
@@ -90,9 +89,8 @@ public class TrivialBillingListener extends DefaultBillingListener {
     }
 
     @Override
-    protected boolean canConsume(@Nullable final Purchase purchase,
-                                 @Nullable final VerificationResult verificationResult) {
-        return TrivialData.canAddGas() && super.canConsume(purchase, verificationResult);
+    protected boolean canConsume(@Nullable final Purchase purchase) {
+        return TrivialData.canAddGas() && super.canConsume(purchase);
     }
 
     @Override

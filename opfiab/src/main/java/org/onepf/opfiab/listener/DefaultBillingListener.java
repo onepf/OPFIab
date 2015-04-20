@@ -54,19 +54,15 @@ public class DefaultBillingListener extends SimpleBillingListener {
         return iabHelper;
     }
 
-    protected boolean canConsume(@Nullable final Purchase purchase,
-                                 @Nullable final VerificationResult verificationResult) {
-        return purchase != null && verificationResult != null
-                && purchase.getType() == SkuType.CONSUMABLE
-                && verificationResult == VerificationResult.SUCCESS;
+    protected boolean canConsume(@Nullable final Purchase purchase) {
+        return purchase != null && purchase.getType() == SkuType.CONSUMABLE;
     }
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
         super.onPurchase(purchaseResponse);
         final Purchase purchase = purchaseResponse.getPurchase();
-        if (purchaseResponse.isSuccessful()
-                && canConsume(purchase, purchaseResponse.getVerificationResult())) {
+        if (purchaseResponse.isSuccessful() && canConsume(purchase)) {
             //noinspection ConstantConditions
             getHelper().consume(purchase);
         }
@@ -83,7 +79,8 @@ public class DefaultBillingListener extends SimpleBillingListener {
                 // Inventory is not empty
                 for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
                     final Purchase purchase = entry.getKey();
-                    if (canConsume(purchase, entry.getValue())) {
+                    final VerificationResult verificationResult = entry.getValue();
+                    if (verificationResult == VerificationResult.SUCCESS && canConsume(purchase)) {
                         getHelper().consume(purchase);
                     }
                 }
