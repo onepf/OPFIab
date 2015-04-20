@@ -47,7 +47,8 @@ public final class BillingProviderInfo implements JsonCompatible {
             final JSONObject jsonObject = new JSONObject(json);
             final String name = jsonObject.getString(NAME_NAME);
             final String packageName = jsonObject.getString(NAME_PACKAGE);
-            return new BillingProviderInfo(name, packageName);
+            final String installer = jsonObject.getString(NAME_INSTALLER);
+            return new BillingProviderInfo(name, packageName, installer);
         } catch (JSONException e) {
             OPFLog.e("", e);
         }
