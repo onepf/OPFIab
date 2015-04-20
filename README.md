@@ -55,3 +55,9 @@ public void onCreate() {
 }
 
 ```
+### Performing Billing Actions
+So, library is set up and ready to go, what next?
+<br>
+Now you need a helper object to tell library to actually do something.
+There's a variety of helpers available from ```OPFiab```, for more details see [Adanced Usage](https://github.com/onepf/OPFIab/wiki/Advanced-Usage) article or check out some [examples](./samples).
+
