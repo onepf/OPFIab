@@ -37,13 +37,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.onepf.opfiab.google.GoogleBillingProvider.PACKAGE_NAME;
+import static org.onepf.opfiab.google.GoogleBillingProvider.PACKAGE;
 
 class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     private static final String INTENT_ACTION = "com.android.vending.billing.InAppBillingService.BIND";
     private static final String INTENT_PACKAGE = "com.android.vending";
-    private static final String KEY_CONTINUATION_TOKEN = PACKAGE_NAME + ".continuation_token.";
+    private static final String KEY_CONTINUATION_TOKEN = PACKAGE + ".continuation_token.";
 
 
     private static final int API = 3;

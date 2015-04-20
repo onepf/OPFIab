@@ -45,6 +45,8 @@ public interface PurchaseVerifier {
 
     /**
      * Attempt to verify purchase owned by user.
+     * <br>
+     * Intended to be called from background thread, may perform lengthy operations.
      *
      * @param purchase Purchase object to verify.
      * @return Verification result.

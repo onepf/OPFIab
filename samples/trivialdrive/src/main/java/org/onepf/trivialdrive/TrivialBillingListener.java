@@ -52,7 +52,7 @@ public class TrivialBillingListener extends DefaultBillingListener {
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         super.onSetupResponse(setupResponse);
-        if (setupResponse.isSuccessful()) {
+        if (setupResponse.isSuccessful() && setupResponse.isAuthorized()) {
             // update inventory and sku data every time provider is picked
             getHelper().inventory(true);
             getHelper().skuDetails(TrivialView.SKUS);

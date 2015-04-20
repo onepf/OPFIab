@@ -236,11 +236,11 @@ public final class TrivialBilling {
 
     public static void updatePurchase(final PurchaseResponse purchaseResponse) {
         final Purchase purchase = purchaseResponse.getPurchase();
-        if (!purchaseResponse.isSuccessful() || purchase == null
-                || purchaseResponse.getVerificationResult() != VerificationResult.SUCCESS) {
+        if (!purchaseResponse.isSuccessful()) {
             // Leave current values intact if request failed
             return;
         }
+        //noinspection ConstantConditions
         final String sku = purchase.getSku();
         if (SKU_PREMIUM.equals(sku)) {
             premium = true;

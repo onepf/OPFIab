@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 final class AmazonBillingHelper implements PurchasingListener {
 
     @SuppressWarnings({"checkstyle:magicnumber", "MagicNumber"})
-    private static final int TIMEOUT = PurchasingService.IS_SANDBOX_MODE ? 60000 : 5000;
+    private static final int TIMEOUT = 1000;
 
 
     @Nullable
