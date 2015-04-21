@@ -49,6 +49,11 @@ import java.util.Set;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
+/**
+ * Collection of handy utility method.
+ * <br>
+ * Intended for internal use.
+ */
 public final class OPFIabUtils {
 
     private static final String KEY_REQUEST = OPFIabUtils.class.getName() + ".request";
@@ -94,12 +99,12 @@ public final class OPFIabUtils {
     }
 
     @Nullable
-    public static BillingProvider withPackage(
+    public static BillingProvider withInstaller(
             @NonNull final Iterable<BillingProvider> providers,
             @NonNull final String packageName) {
         for (final BillingProvider billingProvider : providers) {
             final BillingProviderInfo info = billingProvider.getInfo();
-            if (packageName.equals(info.getPackageName())) {
+            if (packageName.equals(info.getInstaller())) {
                 return billingProvider;
             }
         }

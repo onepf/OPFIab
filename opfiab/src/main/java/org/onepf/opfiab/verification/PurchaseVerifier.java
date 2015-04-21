@@ -20,8 +20,19 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.billing.Purchase;
 
+/**
+ * Interface intended to define purchase verification algorithm.
+ * <br>
+ * Verification process is supposed to confirm the fact that user acquired purchase legitimately.
+ * <br>
+ * Typically some cryptography checks or external server requests.
+ */
 public interface PurchaseVerifier {
 
+    /**
+     * Default implementation of {@link PurchaseVerifier} which always return
+     * {@link VerificationResult#SUCCESS} from {@link #verify(Purchase)} call.
+     */
     @NonNull
     PurchaseVerifier DEFAULT = new PurchaseVerifier() {
 
@@ -32,6 +43,14 @@ public interface PurchaseVerifier {
         }
     };
 
+    /**
+     * Attempt to verify purchase owned by user.
+     * <br>
+     * Intended to be called from background thread, may perform lengthy operations.
+     *
+     * @param purchase Purchase object to verify.
+     * @return Verification result.
+     */
     @NonNull
     VerificationResult verify(@NonNull final Purchase purchase);
 }

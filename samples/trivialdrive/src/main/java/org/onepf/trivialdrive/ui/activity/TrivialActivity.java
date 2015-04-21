@@ -50,13 +50,14 @@ import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
+import org.onepf.opfiab.trivialdrive.R;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.trivialdrive.Helper;
 import org.onepf.trivialdrive.OnProviderPickerListener;
 import org.onepf.trivialdrive.Provider;
-import org.onepf.opfiab.trivialdrive.R;
 import org.onepf.trivialdrive.TrivialBilling;
 import org.onepf.trivialdrive.ui.fragment.ProviderPickerDialogFragment;
+import org.onepf.trivialdrive.ui.view.TrivialView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -352,11 +353,18 @@ abstract class TrivialActivity extends ActionBarActivity
         public void onClick(final View v) {
             if (v == btnForget) {
                 // strictly for demo purposes
+                // you probably shouldn't mess with OPFPreferences in real app
                 new OPFPreferences(getApplicationContext()).clear();
             } else if (v == btnInit) {
                 final TrivialActivity context = TrivialActivity.this;
                 OPFIab.init(getApplication(), TrivialBilling.getRelevantConfiguration(context));
                 setSetupResponse(null);
+                // strictly for demo purposes
+                TrivialBilling.updateSetup();
+                final TrivialView trivialView = (TrivialView) findViewById(R.id.trivial);
+                trivialView.updatePremium();
+                trivialView.updateSubscription();
+                trivialView.updateSkuDetails();
             } else if (v == btnSetup) {
                 OPFIab.setup();
             } else if (v == ctvAutoRecover) {

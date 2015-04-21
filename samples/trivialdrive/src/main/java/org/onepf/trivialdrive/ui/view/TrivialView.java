@@ -21,8 +21,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
@@ -30,7 +28,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.onepf.opfiab.api.IabHelper;
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.trivialdrive.R;
 import org.onepf.trivialdrive.TrivialBilling;
 import org.onepf.trivialdrive.TrivialData;
@@ -63,8 +60,6 @@ public class TrivialView extends LinearLayout
     private SkuDetailsView sdvSubscription;
 
     private IabHelper iabHelper;
-    private boolean hasPremium;
-    private boolean hasSubscription;
 
     public TrivialView(Context context) {
         super(context);
@@ -114,42 +109,23 @@ public class TrivialView extends LinearLayout
         btnBuyPremium.setOnClickListener(this);
         btnBuySubscription.setOnClickListener(this);
 
-        setHasPremium(false);
-        setHasSubscription(false);
-        updateGas();
-        updateButtons();
+        update();
 
         TrivialData.registerOnSharedPreferenceChangeListener(this);
     }
 
-    private void updateButtons() {
-        btnDrive.setEnabled(canDrive());
-        btnBuyGas.setEnabled(canBuyGas());
-        btnBuyPremium.setEnabled(canBuyPremium());
-        btnBuySubscription.setEnabled(canBuySubscription());
-    }
-
-    private boolean canDrive() {
-        return hasSubscription || TrivialData.getGas() > 0;
-    }
-
-    private boolean canBuyGas() {
-        return !hasSubscription && TrivialData.canAddGas();
-    }
-
-    private boolean canBuyPremium() {
-        return !hasPremium;
-    }
-
-    private boolean canBuySubscription() {
-        return !hasSubscription;
-    }
-
     private void drive() {
-        if (hasSubscription || TrivialData.canSpendGas()) {
-            if (!hasSubscription) {
-                TrivialData.spendGas();
-            }
+        final boolean success;
+        if (TrivialBilling.hasValidSubscription()) {
+            success = true;
+        } else if (TrivialData.canSpendGas()) {
+            TrivialData.spendGas();
+            success = true;
+        } else {
+            success = false;
+        }
+
+        if (success) {
             Toast.makeText(getContext(), R.string.msg_drive_success, Toast.LENGTH_SHORT).show();
         } else {
             btnBuyGas.callOnClick();
@@ -157,7 +133,7 @@ public class TrivialView extends LinearLayout
     }
 
     private void updateGas() {
-        if (hasSubscription) {
+        if (TrivialBilling.hasValidSubscription()) {
             ivGas.setImageResource(R.drawable.img_gas_inf);
         } else {
             ivGas.setImageResource(R.drawable.img_gas_level);
@@ -165,33 +141,45 @@ public class TrivialView extends LinearLayout
         }
     }
 
-    public void setHasPremium(final boolean hasPremium) {
-        this.hasPremium = hasPremium;
-        ivCar.setImageResource(hasPremium ? R.drawable.img_car_premium : R.drawable.img_car);
-    }
-
-    public void setHasSubscription(final boolean hasSubscription) {
-        this.hasSubscription = hasSubscription;
-        updateGas();
-    }
-
     public void setIabHelper(final IabHelper iabHelper) {
         this.iabHelper = iabHelper;
     }
 
-    public void setSkuDetailsResponse(final SkuDetailsResponse skuDetailsResponse) {
-        sdvGas.setSkuDetails(TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_GAS));
-        sdvPremium.setSkuDetails(
-                TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_PREMIUM));
-        sdvSubscription.setSkuDetails(
-                TrivialBilling.getDetails(skuDetailsResponse, TrivialBilling.SKU_SUBSCRIPTION));
+    public void updatePremium() {
+        ivCar.setImageResource(TrivialBilling.hasPremium()
+                                       ? R.drawable.img_car_premium
+                                       : R.drawable.img_car);
+    }
+
+    public void updateSubscription() {
+        updateGas();
+    }
+
+    public void updateSkuDetails() {
+        sdvGas.setSkuDetails(TrivialBilling.getDetails(TrivialBilling.SKU_GAS));
+        sdvPremium.setSkuDetails(TrivialBilling.getDetails(TrivialBilling.SKU_PREMIUM));
+        sdvSubscription.setSkuDetails(TrivialBilling.getDetails(TrivialBilling.SKU_SUBSCRIPTION));
+    }
+
+    private void updateButtons() {
+        btnDrive.setEnabled(TrivialData.canSpendGas());
+        btnBuyGas.setEnabled(TrivialData.canAddGas());
+        btnBuyPremium.setEnabled(!TrivialBilling.hasPremium());
+        btnBuySubscription.setEnabled(!TrivialBilling.hasValidSubscription());
+    }
+
+    public void update() {
+        updatePremium();
+        updateSubscription();
+        updateSkuDetails();
+        updateButtons();
     }
 
     @Override
     public void onClick(final View v) {
         if (v == btnDrive) {
             drive();
-        } else if (v == btnBuyGas) {
+        } else if (v == btnBuyGas && !TrivialBilling.hasValidSubscription() && TrivialData.canAddGas()) {
             iabHelper.purchase(TrivialBilling.SKU_GAS);
         } else if (v == btnBuyPremium) {
             iabHelper.purchase(TrivialBilling.SKU_PREMIUM);
@@ -211,55 +199,5 @@ public class TrivialView extends LinearLayout
     public void onSharedPreferenceChanged(final SharedPreferences sharedPreferences,
                                           final String key) {
         updateGas();
-    }
-
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        return new SavedState(super.onSaveInstanceState(), this);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(final Parcelable state) {
-        final SavedState savedState = (SavedState) state;
-        super.onRestoreInstanceState(savedState.getSuperState());
-        setHasPremium(savedState.hasPremium);
-        setHasSubscription(savedState.hasSubscription);
-    }
-
-
-    protected static class SavedState extends BaseSavedState {
-
-        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
-
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
-        private final boolean hasPremium;
-        private final boolean hasSubscription;
-
-        public SavedState(final Parcelable superState,
-                          final TrivialView trivialView) {
-            super(superState);
-            hasPremium = trivialView.hasPremium;
-            hasSubscription = trivialView.hasSubscription;
-        }
-
-        public SavedState(final Parcel source) {
-            super(source);
-            hasPremium = source.readByte() != 0;
-            hasSubscription = source.readByte() != 0;
-        }
-
-        @Override
-        public void writeToParcel(final Parcel dest, final int flags) {
-            super.writeToParcel(dest, flags);
-            dest.writeByte((byte) (hasPremium ? 1 : 0));
-            dest.writeByte((byte) (hasSubscription ? 1 : 0));
-        }
     }
 }

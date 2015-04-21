@@ -22,11 +22,15 @@ import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
 
+/**
+ * Model class representing detailed data of SKU available for purchase.
+ */
 public class SkuDetails extends BillingModel {
 
     private static final String NAME_PRICE = "price";
@@ -64,26 +68,53 @@ public class SkuDetails extends BillingModel {
         this(sku, null, null, null, null, null, null, null);
     }
 
+    /**
+     * Get formatted, localized price for SKU.
+     *
+     * @return SKU price. Can be null.
+     */
     @Nullable
     public String getPrice() {
         return price;
     }
 
+    /**
+     * Get SKU title.
+     *
+     * @return SKU title. Can be null.
+     */
     @Nullable
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Get localized description for SKU.
+     *
+     * @return SKU description. Can be null.
+     */
     @Nullable
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Get URL of the image associated with SKU.
+     *
+     * @return URL for SKU image. Can be null.
+     */
     @Nullable
     public String getIconUrl() {
         return iconUrl;
     }
 
+    /**
+     * Indicates whether this there's actually any data available in this object.
+     * <br>
+     * Typically this is true when SKU wasn't recognized by {@link BillingProvider}.
+     *
+     * @return True is there's no data in this object. False otherwise.
+     */
     public boolean isEmpty() {
         return TextUtils.isEmpty(price)
                 && TextUtils.isEmpty(title)
@@ -106,6 +137,9 @@ public class SkuDetails extends BillingModel {
         return jsonObject;
     }
 
+    /**
+     * Builder class for {@link SkuDetails} object.
+     */
     public static class Builder extends BillingModel.Builder {
 
         @Nullable
@@ -142,26 +176,56 @@ public class SkuDetails extends BillingModel {
             return (Builder) super.setBillingModel(billingModel);
         }
 
+        /**
+         * Set price for new SkuDetails object.
+         *
+         * @param price Formatted, localized price.
+         * @return this object.
+         */
         public Builder setPrice(@Nullable final String price) {
             this.price = price;
             return this;
         }
 
+        /**
+         * Set title for new SkuDetails object.
+         *
+         * @param title SKU title.
+         * @return this object.
+         */
         public Builder setTitle(@Nullable final String title) {
             this.title = title;
             return this;
         }
 
+        /**
+         * Set localized description for new SkuDetails object.
+         *
+         * @param description SKU description.
+         * @return this object.
+         */
         public Builder setDescription(@Nullable final String description) {
             this.description = description;
             return this;
         }
 
+        /**
+         * Set image URL for new SkuDetails object.
+         *
+         * @param iconUrl SKU image URL.
+         * @return this object.
+         */
         public Builder setIconUrl(@Nullable final String iconUrl) {
             this.iconUrl = iconUrl;
             return this;
         }
 
+        /**
+         * Set existing SkuDetails object to use as a base for new one.
+         *
+         * @param skuDetails Existing SkuDetails object.
+         * @return this object.
+         */
         public Builder setSkuDetails(@NonNull final SkuDetails skuDetails) {
             setBillingModel(skuDetails);
             setPrice(skuDetails.getPrice());

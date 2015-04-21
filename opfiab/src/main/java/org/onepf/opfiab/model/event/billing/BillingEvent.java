@@ -26,11 +26,17 @@ import org.onepf.opfutils.OPFLog;
 
 import java.io.Serializable;
 
+/**
+ * Model class representing some occurred billing event.
+ */
 abstract class BillingEvent implements JsonCompatible, Serializable {
 
     private static final String NAME_TYPE = "type";
 
-    public static enum Type {
+    /**
+     * Type of billing event.
+     */
+    public enum Type {
 
         CONSUME,
         PURCHASE,
@@ -46,6 +52,11 @@ abstract class BillingEvent implements JsonCompatible, Serializable {
         this.type = type;
     }
 
+    /**
+     * Get type of this event.
+     *
+     * @return Type of this event.
+     */
     @NonNull
     public Type getType() {
         return type;

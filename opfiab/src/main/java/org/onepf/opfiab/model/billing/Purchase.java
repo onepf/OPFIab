@@ -26,6 +26,9 @@ import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
 
+/**
+ * Model class representing purchase made my user.
+ */
 public class Purchase extends BillingModel {
 
     private static final String NAME_TOKEN = "token";
@@ -55,15 +58,32 @@ public class Purchase extends BillingModel {
         this(sku, null, null, null, null, -1L, false);
     }
 
+    /**
+     * Get unique token identifying this purchase.
+     *
+     * @return This purchase token.
+     */
     @Nullable
     public String getToken() {
         return token;
     }
 
+    /**
+     * Get date of this purchase in milliseconds.
+     *
+     * @return Date when this purchase was made.
+     */
     public long getPurchaseTime() {
         return purchaseTime;
     }
 
+    /**
+     * Indicates whether this purchase is still valid or not.
+     * <br>
+     * This will return <b>true</b> if this purchase represents a subscription and it's expired.
+     *
+     * @return True if this purchase is no longer valid, false otherwise.
+     */
     public boolean isCanceled() {
         return canceled;
     }
@@ -82,6 +102,9 @@ public class Purchase extends BillingModel {
         return jsonObject;
     }
 
+    /**
+     * Builder class for {@link Purchase} object.
+     */
     public static class Builder extends BillingModel.Builder {
 
         @Nullable
@@ -114,21 +137,45 @@ public class Purchase extends BillingModel {
             return (Builder) super.setBillingModel(billingModel);
         }
 
+        /**
+         * Set unique token to use in new Purchase object.
+         *
+         * @param token Token to use.
+         * @return this object.
+         */
         public Builder setToken(@Nullable final String token) {
             this.token = token;
             return this;
         }
 
+        /**
+         * Set canceled status of new Purchase object.
+         *
+         * @param canceled Canceled status to set.
+         * @return this object.
+         */
         public Builder setCanceled(final boolean canceled) {
             this.canceled = canceled;
             return this;
         }
 
+        /**
+         * Set the time for new Purchase object.
+         *
+         * @param purchaseTime Time in millisecond when purchase was made.
+         * @return this object.
+         */
         public Builder setPurchaseTime(final long purchaseTime) {
             this.purchaseTime = purchaseTime;
             return this;
         }
 
+        /**
+         * Set existing Purchase object to use as base for new one.
+         *
+         * @param purchase Existing purchase object.
+         * @return this object.
+         */
         public Builder setPurchase(@NonNull final Purchase purchase) {
             setBillingModel(purchase);
             setToken(purchase.getToken());

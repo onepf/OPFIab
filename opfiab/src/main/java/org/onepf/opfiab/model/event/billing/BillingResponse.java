@@ -21,7 +21,9 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.billing.BillingModel;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Arrays;
@@ -31,6 +33,9 @@ import static org.json.JSONObject.NULL;
 import static org.onepf.opfiab.model.event.billing.Status.PENDING;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 
+/**
+ * Model class representing response from {@link BillingProvider} for corresponding {@link BillingRequest}.
+ */
 public abstract class BillingResponse extends BillingEvent {
 
     private static final String NAME_PROVIDER_INFO = "provider_info";
@@ -52,16 +57,34 @@ public abstract class BillingResponse extends BillingEvent {
         this.providerInfo = providerInfo;
     }
 
+    /**
+     * Get information about {@link BillingProvider} which is responsible for this BillingResponse.
+     * <br>
+     * Might be useful to properly handle some data from {@link BillingModel#getOriginalJson()}.
+     *
+     * @return BillingProviderInfo object from corresponding {@link BillingProvider}.
+     */
     @Nullable
     public BillingProviderInfo getProviderInfo() {
         return providerInfo;
     }
 
+    /**
+     * Indicates whether corresponding billing operation was successful or what kind of error caused
+     * it to fail.
+     *
+     * @return Status of this BillingResponse.
+     */
     @NonNull
     public Status getStatus() {
         return status;
     }
 
+    /**
+     * Indicates whether status of this response is successful.
+     *
+     * @return True if this BillingResponse was not caused by any kind of error, false otherwise.
+     */
     public boolean isSuccessful() {
         return SUCCESSFUL.contains(getStatus());
     }

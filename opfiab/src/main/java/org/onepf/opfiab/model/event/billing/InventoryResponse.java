@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.verification.VerificationResult;
@@ -29,6 +30,9 @@ import org.onepf.opfutils.OPFLog;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * Response from {@link BillingProvider} for corresponding {@link InventoryRequest}.
+ */
 public class InventoryResponse extends BillingResponse {
 
     private static final String NAME_INVENTORY = "inventory";
@@ -50,11 +54,23 @@ public class InventoryResponse extends BillingResponse {
         this.hasMore = hasMore;
     }
 
+    /**
+     * Get items owned by user along with {@link VerificationResult} of those items.
+     *
+     * @return Purchases made by user mapped to their verification status. Can be null.
+     * @see #isSuccessful()
+     */
     @Nullable
     public Map<Purchase, VerificationResult> getInventory() {
         return inventory;
     }
 
+    /**
+     * Indicated whether there's more items to be loaded with subsequent {@link InventoryRequest}s.
+     *
+     * @return True if there's more user owned purchases to be loaded, false otherwise.
+     * @see InventoryRequest#startOver()
+     */
     public boolean hasMore() {
         return hasMore;
     }

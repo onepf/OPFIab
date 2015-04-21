@@ -16,20 +16,29 @@
 
 package org.onepf.opfiab.model;
 
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
 
+/**
+ * Model class containing all information which uniquely identifies some {@link BillingProvider}.
+ *
+ * @see BillingProvider#getInfo()
+ */
 public final class BillingProviderInfo implements JsonCompatible {
 
     private static final String NAME_NAME = "name";
     private static final String NAME_PACKAGE = "package_name";
+    private static final String NAME_INSTALLER = "installer";
 
 
     @Nullable
@@ -38,7 +47,8 @@ public final class BillingProviderInfo implements JsonCompatible {
             final JSONObject jsonObject = new JSONObject(json);
             final String name = jsonObject.getString(NAME_NAME);
             final String packageName = jsonObject.getString(NAME_PACKAGE);
-            return new BillingProviderInfo(name, packageName);
+            final String installer = jsonObject.getString(NAME_INSTALLER);
+            return new BillingProviderInfo(name, packageName, installer);
         } catch (JSONException e) {
             OPFLog.e("", e);
         }
@@ -50,20 +60,50 @@ public final class BillingProviderInfo implements JsonCompatible {
     private final String name;
     @Nullable
     private final String packageName;
+    @Nullable
+    private final String installer;
 
     public BillingProviderInfo(@NonNull final String name, @Nullable final String packageName) {
-        this.name = name;
-        this.packageName = packageName;
+        this(name, packageName, null);
     }
 
+    public BillingProviderInfo(@NonNull final String name,
+                               @Nullable final String packageName,
+                               @Nullable final String installer) {
+        this.name = name;
+        this.packageName = packageName;
+        this.installer = TextUtils.isEmpty(installer) ? packageName : installer;
+    }
+
+    /**
+     * Get name of corresponding {@link BillingProvider}.
+     *
+     * @return BillingProvider name.
+     */
     @NonNull
     public String getName() {
         return name;
     }
 
+    /**
+     * Get package name of corresponding {@link BillingProvider}.
+     *
+     * @return BillingProvider package. Can be null.
+     */
     @Nullable
     public String getPackageName() {
         return packageName;
+    }
+
+    /**
+     * Get installer used by corresponding {@link BillingProvider}.
+     *
+     * @return Installer used by BillingProvider. Can be null.
+     * @see PackageManager#getPackageInstaller()
+     */
+    @Nullable
+    public String getInstaller() {
+        return installer;
     }
 
     @NonNull
@@ -73,19 +113,15 @@ public final class BillingProviderInfo implements JsonCompatible {
         try {
             jsonObject.put(NAME_NAME, name);
             jsonObject.put(NAME_PACKAGE, packageName == null ? NULL : packageName);
+            jsonObject.put(NAME_INSTALLER, installer == null ? NULL : installer);
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }
         return jsonObject;
     }
 
-    @Override
-    public String toString() {
-        return OPFIabUtils.toString(this);
-    }
-
     //CHECKSTYLE:OFF
-    @SuppressWarnings("PMD")
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -94,18 +130,23 @@ public final class BillingProviderInfo implements JsonCompatible {
         final BillingProviderInfo that = (BillingProviderInfo) o;
 
         if (!name.equals(that.name)) return false;
-        //noinspection RedundantIfStatement
         if (packageName != null ? !packageName.equals(that.packageName) : that.packageName != null)
             return false;
+        return !(installer != null ? !installer.equals(that.installer) : that.installer != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
         int result = name.hashCode();
         result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
+        result = 31 * result + (installer != null ? installer.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return OPFIabUtils.toString(this);
     }
     //CHECKSTYLE:ON
 }

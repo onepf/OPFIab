@@ -59,11 +59,13 @@ public class GoogleBillingProvider
         extends ActivityBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
 
     protected static final String NAME = "Google";
-    protected static final String PACKAGE_NAME = "com.google.play";
+    protected static final String PACKAGE = "com.google.play";
+    protected static final String INSTALLER = "com.android.vending";
     protected static final String PERMISSION_BILLING = "com.android.vending.BILLING";
     protected static final String ACCOUNT_TYPE_GOOGLE = "com.google";
 
-    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
+    public static final BillingProviderInfo INFO =
+            new BillingProviderInfo(NAME, PACKAGE, INSTALLER);
 
 
     protected final GoogleBillingHelper helper;
@@ -217,6 +219,7 @@ public class GoogleBillingProvider
     public void skuDetails(@NonNull final Set<String> skus) {
         final Bundle result = helper.getSkuDetails(skus);
         final Response response = GoogleUtils.getResponse(result);
+        //noinspection ConstantConditions
         if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve sku details.");
             postSkuDetailsResponse(getStatus(response), null);

@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.IabHelper;
+import org.onepf.opfiab.model.Configuration.Builder;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
@@ -29,6 +30,17 @@ import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.Map;
 
+/**
+ * Default implementation of {@link BillingListener} interface.
+ * <br>
+ * Intended to be used in {@link Builder#setBillingListener(BillingListener)}.
+ * <br>
+ * Implements following features:
+ * <ul>
+ * <li>Attempt to consume all consumable, verified purchases.
+ * <li>Attempt to fully load user inventory via subsequently calling {@link IabHelper#inventory(boolean)}.
+ * </ul>
+ */
 public class DefaultBillingListener extends SimpleBillingListener {
 
     @Nullable
@@ -42,11 +54,17 @@ public class DefaultBillingListener extends SimpleBillingListener {
         return iabHelper;
     }
 
+    protected boolean canConsume(@Nullable final Purchase purchase) {
+        return purchase != null && purchase.getType() == SkuType.CONSUMABLE;
+    }
+
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
         super.onPurchase(purchaseResponse);
-        if (purchaseResponse.isSuccessful()) {
-            getHelper().inventory(true);
+        final Purchase purchase = purchaseResponse.getPurchase();
+        if (purchaseResponse.isSuccessful() && canConsume(purchase)) {
+            //noinspection ConstantConditions
+            getHelper().consume(purchase);
         }
     }
 
@@ -61,20 +79,16 @@ public class DefaultBillingListener extends SimpleBillingListener {
                 // Inventory is not empty
                 for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
                     final Purchase purchase = entry.getKey();
-                    if (purchase.getType() == SkuType.CONSUMABLE
-                            && entry.getValue() == VerificationResult.SUCCESS) {
-                        // Purchase is consumable and it was successfully verified
-                        consume(purchase);
+                    final VerificationResult verificationResult = entry.getValue();
+                    if (verificationResult == VerificationResult.SUCCESS && canConsume(purchase)) {
+                        getHelper().consume(purchase);
                     }
                 }
             }
+            // Load next batch if there's more
             if (inventoryResponse.hasMore()) {
                 getHelper().inventory(false);
             }
         }
-    }
-
-    protected void consume(final Purchase purchase) {
-        getHelper().consume(purchase);
     }
 }

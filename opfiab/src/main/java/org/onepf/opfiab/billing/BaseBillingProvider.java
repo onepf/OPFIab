@@ -93,14 +93,57 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         this.skuResolver = skuResolver;
     }
 
+    /**
+     * Load details for specified SKUs.
+     * <br>
+     * At this point all SKUs should be resolved with supplied {@link SkuResolver}.
+     *
+     * @param skus skus to load details for.
+     * @see SkuDetails
+     * @see #postSkuDetailsResponse(Status, Collection)
+     */
     protected abstract void skuDetails(@NonNull final Set<String> skus);
 
+    /**
+     * Load user inventory.
+     *
+     * @param startOver Flag indicating whether inventory should be loaded from the start, or
+     *                  continue from the last request.
+     * @see Purchase
+     * @see #postInventoryResponse(Status, Iterable, boolean)
+     */
     protected abstract void inventory(final boolean startOver);
 
+    /**
+     * Purchase specified SKU.
+     * <br>
+     * At this point sku should be already resolved with supplied {@link SkuResolver}.
+     *
+     * @param activity can be null. Activity object to use for purchase if necessary.
+     * @param sku      SKU to purchase.
+     * @see Purchase
+     * @see #postResponse(BillingResponse)
+     */
     protected abstract void purchase(@Nullable final Activity activity, @NonNull final String sku);
 
+    /**
+     * Consume specified Purchase.
+     * <br>
+     * SKU available from {@link Purchase#getSku()} should be already resolved with supplied
+     * {@link SkuResolver}.
+     *
+     * @param purchase Purchase object to consume
+     * @see #postConsumeResponse(Status, Purchase)
+     */
     protected abstract void consume(@NonNull final Purchase purchase);
 
+    /**
+     * Entry point for all incoming billing requests.
+     * <br>
+     * Might be a good place for intercepting request.
+     *
+     * @param billingRequest incoming BillingRequest object.
+     */
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
         OPFLog.logMethod(billingRequest);
@@ -147,15 +190,37 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         }
     }
 
+    /**
+     * Notify library about billing response from this billing provider.
+     *
+     * @param billingResponse BillingResponse object to send to library.
+     */
     protected void postResponse(@NonNull final BillingResponse billingResponse) {
         OPFIab.post(billingResponse);
     }
 
+    /**
+     * Construct and send empty {@link BillingResponse}.
+     *
+     * @param billingRequest BillingRequest object to construct corresponding response to.
+     * @param status         Status object to use in BillingResponse.
+     * @see #postResponse(BillingResponse)
+     */
     protected void postEmptyResponse(@NonNull final BillingRequest billingRequest,
                                      @NonNull final Status status) {
         postResponse(OPFIabUtils.emptyResponse(getInfo(), billingRequest, status));
     }
 
+    /**
+     * Construct and send {@link SkuDetailsResponse}.
+     * <br>
+     * SKUs available from {@link SkuDetails#getSku()} will be reverted with supplied
+     * {@link SkuResolver}.
+     *
+     * @param status      Status object to use in response.
+     * @param skusDetails Can be null. Collection of SkuDetails object to add to response.
+     * @see SkuDetailsResponse
+     */
     protected void postSkuDetailsResponse(@NonNull final Status status,
                                           @Nullable final Collection<SkuDetails> skusDetails) {
         final SkuDetailsResponse response;
@@ -171,6 +236,17 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         postResponse(response);
     }
 
+    /**
+     * Construct and send {@link InventoryResponse}.
+     * <br>
+     * SKUs available from {@link Purchase#getSku()} will be reverted with supplied
+     * {@link SkuResolver}.
+     *
+     * @param status    Status object to use in response.
+     * @param inventory Can be null. Collection of Purchase objects to add to response.
+     * @param hasMore   Flag indicating whether more items are available in user inventory.
+     * @see InventoryResponse
+     */
     protected void postInventoryResponse(@NonNull final Status status,
                                          @Nullable final Iterable<Purchase> inventory,
                                          final boolean hasMore) {
@@ -189,6 +265,16 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         postResponse(response);
     }
 
+    /**
+     * Construct and send {@link PurchaseResponse}.
+     * <br>
+     * SKU available from {@link Purchase#getSku()} will be reverted with supplied
+     * {@link SkuResolver}.
+     *
+     * @param status   Status object to use in response.
+     * @param purchase Can be null. Purchase object to add to response.
+     * @see PurchaseResponse
+     */
     protected void postPurchaseResponse(@NonNull final Status status,
                                         @Nullable final Purchase purchase) {
         final PurchaseResponse response;
@@ -202,6 +288,15 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         postResponse(response);
     }
 
+    /**
+     * Construct and send {@link ConsumeResponse}.
+     * <br>
+     * SKU available from {@link Purchase#getSku()} will be reverted with supplied
+     * {@link SkuResolver}.
+     *
+     * @param status   Status object to use in response.
+     * @param purchase Can't be null. Purchase object to add to response.
+     */
     protected void postConsumeResponse(@NonNull final Status status,
                                        @NonNull final Purchase purchase) {
         final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);

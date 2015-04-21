@@ -20,8 +20,13 @@ import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfutils.OPFLog;
 
+/**
+ * Request for {@link BillingProvider} to load user inventory.
+ * @see InventoryResponse
+ */
 public class InventoryRequest extends BillingRequest {
 
     private static final String NAME_START_OVER = "start_over";
@@ -34,6 +39,12 @@ public class InventoryRequest extends BillingRequest {
         this.startOver = startOver;
     }
 
+    /**
+     * Indicates whether user inventory should be loaded from the start, or continued from the point
+     * of last {@link BillingRequest}.
+     *
+     * @return True if inventory should be loaded from the start, false otherwise.
+     */
     public boolean startOver() {
         return startOver;
     }

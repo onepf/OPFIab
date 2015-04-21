@@ -18,9 +18,19 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
+/**
+ * Listener for sku details billing events.
+ */
 public interface OnSkuDetailsListener {
 
+    /**
+     * Called every time SkuDetailsResponse is sent by current {@link BillingProvider}.
+     *
+     * @param skuDetailsResponse {@link BillingResponse} object sent by BillingProvider.
+     */
     void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse);
 }

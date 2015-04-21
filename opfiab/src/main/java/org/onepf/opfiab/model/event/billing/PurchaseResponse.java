@@ -21,13 +21,18 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
 
+/**
+ * Response from {@link BillingProvider} for corresponding {@link PurchaseRequest}.
+ */
 public class PurchaseResponse extends BillingResponse {
 
     private static final String NAME_PURCHASE = "purchase";
@@ -48,16 +53,33 @@ public class PurchaseResponse extends BillingResponse {
         this.verificationResult = verificationResult;
     }
 
+    /**
+     * Get purchase acquired by user with corresponding {@link BillingRequest}.
+     *
+     * @return Purchase object. Can be null.
+     * @see #isSuccessful()
+     */
     @Nullable
     public Purchase getPurchase() {
         return purchase;
     }
 
+    /**
+     * Get verification result for corresponding purchase.
+     *
+     * @return VerificationResult. Can be null.
+     * @see #isSuccessful()
+     * @see PurchaseVerifier
+     */
     @Nullable
     public VerificationResult getVerificationResult() {
         return verificationResult;
     }
 
+    /**
+     * @return True if purchase was successful and corresponding purchase object is successfully
+     * verified, false otherwise.
+     */
     @Override
     public boolean isSuccessful() {
         return super.isSuccessful() && verificationResult == VerificationResult.SUCCESS;

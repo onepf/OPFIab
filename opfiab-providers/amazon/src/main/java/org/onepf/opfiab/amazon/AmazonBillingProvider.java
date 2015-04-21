@@ -38,6 +38,7 @@ import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
@@ -46,6 +47,7 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -64,9 +66,11 @@ import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, PurchaseVerifier> {
 
     protected static final String NAME = "Amazon";
-    protected static final String PACKAGE_NAME = "com.amazon.venezia";
+    protected static final String INSTALLER = "com.amazon.venezia";
+    protected static final Collection<String> PACKAGES = Arrays.asList("com.amazon.venezia",
+                                                                       "com.amazon.mShop.android");
 
-    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE_NAME);
+    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, INSTALLER);
 
 
     @NonNull
@@ -135,8 +139,6 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     protected Status handleFailure() {
         if (!PurchasingService.IS_SANDBOX_MODE && !OPFUtils.isConnected(context)) {
             return SERVICE_UNAVAILABLE;
-        } else if (!isAuthorised()) {
-            return UNAUTHORISED;
         }
 
         return UNKNOWN_ERROR;
@@ -228,12 +230,26 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     @Override
     public boolean isAvailable() {
-        return super.isAvailable();
+        for (final String packageName : PACKAGES) {
+            if (OPFUtils.isInstalled(context, packageName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public boolean isAuthorised() {
         return billingHelper.getUserData() != null;
+    }
+
+    @Override
+    protected void handleRequest(@NonNull final BillingRequest billingRequest) {
+        if (!isAuthorised()) {
+            postEmptyResponse(billingRequest, UNAUTHORISED);
+        } else {
+            super.handleRequest(billingRequest);
+        }
     }
 
     @Override

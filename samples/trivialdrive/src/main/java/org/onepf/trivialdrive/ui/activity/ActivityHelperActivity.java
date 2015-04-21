@@ -23,18 +23,19 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.listener.OnInventoryListener;
+import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.trivialdrive.R;
-import org.onepf.trivialdrive.TrivialBilling;
 import org.onepf.trivialdrive.ui.view.TrivialView;
 
 public class ActivityHelperActivity extends TrivialActivity
-        implements OnSetupListener, OnInventoryListener, OnSkuDetailsListener {
+        implements OnSetupListener, OnPurchaseListener, OnInventoryListener, OnSkuDetailsListener {
 
     private ActivityIabHelper iabHelper;
     private TrivialView trivialView;
@@ -44,9 +45,10 @@ public class ActivityHelperActivity extends TrivialActivity
         super.onCreate(savedInstanceState);
         iabHelper = OPFIab.getActivityHelper(this);
         setContentView(R.layout.include_trivial);
-        trivialView = (TrivialView) findViewById(R.id.trivial_drive);
+        trivialView = (TrivialView) findViewById(R.id.trivial);
         trivialView.setIabHelper(iabHelper);
 
+        iabHelper.addPurchaseListener(this);
         iabHelper.addInventoryListener(this);
         iabHelper.addSkuDetailsListener(this);
         iabHelper.addSetupListener(this, false);
@@ -55,8 +57,9 @@ public class ActivityHelperActivity extends TrivialActivity
     @Override
     protected void onResume() {
         super.onResume();
-        iabHelper.inventory(true);
-        iabHelper.skuDetails(TrivialView.SKUS);
+        // Some billing operations may involve another activities
+        // It's a good idea to check for updates here
+        trivialView.update();
     }
 
     @Override
@@ -67,24 +70,30 @@ public class ActivityHelperActivity extends TrivialActivity
     }
 
     @Override
-    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) { }
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
+        // might be a good place to show progress
+        trivialView.update();
+    }
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-        if (setupResponse.isSuccessful()) {
-            iabHelper.inventory(true);
-            iabHelper.skuDetails(TrivialView.SKUS);
-        }
+        // good place to hide progress
+    }
+
+    @Override
+    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+        trivialView.updatePremium();
+        trivialView.updateSubscription();
     }
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-        trivialView.setHasPremium(TrivialBilling.hasPremium(inventoryResponse));
-        trivialView.setHasSubscription(TrivialBilling.hasValidSubscription(inventoryResponse));
+        trivialView.updatePremium();
+        trivialView.updateSubscription();
     }
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-        trivialView.setSkuDetailsResponse(skuDetailsResponse);
+        trivialView.updateSkuDetails();
     }
 }

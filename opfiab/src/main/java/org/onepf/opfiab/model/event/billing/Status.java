@@ -23,11 +23,11 @@ public enum Status {
      */
     SUCCESS,
     /**
-     * Request was handled, but takes considerable time to process.
+     * Request was handled successfully, but takes considerable time to process.
      */
     PENDING,
     /**
-     * Billing provider requires authorisation.
+     * Billing provider requires authorization.
      */
     UNAUTHORISED,
     /**
@@ -47,8 +47,9 @@ public enum Status {
      */
     NO_BILLING_PROVIDER,
     /**
-     * Request can't be handled at a time.<br>
-     * For example: connection is down.
+     * Request can't be handled at a time.
+     * <br>
+     * Most likely - connection is down.
      */
     SERVICE_UNAVAILABLE,
     /**
@@ -56,8 +57,9 @@ public enum Status {
      */
     ITEM_UNAVAILABLE,
     /**
-     * Item is already owned by user.<br>
-     * If it's consumable - consume() must be called.
+     * Item is already owned by user.
+     * <br>
+     * If it's consumable - purchase must be consumed first.
      */
     ITEM_ALREADY_OWNED,
     /**

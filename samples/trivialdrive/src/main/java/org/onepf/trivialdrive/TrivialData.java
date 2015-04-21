@@ -26,7 +26,6 @@ public final class TrivialData {
     private static final int GAS_INITIAL = 2;
     private static final int GAS_MAX = 4;
 
-    private static final String KEY_FIRST_LAUNCH = "first_launch";
     private static final String KEY_GAS = "gas";
 
 
@@ -34,12 +33,10 @@ public final class TrivialData {
 
     public static void init(final Context context) {
         preferences = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        if (preferences.getBoolean(KEY_FIRST_LAUNCH, true)) {
-            preferences.edit()
-                    .putBoolean(KEY_FIRST_LAUNCH, false)
-                    .putInt(KEY_GAS, GAS_INITIAL)
-                    .apply();
-        }
+    }
+
+    public static void resetGas() {
+        preferences.edit().putInt(KEY_GAS, GAS_INITIAL).apply();
     }
 
     public static int getGas() {

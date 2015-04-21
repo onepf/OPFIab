@@ -21,12 +21,18 @@ import android.support.annotation.NonNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Request for {@link BillingProvider} to load details for corresponding SKUs.
+ *
+ * @see SkuDetailsResponse
+ */
 public class SkuDetailsRequest extends BillingRequest {
 
     private static final String NAME_SKUS = "skus";
@@ -44,6 +50,11 @@ public class SkuDetailsRequest extends BillingRequest {
         this.skus = new HashSet<>(skus);
     }
 
+    /**
+     * Get SKUs to load details for.
+     *
+     * @return SKUs.
+     */
     @NonNull
     public Set<String> getSkus() {
         return Collections.unmodifiableSet(skus);

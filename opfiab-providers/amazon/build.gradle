@@ -33,7 +33,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
-        versionName "0.1-SNAPSHOT"
+        versionName "0.2.0-SNAPSHOT"
     }
     buildTypes {
         release {

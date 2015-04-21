@@ -24,8 +24,9 @@ import android.text.TextUtils;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.SetupStartedEvent;
+import org.onepf.opfiab.model.Configuration.Builder;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFPreferences;
@@ -35,6 +36,20 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 
+/**
+ * This class with try to pick one {@link BillingProvider} from those available from
+ * {@link Configuration#getProviders()}.
+ * <br>
+ * Provider will be picked according to this priority:
+ * <ul>
+ * <li> Only available providers will be considered, according to {@link BillingProvider#isAvailable()}.
+ * <li> If was already used by this app, it will be considered first.
+ * <li> If provider has {@link BillingProviderInfo#getInstaller()} that matches this application
+ * package installer, it will be considered next.
+ * <li> First suitable provider will be picked according to order it was added in
+ * {@link Builder#addBillingProvider(BillingProvider)}.
+ * </ul>
+ */
 final class SetupManager {
 
     private static final String KEY_LAST_PROVIDER = SetupManager.class.getName() + ".last_provider";
@@ -98,8 +113,8 @@ final class SetupManager {
         final String packageInstaller = OPFUtils.getPackageInstaller(context);
         // If package installer is set, try it before anything else
         if (!TextUtils.isEmpty(packageInstaller)) {
-            final BillingProvider installerProvider =
-                    OPFIabUtils.withPackage(availableProviders, packageInstaller);
+            final BillingProvider installerProvider = OPFIabUtils
+                    .withInstaller(availableProviders, packageInstaller);
             final SetupResponse setupResponse;
             if (installerProvider != null
                     && (setupResponse = withProvider(configuration, installerProvider,
@@ -134,7 +149,7 @@ final class SetupManager {
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
         setupInProgress = false;
         if (lastConfiguration != null && lastConfiguration != setupResponse.getConfiguration()) {
-            // If someone requested setup with different configuration
+            // If another setup was requested with different configuration
             startSetup(lastConfiguration);
         } else {
             lastConfiguration = null;

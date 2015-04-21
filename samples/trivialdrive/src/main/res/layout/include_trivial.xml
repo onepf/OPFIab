@@ -17,7 +17,7 @@
 
 <org.onepf.trivialdrive.ui.view.TrivialView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/trivial_drive"
+    android:id="@+id/trivial"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/padding_act_vertical"
