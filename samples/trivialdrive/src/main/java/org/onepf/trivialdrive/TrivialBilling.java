@@ -56,7 +56,7 @@ public final class TrivialBilling {
 
     private static final String AMAZON_SKU_GAS = "org.onepf.opfiab.trivialdrive.sku_gas";
     private static final String AMAZON_SKU_PREMIUM = "org.onepf.opfiab.trivialdrive.sku_premium";
-    private static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.opfiab.trivialdrive.sku_infinite_gas";
+    private static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.opfiab.trivialdrive.sku_infinite_gas.month";
 
     private static final String GOOGLE_SKU_GAS = "sku_gas";
     private static final String GOOGLE_SKU_PREMIUM = "sku_premum";

@@ -27,8 +27,8 @@ android {
         applicationId "org.onepf.opfiab.trivialdrive"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 25
-        versionName "0.2.0"
+        versionCode 27
+        versionName "0.2.0-SNAPSHOT-1"
     }
 
     signingConfigs {
