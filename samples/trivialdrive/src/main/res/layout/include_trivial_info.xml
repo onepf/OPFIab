@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2012-2015 One Platform Foundation
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +15,9 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical">
 
@@ -34,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_normal"
         android:src="@drawable/img_gas_level"
-        tools:level="4"/>
+        tools:level="4" />
 
     <Button
         android:id="@+id/btn_drive"
