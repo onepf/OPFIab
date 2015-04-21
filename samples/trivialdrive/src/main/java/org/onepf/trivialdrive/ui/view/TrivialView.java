@@ -117,12 +117,32 @@ public class TrivialView extends LinearLayout
         setHasPremium(false);
         setHasSubscription(false);
         updateGas();
+        updateButtons();
 
         TrivialData.registerOnSharedPreferenceChangeListener(this);
     }
 
+    private void updateButtons() {
+        btnDrive.setEnabled(canDrive());
+        btnBuyGas.setEnabled(canBuyGas());
+        btnBuyPremium.setEnabled(canBuyPremium());
+        btnBuySubscription.setEnabled(canBuySubscription());
+    }
+
+    private boolean canDrive() {
+        return hasSubscription || TrivialData.getGas() > 0;
+    }
+
     private boolean canBuyGas() {
         return !hasSubscription && TrivialData.canAddGas();
+    }
+
+    private boolean canBuyPremium() {
+        return !hasPremium;
+    }
+
+    private boolean canBuySubscription() {
+        return !hasSubscription;
     }
 
     private void drive() {
@@ -178,6 +198,7 @@ public class TrivialView extends LinearLayout
         } else if (v == btnBuySubscription) {
             iabHelper.purchase(TrivialBilling.SKU_SUBSCRIPTION);
         }
+        updateButtons();
     }
 
     @Override
@@ -208,6 +229,16 @@ public class TrivialView extends LinearLayout
 
     protected static class SavedState extends BaseSavedState {
 
+        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
+
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
         private final boolean hasPremium;
         private final boolean hasSubscription;
 
@@ -230,16 +261,5 @@ public class TrivialView extends LinearLayout
             dest.writeByte((byte) (hasPremium ? 1 : 0));
             dest.writeByte((byte) (hasSubscription ? 1 : 0));
         }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = new Creator<SavedState>() {
-
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 }
