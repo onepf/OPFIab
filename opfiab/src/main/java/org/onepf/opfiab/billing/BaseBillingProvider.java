@@ -75,6 +75,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      * <p/>
      * Use reflection if you absolutely need to change it.
      */
+    @SuppressFBWarnings({"NAB_NEEDLESS_BOX_TO_UNBOX"})
     @SuppressWarnings({"UnnecessaryBoxing", "MagicNumber"})
     protected static final int REQUEST_CODE = Integer.valueOf(13685093);
 

@@ -27,8 +27,8 @@ android {
         applicationId "org.onepf.opfiab.trivialdrive"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 27
-        versionName "0.2.0-SNAPSHOT-1"
+        versionCode 28
+        versionName "0.2.0"
     }
 
     signingConfigs {
@@ -73,15 +73,15 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:recyclerview-v7:22.0.0'
 
-    compile 'com.makeramen:dragsortadapter:1.1.0'
-
-    //noinspection GradleDynamicVersion
-    compile 'org.onepf:opfutils:+'
-
-    compile project(':amazon')
+    // OPFIab core
+    compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'org.onepf:opfutils:0.1.21'
+    compile 'org.onepf:opfiab:0.2.0@aar'
+    // OPFIab Google
+    compile 'org.onepf:opfiab-google:0.2.0@aar'
+    // OPFIab Amazon
+    compile 'org.onepf:opfiab-amazon:0.2.0@aar'
     compile 'com.amazon:in-app-purchasing:2.0.61'
 
-    compile project(':opfiab')
-
-    compile project(':google')
+    compile 'com.makeramen:dragsortadapter:1.1.0'
 }

@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-
-
-
-
-
-
 apply plugin: 'idea'
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
 apply plugin: 'com.noveogroup.android.check'
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
 
 android {
     //noinspection GroovyAssignabilityCheck
@@ -35,7 +30,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
-        versionName "0.2.0-SNAPSHOT"
+        versionName "0.2.0"
     }
 
     buildTypes {
@@ -72,9 +67,9 @@ check {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.google.code.findbugs:annotations:3.0.0'
+    compile 'com.android.support:support-annotations:21.0.3'
 
-    //noinspection GradleDynamicVersion
-    provided 'org.onepf:opfutils:+'
-
-    compile project(':opfiab')
+    compile 'org.onepf:opfiab:0.2.0@aar'
+    provided 'org.onepf:opfutils:0.1.21'
 }

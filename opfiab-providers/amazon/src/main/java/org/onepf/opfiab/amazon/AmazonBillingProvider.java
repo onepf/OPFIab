@@ -49,6 +49,7 @@ import org.onepf.opfutils.OPFUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -67,8 +68,8 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     protected static final String NAME = "Amazon";
     protected static final String INSTALLER = "com.amazon.venezia";
-    protected static final Collection<String> PACKAGES = Arrays.asList("com.amazon.venezia",
-                                                                       "com.amazon.mShop.android");
+    protected static final Collection<String> PACKAGES = Collections.unmodifiableList(
+            Arrays.asList("com.amazon.venezia", "com.amazon.mShop.android"));
 
     public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, INSTALLER);
 

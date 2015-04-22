@@ -35,7 +35,11 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        // allow snapshots
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        // simplify maven upload
+        maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
+        // third-party dependencies
         maven { url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/' }
     }
 
