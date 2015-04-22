@@ -1,7 +1,7 @@
 # OPFIab
-OPFIab is a next step from [OpenIAB](https://github.com/onepf/OpenIAB). It's Android library intended to make in-app billing integration easy while supporting multiple billing providers (Appstores).
+OPFIab is a next step from [OpenIAB](https://github.com/onepf/OpenIAB). It's an Android library intended to make in-app billing integration easy while supporting multiple billing providers (Appstores).
 
-**This is library is still under development and may contain bugs. Any feedback is deeply apreciated**
+**This library is still under development and may contain bugs. Any feedback is deeply apreciated**
 
 ## Dependencies
 Library is designed to be extensible and cosist of separate modules.
@@ -18,6 +18,12 @@ Then you have to add one or few `BillingProvider` modules. Check [supported prov
 
 ## Documentation
 Full documentaion is available on our [wiki](https://github.com/onepf/OPFIab/wiki).
+
+Also check out our [sample](https://github.com/onepf/OPFIab/tree/master/samples/trivialdrive):
+* [Google Play](https://play.google.com/store/apps/details?id=org.onepf.opfiab.trivialdrive)
+* Amazon
+
+**Please be carefull, you might actually get charged.**
 
 ## FAQ
 Coming soon.
