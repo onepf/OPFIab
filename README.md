@@ -21,7 +21,7 @@ Full documentaion is available on our [wiki](https://github.com/onepf/OPFIab/wik
 
 Also check out our [sample](https://github.com/onepf/OPFIab/tree/master/samples/trivialdrive):
 * [Google Play](https://play.google.com/store/apps/details?id=org.onepf.opfiab.trivialdrive)
-* Amazon
+* [Amazon](http://www.amazon.com/OPF-Test-Account-OPFIab-Trivial/dp/B00W9TY70E/)
 
 **Please be carefull, you might actually get charged.**
 
