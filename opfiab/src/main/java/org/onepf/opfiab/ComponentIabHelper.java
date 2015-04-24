@@ -26,6 +26,7 @@ import org.onepf.opfiab.android.OPFIabSupportFragment;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.android.FragmentLifecycleEvent;
 import org.onepf.opfiab.model.event.android.SupportFragmentLifecycleEvent;
+import org.onepf.opfutils.OPFLog;
 
 abstract class ComponentIabHelper extends AdvancedIabHelperImpl {
 
@@ -41,6 +42,7 @@ abstract class ComponentIabHelper extends AdvancedIabHelperImpl {
         OPFIab.register(this);
 
         if (supportFragmentManager != null) {
+            OPFLog.d("Using android.support.v4.app.Fragment.");
             final android.support.v4.app.Fragment existingFragment = supportFragmentManager
                     .findFragmentByTag(FRAGMENT_TAG);
             if (existingFragment != null) {
@@ -58,6 +60,7 @@ abstract class ComponentIabHelper extends AdvancedIabHelperImpl {
         }
 
         if (fragmentManager != null) {
+            OPFLog.d("Using android.app.Fragment.");
             final android.app.Fragment existingFragment = fragmentManager
                     .findFragmentByTag(FRAGMENT_TAG);
             if (existingFragment != null) {
