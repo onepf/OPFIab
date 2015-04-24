@@ -21,12 +21,8 @@ You'll also whant to add one or few `BillingProvider` modules. Check [supported 
 ## Documentation
 Full documentaion is available on our [wiki](https://github.com/onepf/OPFIab/wiki).
 
-Also check out our [sample](https://github.com/onepf/OPFIab/tree/master/samples/trivialdrive):
-* [Google Play](https://play.google.com/store/apps/details?id=org.onepf.opfiab.trivialdrive)
-  * Testers [Google Group](https://groups.google.com/forum/#!members/opfiab_testers)
-* [Amazon](http://www.amazon.com/OPF-Test-Account-OPFIab-Trivial/dp/B00W9TY70E/)
-
-**Please be carefull, you might actually get charged.**
+## Samples
+* [TrivialDrive](https://github.com/onepf/OPFIab/tree/master/samples/trivialdrive)
 
 ## FAQ
 Coming soon.
