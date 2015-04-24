@@ -174,7 +174,7 @@ public class GoogleBillingProvider
         final ItemType itemType = ItemType.fromSkuType(skuType);
         if (itemType == null) {
             OPFLog.e("Unknown sku type: %s", sku);
-            postPurchaseResponse(Status.UNKNOWN_ERROR, null);
+            postPurchaseResponse(Status.ITEM_UNAVAILABLE, null);
             return;
         }
 
@@ -254,6 +254,7 @@ public class GoogleBillingProvider
     public void inventory(final boolean startOver) {
         final Bundle result = helper.getPurchases(startOver);
         final Response response = GoogleUtils.getResponse(result);
+        //noinspection ConstantConditions
         if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve purchase data.");
             postInventoryResponse(getStatus(response), null, false);
