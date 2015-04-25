@@ -70,6 +70,9 @@ public class OPFIabActivity extends Activity {
 
 
     protected final Handler handler = new Handler(Looper.getMainLooper());
+    /**
+     * Used to finish activity if for some reason it wasn't used by library.
+     */
     protected final Runnable finishTask = new Runnable() {
         @Override
         public void run() {
@@ -81,6 +84,13 @@ public class OPFIabActivity extends Activity {
     };
 
 
+    /**
+     * Used to schedule {@link #finishTask} call after timeout.
+     * <br>
+     * Resets timeout if task was already scheduled.
+     *
+     * @param schedule True if finish should be scheduled, false otherwise.
+     */
     protected void scheduleFinish(final boolean schedule) {
         handler.removeCallbacks(finishTask);
         if (schedule) {
@@ -92,6 +102,7 @@ public class OPFIabActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         OPFLog.d("onCreate: %s, task: %d", this, getTaskId());
+        // Don't handle any touch events
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         OPFIab.post(new ActivityLifecycleEvent(ComponentState.CREATE, this));
         onNewIntent(getIntent());
@@ -119,8 +130,11 @@ public class OPFIabActivity extends Activity {
         OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
         OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
         if (data != null || resultCode == RESULT_OK) {
+            // Result was delivered successfully, there's no further need for this activity.
             finish();
         } else {
+            // May indicated that this activity is used for something else, for example - to start
+            // another activity.
             scheduleFinish(true);
         }
     }

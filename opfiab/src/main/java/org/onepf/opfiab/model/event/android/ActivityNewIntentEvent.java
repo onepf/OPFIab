@@ -20,6 +20,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+/**
+ * Event indicating {@link Activity#onNewIntent(Intent)} call.
+ */
 public class ActivityNewIntentEvent extends ActivityEvent {
 
     @NonNull

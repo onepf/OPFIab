@@ -40,17 +40,30 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Helper class intended to simplify interaction with {@link Service} declared using Android Interface Definition Language (AIDL).
+ * Helper class intended to simplify interaction with {@link Service} declared using Android
+ * Interface Definition Language (AIDL).
  *
  * @param <AIDL> AIDL class to bind to.
  */
 public abstract class AidlBillingHelper<AIDL extends IInterface> implements ServiceConnection {
 
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+    /**
+     * Timeout to wait before giving up connecting to service.
+     */
     private static final long CONNECTION_TIMEOUT = 3000L; // 3 seconds
+    /**
+     * Automatically disconnect from service after this delay since last usage.
+     */
     private static final long DISCONNECT_DELAY = 60000L; // 1 minute
 
+    /**
+     * Used to block library thread and wait for service to connect.
+     */
     private final Semaphore serviceSemaphore = new Semaphore(0);
+    /**
+     * Task to used to disconnect from service.
+     */
     private final Runnable disconnect = new Runnable() {
         @Override
         public void run() {
@@ -62,6 +75,9 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     };
     @NonNull
     protected final Context context;
+    /**
+     * Method used to connect to service.
+     */
     @NonNull
     private final Method asInterface;
     @Nullable
@@ -84,6 +100,9 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         throw new IllegalStateException("Couldn't extract Stub implementation from AIDL class.");
     }
 
+    /**
+     * Schedule {@link #disconnect} after {@link #DISCONNECT_DELAY}.
+     */
     private void scheduleDisconnect() {
         HANDLER.removeCallbacks(disconnect);
         HANDLER.postDelayed(disconnect, DISCONNECT_DELAY);

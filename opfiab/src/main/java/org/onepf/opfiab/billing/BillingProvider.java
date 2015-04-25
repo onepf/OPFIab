@@ -25,6 +25,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 
 /**
  * This interface represents billing service provider, capable of handling in-app purchases.
@@ -70,7 +71,8 @@ public interface BillingProvider {
      * Called from <b>single</b> background thread.
      * <p/>
      * As soon as billing request is handled, BillingProvider <b>must</b> notify library with
-     * {@link RequestHandledEvent} using {@link OPFIab#post(Object)}.
+     * {@link RequestHandledEvent} using {@link OPFIab#post(Object)}. Same method should be used
+     * with proper {@link BillingResponse} object when result of performed action becomes available.
      *
      * @param billingRequest Billing request to handle with this billing provider.
      */

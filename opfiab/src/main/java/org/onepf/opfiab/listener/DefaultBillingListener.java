@@ -43,6 +43,10 @@ import java.util.Map;
  */
 public class DefaultBillingListener extends SimpleBillingListener {
 
+    /**
+     * Lazy initialized {@link IabHelper} instance used for any billing actions performed by
+     * {@link DefaultBillingListener}.
+     */
     @Nullable
     private IabHelper iabHelper;
 
@@ -54,6 +58,13 @@ public class DefaultBillingListener extends SimpleBillingListener {
         return iabHelper;
     }
 
+    /**
+     * Checks if supplied purchase can be consumed.
+     *
+     * @param purchase Purchase object to check.
+     * @return True if purchase can be consumed, false otherwise.
+     * @see IabHelper#consume(Purchase)
+     */
     protected boolean canConsume(@Nullable final Purchase purchase) {
         return purchase != null && purchase.getType() == SkuType.CONSUMABLE;
     }
@@ -61,8 +72,9 @@ public class DefaultBillingListener extends SimpleBillingListener {
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
         super.onPurchase(purchaseResponse);
-        final Purchase purchase = purchaseResponse.getPurchase();
-        if (purchaseResponse.isSuccessful() && canConsume(purchase)) {
+        final Purchase purchase;
+        if (purchaseResponse.isSuccessful()
+                && canConsume(purchase = purchaseResponse.getPurchase())) {
             //noinspection ConstantConditions
             getHelper().consume(purchase);
         }
@@ -78,9 +90,10 @@ public class DefaultBillingListener extends SimpleBillingListener {
             if (inventory != null) {
                 // Inventory is not empty
                 for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
-                    final Purchase purchase = entry.getKey();
                     final VerificationResult verificationResult = entry.getValue();
-                    if (verificationResult == VerificationResult.SUCCESS && canConsume(purchase)) {
+                    final Purchase purchase;
+                    if (verificationResult == VerificationResult.SUCCESS
+                            && canConsume(purchase = entry.getKey())) {
                         getHelper().consume(purchase);
                     }
                 }

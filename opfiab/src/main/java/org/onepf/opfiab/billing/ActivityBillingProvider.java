@@ -38,6 +38,8 @@ import org.onepf.opfutils.OPFLog;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 /**
  * Extension of {@link BillingProvider} which guarantees non-null {@link Activity} object in {@link #purchase(Activity, String)}.
  * <br>
@@ -46,14 +48,35 @@ import java.util.concurrent.TimeUnit;
 public abstract class ActivityBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         extends BaseBillingProvider<R, V> {
 
+    /**
+     * <a href="http://imgs.xkcd.com/comics/random_number.png">Random Number</a> intended for use in
+     * {@link Activity#startActivityForResult(Intent, int)}.
+     * <p/>
+     * Use reflection if you absolutely need to change it.
+     */
+    @SuppressFBWarnings({"NAB_NEEDLESS_BOX_TO_UNBOX"})
+    @SuppressWarnings({"UnnecessaryBoxing", "MagicNumber"})
+    protected static final int REQUEST_CODE = Integer.valueOf(13685093);
+    /**
+     * Timeout to give up on waiting for new activity instance.
+     */
     private static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
 
 
+    /**
+     * Used to block library thread to wait for new activity instance.
+     */
     private final Semaphore semaphore = new Semaphore(0);
+    /**
+     * Request waiting for new activity instance.
+     */
     @Nullable
-    private volatile BillingRequest pendingRequest;
+    private volatile PurchaseRequest pendingRequest;
+    /**
+     * Copy of {@link #pendingRequest} but with newly created activity instance attached to it.
+     */
     @Nullable
-    private volatile BillingRequest activityRequest;
+    private volatile PurchaseRequest activityRequest;
 
     protected ActivityBillingProvider(@NonNull final Context context,
                                       @NonNull final R skuResolver,
@@ -61,13 +84,16 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         super(context, skuResolver, purchaseVerifier);
     }
 
+    /**
+     * Handle result of activity previously started with {@link #REQUEST_CODE}.
+     */
     protected abstract void onActivityResult(@NonNull final Activity activity,
                                              final int requestCode,
                                              final int resultCode,
                                              @NonNull final Intent data);
 
     /**
-     * @param activity can't be null
+     * @param activity can't be null.
      */
     @Override
     protected abstract void purchase(
@@ -83,8 +109,8 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
             return;
         }
         // We have to start OPFIabActivity to properly handle this request
+        pendingRequest = (PurchaseRequest) billingRequest;
         semaphore.drainPermits();
-        pendingRequest = billingRequest;
         activityRequest = null;
         final Activity activity = purchaseRequest.getActivity();
         OPFIabActivity.start(activity == null ? context : activity);
@@ -109,10 +135,10 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     }
 
     public void onEventMainThread(@NonNull final ActivityNewIntentEvent intentEvent) {
-        final BillingRequest pendingRequest = this.pendingRequest;
+        final PurchaseRequest pendingRequest = this.pendingRequest;
         if (pendingRequest != null) {
             final Activity activity = intentEvent.getActivity();
-            activityRequest = OPFIabUtils.withActivity(pendingRequest, activity);
+            activityRequest = new PurchaseRequest(activity, pendingRequest.getSku());
             semaphore.release();
         }
     }

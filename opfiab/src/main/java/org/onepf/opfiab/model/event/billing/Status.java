@@ -16,6 +16,11 @@
 
 package org.onepf.opfiab.model.event.billing;
 
+import org.onepf.opfiab.api.IabHelper;
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.billing.SkuType;
+
 public enum Status {
 
     /**
@@ -27,7 +32,7 @@ public enum Status {
      */
     PENDING,
     /**
-     * Billing provider requires authorization.
+     * {@link BillingProvider} requires authorization.
      */
     UNAUTHORISED,
     /**
@@ -39,7 +44,7 @@ public enum Status {
      */
     USER_CANCELED,
     /**
-     * Billing provider reported it can't handle billing.
+     * {@link BillingProvider} reported it can't handle billing.
      */
     BILLING_UNAVAILABLE,
     /**
@@ -53,17 +58,18 @@ public enum Status {
      */
     SERVICE_UNAVAILABLE,
     /**
-     * Requested sku is unavailable from current billing provider.
+     * Requested sku is unavailable from current {@link BillingProvider}.
      */
     ITEM_UNAVAILABLE,
     /**
      * Item is already owned by user.
      * <br>
-     * If it's consumable - purchase must be consumed first.
+     * If it's {@link SkuType#CONSUMABLE} - purchase must be consumed using
+     * {@link IabHelper#consume(Purchase)}.
      */
     ITEM_ALREADY_OWNED,
     /**
-     * For some reason billing provider refused to handle request.
+     * For some reason {@link BillingProvider} refused to handle request.
      */
     UNKNOWN_ERROR,
 }
