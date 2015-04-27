@@ -55,7 +55,7 @@ public class InventoryResponse extends BillingResponse {
     }
 
     /**
-     * Get items owned by user along with {@link VerificationResult} of those items.
+     * Gets items owned by user along with {@link VerificationResult} of those items.
      *
      * @return Purchases made by user mapped to their verification status. Can be null.
      * @see #isSuccessful()
@@ -66,9 +66,9 @@ public class InventoryResponse extends BillingResponse {
     }
 
     /**
-     * Indicated whether there's more items to be loaded with subsequent {@link InventoryRequest}s.
+     * Indicates whether there are more items to be loaded with subsequent {@link InventoryRequest}s.
      *
-     * @return True if there's more user owned purchases to be loaded, false otherwise.
+     * @return True if there are more user owned purchases to be loaded, false otherwise.
      * @see InventoryRequest#startOver()
      */
     public boolean hasMore() {

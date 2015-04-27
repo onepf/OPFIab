@@ -44,7 +44,7 @@ public class ConsumeResponse extends BillingResponse {
     }
 
     /**
-     * Get Purchase intended for consumption.
+     * Gets Purchase intended for consumption.
      *
      * @return Purchase object. Can't be null.
      */

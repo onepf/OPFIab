@@ -27,7 +27,7 @@ import org.onepf.opfutils.OPFLog;
 import java.io.Serializable;
 
 /**
- * Model class representing some occurred billing event.
+ * Model class representing any occurred billing event.
  */
 abstract class BillingEvent implements JsonCompatible, Serializable {
 
@@ -53,7 +53,7 @@ abstract class BillingEvent implements JsonCompatible, Serializable {
     }
 
     /**
-     * Get type of this event.
+     * Gets type of this event.
      *
      * @return Type of this event.
      */

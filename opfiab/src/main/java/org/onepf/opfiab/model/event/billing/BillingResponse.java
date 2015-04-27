@@ -34,7 +34,8 @@ import static org.onepf.opfiab.model.event.billing.Status.PENDING;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 
 /**
- * Model class representing response from {@link BillingProvider} for corresponding {@link BillingRequest}.
+ * Model class that represents response from {@link BillingProvider} for
+ * corresponding {@link BillingRequest}.
  */
 public abstract class BillingResponse extends BillingEvent {
 
@@ -58,7 +59,7 @@ public abstract class BillingResponse extends BillingEvent {
     }
 
     /**
-     * Get information about {@link BillingProvider} which is responsible for this BillingResponse.
+     * Gets information about {@link BillingProvider} which is responsible for this BillingResponse.
      * <br>
      * Might be useful to properly handle some data from {@link BillingModel#getOriginalJson()}.
      *

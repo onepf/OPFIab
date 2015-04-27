@@ -138,7 +138,7 @@ public class SetupResponse implements JsonCompatible {
     /**
      * Indicates whether picked billing provider is authorised or not.
      *
-     * @return True if BillingProvider was picked and does not require authorization, false
+     * @return True if picked BillingProvider is authorized, false
      * otherwise.
      * @see BillingProvider#isAuthorised()
      */

@@ -42,7 +42,7 @@ public class ConsumeRequest extends BillingRequest {
     }
 
     /**
-     * Get Purchase intended for consumption.
+     * Gets Purchase intended for consumption.
      *
      * @return Purchase object.
      */
