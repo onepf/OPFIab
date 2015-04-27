@@ -49,7 +49,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
 
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
     /**
-     * Timeout to wait before giving up connecting to service.
+     * Timeout to wait before giving up on connecting to service.
      */
     private static final long CONNECTION_TIMEOUT = 3000L; // 3 seconds
     /**
@@ -62,7 +62,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
      */
     private final Semaphore serviceSemaphore = new Semaphore(0);
     /**
-     * Task to used to disconnect from service.
+     * Task to be used to disconnect from service.
      */
     private final Runnable disconnect = new Runnable() {
         @Override
@@ -76,7 +76,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     @NonNull
     protected final Context context;
     /**
-     * Method used to connect to service.
+     * Method that is used to connect to the service.
      */
     @NonNull
     private final Method asInterface;
@@ -101,7 +101,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     }
 
     /**
-     * Schedule {@link #disconnect} after {@link #DISCONNECT_DELAY}.
+     * Schedules {@link #disconnect} after {@link #DISCONNECT_DELAY} milliseconds.
      */
     private void scheduleDisconnect() {
         HANDLER.removeCallbacks(disconnect);
@@ -109,7 +109,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     }
 
     /**
-     * Acquire intent to start {@link Service} with.
+     * Acquires intent to start {@link Service} with.
      *
      * @return new Intent suitable for {@link Context#startService(Intent)}.
      */

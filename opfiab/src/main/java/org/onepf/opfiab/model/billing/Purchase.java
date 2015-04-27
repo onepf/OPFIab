@@ -27,7 +27,7 @@ import org.onepf.opfutils.OPFLog;
 import static org.json.JSONObject.NULL;
 
 /**
- * Model class representing purchase made my user.
+ * Model class representing purchase made by user.
  */
 public class Purchase extends BillingModel {
 
@@ -59,7 +59,7 @@ public class Purchase extends BillingModel {
     }
 
     /**
-     * Get unique token identifying this purchase.
+     * Gets unique token identifying the purchase.
      *
      * @return This purchase token.
      */
@@ -69,7 +69,7 @@ public class Purchase extends BillingModel {
     }
 
     /**
-     * Get date of this purchase in milliseconds.
+     * Gets date of the purchase in milliseconds.
      *
      * @return Date when this purchase was made.
      */
@@ -138,7 +138,7 @@ public class Purchase extends BillingModel {
         }
 
         /**
-         * Set unique token to use in new Purchase object.
+         * Sets unique token to use in a new Purchase object.
          *
          * @param token Token to use.
          * @return this object.
@@ -149,7 +149,7 @@ public class Purchase extends BillingModel {
         }
 
         /**
-         * Set canceled status of new Purchase object.
+         * Sets canceled status of a new Purchase object.
          *
          * @param canceled Canceled status to set.
          * @return this object.
@@ -160,7 +160,7 @@ public class Purchase extends BillingModel {
         }
 
         /**
-         * Set the time for new Purchase object.
+         * Sets the time for a new Purchase object.
          *
          * @param purchaseTime Time in millisecond when purchase was made.
          * @return this object.
@@ -171,7 +171,7 @@ public class Purchase extends BillingModel {
         }
 
         /**
-         * Set existing Purchase object to use as base for new one.
+         * Sets existing Purchase object to use as a base for a new one.
          *
          * @param purchase Existing purchase object.
          * @return this object.

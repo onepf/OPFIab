@@ -50,7 +50,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 
 /**
- * Collection of handy utility method.
+ * Collection of handy utility methods.
  * <br>
  * Intended for internal use.
  */

@@ -22,7 +22,7 @@ import android.support.v4.app.Fragment;
 import org.onepf.opfiab.model.ComponentState;
 
 /**
- * Event indicating {@link Fragment} lifecycle change.
+ * Event that indicates {@link Fragment} lifecycle state change.
  */
 public class SupportFragmentLifecycleEvent extends LifecycleEvent {
 

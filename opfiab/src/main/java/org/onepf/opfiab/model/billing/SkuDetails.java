@@ -69,7 +69,7 @@ public class SkuDetails extends BillingModel {
     }
 
     /**
-     * Get formatted, localized price for SKU.
+     * Gets formatted, localized price for the SKU.
      *
      * @return SKU price. Can be null.
      */
@@ -79,7 +79,7 @@ public class SkuDetails extends BillingModel {
     }
 
     /**
-     * Get SKU title.
+     * Gets SKU title.
      *
      * @return SKU title. Can be null.
      */
@@ -89,7 +89,7 @@ public class SkuDetails extends BillingModel {
     }
 
     /**
-     * Get localized description for SKU.
+     * Gets localized description for SKU.
      *
      * @return SKU description. Can be null.
      */
@@ -99,7 +99,7 @@ public class SkuDetails extends BillingModel {
     }
 
     /**
-     * Get URL of the image associated with SKU.
+     * Gets URL of the image associated with the SKU.
      *
      * @return URL for SKU image. Can be null.
      */
@@ -109,7 +109,7 @@ public class SkuDetails extends BillingModel {
     }
 
     /**
-     * Indicates whether this there's actually any data available in this object.
+     * Indicates if there's actually any data available in this object.
      * <br>
      * Typically this is true when SKU wasn't recognized by {@link BillingProvider}.
      *
@@ -177,7 +177,7 @@ public class SkuDetails extends BillingModel {
         }
 
         /**
-         * Set price for new SkuDetails object.
+         * Sets price for a new SkuDetails object.
          *
          * @param price Formatted, localized price.
          * @return this object.
@@ -188,7 +188,7 @@ public class SkuDetails extends BillingModel {
         }
 
         /**
-         * Set title for new SkuDetails object.
+         * Sets title for a new SkuDetails object.
          *
          * @param title SKU title.
          * @return this object.
@@ -199,7 +199,7 @@ public class SkuDetails extends BillingModel {
         }
 
         /**
-         * Set localized description for new SkuDetails object.
+         * Sets localized description for a new SkuDetails object.
          *
          * @param description SKU description.
          * @return this object.
@@ -210,7 +210,7 @@ public class SkuDetails extends BillingModel {
         }
 
         /**
-         * Set image URL for new SkuDetails object.
+         * Sets image URL for a new SkuDetails object.
          *
          * @param iconUrl SKU image URL.
          * @return this object.
@@ -221,7 +221,7 @@ public class SkuDetails extends BillingModel {
         }
 
         /**
-         * Set existing SkuDetails object to use as a base for new one.
+         * Sets existing SkuDetails object to use as a base for a new one.
          *
          * @param skuDetails Existing SkuDetails object.
          * @return this object.

@@ -37,7 +37,7 @@ interface ListenersSupport {
     void addSetupListener(@NonNull final OnSetupListener setupListener);
 
     /**
-     * Register callback for setup events.
+     * Registers callback for setup events.
      *
      * @param setupListener listener to register.
      * @param deliverLast   if true and setup was already finished, immediately deliver last {@link SetupResponse}
@@ -46,35 +46,35 @@ interface ListenersSupport {
                           final boolean deliverLast);
 
     /**
-     * Register callback for purchase events.
+     * Registers callback for purchase events.
      *
      * @param purchaseListener listener to register.
      */
     void addPurchaseListener(@NonNull final OnPurchaseListener purchaseListener);
 
     /**
-     * Register callback for inventory events.
+     * Registers callback for inventory events.
      *
      * @param inventoryListener listener to register.
      */
     void addInventoryListener(@NonNull final OnInventoryListener inventoryListener);
 
     /**
-     * Register callback for sku details events.
+     * Registers callback for SKU details events.
      *
      * @param skuInfoListener listener to register.
      */
     void addSkuDetailsListener(@NonNull final OnSkuDetailsListener skuInfoListener);
 
     /**
-     * Register callback for consume events.
+     * Registers callback for consume events.
      *
      * @param consumeListener listener to register.
      */
     void addConsumeListener(@NonNull final OnConsumeListener consumeListener);
 
     /**
-     * Register callback for all billing events.
+     * Registers callback for all billing events.
      *
      * @param billingListener listener to register.
      */

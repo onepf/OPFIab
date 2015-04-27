@@ -58,22 +58,22 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     @SuppressWarnings({"UnnecessaryBoxing", "MagicNumber"})
     protected static final int REQUEST_CODE = Integer.valueOf(13685093);
     /**
-     * Timeout to give up on waiting for new activity instance.
+     * Timeout to give up on waiting for a new activity instance.
      */
     private static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
 
 
     /**
-     * Used to block library thread to wait for new activity instance.
+     * Used to block library thread to wait for a new activity instance.
      */
     private final Semaphore semaphore = new Semaphore(0);
     /**
-     * Request waiting for new activity instance.
+     * Request waiting for a new activity instance.
      */
     @Nullable
     private volatile PurchaseRequest pendingRequest;
     /**
-     * Copy of {@link #pendingRequest} but with newly created activity instance attached to it.
+     * Copy of {@link #pendingRequest} but with a newly created activity instance attached to it.
      */
     @Nullable
     private volatile PurchaseRequest activityRequest;
@@ -85,7 +85,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     }
 
     /**
-     * Handle result of activity previously started with {@link #REQUEST_CODE}.
+     * Handles result of activity previously started with {@link #REQUEST_CODE}.
      */
     protected abstract void onActivityResult(@NonNull final Activity activity,
                                              final int requestCode,

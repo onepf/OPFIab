@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.billing.BillingProvider;
 
 /**
- * Interface intended to help resole {@link BillingProvider} specific SKUs.
+ * Interface intended to help resolve {@link BillingProvider} specific SKUs.
  */
 public interface SkuResolver {
 
@@ -47,7 +47,7 @@ public interface SkuResolver {
 
 
     /**
-     * Get {@link BillingProvider} specific SKU value.
+     * Gets {@link BillingProvider} specific SKU value.
      *
      * @param sku SKU to resolve.
      * @return Resolved SKU value.
@@ -56,7 +56,7 @@ public interface SkuResolver {
     String resolve(@NonNull final String sku);
 
     /**
-     * Get original SKU value from {@link BillingProvider} specific one.
+     * Gets original SKU value from {@link BillingProvider} specific one.
      *
      * @param resolvedSku SKU to revert.
      * @return Reverted SKU value.

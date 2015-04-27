@@ -87,7 +87,7 @@ public class OPFIabActivity extends Activity {
     /**
      * Used to schedule {@link #finishTask} call after timeout.
      * <br>
-     * Resets timeout if task was already scheduled.
+     * Resets timeout if task has been already scheduled.
      *
      * @param schedule True if finish should be scheduled, false otherwise.
      */

@@ -36,7 +36,7 @@ public class SetupStartedEvent {
     }
 
     /**
-     * Get configuration used for this setup.
+     * Gets configuration used for the setup.
      *
      * @return Configuration object.
      */

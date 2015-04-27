@@ -38,15 +38,15 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED
 import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 
 /**
- * This class with try to pick one {@link BillingProvider} from those available from
+ * This class tries to pick one {@link BillingProvider} from those available from
  * {@link Configuration#getProviders()}.
  * <br>
- * Provider will be picked according to this priority:
+ * Providers are picked according to this priority rules:
  * <ul>
  * <li> Only available providers will be considered, according to {@link BillingProvider#isAvailable()}.
- * <li> If was already used by this app, it will be considered first.
+ * <li> If provider had been already used by this app, it is considered first.
  * <li> If provider has {@link BillingProviderInfo#getInstaller()} that matches this application
- * package installer, it will be considered next.
+ * package installer, it is considered next.
  * <li> First suitable provider will be picked according to order it was added in
  * {@link Builder#addBillingProvider(BillingProvider)}.
  * </ul>

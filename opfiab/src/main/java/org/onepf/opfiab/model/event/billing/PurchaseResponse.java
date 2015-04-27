@@ -54,7 +54,7 @@ public class PurchaseResponse extends BillingResponse {
     }
 
     /**
-     * Get purchase acquired by user with corresponding {@link BillingRequest}.
+     * Gets purchase acquired by user with corresponding {@link BillingRequest}.
      *
      * @return Purchase object. Can be null.
      * @see #isSuccessful()
@@ -65,7 +65,7 @@ public class PurchaseResponse extends BillingResponse {
     }
 
     /**
-     * Get verification result for corresponding purchase.
+     * Gets verification result for corresponding purchase.
      *
      * @return VerificationResult. Can be null.
      * @see #isSuccessful()

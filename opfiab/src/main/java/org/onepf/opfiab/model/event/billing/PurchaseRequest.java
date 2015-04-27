@@ -69,7 +69,7 @@ public class PurchaseRequest extends BillingRequest {
     }
 
     /**
-     * Get Activity object to be used to start other activities if necessary.
+     * Gets Activity object to be used to start other activities if necessary.
      *
      * @return Activity object. Can be null.
      */
@@ -79,7 +79,7 @@ public class PurchaseRequest extends BillingRequest {
     }
 
     /**
-     * Get SKU intended for purchasing.
+     * Gets SKU intended for purchasing.
      *
      * @return SKU.
      */
@@ -93,7 +93,7 @@ public class PurchaseRequest extends BillingRequest {
      * <br>
      * Intended for internal usage only.
      *
-     * @return True if this request require {@link OPFIabActivity}, false otherwise.
+     * @return True if this request requires {@link OPFIabActivity}, false otherwise.
      * @see ActivityBillingProvider
      */
     public boolean needsFakeActivity() {

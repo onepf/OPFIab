@@ -35,7 +35,7 @@ import org.onepf.opfiab.model.event.billing.BillingResponse;
 public interface BillingProvider {
 
     /**
-     * Retrieve information about this BillingProvider.
+     * Retrieves information about this BillingProvider.
      *
      * @return single immutable object containing all relevant information about this provider.
      */
@@ -43,7 +43,7 @@ public interface BillingProvider {
     BillingProviderInfo getInfo();
 
     /**
-     * Check if Manifest contains all necessary entries.
+     * Checks if Manifest contains all necessary entries.
      *
      * @throws java.lang.IllegalStateException if manifest doesn't contain all necessary entries.
      */
@@ -54,7 +54,7 @@ public interface BillingProvider {
      * <br>
      * Called before each request, thus it might be a good idea to cache intermediate result.
      *
-     * @return true is BillingProvider is currently available, false otherwise.
+     * @return true if BillingProvider is currently available, false otherwise.
      */
     boolean isAvailable();
 
@@ -79,7 +79,7 @@ public interface BillingProvider {
     void onEventAsync(@NonNull final BillingRequest billingRequest);
 
     /**
-     * Acquire {@link Intent} to open representation of this App within this BillingProvider.
+     * Acquires {@link Intent} to open representation of this App within this BillingProvider.
      *
      * @return Intent object suitable for {@link Activity#startActivity(Intent)}. Can be null.
      */
@@ -87,7 +87,7 @@ public interface BillingProvider {
     Intent getStorePageIntent();
 
     /**
-     * Acquire {@link Intent} to rate this App within this BillingProvider.
+     * Acquires {@link Intent} to rate this App within this BillingProvider.
      *
      * @return Intent object suitable for {@link Activity#startActivity(Intent)}. Can be null.
      */

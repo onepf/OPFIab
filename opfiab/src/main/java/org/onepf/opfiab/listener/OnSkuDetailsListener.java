@@ -23,7 +23,7 @@ import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 
 /**
- * Listener for sku details billing events.
+ * Listener for SKU details billing events.
  */
 public interface OnSkuDetailsListener {
 

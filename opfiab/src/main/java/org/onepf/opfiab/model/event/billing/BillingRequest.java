@@ -23,8 +23,8 @@ import org.onepf.opfiab.billing.BillingProvider;
 /**
  * Model class representing request of some action from {@link BillingProvider}.
  * <br>
- * Please not that not every request will cause corresponding {@link BillingResponse}, different
- * {@link BillingProvider}s can behave differently.
+ * Please note that not every single request will lead to a corresponding {@link BillingResponse},
+ * different {@link BillingProvider}s can behave differently.
  */
 public abstract class BillingRequest extends BillingEvent {
 

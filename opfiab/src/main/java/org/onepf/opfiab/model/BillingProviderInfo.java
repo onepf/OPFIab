@@ -42,10 +42,10 @@ public final class BillingProviderInfo implements JsonCompatible {
 
 
     /**
-     * Make new {@link BillingProviderInfo} instance from supplied JSON representation.
+     * Makes new {@link BillingProviderInfo} instance from provided JSON representation.
      *
      * @param json JSON representation of {@link BillingProviderInfo} object.
-     * @return New {@link BillingProviderInfo} object if {@code json} was formatted correctly, false
+     * @return New {@link BillingProviderInfo} object if {@code json} was formatted correctly, null
      * otherwise.
      */
     @Nullable
@@ -83,7 +83,7 @@ public final class BillingProviderInfo implements JsonCompatible {
     }
 
     /**
-     * Get name of corresponding {@link BillingProvider}.
+     * Gets name of corresponding {@link BillingProvider}.
      *
      * @return BillingProvider name.
      */
@@ -93,7 +93,7 @@ public final class BillingProviderInfo implements JsonCompatible {
     }
 
     /**
-     * Get package name of corresponding {@link BillingProvider}.
+     * Gets package name of corresponding {@link BillingProvider}.
      *
      * @return BillingProvider package. Can be null.
      */
@@ -103,7 +103,7 @@ public final class BillingProviderInfo implements JsonCompatible {
     }
 
     /**
-     * Get installer used by corresponding {@link BillingProvider}.
+     * Gets installer used by corresponding {@link BillingProvider}.
      *
      * @return Installer used by BillingProvider. Can be null.
      * @see PackageManager#getPackageInstaller()

@@ -38,7 +38,7 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 
 
 /**
- * Class intended to indicate that setup process is finished.
+ * Class intended to indicate that setup process has finished.
  *
  * @see SetupStartedEvent
  * @see OPFIab#setup()
@@ -55,14 +55,14 @@ public class SetupResponse implements JsonCompatible {
     public enum Status {
 
         /**
-         * {@link BillingProvider} was successfully picked.
+         * {@link BillingProvider} has been successfully picked.
          */
         SUCCESS,
         /**
-         * Setup resulted in different {@link BillingProvider} being picked then one that was once
-         * already used for this application.
+         * Setup resulted in a different {@link BillingProvider} being picked then one that was used
+         * for this application previously.
          * <br>
-         * Some items might be missing form user inventory.
+         * Some items might be missing form user's inventory.
          */
         PROVIDER_CHANGED,
         /**
@@ -104,7 +104,7 @@ public class SetupResponse implements JsonCompatible {
     }
 
     /**
-     * Get configuration object used for setup.
+     * Gets configuration object which is used for the setup.
      *
      * @return Configuration object.
      * @see OPFIab#init(Application, Configuration)
@@ -115,7 +115,7 @@ public class SetupResponse implements JsonCompatible {
     }
 
     /**
-     * Get status of this setup event.
+     * Gets status of this setup event.
      *
      * @return Status.
      */
@@ -125,7 +125,7 @@ public class SetupResponse implements JsonCompatible {
     }
 
     /**
-     * Get billing provider picked during setup.
+     * Gets billing provider that was picked during setup.
      *
      * @return BillingProvider object if setup was successful, null otherwise.
      * @see #isSuccessful()
@@ -138,7 +138,7 @@ public class SetupResponse implements JsonCompatible {
     /**
      * Indicates whether picked billing provider is authorised or not.
      *
-     * @return True if BillingProvider was picked and does not require authorisation, false
+     * @return True if picked BillingProvider is authorized, false
      * otherwise.
      * @see BillingProvider#isAuthorised()
      */

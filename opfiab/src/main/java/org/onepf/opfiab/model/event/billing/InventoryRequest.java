@@ -41,7 +41,7 @@ public class InventoryRequest extends BillingRequest {
 
     /**
      * Indicates whether user inventory should be loaded from the start, or continued from the point
-     * of last {@link BillingRequest}.
+     * of the last {@link BillingRequest}.
      *
      * @return True if inventory should be loaded from the start, false otherwise.
      */

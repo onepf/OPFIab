@@ -44,7 +44,7 @@ public enum Status {
      */
     USER_CANCELED,
     /**
-     * {@link BillingProvider} reported it can't handle billing.
+     * {@link BillingProvider} reported that it can't handle billing.
      */
     BILLING_UNAVAILABLE,
     /**
@@ -54,7 +54,7 @@ public enum Status {
     /**
      * Request can't be handled at a time.
      * <br>
-     * Most likely - connection is down.
+     * Most likely - connection went down.
      */
     SERVICE_UNAVAILABLE,
     /**

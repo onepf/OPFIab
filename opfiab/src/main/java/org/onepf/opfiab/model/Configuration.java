@@ -30,7 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Model class representing library configuration.
+ * Model class that represents library configuration.
  *
  * @see org.onepf.opfiab.OPFIab#init(Application, Configuration)
  */
@@ -61,7 +61,7 @@ public final class Configuration {
     }
 
     /**
-     * Get supported billing provider.
+     * Gets supported billing provider.
      *
      * @return Collection of BillingProvider objects.
      */
@@ -72,7 +72,7 @@ public final class Configuration {
     }
 
     /**
-     * Get persistent listener used to handle all billing events.
+     * Gets persistent listener which is used to handle all billing events.
      *
      * @return BillingListener object. Can be null.
      */
@@ -82,7 +82,7 @@ public final class Configuration {
     }
 
     /**
-     * Get minimal time gap between requests with the same type.
+     * Gets minimal time gap between pending requests.
      *
      * @return Time gap in milliseconds.
      */
@@ -103,7 +103,7 @@ public final class Configuration {
 
     /**
      * Indicates whether library should attempt to pick another suitable {@link BillingProvider} if
-     * current one become unavailable.
+     * current one becomes unavailable.
      *
      * @return True if library will attempt to pick another BillingProvider. False otherwise.
      */
@@ -125,9 +125,9 @@ public final class Configuration {
         private boolean autoRecover;
 
         /**
-         * Add supported billing provider.
+         * Adds supported billing provider.
          * <br>
-         * During setup process billing providers will be considered in order they were added.
+         * During setup process billing providers will be considered in the order they were added.
          *
          * @param provider BillingProvider object to add.
          * @return this object.
@@ -138,9 +138,9 @@ public final class Configuration {
         }
 
         /**
-         * Set global listener to handle all billing events.
+         * Sets global listener to handle all billing events.
          * <br>
-         * This listener will be stored in static reference.
+         * This listener will be stored in a static reference.
          *
          * @param billingListener BillingListener object to use.
          * @return this object.
@@ -152,9 +152,9 @@ public final class Configuration {
         }
 
         /**
-         * Set time gap between attempts to execute enqueued requests.
+         * Sets time gap between attempts to execute enqueued requests.
          * <br>
-         * Default valued is 50ms.
+         * Default value is 50ms.
          *
          * @param subsequentRequestDelay Time gap in milliseconds.
          * @see #getSubsequentRequestDelay()
@@ -166,7 +166,7 @@ public final class Configuration {
         }
 
         /**
-         * Set flag indicating whether unauthorized {@link BillingProvider}s should be skipped
+         * Sets flag indicating whether unauthorized {@link BillingProvider}s should be skipped
          * during setup.
          *
          * @param skipUnauthorised True to skip unauthorized BillingProviders.
@@ -179,8 +179,8 @@ public final class Configuration {
         }
 
         /**
-         * Set flag indicating whether library should attempt to substitute current
-         * {@link BillingProvider} is it becomes unavailable.
+         * Sets flag indicating whether library should attempt to substitute current
+         * {@link BillingProvider} if it becomes unavailable.
          *
          * @param autoRecover True to attempt substitution of unavailable provider.
          * @return this object.
@@ -192,7 +192,7 @@ public final class Configuration {
         }
 
         /**
-         * Construct new configuration object.
+         * Constructs new Configuration object.
          *
          * @return Newly constructed Configuration instance.
          */

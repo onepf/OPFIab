@@ -51,7 +51,7 @@ public class SkuDetailsRequest extends BillingRequest {
     }
 
     /**
-     * Get SKUs to load details for.
+     * Gets SKUs to load details for.
      *
      * @return SKUs.
      */

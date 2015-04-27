@@ -56,7 +56,7 @@ public interface IabHelper {
     /**
      * Sends {@link InventoryRequest} to current {@link BillingProvider}.
      * <p/>
-     * For the sake of performance, large inventory might not be loaded with one request.
+     * For the sake of performance, large inventory might not be loaded within one request.
      * Maximum number of items queried per request depends on {@link BillingProvider} implementation.
      *
      * @param startOver Flag indicating weather library should load inventory from the start,
