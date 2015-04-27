@@ -31,8 +31,18 @@ import java.util.WeakHashMap;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * Class designed to monitor existing {@link Activity}s lifecycle.
+ * <br>
+ * Intended for internal use.
+ */
 public final class ActivityMonitor implements Application.ActivityLifecycleCallbacks {
 
+    /**
+     * Map of existing activities lifecycle states.
+     * <br>
+     * Backed up by {@link WeakHashMap} to avoid memory leaks.
+     */
     @SuppressFBWarnings({"PMB_POSSIBLE_MEMORY_BLOAT"})
     private static final Map<Activity, ComponentState> STATE_MAP =
             Collections.synchronizedMap(new WeakHashMap<Activity, ComponentState>());
@@ -59,6 +69,13 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
         return STATE_MAP.get(activity);
     }
 
+    /**
+     * Check if supplied activity is in resumed state.
+     *
+     * @param activity Activity object to check lifecycle state for.
+     * @return True is supplied activity is resumed.
+     * @see {@link Activity#onResume()}
+     */
     public static boolean isResumed(@NonNull final Activity activity) {
         return getState(activity) == ComponentState.RESUME;
     }

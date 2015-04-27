@@ -20,7 +20,10 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.ComponentState;
 
-public class LifecycleEvent {
+/**
+ * Event indicating some android component lifecycle change.
+ */
+public abstract class LifecycleEvent {
 
     @NonNull
     private final ComponentState type;

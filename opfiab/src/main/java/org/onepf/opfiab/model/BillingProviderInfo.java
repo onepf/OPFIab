@@ -41,6 +41,13 @@ public final class BillingProviderInfo implements JsonCompatible {
     private static final String NAME_INSTALLER = "installer";
 
 
+    /**
+     * Make new {@link BillingProviderInfo} instance from supplied JSON representation.
+     *
+     * @param json JSON representation of {@link BillingProviderInfo} object.
+     * @return New {@link BillingProviderInfo} object if {@code json} was formatted correctly, false
+     * otherwise.
+     */
     @Nullable
     public static BillingProviderInfo fromJson(@NonNull final String json) {
         try {

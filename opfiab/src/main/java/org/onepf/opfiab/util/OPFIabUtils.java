@@ -138,17 +138,6 @@ public final class OPFIabUtils {
         return billingResponse;
     }
 
-    @NonNull
-    public static BillingRequest withActivity(@NonNull final BillingRequest billingRequest,
-                                              @NonNull final Activity activity) {
-        if (billingRequest.getType() == BillingRequest.Type.PURCHASE) {
-            final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
-            final String sku = purchaseRequest.getSku();
-            return new PurchaseRequest(activity, sku);
-        }
-        return billingRequest;
-    }
-
     public static SkuDetails substituteSku(@NonNull final SkuDetails skuDetails,
                                            @NonNull final String sku) {
         if (TextUtils.equals(skuDetails.getSku(), sku)) {

@@ -21,12 +21,16 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.model.ComponentState;
 
+/**
+ * Event indicating {@link Fragment} lifecycle change.
+ */
 public class FragmentLifecycleEvent extends LifecycleEvent {
 
     @NonNull
     private final Fragment fragment;
 
-    public FragmentLifecycleEvent(@NonNull final ComponentState type, @NonNull final Fragment fragment) {
+    public FragmentLifecycleEvent(@NonNull final ComponentState type,
+                                  @NonNull final Fragment fragment) {
         super(type);
         this.fragment = fragment;
     }

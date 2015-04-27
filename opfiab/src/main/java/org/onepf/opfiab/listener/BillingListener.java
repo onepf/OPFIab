@@ -19,6 +19,7 @@ package org.onepf.opfiab.listener;
 
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 
@@ -29,7 +30,17 @@ public interface BillingListener
         extends OnSetupListener, OnPurchaseListener, OnConsumeListener, OnInventoryListener,
                 OnSkuDetailsListener {
 
+    /**
+     * Called on every {@link BillingRequest} handled by library.
+     *
+     * @param billingRequest Request being handled.
+     */
     void onRequest(@NonNull final BillingRequest billingRequest);
 
+    /**
+     * Called on every {@link BillingResponse} sent by {@link BillingProvider}.
+     *
+     * @param billingResponse Response being send.
+     */
     void onResponse(@NonNull final BillingResponse billingResponse);
 }

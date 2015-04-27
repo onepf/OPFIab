@@ -30,12 +30,16 @@ import static org.onepf.opfiab.model.ComponentState.RESUME;
 import static org.onepf.opfiab.model.ComponentState.START;
 import static org.onepf.opfiab.model.ComponentState.STOP;
 
+/**
+ * Event indicating {@link Activity} lifecycle change.
+ */
 public class ActivityLifecycleEvent extends LifecycleEvent {
 
     @NonNull
     private final Activity activity;
 
-    public ActivityLifecycleEvent(@NonNull final ComponentState type, @NonNull final Activity activity) {
+    public ActivityLifecycleEvent(@NonNull final ComponentState type,
+                                  @NonNull final Activity activity) {
         super(type);
         if (!Arrays.asList(CREATE, START, RESUME, PAUSE, STOP, DESTROY).contains(type)) {
             throw new IllegalArgumentException("Illegal lifecycle callback for Activity");

@@ -21,6 +21,9 @@ import android.support.v4.app.Fragment;
 
 import org.onepf.opfiab.model.ComponentState;
 
+/**
+ * Event indicating {@link Fragment} lifecycle change.
+ */
 public class SupportFragmentLifecycleEvent extends LifecycleEvent {
 
     @NonNull

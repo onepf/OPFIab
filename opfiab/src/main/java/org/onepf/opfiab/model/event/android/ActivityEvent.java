@@ -19,6 +19,9 @@ package org.onepf.opfiab.model.event.android;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 
+/**
+ * Parent class for any activity related events.
+ */
 class ActivityEvent {
 
     @NonNull

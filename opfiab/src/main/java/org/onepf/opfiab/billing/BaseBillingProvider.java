@@ -70,15 +70,6 @@ import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 public abstract class BaseBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         implements BillingProvider {
 
-    /**
-     * <a href="http://imgs.xkcd.com/comics/random_number.png">Random Number</a>
-     * <p/>
-     * Use reflection if you absolutely need to change it.
-     */
-    @SuppressFBWarnings({"NAB_NEEDLESS_BOX_TO_UNBOX"})
-    @SuppressWarnings({"UnnecessaryBoxing", "MagicNumber"})
-    protected static final int REQUEST_CODE = Integer.valueOf(13685093);
-
     @NonNull
     protected final Context context;
     @NonNull
