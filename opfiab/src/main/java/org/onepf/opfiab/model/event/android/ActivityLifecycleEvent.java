@@ -31,7 +31,7 @@ import static org.onepf.opfiab.model.ComponentState.START;
 import static org.onepf.opfiab.model.ComponentState.STOP;
 
 /**
- * Event indicating {@link Activity} lifecycle change.
+ * Event indicating {@link Activity} lifecycle state change.
  */
 public class ActivityLifecycleEvent extends LifecycleEvent {
 

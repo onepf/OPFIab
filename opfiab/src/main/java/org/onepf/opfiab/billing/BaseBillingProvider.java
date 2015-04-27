@@ -62,7 +62,7 @@ import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 /**
  * Base implementation of {@link BillingProvider}.
  * <br>
- * Most implementations should extend this one, unless implementation from scratch is absolutely necessary.
+ * Most implementations should extend this one unless implementation from scratch is absolutely necessary.
  *
  * @param <R> {@link SkuResolver} subclass to use with this BillingProvider.
  * @param <V> {@link PurchaseVerifier} subclass to use with this BillingProvider.
@@ -86,9 +86,9 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     /**
-     * Load details for specified SKUs.
+     * Loads details for specified SKUs.
      * <br>
-     * At this point all SKUs should be resolved with supplied {@link SkuResolver}.
+     * At this point all SKUs should be resolved with provided {@link SkuResolver}.
      *
      * @param skus skus to load details for.
      * @see SkuDetails
@@ -97,9 +97,9 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     protected abstract void skuDetails(@NonNull final Set<String> skus);
 
     /**
-     * Load user inventory.
+     * Loads user's inventory.
      *
-     * @param startOver Flag indicating whether inventory should be loaded from the start, or
+     * @param startOver Flag indicating whether inventory should be loaded from the start or
      *                  continue from the last request.
      * @see Purchase
      * @see #postInventoryResponse(Status, Iterable, boolean)
@@ -119,7 +119,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     protected abstract void purchase(@Nullable final Activity activity, @NonNull final String sku);
 
     /**
-     * Consume specified Purchase.
+     * Consumes specified Purchase.
      * <br>
      * SKU available from {@link Purchase#getSku()} should be already resolved with supplied
      * {@link SkuResolver}.
@@ -183,7 +183,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     /**
-     * Notify library about billing response from this billing provider.
+     * Notifies library about billing response from this billing provider.
      *
      * @param billingResponse BillingResponse object to send to library.
      */
@@ -192,7 +192,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     /**
-     * Construct and send empty {@link BillingResponse}.
+     * Constructs and sends empty {@link BillingResponse}.
      *
      * @param billingRequest BillingRequest object to construct corresponding response to.
      * @param status         Status object to use in BillingResponse.
@@ -204,13 +204,13 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     /**
-     * Construct and send {@link SkuDetailsResponse}.
+     * Constructs and sends {@link SkuDetailsResponse}.
      * <br>
      * SKUs available from {@link SkuDetails#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *
      * @param status      Status object to use in response.
-     * @param skusDetails Can be null. Collection of SkuDetails object to add to response.
+     * @param skusDetails Can be null. Collection of SkuDetails objects to add in response.
      * @see SkuDetailsResponse
      */
     protected void postSkuDetailsResponse(@NonNull final Status status,
@@ -229,13 +229,13 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     /**
-     * Construct and send {@link InventoryResponse}.
+     * Constructs and sends {@link InventoryResponse}.
      * <br>
      * SKUs available from {@link Purchase#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *
      * @param status    Status object to use in response.
-     * @param inventory Can be null. Collection of Purchase objects to add to response.
+     * @param inventory Can be null. Collection of Purchase objects to add in response.
      * @param hasMore   Flag indicating whether more items are available in user inventory.
      * @see InventoryResponse
      */
@@ -258,13 +258,13 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     /**
-     * Construct and send {@link PurchaseResponse}.
+     * Constructs and sends {@link PurchaseResponse}.
      * <br>
      * SKU available from {@link Purchase#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *
      * @param status   Status object to use in response.
-     * @param purchase Can be null. Purchase object to add to response.
+     * @param purchase Can be null. Purchase object to add in response.
      * @see PurchaseResponse
      */
     protected void postPurchaseResponse(@NonNull final Status status,
@@ -281,13 +281,13 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     /**
-     * Construct and send {@link ConsumeResponse}.
+     * Constructs and sends {@link ConsumeResponse}.
      * <br>
      * SKU available from {@link Purchase#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *
      * @param status   Status object to use in response.
-     * @param purchase Can't be null. Purchase object to add to response.
+     * @param purchase Can't be null. Purchase object to add in response.
      */
     protected void postConsumeResponse(@NonNull final Status status,
                                        @NonNull final Purchase purchase) {
@@ -385,7 +385,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         }
 
         /**
-         * Set {@link SkuResolver} to use with this BillingProvider.
+         * Sets {@link SkuResolver} to use with this BillingProvider.
          *
          * @param skuResolver SkuResolver to use with this BillingProvider.
          * @return this object.
@@ -396,7 +396,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         }
 
         /**
-         * Set {@link PurchaseVerifier} to use with this BillingProvider.
+         * Sets {@link PurchaseVerifier} to use with this BillingProvider.
          *
          * @param purchaseVerifier PurchaseVerifier to use with this BillingProvider.
          * @return this object.
@@ -407,7 +407,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         }
 
         /**
-         * Construct new {@link BillingProvider} object.
+         * Constructs a new {@link BillingProvider} object.
          *
          * @return new BillingProvider.
          */

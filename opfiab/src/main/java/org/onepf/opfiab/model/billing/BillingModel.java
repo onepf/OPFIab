@@ -62,7 +62,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     }
 
     /**
-     * Get Store Keeping Unit associated with this billing model.
+     * Gets Store Keeping Unit (SKU) associated with this billing model.
      *
      * @return SKU associated with this billing model.
      */
@@ -72,7 +72,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     }
 
     /**
-     * Get type of this billing model.
+     * Gets type of this billing model.
      *
      * @return Type of this billing model.
      */
@@ -82,7 +82,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     }
 
     /**
-     * Get info of {@link BillingProvider} associated with this billing model.
+     * Gets info of {@link BillingProvider} associated with this billing model.
      *
      * @return BillingProviderInfo associated with this billing model.
      */
@@ -92,7 +92,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     }
 
     /**
-     * Get JSON representation of data from which this billing model was constructed.
+     * Gets JSON representation of data from which this billing model was constructed.
      *
      * @return JSON representation of data originally returned by {@link BillingProvider}.
      */
@@ -168,7 +168,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
-         * Set type for new billing model.
+         * Sets type for a new billing model.
          *
          * @param type Type to set.
          * @return this object.
@@ -179,7 +179,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
-         * Set billing provider info for new billing model.
+         * Sets billing provider info for a new billing model.
          *
          * @param providerInfo BillingProviderInfo object to set.
          * @return this object.
@@ -190,7 +190,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
-         * Set JSON representation of original data for new billing model.
+         * Sets JSON representation of original data for a new billing model.
          *
          * @param originalJson JSON data to set.
          * @return this object.
@@ -201,7 +201,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
-         * Existing billing model to use as base for new billing model.
+         * Sets existing billing model to use as base for a new billing model.
          *
          * @param billingModel BillingModel object to copy data from.
          * @return this object.
@@ -214,7 +214,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
-         * Construct new billing model object.
+         * Constructs a new billing model object.
          *
          * @return new BillingModer from supplied data.
          */
