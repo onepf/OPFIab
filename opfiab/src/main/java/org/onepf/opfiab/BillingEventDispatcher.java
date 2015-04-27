@@ -135,6 +135,7 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+        OPFLog.logMethod(purchaseResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
             billingListener.onPurchase(purchaseResponse);
@@ -144,6 +145,7 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
+        OPFLog.logMethod(consumeResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
             billingListener.onConsume(consumeResponse);
@@ -153,6 +155,7 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
+        OPFLog.logMethod(inventoryResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
             billingListener.onInventory(inventoryResponse);
@@ -162,6 +165,7 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
+        OPFLog.logMethod(skuDetailsResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
             billingListener.onSkuDetails(skuDetailsResponse);

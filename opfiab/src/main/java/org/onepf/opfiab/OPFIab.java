@@ -45,7 +45,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 /**
  * This class is OPFIab library entry point.
  * <p/>
- * Before anything else, {@link #init(Application, Configuration)} must called.
+ * Before anything else, {@link #init(Application, Configuration)} must be called.
  * Multiple init() calls are supported.
  * <p/>
  * Before utilizing library billing capabilities {@link BillingProvider} must be picked.
@@ -101,7 +101,7 @@ public final class OPFIab {
 
     /**
      * Posts event object for delivery to all subscribers.
-     * Intend to be used by {@link BillingProvider} implementations.
+     * Intend to be used by {@link BillingProvider} implementations only.
      *
      * @param event Event object to deliver.
      */
@@ -148,7 +148,7 @@ public final class OPFIab {
     /**
      * Instantiates {@link IabHelper} associated with supplied activity.
      * <p/>
-     * This call will attach invisible fragment which will monitor activity lifecycle.
+     * This call will attach invisible fragment which monitors activity lifecycle.
      * <p/>
      * Supplied activity <b>must</b> delegate {@link Activity#onActivityResult(int, int, Intent)}
      * to {@link ActivityIabHelper#onActivityResult(Activity, int, int, Intent)}.
@@ -176,7 +176,7 @@ public final class OPFIab {
     /**
      * Instantiates {@link IabHelper} associated with supplied fragment.
      * <p/>
-     * This call will attach invisible child fragment which will monitor parent lifecycle.
+     * This call will attach invisible child fragment which monitors parent lifecycle.
      * <p/>
      * If parent activity delegates {@link Activity#onActivityResult(int, int, Intent)}
      * to {@link ActivityIabHelper#onActivityResult(Activity, int, int, Intent)}, consider using
@@ -243,7 +243,7 @@ public final class OPFIab {
     }
 
     /**
-     * Try to pick one of the {@link BillingProvider}s supplied in {@link Configuration}.
+     * Tries to pick one of the {@link BillingProvider}s supplied in {@link Configuration}.
      * <br>
      * {@link #init(Application, Configuration)} must be called prior to this method.
      * <p/>
