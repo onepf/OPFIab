@@ -30,6 +30,7 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -104,6 +105,7 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onRequest(@NonNull final BillingRequest billingRequest) {
+        OPFLog.logMethod(billingRequest);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
             billingListener.onRequest(billingRequest);
@@ -113,6 +115,7 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onResponse(@NonNull final BillingResponse billingResponse) {
+        OPFLog.logMethod(billingResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
             billingListener.onResponse(billingResponse);
@@ -122,6 +125,7 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
+        OPFLog.logMethod(setupResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
         if (billingListener != null) {
             billingListener.onSetupResponse(setupResponse);
