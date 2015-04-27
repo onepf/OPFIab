@@ -84,13 +84,12 @@ final class SetupManager {
                                        @NonNull final BillingProvider billingProvider,
                                        final boolean providerChanged) {
         final boolean authorized = billingProvider.isAuthorised();
-
         OPFLog.d(billingProvider.getInfo().getName() + " isAuthorized = " + authorized);
-
         if (authorized || !configuration.skipUnauthorised()) {
             final SetupResponse.Status status = providerChanged ? PROVIDER_CHANGED : SUCCESS;
             return new SetupResponse(configuration, status, billingProvider, authorized);
         }
+        OPFLog.d(String.format("%s does not satisfies configuration (skipUnauthorised = %b)", billingProvider.getInfo().getName(), configuration.skipUnauthorised()));
         return null;
     }
 
@@ -109,9 +108,7 @@ final class SetupManager {
             final BillingProviderInfo info = BillingProviderInfo.fromJson(lastProvider);
             final BillingProvider provider;
             final SetupResponse setupResponse;
-
             OPFLog.d("Previous provider: " + lastProvider);
-
             if (info != null
                     && (provider = OPFIabUtils.findWithInfo(availableProviders, info)) != null
                     && (setupResponse = withProvider(configuration, provider, false)) != null) {
@@ -120,9 +117,7 @@ final class SetupManager {
         }
 
         final String packageInstaller = OPFUtils.getPackageInstaller(context);
-
         OPFLog.d("Package installer: " + packageInstaller);
-
         // If package installer is set, try it before anything else
         if (!TextUtils.isEmpty(packageInstaller)) {
             final BillingProvider installerProvider = OPFIabUtils
@@ -141,7 +136,6 @@ final class SetupManager {
             if (setupResponse != null) {
                 return setupResponse;
             }
-            OPFLog.d("Provider " + provider.getInfo().getName() + " does not satisfies current configuration");
         }
 
         return new SetupResponse(configuration, FAILED, null);
