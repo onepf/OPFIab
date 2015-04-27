@@ -4,7 +4,7 @@ OPFIab is a next step from [OpenIAB](https://github.com/onepf/OpenIAB). It's an 
 **This library is still under development and may contain bugs. Any feedback is deeply appreciated.**
 
 ## Dependencies
-Library is designed to be extensible and cosist of separate modules.
+Library is designed to be extensible and cosists of separate modules.
 
 Add core dependency:
 ```groovy
