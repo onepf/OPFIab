@@ -82,7 +82,7 @@ public final class Configuration {
     }
 
     /**
-     * Gets minimal time gap between requests of the same type.
+     * Gets minimal time gap between pending requests.
      *
      * @return Time gap in milliseconds.
      */

@@ -101,7 +101,7 @@ public final class OPFIab {
 
     /**
      * Posts event object for delivery to all subscribers.
-     * Intend to be used by {@link BillingProvider} implementations only.
+     * Intend to be used by {@link BillingProvider} implementations.
      *
      * @param event Event object to deliver.
      */
