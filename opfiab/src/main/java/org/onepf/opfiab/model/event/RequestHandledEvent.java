@@ -38,7 +38,7 @@ public class RequestHandledEvent {
     }
 
     /**
-     * Get request handled by {@link BillingProvider}.
+     * Gets request that was handled by {@link BillingProvider}.
      *
      * @return BillingRequest object.
      */
