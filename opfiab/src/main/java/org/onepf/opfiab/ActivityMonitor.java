@@ -73,7 +73,7 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
      * Check if supplied activity is in resumed state.
      *
      * @param activity Activity object to check lifecycle state for.
-     * @return True is supplied activity is resumed.
+     * @return True if supplied activity is resumed.
      * @see {@link Activity#onResume()}
      */
     public static boolean isResumed(@NonNull final Activity activity) {
