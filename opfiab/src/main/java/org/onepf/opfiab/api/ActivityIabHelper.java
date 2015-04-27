@@ -23,4 +23,4 @@ import android.app.Activity;
  * <br>
  * Supports all {@link AdvancedIabHelper} features.
  */
-public interface ActivityIabHelper extends IabHelper, ActivityResultSupport, ListenersSupport {}
+public interface ActivityIabHelper extends IabHelper, ActivityResultSupport, ListenersSupport { }

@@ -23,4 +23,4 @@ import android.app.Fragment;
  * <br>
  * Supports all {@link AdvancedIabHelper} features.
  */
-public interface FragmentIabHelper extends IabHelper, ListenersSupport {}
+public interface FragmentIabHelper extends IabHelper, ListenersSupport { }

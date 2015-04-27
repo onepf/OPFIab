@@ -89,7 +89,8 @@ final class SetupManager {
             final SetupResponse.Status status = providerChanged ? PROVIDER_CHANGED : SUCCESS;
             return new SetupResponse(configuration, status, billingProvider, authorized);
         }
-        OPFLog.d(String.format("%s does not satisfies configuration (skipUnauthorised = %b)", billingProvider.getInfo().getName(), configuration.skipUnauthorised()));
+        OPFLog.d(String.format("%s does not satisfies configuration (skipUnauthorised = %b)",
+                               billingProvider.getInfo().getName(), configuration.skipUnauthorised()));
         return null;
     }
 

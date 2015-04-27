@@ -37,7 +37,7 @@ public enum PurchaseState {
 
     private final int code;
 
-    private PurchaseState(final int code) {
+    PurchaseState(final int code) {
         this.code = code;
     }
 }

@@ -19,7 +19,6 @@ package org.onepf.opfiab.model.event.billing;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.model.billing.SkuType;
 
 public enum Status {
 
@@ -64,8 +63,8 @@ public enum Status {
     /**
      * Item is already owned by user.
      * <br>
-     * If it's {@link SkuType#CONSUMABLE} - purchase must be consumed using
-     * {@link IabHelper#consume(Purchase)}.
+     * If it's {@link org.onepf.opfiab.model.billing.SkuType#CONSUMABLE} - purchase must be consumed
+     * using {@link IabHelper#consume(Purchase)}.
      */
     ITEM_ALREADY_OWNED,
     /**

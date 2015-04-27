@@ -32,13 +32,12 @@ import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
-import org.onepf.opfiab.model.event.billing.Status;
 
 /**
  * Advanced version of {@link SimpleIabHelper} with following features:
  * <ul>
  * <li>Request queue: If {@link BillingProvider} is busy with another request, new request will
- * be enqueued instead of immediately returning {@link Status#BUSY}.
+ * be enqueued instead of immediately returning {@link org.onepf.opfiab.model.event.billing.Status#BUSY}.
  * <li>Lazy setup: If {@link OPFIab#setup()} wasn't called up to the point when this helper tries to
  * send {@link BillingRequest} - request will be enqueued and setup() will be called instead.
  * <li>Listeners API for handling {@link BillingResponse}s as well as setup events.

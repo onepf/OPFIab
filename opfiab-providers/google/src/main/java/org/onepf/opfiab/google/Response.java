@@ -43,7 +43,7 @@ enum Response {
 
     private final int code;
 
-    private Response(final int code) {
+    Response(final int code) {
         this.code = code;
     }
 

@@ -128,7 +128,7 @@ public final class BillingProviderInfo implements JsonCompatible {
     }
 
     //CHECKSTYLE:OFF
-    @SuppressWarnings("SimplifiableIfStatement")
+    @SuppressWarnings({"PMD", "RedundantIfStatement", "SimplifiableIfStatement"})
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

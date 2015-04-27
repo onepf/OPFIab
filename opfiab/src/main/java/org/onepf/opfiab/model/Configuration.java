@@ -16,10 +16,10 @@
 
 package org.onepf.opfiab.model;
 
-import android.app.Application;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.AdvancedIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * Model class that represents library configuration.
  *
- * @see org.onepf.opfiab.OPFIab#init(Application, Configuration)
+ * @see OPFIab#init(android.app.Application, Configuration)
  */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class Configuration {

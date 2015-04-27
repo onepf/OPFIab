@@ -128,6 +128,7 @@ public final class OPFIab {
      * @see AdvancedIabHelper
      * @see #getSimpleHelper()
      */
+    @SuppressWarnings("TypeMayBeWeakened")
     @NonNull
     public static AdvancedIabHelper getAdvancedHelper() {
         checkInit();

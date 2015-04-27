@@ -47,7 +47,6 @@ final class BillingBase {
     }
 
 
-    @NonNull
     private Configuration configuration;
     @Nullable
     private SetupResponse setupResponse;

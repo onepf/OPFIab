@@ -82,6 +82,7 @@
         <exclude name="SwitchStmtsShouldHaveDefault"/>
         <!-- Android listeners contain a lot of such switch statements -->
         <exclude name="TooFewBranchesForASwitchStatement"/>
+        <exclude name="AbstractClassWithoutAbstractMethod"/>
     </rule>
 
     <rule ref="rulesets/java/empty.xml"/>

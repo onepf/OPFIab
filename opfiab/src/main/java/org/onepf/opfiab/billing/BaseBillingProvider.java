@@ -147,8 +147,8 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
                 final Purchase purchase = consumeRequest.getPurchase();
                 final BillingProviderInfo providerInfo = purchase.getProviderInfo();
                 if (!getInfo().equals(providerInfo)) {
-                    OPFLog.e("Attempt to consume purchase from wrong provider: %s.\n" +
-                                     "Current provider: %s", providerInfo, getInfo());
+                    OPFLog.e("Attempt to consume purchase from wrong provider: %s.\n"
+                                     + "Current provider: %s", providerInfo, getInfo());
                     postEmptyResponse(billingRequest, ITEM_UNAVAILABLE);
                     break;
                 }

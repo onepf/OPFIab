@@ -83,7 +83,7 @@ public class SetupResponse implements JsonCompatible {
     private final BillingProvider billingProvider;
     private final boolean authorized;
 
-    public SetupResponse(final @NonNull Configuration configuration,
+    public SetupResponse(@NonNull final Configuration configuration,
                          @NonNull final Status status,
                          @Nullable final BillingProvider billingProvider,
                          final boolean authorized) {

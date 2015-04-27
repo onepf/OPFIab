@@ -54,7 +54,7 @@ public enum ItemType {
 
     private final String code;
 
-    private ItemType(final String code) {
+    ItemType(final String code) {
         this.code = code;
     }
 
