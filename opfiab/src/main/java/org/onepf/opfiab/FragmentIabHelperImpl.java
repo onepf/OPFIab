@@ -22,10 +22,17 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.api.FragmentIabHelper;
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 
+/**
+ * This {@link IabHelper} implementation works with supplied fragment instance. {@link
+ * OPFIabFragment} will be attached to it to monitor lifecycle and automatically call {@link
+ * #register()} and {@link #unregister()} when appropriate.
+ */
 class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHelper {
 
     @Nullable
@@ -44,6 +51,7 @@ class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHel
     }
 
     @NonNull
+    @Override
     protected Activity getActivity() {
         final Activity activity;
         if (supportFragment != null) {
@@ -51,6 +59,7 @@ class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHel
         } else if (fragment != null) {
             activity = fragment.getActivity();
         } else {
+            // Fragment is detached from activity.
             throw new IllegalStateException("Fragment is detached!");
         }
         return activity;
@@ -75,6 +84,7 @@ class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHel
 
     @Override
     public void purchase(@NonNull final String sku) {
+        // Automatically use fragment parent Activity
         postRequest(new PurchaseRequest(getActivity(), sku, true));
     }
 }

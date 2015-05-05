@@ -46,12 +46,29 @@ public abstract class PublicKeyPurchaseVerifier implements PurchaseVerifier {
     protected static final String KEY_FACTORY_ALGORITHM = "RSA";
     protected static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
 
+    /**
+     * Gets public key used for verification.
+     *
+     * @return Public key, can't be null.
+     */
     @NonNull
     protected abstract String getPublicKey();
 
+    /**
+     * Gets data from supplied purchase to verify.
+     *
+     * @param purchase Purchase to get data from.
+     * @return Data to verify.
+     */
     @Nullable
     protected abstract String getData(@NonNull final Purchase purchase);
 
+    /**
+     * Gets signature to sign data with.
+     *
+     * @param purchase Purchase to get sighnature from.
+     * @return Signature to sign data.
+     */
     @Nullable
     protected abstract String getSignature(@NonNull final Purchase purchase);
 

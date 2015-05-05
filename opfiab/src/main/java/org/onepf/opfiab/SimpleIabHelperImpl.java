@@ -21,10 +21,21 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.android.OPFIabActivity;
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.api.SimpleIabHelper;
 import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 
+/**
+ * This implementation of {@link IabHelper} allows passing existing {@link Activity} object thus
+ * avoiding usage of {@link OPFIabActivity}.
+ * <br>
+ * Supplied Activity <b>must</b> delegate {@link Activity#onActivityResult(int, int, Intent)} callback
+ * to this helper.
+ *
+ * @see #purchase(Activity, String)
+ */
 class SimpleIabHelperImpl extends IabHelperImpl implements SimpleIabHelper {
 
     @Override

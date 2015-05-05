@@ -19,6 +19,7 @@ package org.onepf.opfiab;
 import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.api.AdvancedIabHelper;
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerCompositor;
 import org.onepf.opfiab.listener.OnConsumeListener;
@@ -30,11 +31,20 @@ import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfutils.OPFChecks;
 
+/**
+ * This implementation of {@link IabHelper} adds two main features.
+ * <p>
+ * 1. Pending request queue. With a help of {@link BillingRequestScheduler} subsequent billing
+ * request will be scheduled for execution.
+ * <br>
+ * Each helper instance has separate queue.
+ * <p>
+ * 2. API to add listeners for specific billing events.
+ */
 class AdvancedIabHelperImpl extends SimpleIabHelperImpl implements AdvancedIabHelper {
 
     private final BillingRequestScheduler scheduler = BillingRequestScheduler.getInstance();
     private final BillingEventDispatcher dispatcher = BillingEventDispatcher.getInstance();
-
     private final BillingListenerCompositor listenerCompositor = new BillingListenerCompositor();
 
     AdvancedIabHelperImpl() {
@@ -106,7 +116,6 @@ class AdvancedIabHelperImpl extends SimpleIabHelperImpl implements AdvancedIabHe
     public void addBillingListener(@NonNull final BillingListener billingListener) {
         OPFChecks.checkThread(true);
         listenerCompositor.addBillingListener(billingListener);
-        deliverLastSetupEvent(billingListener);
     }
 
     @Override

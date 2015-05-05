@@ -30,6 +30,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Very basic {@link IabHelper} implementation.
+ * <br>
+ * Responsible for {@link BillingRequest}s creation and handing them to {@link BillingBase}.
+ */
 class IabHelperImpl implements IabHelper {
 
     protected final BillingBase billingBase = BillingBase.getInstance();
@@ -38,6 +43,12 @@ class IabHelperImpl implements IabHelper {
         super();
     }
 
+    /**
+     * Sends supplied billing request for execution.
+     *
+     * @param billingRequest BillingRequest to execute.
+     * @see BillingBase
+     */
     protected void postRequest(@NonNull final BillingRequest billingRequest) {
         billingBase.postRequest(billingRequest);
     }

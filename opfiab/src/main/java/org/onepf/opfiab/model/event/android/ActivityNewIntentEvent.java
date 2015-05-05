@@ -34,6 +34,11 @@ public class ActivityNewIntentEvent extends ActivityEvent {
         this.intent = intent;
     }
 
+    /**
+     * Gets intent associated with this event.
+     *
+     * @return Intent object, can't be null.
+     */
     @NonNull
     public Intent getIntent() {
         return intent;

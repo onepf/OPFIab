@@ -59,18 +59,29 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
         return instance;
     }
 
+    /**
+     * Sets lifecycle state of supplied activity.
+     *
+     * @param activity Activity object to set lifecycle state for.
+     */
     public static void setState(@NonNull final Activity activity,
                                 @NonNull final ComponentState componentState) {
         STATE_MAP.put(activity, componentState);
     }
 
+    /**
+     * Gets last known lifecycle state of supplied activity.
+     *
+     * @param activity Activity object to get lifecycle state for.
+     * @return Current lifecycle state if known, null otherwise.
+     */
     @Nullable
     public static ComponentState getState(@NonNull final Activity activity) {
         return STATE_MAP.get(activity);
     }
 
     /**
-     * Check if supplied activity is in resumed state.
+     * Checks if supplied activity is in resumed state.
      *
      * @param activity Activity object to check lifecycle state for.
      * @return True if supplied activity is resumed.
