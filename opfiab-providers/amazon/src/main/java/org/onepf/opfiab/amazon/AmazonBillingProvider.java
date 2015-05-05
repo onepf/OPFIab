@@ -34,6 +34,7 @@ import com.amazon.device.iap.model.Receipt;
 
 import org.json.JSONException;
 import org.onepf.opfiab.billing.BaseBillingProvider;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -63,6 +64,10 @@ import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
+/**
+ * This {@link BillingProvider} implementation add support of
+ * <a href="http://www.amazon.com/mobile-apps/b?node=2350149011">Amazon Appstore</a>
+ */
 @SuppressWarnings("PMD.GodClass")
 public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, PurchaseVerifier> {
 
@@ -73,19 +78,32 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, INSTALLER);
 
+    /**
+     * Helper object handling all Amazon SDK related calls.
+     */
+    protected static AmazonBillingHelper billingHelper;
 
-    @NonNull
-    protected final AmazonBillingHelper billingHelper = new AmazonBillingHelper();
 
+    @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
     protected AmazonBillingProvider(
             @NonNull final Context context,
             @NonNull final SkuResolver skuResolver,
             @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
-        // Register Amazon callbacks handler
-        PurchasingService.registerListener(context, billingHelper);
+        if (billingHelper == null) {
+            billingHelper = new AmazonBillingHelper();
+            // Register Amazon callbacks handler, it's never unregistered.
+            PurchasingService.registerListener(context, billingHelper);
+        }
     }
 
+    /**
+     * Transforms Amazon product to library sku details model.
+     *
+     * @param product Amazon product to transform.
+     *
+     * @return Newly constructed SkuDetails object.
+     */
     protected SkuDetails newSkuDetails(@NonNull final Product product) {
         final SkuDetails.Builder builder = new SkuDetails.Builder(product.getSku());
         switch (product.getProductType()) {
@@ -114,6 +132,13 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         return builder.build();
     }
 
+    /**
+     * Transforms Amazon receipt to library purchase model.
+     *
+     * @param receipt Amazon receipt to transform.
+     *
+     * @return Newly constructed purchase object.
+     */
     protected Purchase newPurchase(@NonNull final Receipt receipt) {
         final Purchase.Builder builder = new Purchase.Builder(receipt.getSku());
         switch (receipt.getProductType()) {
@@ -137,6 +162,11 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         return builder.build();
     }
 
+    /**
+     * Tries to guess appropriate error code.
+     *
+     * @return Most suitable status.
+     */
     protected Status handleFailure() {
         if (!PurchasingService.IS_SANDBOX_MODE && !OPFUtils.isConnected(context)) {
             return SERVICE_UNAVAILABLE;
@@ -145,6 +175,11 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         return UNKNOWN_ERROR;
     }
 
+    /**
+     * Handle sku details response from Amazon.
+     *
+     * @param productDataResponse Response to handle.
+     */
     public void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
         switch (productDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
@@ -168,6 +203,11 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         }
     }
 
+    /**
+     * Handle inventory response from Amazon.
+     *
+     * @param purchaseUpdatesResponse Response to handle.
+     */
     public void onEventAsync(@NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
         switch (purchaseUpdatesResponse.getRequestStatus()) {
             case SUCCESSFUL:
@@ -189,6 +229,11 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         }
     }
 
+    /**
+     * Handle purchase response from Amazon.
+     *
+     * @param purchaseResponse Response to handle.`
+     */
     public void onEventAsync(
             @NonNull final com.amazon.device.iap.model.PurchaseResponse purchaseResponse) {
         switch (purchaseResponse.getRequestStatus()) {
