@@ -26,6 +26,9 @@ import org.onepf.opfiab.sku.MapSkuResolver;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * This is a simple map-based implementation of {@link GoogleSkuResolver}.
+ */
 public class GoogleMapSkuResolver implements GoogleSkuResolver {
 
     protected final MapSkuResolver mapSkuResolver = new MapSkuResolver();
@@ -35,6 +38,13 @@ public class GoogleMapSkuResolver implements GoogleSkuResolver {
         super();
     }
 
+    /**
+     * Adds SKU mapping with corresponding SKU type.
+     *
+     * @param sku         Original SKU.
+     * @param resolvedSku Provider specific SKU. Can be null if there's no need for mapping.
+     * @param skuType     Type of the mapped SKU.
+     */
     public void add(@NonNull final String sku,
                     @Nullable final String resolvedSku,
                     @NonNull final SkuType skuType) {
@@ -45,6 +55,11 @@ public class GoogleMapSkuResolver implements GoogleSkuResolver {
         }
     }
 
+    /**
+     * Same as {@code add(sku, null, skuType)}.
+     *
+     * @see #add(String, String, SkuType)
+     */
     public void add(@NonNull final String sku,
                     @NonNull final SkuType skuType) {
         add(sku, null, skuType);

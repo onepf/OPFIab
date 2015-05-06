@@ -22,6 +22,9 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This model represents purchase made from Google Play.
+ */
 public class GooglePurchase extends GoogleModel {
 
     private static final String NAME_ORDER_ID = "orderId";
@@ -71,35 +74,72 @@ public class GooglePurchase extends GoogleModel {
     }
 
 
+    /**
+     * Gets a unique order identifier for the transaction. This identifier corresponds to the
+     * Google Wallet Order ID.
+     *
+     * @return Unique order ID, can't be null.
+     */
     @NonNull
     public String getOrderId() {
         return orderId;
     }
 
+    /**
+     * Gets application package from which the purchase originated.
+     *
+     * @return Package name, can't be null.
+     */
     @NonNull
     public String getPackageName() {
         return packageName;
     }
 
+    /**
+     * Gets token that uniquely identifies a purchase for a given item and user pair.
+     *
+     * @return Purchase token, can't be null.
+     */
     @NonNull
     public String getPurchaseToken() {
         return purchaseToken;
     }
 
+    /**
+     * Gets purchase state of the order.
+     *
+     * @return Purchase state, can't be null.
+     */
     @NonNull
     public PurchaseState getPurchaseState() {
         return purchaseState;
     }
 
+    /**
+     * A developer-specified string that contains supplemental information about an order.
+     *
+     * @return Developer payload, can be null.
+     */
     @Nullable
     public String getDeveloperPayload() {
         return developerPayload;
     }
 
+    /**
+     * Gets time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
+     *
+     * @return Time of purchase.
+     */
     public long getPurchaseTime() {
         return purchaseTime;
     }
 
+    /**
+     * Indicates whether the subscription renews automatically.
+     *
+     * @return True if subscription is active, and will automatically renew on the next billing
+     * date. False if the user has canceled the subscription.
+     */
     public boolean isAutoRenewing() {
         return autoRenewing;
     }

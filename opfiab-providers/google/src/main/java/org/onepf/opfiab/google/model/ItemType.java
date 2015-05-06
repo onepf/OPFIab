@@ -24,8 +24,19 @@ import org.onepf.opfiab.model.billing.SkuType;
 public enum ItemType {
 
     SUBSCRIPTION("subs"),
+    /**
+     * Google does not distinguish consumables and entitlements. Entitlement - is a consumable
+     * which is never consumed.
+     */
     CONSUMABLE_OR_ENTITLEMENT("inapp");
 
+    /**
+     * Gets Google product type from code.
+     *
+     * @param code Code of product type.
+     *
+     * @return Product type if code is recognized, null otherwise.
+     */
     @Nullable
     public static ItemType fromCode(@Nullable final String code) {
         if (code == null) {
@@ -39,6 +50,13 @@ public enum ItemType {
         return null;
     }
 
+    /**
+     * Get Google product type from SKU type.
+     *
+     * @param skuType SKU type to convert.
+     *
+     * @return Product type if SKU type was recognized, null otherwise.
+     */
     @Nullable
     public static ItemType fromSkuType(@NonNull final SkuType skuType) {
         switch (skuType) {

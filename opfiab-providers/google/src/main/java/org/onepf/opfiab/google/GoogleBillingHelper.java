@@ -39,12 +39,14 @@ import java.util.List;
 
 import static org.onepf.opfiab.google.GoogleBillingProvider.PACKAGE;
 
+/**
+ * This class handles all Google specific billing operations.
+ */
 class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     private static final String INTENT_ACTION = "com.android.vending.billing.InAppBillingService.BIND";
     private static final String INTENT_PACKAGE = "com.android.vending";
     private static final String KEY_CONTINUATION_TOKEN = PACKAGE + ".continuation_token.";
-
 
     private static final int API = 3;
     private static final int BATCH_SIZE = 20;
@@ -61,11 +63,18 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
         this.preferences = new OPFPreferences(context, GoogleBillingProvider.NAME);
     }
 
+    /**
+     * Tries to check if Google billing is available on current device.
+     *
+     * @return {@link Response#OK} if billing is supported, another corresponding {@link Response}
+     * if it's not. Null if error occurred.
+     */
     @Nullable
     Response isBillingSupported() {
         OPFLog.logMethod();
         final IInAppBillingService service = getService();
         if (service == null) {
+            // Can't connect to service.
             return null;
         }
         try {
@@ -73,6 +82,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
                 final int code = service.isBillingSupported(API, packageName, itemType.toString());
                 final Response response = Response.fromCode(code);
                 if (response != Response.OK) {
+                    // Report first encountered unsuccessful response.
                     return response;
                 }
             }
@@ -83,6 +93,14 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
         return null;
     }
 
+    /**
+     * Wraps {@link IInAppBillingService#getBuyIntent(int, String, String, String, String)}
+     *
+     * @param sku      SKU of a product to purchase.
+     * @param itemType Type of item to purchase.
+     *
+     * @return Bundle containing purchase intent. Can be null.
+     */
     @Nullable
     Bundle getBuyIntent(@NonNull final String sku, @NonNull final ItemType itemType) {
         OPFLog.logMethod(sku, itemType);
@@ -102,6 +120,13 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
         return null;
     }
 
+    /**
+     * Wraps {@link IInAppBillingService#consumePurchase(int, String, String)}
+     *
+     * @param token Token of a purchase to consume.
+     *
+     * @return Result of operation. Can be null.
+     */
     @Nullable
     Response consumePurchase(@NonNull final String token) {
         OPFLog.logMethod(token);
@@ -121,6 +146,13 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
         return null;
     }
 
+    /**
+     * Wraps {@link IInAppBillingService#getSkuDetails(int, String, String, Bundle)}.
+     *
+     * @param skus SKUs to load details for.
+     *
+     * @return Bundle containing requested SKUs details. Can be null.
+     */
     @Nullable
     Bundle getSkuDetails(@NonNull final Collection<String> skus) {
         OPFLog.logMethod(Arrays.toString(skus.toArray()));
@@ -145,8 +177,10 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
                     OPFLog.d("From %d to %d. Type: %s. Response: %s. Details: %s.",
                              first, last, itemType, response, OPFUtils.toString(details));
                     if (response != Response.OK) {
+                        // Return received bundle if error is encountered
                         return details;
                     } else {
+                        // Aggregate all loaded details in a single bundle
                         final ArrayList<String> skuDetails = GoogleUtils.getSkuDetails(details);
                         GoogleUtils.addSkuDetails(result, skuDetails);
                     }
@@ -159,6 +193,14 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
         return GoogleUtils.putResponse(result, Response.OK);
     }
 
+    /**
+     * Wraps {@link IInAppBillingService#getPurchases(int, String, String, String)}.
+     *
+     * @param startOver Flag indicating weather inventory should be loaded from the start, on from
+     *                  the point of previous successful request.
+     *
+     * @return Bundle containing user inventory. Can be null.
+     */
     @Nullable
     Bundle getPurchases(final boolean startOver) {
         OPFLog.logMethod(startOver);
@@ -171,6 +213,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
             for (final ItemType itemType : ItemType.values()) {
                 final String type = itemType.toString();
                 final String key = KEY_CONTINUATION_TOKEN + type;
+                // Try to use last successful request token is required
                 final String token = startOver ? null : preferences.getString(key);
                 final Bundle purchases = service.getPurchases(API, packageName, type, token);
                 final Response response = GoogleUtils.getResponse(purchases);
@@ -183,9 +226,11 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
                     final ArrayList<String> itemList = GoogleUtils.getItemList(purchases);
                     final ArrayList<String> signatureList = GoogleUtils.getSignatureList(purchases);
                     final String newToken = GoogleUtils.getContinuationToken(purchases);
+                    // Aggregate all responses in a single bundle
                     GoogleUtils.addDataList(result, purchaseDataList);
                     GoogleUtils.addItemList(result, itemList);
                     GoogleUtils.addSignatureList(result, signatureList);
+                    // Save token for future use
                     if (TextUtils.isEmpty(newToken)) {
                         preferences.remove(key);
                     } else {

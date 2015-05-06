@@ -30,6 +30,7 @@ import android.text.TextUtils;
 import org.json.JSONException;
 import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProvider;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
 import org.onepf.opfiab.google.model.ItemType;
@@ -54,6 +55,10 @@ import java.util.Set;
 
 import static android.Manifest.permission.GET_ACCOUNTS;
 
+/**
+ * This {@link BillingProvider} implementation add support for
+ * <a href="https://play.google.com/store">Google Play</a> App Store.
+ */
 @SuppressWarnings("PMD.GodClass")
 public class GoogleBillingProvider
         extends ActivityBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
@@ -68,6 +73,9 @@ public class GoogleBillingProvider
             new BillingProviderInfo(NAME, PACKAGE, INSTALLER);
 
 
+    /**
+     * Helper object to delegate all Google specific calls to.
+     */
     protected final GoogleBillingHelper helper;
 
     protected GoogleBillingProvider(
@@ -78,6 +86,14 @@ public class GoogleBillingProvider
         helper = new GoogleBillingHelper(context);
     }
 
+    /**
+     * Resolves proper SKU type from supplied Google product type.
+     *
+     * @param sku      SKU to resolve type for.
+     * @param itemType Supplied SKU type.
+     *
+     * @return Resolve SKU type, can't be null.
+     */
     @NonNull
     protected SkuType skuType(@NonNull final String sku, @NonNull final ItemType itemType) {
         switch (itemType) {
@@ -90,6 +106,13 @@ public class GoogleBillingProvider
         }
     }
 
+    /**
+     * Transforms Google product details to library SKU details model.
+     *
+     * @param googleSkuDetails Google product details to transform.
+     *
+     * @return Newly constructed SKU details object, can't be null.
+     */
     @NonNull
     protected SkuDetails newSkuDetails(@NonNull final GoogleSkuDetails googleSkuDetails) {
         final String sku = googleSkuDetails.getProductId();
@@ -105,6 +128,13 @@ public class GoogleBillingProvider
                 .build();
     }
 
+    /**
+     * Transforms Google purchase to library specific model.
+     *
+     * @param googlePurchase Google purchase to transform.
+     *
+     * @return Newly constructed purchase object, can't be null.
+     */
     @NonNull
     protected Purchase newPurchase(@NonNull final GooglePurchase googlePurchase) {
         final String sku = googlePurchase.getProductId();
@@ -119,6 +149,14 @@ public class GoogleBillingProvider
                 .build();
     }
 
+    /**
+     * Picks proper response status for supplied Google response.
+     *
+     * @param response Response to pick status for.
+     *
+     * @return Billing response status most fitting supplied response. Can't be null.
+     */
+    @NonNull
     protected Status getStatus(@Nullable final Response response) {
         if (response == null) {
             return Status.UNKNOWN_ERROR;
@@ -159,6 +197,7 @@ public class GoogleBillingProvider
     public boolean isAuthorised() {
         final Object service = context.getSystemService(Context.ACCOUNT_SERVICE);
         final AccountManager accountManager = (AccountManager) service;
+        // At least one Google account is present on device
         return accountManager.getAccountsByType(ACCOUNT_TYPE_GOOGLE).length > 0;
     }
 
@@ -172,6 +211,8 @@ public class GoogleBillingProvider
     public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
         final SkuType skuType = skuResolver.resolveType(sku);
         final ItemType itemType = ItemType.fromSkuType(skuType);
+        // Google can't process purchase with unknown type
+        // TODO or can it?
         if (itemType == null) {
             OPFLog.e("Unknown sku type: %s", sku);
             postPurchaseResponse(Status.ITEM_UNAVAILABLE, null);
@@ -232,6 +273,7 @@ public class GoogleBillingProvider
             return;
         }
 
+        // Some detail might not have been loaded
         final Collection<SkuDetails> skusDetails = new ArrayList<>();
         final Collection<String> unresolvedSkus = new LinkedList<>(skus);
         for (final String jsonSku : jsonSkuDetails) {
@@ -299,6 +341,7 @@ public class GoogleBillingProvider
                                  final int requestCode,
                                  final int resultCode,
                                  @Nullable final Intent data) {
+        // Handle purchase result
         final Response response = GoogleUtils.getResponse(data);
         final String purchaseData = GoogleUtils.getPurchaseData(data);
         final String signature = GoogleUtils.getSignature(data);
@@ -313,6 +356,7 @@ public class GoogleBillingProvider
         try {
             googlePurchase = new GooglePurchase(purchaseData);
         } catch (JSONException exception) {
+            // Can't parse purchase data
             OPFLog.e("Failed to parse purchase data: " + purchaseData, exception);
             postPurchaseResponse(Status.UNKNOWN_ERROR, null);
             return;

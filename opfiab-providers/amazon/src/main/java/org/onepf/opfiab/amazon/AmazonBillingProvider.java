@@ -98,7 +98,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     /**
-     * Transforms Amazon product to library sku details model.
+     * Transforms Amazon product to library SKU details model.
      *
      * @param product Amazon product to transform.
      *
@@ -168,6 +168,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
      * @return Most suitable status.
      */
     protected Status handleFailure() {
+        // Unfortunately Amazon doesn't report a reason for error
         if (!PurchasingService.IS_SANDBOX_MODE && !OPFUtils.isConnected(context)) {
             return SERVICE_UNAVAILABLE;
         }
