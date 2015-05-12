@@ -18,6 +18,9 @@ package org.onepf.opfiab.google;
 
 import android.support.annotation.Nullable;
 
+/**
+ * All possible responses from Google service.
+ */
 enum Response {
 
     OK(0),

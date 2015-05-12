@@ -32,6 +32,11 @@ public abstract class LifecycleEvent {
         this.type = type;
     }
 
+    /**
+     * Gets lifecycle type associated with this event.
+     *
+     * @return Lifecycle type, can't be null.
+     */
     @NonNull
     public ComponentState getType() {
         return type;

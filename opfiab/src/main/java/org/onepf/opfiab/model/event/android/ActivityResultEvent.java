@@ -41,14 +41,29 @@ public class ActivityResultEvent extends ActivityEvent {
         this.data = data;
     }
 
+    /**
+     * Gets request code associated with this event.
+     *
+     * @return Request code.
+     */
     public int getRequestCode() {
         return requestCode;
     }
 
+    /**
+     * Gets result code associated with this event.
+     *
+     * @return Result code.
+     */
     public int getResultCode() {
         return resultCode;
     }
 
+    /**
+     * Gets data associated with this event.
+     *
+     * @return Data intent, can be null.
+     */
     @Nullable
     public Intent getData() {
         return data;

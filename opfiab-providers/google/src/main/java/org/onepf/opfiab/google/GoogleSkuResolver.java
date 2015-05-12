@@ -21,8 +21,15 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.sku.SkuResolver;
 
+/**
+ * This Google specific {@link SkuResolver} must be used with {@link GoogleBillingProvider} since
+ * it's necessary to be able to resolve SKU type.
+ */
 public interface GoogleSkuResolver extends SkuResolver {
 
+    /**
+     * Default implementation of {@link GoogleSkuResolver} that maps SKUs to themselves.
+     */
     GoogleSkuResolver DEFAULT = new GoogleSkuResolver() {
         @NonNull
         @Override
@@ -43,6 +50,13 @@ public interface GoogleSkuResolver extends SkuResolver {
         }
     };
 
+    /**
+     * Resolves type of supplied SKU.
+     *
+     * @param sku SKU to resolve type for.
+     *
+     * @return SKU type, can't be null.
+     */
     @NonNull
     SkuType resolveType(@NonNull final String sku);
 }

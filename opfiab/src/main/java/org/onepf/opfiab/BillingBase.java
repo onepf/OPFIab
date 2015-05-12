@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab;
 
+import android.app.Application;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -33,6 +34,10 @@ import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.BUSY;
 import static org.onepf.opfiab.model.event.billing.Status.NO_BILLING_PROVIDER;
 
+/**
+ * This class is intended to be a single entry point for all {@link BillingRequest}s, it also holds
+ * library state (current {@link BillingProvider}) and last {@link SetupResponse}.
+ */
 final class BillingBase {
 
     private static BillingBase instance;
@@ -47,11 +52,29 @@ final class BillingBase {
     }
 
 
+    /**
+     * Currently used configuration object.
+     *
+     * @see OPFIab#init(Application, Configuration)
+     */
     private Configuration configuration;
+    /**
+     * Last received setup response.
+     *
+     * @see OPFIab#setup()
+     */
     @Nullable
     private SetupResponse setupResponse;
+    /**
+     * Currently used billing provider.
+     */
     @Nullable
     private BillingProvider currentProvider;
+    /**
+     * Request being executed by {@link #currentProvider}.
+     *
+     * @see RequestHandledEvent
+     */
     @Nullable
     private BillingRequest pendingRequest;
 
@@ -61,6 +84,7 @@ final class BillingBase {
 
     private void setCurrentProvider(@Nullable final BillingProvider provider) {
         if (currentProvider != null) {
+            // Unregister provider from receiving any billing requests
             OPFIab.unregister(currentProvider);
         }
         currentProvider = provider;
@@ -74,29 +98,60 @@ final class BillingBase {
         OPFIab.post(OPFIabUtils.emptyResponse(null, billingRequest, status));
     }
 
+    /**
+     * Sets configuration currently used by library.
+     * <br>
+     * This method resets library setup state.
+     *
+     * @param configuration Current configuration object
+     */
     void setConfiguration(@NonNull final Configuration configuration) {
         this.configuration = configuration;
         setCurrentProvider(null);
         setupResponse = null;
     }
 
+    /**
+     * Gets last setup response.
+     *
+     * @return SetupResponse object if setup has finished at least once, null otherwise.
+     */
     @Nullable
     SetupResponse getSetupResponse() {
         OPFChecks.checkThread(true);
         return setupResponse;
     }
 
+    /**
+     * Gets request currently being executed.
+     *
+     * @return BillingRequest object if there's one, null otherwise.
+     */
     @Nullable
     BillingRequest getPendingRequest() {
         OPFChecks.checkThread(true);
         return pendingRequest;
     }
 
+    /**
+     * Indicates whether current {@link BillingProvider} is busy executing request.
+     *
+     * @return True is BillingProvider is busy, false otherwise.
+     */
     boolean isBusy() {
         OPFChecks.checkThread(true);
         return getPendingRequest() != null;
     }
 
+    /**
+     * Attempts to execute supplied billing request using current billing provider.
+     * <br>
+     * If current provider is unavailable or busy, supplied request will not be executed and
+     * instead corresponding response will be send immediately.
+     *
+     * @param billingRequest BillingRequest to execute.
+     * @see #isBusy()
+     */
     void postRequest(@NonNull final BillingRequest billingRequest) {
         OPFChecks.checkThread(true);
         final SetupResponse setupResponse;
@@ -114,15 +169,17 @@ final class BillingBase {
     }
 
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
+        // Called before any other SetupResponse handler
         this.setupResponse = setupResponse;
         if (setupResponse.isSuccessful()) {
+            // Suitable provider was found
             setCurrentProvider(setupResponse.getBillingProvider());
         }
     }
 
     public void onEventMainThread(@NonNull final RequestHandledEvent event) {
-        // At this point request should be handled by BillingProvider
         if (!event.getBillingRequest().equals(pendingRequest)) {
+            // For some reason billing provider didn't report correct request
             throw new IllegalStateException();
         }
         pendingRequest = null;

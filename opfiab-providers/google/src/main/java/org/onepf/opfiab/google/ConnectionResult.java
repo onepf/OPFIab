@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab.google;
 
+// TODO
 enum ConnectionResult {
     //    SUCCESS(com.google.android.gms.common.ConnectionResult.SUCCESS),
     //    SERVICE_MISSING(com.google.android.gms.common.ConnectionResult.SERVICE_MISSING),

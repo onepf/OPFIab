@@ -36,7 +36,7 @@ public class MapSkuResolver implements SkuResolver {
     }
 
     /**
-     * Add SKU mapping.
+     * Adds SKU mapping.
      *
      * @param sku         Original SKU value.
      * @param resolvedSku SKU value to which original one should be mapped.
