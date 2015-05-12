@@ -37,8 +37,8 @@ import java.util.Map;
  * <br>
  * Implements following features:
  * <ul>
- * <li>Attempts to consume all verified consumable purchases.
- * <li>Attempts to fully load user's inventory via subsequent calls to {@link IabHelper#inventory(boolean)}.
+ *  <li>Attempts to consume all verified consumable purchases.
+ *  <li>Attempts to fully load user's inventory via subsequent calls to {@link IabHelper#inventory(boolean)}.
  * </ul>
  */
 public class DefaultBillingListener extends SimpleBillingListener {

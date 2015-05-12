@@ -24,6 +24,13 @@ public enum PurchaseState {
     CANCELED(1),
     REFUNDED(2);
 
+    /**
+     * Gets purchase state from code.
+     *
+     * @param code Code to convert.
+     *
+     * @return Purchase state if code is recognized, null otherwise.
+     */
     @Nullable
     public static PurchaseState fromCode(final int code) {
         for (final PurchaseState purchaseState : values()) {

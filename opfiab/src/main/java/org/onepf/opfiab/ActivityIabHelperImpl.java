@@ -21,9 +21,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
+import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.api.ActivityIabHelper;
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.ComponentState;
 
+/**
+ * This {@link IabHelper} implementation works with supplied Activity instance. {@link
+ * OPFIabFragment} will be attached to it to monitor lifecycle and automatically call {@link
+ * #register()} and {@link #unregister()} when appropriate.
+ */
 class ActivityIabHelperImpl extends ComponentIabHelper implements ActivityIabHelper {
 
     @Nullable
@@ -41,6 +48,7 @@ class ActivityIabHelperImpl extends ComponentIabHelper implements ActivityIabHel
     }
 
     @NonNull
+    @Override
     protected Activity getActivity() {
         if (fragmentActivity != null) {
             return fragmentActivity;

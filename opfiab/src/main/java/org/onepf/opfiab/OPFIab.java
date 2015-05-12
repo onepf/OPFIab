@@ -207,8 +207,8 @@ public final class OPFIab {
      * Initialize OPFIab library with supplied configuration.
      * <br>
      * It's strongly recommended to call this method from {@link Application#onCreate()}.
-     * <p/>
-     * Subsequent calls are supported.
+     * <br>
+     * Subsequent calls are supported but will reset any previous setup state.
      *
      * @param application   Application object to add {@link Application.ActivityLifecycleCallbacks}
      *                      to and to use as {@link Context}.

@@ -69,7 +69,15 @@ final class SetupManager {
 
     private final Context context;
     private final OPFPreferences preferences;
+    /**
+     * Flag indicating whether setup process is happening at the moment.
+     */
     private boolean setupInProgress;
+    /**
+     * Configuration object from last received setup request.
+     * <br>
+     * Used to determine whether {@link SetupResponse} is relevant when it's ready.
+     */
     @Nullable
     private Configuration lastConfiguration;
 
@@ -86,11 +94,11 @@ final class SetupManager {
         final boolean authorized = billingProvider.isAuthorised();
         OPFLog.d(billingProvider.getInfo().getName() + " isAuthorized = " + authorized);
         if (authorized || !configuration.skipUnauthorised()) {
+            // Provider is authorized or we don't care about authorization
             final SetupResponse.Status status = providerChanged ? PROVIDER_CHANGED : SUCCESS;
             return new SetupResponse(configuration, status, billingProvider, authorized);
         }
-        OPFLog.d(String.format("%s does not satisfies configuration (skipUnauthorised = %b)",
-                               billingProvider.getInfo().getName(), configuration.skipUnauthorised()));
+        OPFLog.d("Skipping: %s", billingProvider);
         return null;
     }
 
@@ -103,28 +111,31 @@ final class SetupManager {
         final Iterable<BillingProvider> availableProviders = OPFIabUtils.getAvailable(providers);
 
         final boolean hadProvider = preferences.contains(KEY_LAST_PROVIDER);
-        // Try previously used provider
         if (hadProvider) {
+            // Try previously used provider
             final String lastProvider = preferences.getString(KEY_LAST_PROVIDER, "");
             final BillingProviderInfo info = BillingProviderInfo.fromJson(lastProvider);
             final BillingProvider provider;
             final SetupResponse setupResponse;
-            OPFLog.d("Previous provider: " + lastProvider);
+            OPFLog.d("Previous provider: %s", lastProvider);
             if (info != null
+                    // Last provider info is valid
                     && (provider = OPFIabUtils.findWithInfo(availableProviders, info)) != null
+                    // Provider is present in configuration
                     && (setupResponse = withProvider(configuration, provider, false)) != null) {
                 return setupResponse;
             }
         }
 
         final String packageInstaller = OPFUtils.getPackageInstaller(context);
-        OPFLog.d("Package installer: " + packageInstaller);
-        // If package installer is set, try it before anything else
+        OPFLog.d("Package installer: %s", packageInstaller);
         if (!TextUtils.isEmpty(packageInstaller)) {
+            // If package installer is set, try it before anything else
             final BillingProvider installerProvider = OPFIabUtils
                     .withInstaller(availableProviders, packageInstaller);
             final SetupResponse setupResponse;
             if (installerProvider != null
+                    // Provider is present in configuration
                     && (setupResponse = withProvider(configuration, installerProvider,
                                                      hadProvider)) != null) {
                 return setupResponse;
@@ -139,9 +150,19 @@ final class SetupManager {
             }
         }
 
+        // No suitable provider was found
         return new SetupResponse(configuration, FAILED, null);
     }
 
+    /**
+     * Tries to start setup process for the supplied configuration.
+     * <br>
+     * If setup is already in progress, new configuration object is stored and used after
+     * current setup is finished.
+     *
+     * @param configuration Configuration object to perform setup for.
+     * @see OPFIab#setup()
+     */
     void startSetup(@NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
         lastConfiguration = configuration;
@@ -166,9 +187,10 @@ final class SetupManager {
 
     public void onEventAsync(@NonNull final SetupStartedEvent setupStartedEvent) {
         final SetupResponse setupResponse = newResponse(setupStartedEvent);
-        if (setupResponse.isSuccessful()) {
-            final BillingProvider provider = setupResponse.getBillingProvider();
-            //noinspection ConstantConditions
+        final BillingProvider provider;
+        if (setupResponse.isSuccessful()
+                && (provider = setupResponse.getBillingProvider()) != null) {
+            // Suitable provider successfully picked, remember it to prioritize for next setup.
             final BillingProviderInfo info = provider.getInfo();
             preferences.put(KEY_LAST_PROVIDER, info.toJson().toString());
         }

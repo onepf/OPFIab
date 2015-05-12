@@ -21,6 +21,9 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Parent of a few Google billing model classes.
+ */
 public class GoogleModel {
 
     private static final String NAME_PRODUCT_ID = "productId";
@@ -39,11 +42,22 @@ public class GoogleModel {
         this.productId = jsonObject.getString(NAME_PRODUCT_ID);
     }
 
+    /**
+     * Gets JSON data associated with this billing model.
+     *
+     * @return JSON string.
+     */
     @NonNull
     public String getOriginalJson() {
         return originalJson;
     }
 
+    /**
+     * Gets item's product identifier. Every item has a product ID which you must specify in the
+     * application's product list in the Google Play Developer Console.
+     *
+     * @return Unique product ID, can't be null.
+     */
     @NonNull
     public String getProductId() {
         return productId;

@@ -35,6 +35,11 @@ public class FragmentLifecycleEvent extends LifecycleEvent {
         this.fragment = fragment;
     }
 
+    /**
+     * Gets fragment associated with this event.
+     *
+     * @return Fragment object, can't be null.
+     */
     @NonNull
     public Fragment getFragment() {
         return fragment;

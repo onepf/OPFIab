@@ -31,6 +31,11 @@ class ActivityEvent {
         this.activity = activity;
     }
 
+    /**
+     * Gets activity associated with this event.
+     *
+     * @return Activity object, can't be null.
+     */
     @NonNull
     public Activity getActivity() {
         return activity;

@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.billing.BillingProvider;
 
 /**
- * Model class representing request of some action from {@link BillingProvider}.
+ * Model class representing request for some action from {@link BillingProvider}.
  * <br>
  * Please note that not every single request will lead to a corresponding {@link BillingResponse},
  * different {@link BillingProvider}s can behave differently.

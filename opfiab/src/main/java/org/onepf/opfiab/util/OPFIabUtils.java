@@ -63,6 +63,13 @@ public final class OPFIabUtils {
     }
 
 
+    /**
+     * Converts supplied object to human-readable JSON representation.
+     *
+     * @param jsonCompatible Object to convert.
+     *
+     * @return Human-readable string, can't be null.
+     */
     @NonNull
     public static String toString(@NonNull final JsonCompatible jsonCompatible) {
         try {
@@ -73,6 +80,13 @@ public final class OPFIabUtils {
         return "";
     }
 
+    /**
+     * Filters out unavailable {@link BillingProvider}s.
+     *
+     * @param providers Providers to filter.
+     *
+     * @return Collection of available providers.
+     */
     @NonNull
     public static Iterable<BillingProvider> getAvailable(
             @NonNull final Iterable<BillingProvider> providers) {
@@ -85,6 +99,14 @@ public final class OPFIabUtils {
         return availableProviders;
     }
 
+    /**
+     * Looks for a provider with supplied {@link BillingProviderInfo}.
+     *
+     * @param providers Providers to look among.
+     * @param info      Info to look up.
+     *
+     * @return BillingProvider if it was found, null otherwise.
+     */
     @Nullable
     public static BillingProvider findWithInfo(@NonNull final Iterable<BillingProvider> providers,
                                                @NonNull final BillingProviderInfo info) {
@@ -96,6 +118,16 @@ public final class OPFIabUtils {
         return null;
     }
 
+    // where are you stream API...
+
+    /**
+     * Looks for a provider with supplied installer.
+     *
+     * @param providers   Providers to look among.
+     * @param packageName Installer to look for.
+     *
+     * @return BillingProvider if it was found, null otherwise.
+     */
     @Nullable
     public static BillingProvider withInstaller(
             @NonNull final Iterable<BillingProvider> providers,
@@ -109,6 +141,15 @@ public final class OPFIabUtils {
         return null;
     }
 
+    /**
+     * Constructs empty response corresponding to supplied request.`
+     *
+     * @param providerInfo   Info of provider handling request, can be null.
+     * @param billingRequest Request to make response for.
+     * @param status         Status for newly constructed response.
+     *
+     * @return Newly constructed BillingResponse with no data.
+     */
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     @NonNull
     public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
@@ -203,6 +244,13 @@ public final class OPFIabUtils {
         return null;
     }
 
+    /**
+     * Removes first element from supplied collection.
+     *
+     * @param collection Collection to remove element from.
+     *
+     * @return Removed object or null.
+     */
     @Nullable
     public static <E> E poll(@NonNull final Collection<E> collection) {
         if (collection.isEmpty()) {

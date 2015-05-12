@@ -37,10 +37,12 @@ interface ListenersSupport {
     void addSetupListener(@NonNull final OnSetupListener setupListener);
 
     /**
-     * Registers callback for setup events.
+     * Registers callback for setup events with handy option to immediately receive last known
+     * {@link SetupResponse}.
      *
-     * @param setupListener listener to register.
-     * @param deliverLast   if true and setup was already finished, immediately deliver last {@link SetupResponse}
+     * @param setupListener Listener to register.
+     * @param deliverLast   If true and setup was already finished, immediately deliver last {@link
+     *                      SetupResponse}
      */
     void addSetupListener(@NonNull final OnSetupListener setupListener,
                           final boolean deliverLast);
@@ -48,35 +50,35 @@ interface ListenersSupport {
     /**
      * Registers callback for purchase events.
      *
-     * @param purchaseListener listener to register.
+     * @param purchaseListener Listener to register.
      */
     void addPurchaseListener(@NonNull final OnPurchaseListener purchaseListener);
 
     /**
      * Registers callback for inventory events.
      *
-     * @param inventoryListener listener to register.
+     * @param inventoryListener Listener to register.
      */
     void addInventoryListener(@NonNull final OnInventoryListener inventoryListener);
 
     /**
      * Registers callback for SKU details events.
      *
-     * @param skuInfoListener listener to register.
+     * @param skuInfoListener Listener to register.
      */
     void addSkuDetailsListener(@NonNull final OnSkuDetailsListener skuInfoListener);
 
     /**
      * Registers callback for consume events.
      *
-     * @param consumeListener listener to register.
+     * @param consumeListener Listener to register.
      */
     void addConsumeListener(@NonNull final OnConsumeListener consumeListener);
 
     /**
      * Registers callback for all billing events.
      *
-     * @param billingListener listener to register.
+     * @param billingListener Listener to register.
      */
     void addBillingListener(@NonNull final BillingListener billingListener);
 }
