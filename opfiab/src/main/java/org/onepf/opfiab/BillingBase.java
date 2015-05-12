@@ -101,7 +101,7 @@ final class BillingBase {
     /**
      * Sets configuration currently used by library.
      * <br>
-     * This will reset library setup state.
+     * This method resets library setup state.
      *
      * @param configuration Current configuration object
      */
@@ -114,7 +114,7 @@ final class BillingBase {
     /**
      * Gets last setup response.
      *
-     * @return SetupResponse object if setup was finished at least once, null otherwise.
+     * @return SetupResponse object if setup has finished at least once, null otherwise.
      */
     @Nullable
     SetupResponse getSetupResponse() {
@@ -144,7 +144,7 @@ final class BillingBase {
     }
 
     /**
-     * Attempt to execute supplied billing request using current billing provider.
+     * Attempts to execute supplied billing request using current billing provider.
      * <br>
      * If current provider is unavailable or busy, supplied request will not be executed and
      * instead corresponding response will be send immediately.

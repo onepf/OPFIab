@@ -65,7 +65,7 @@ import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
 /**
- * This {@link BillingProvider} implementation add support of
+ * This {@link BillingProvider} implementation adds support of
  * <a href="http://www.amazon.com/mobile-apps/b?node=2350149011">Amazon Appstore</a>
  */
 @SuppressWarnings("PMD.GodClass")
@@ -79,7 +79,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, INSTALLER);
 
     /**
-     * Helper object handling all Amazon SDK related calls.
+     * Helper object handles all Amazon SDK related calls.
      */
     protected static AmazonBillingHelper billingHelper;
 
@@ -98,7 +98,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     /**
-     * Transforms Amazon product to library SKU details model.
+     * Transforms Amazon product into library SKU details model.
      *
      * @param product Amazon product to transform.
      *
@@ -133,7 +133,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     /**
-     * Transforms Amazon receipt to library purchase model.
+     * Transforms Amazon receipt into library purchase model.
      *
      * @param receipt Amazon receipt to transform.
      *
@@ -177,7 +177,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     /**
-     * Handle sku details response from Amazon.
+     * Handles sku details response from Amazon.
      *
      * @param productDataResponse Response to handle.
      */
@@ -205,7 +205,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     /**
-     * Handle inventory response from Amazon.
+     * Handles inventory response from Amazon.
      *
      * @param purchaseUpdatesResponse Response to handle.
      */
@@ -231,7 +231,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     /**
-     * Handle purchase response from Amazon.
+     * Handles purchase response from Amazon.
      *
      * @param purchaseResponse Response to handle.`
      */

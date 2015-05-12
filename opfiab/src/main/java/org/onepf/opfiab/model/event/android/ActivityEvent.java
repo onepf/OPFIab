@@ -32,7 +32,7 @@ class ActivityEvent {
     }
 
     /**
-     * Get activity associated with this event.
+     * Gets activity associated with this event.
      *
      * @return Activity object, can't be null.
      */

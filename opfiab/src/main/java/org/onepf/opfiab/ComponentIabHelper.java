@@ -32,11 +32,11 @@ import org.onepf.opfiab.model.event.android.SupportFragmentLifecycleEvent;
 import org.onepf.opfutils.OPFLog;
 
 /**
- * This class contains common code for all {@link IabHelper} implementations intended for use from
+ * This class contains common code for all {@link IabHelper} implementations intended to use from
  * within Android components ({@link Activity}, {@link Fragment}).
  * <p>
- * Helper will attempt to attach instance of {@link OPFIabFragment} to supplied fragment manager.
- * Fragment will monitor component lifecycle and report it to library.
+ * Helper attempts to attach instance of {@link OPFIabFragment} to supplied fragment manager.
+ * Fragment will monitor component lifecycle and report it to the library.
  */
 abstract class ComponentIabHelper extends AdvancedIabHelperImpl {
 
@@ -95,7 +95,7 @@ abstract class ComponentIabHelper extends AdvancedIabHelperImpl {
     }
 
     /**
-     * Gets activity from associated android component.
+     * Gets activity from the associated android component.
      *
      * @return Activity object, can't be null.
      */

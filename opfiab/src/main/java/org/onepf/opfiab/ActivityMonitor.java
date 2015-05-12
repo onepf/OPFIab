@@ -32,14 +32,14 @@ import java.util.WeakHashMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * Class designed to monitor existing {@link Activity}s lifecycle.
+ * This class is designed to monitor the existing {@link Activity}s lifecycle.
  * <br>
  * Intended for internal use.
  */
 public final class ActivityMonitor implements Application.ActivityLifecycleCallbacks {
 
     /**
-     * Map of existing activities lifecycle states.
+     * Map of the existing activities lifecycle states.
      * <br>
      * Backed up by {@link WeakHashMap} to avoid memory leaks.
      */
@@ -60,7 +60,7 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
     }
 
     /**
-     * Sets lifecycle state of supplied activity.
+     * Sets lifecycle state of the supplied activity.
      *
      * @param activity Activity object to set lifecycle state for.
      */
@@ -70,7 +70,7 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
     }
 
     /**
-     * Gets last known lifecycle state of supplied activity.
+     * Gets last known lifecycle state of the supplied activity.
      *
      * @param activity Activity object to get lifecycle state for.
      * @return Current lifecycle state if known, null otherwise.

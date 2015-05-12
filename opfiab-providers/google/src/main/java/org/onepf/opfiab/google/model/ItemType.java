@@ -25,8 +25,8 @@ public enum ItemType {
 
     SUBSCRIPTION("subs"),
     /**
-     * Google does not distinguish consumables and entitlements. Entitlement - is a consumable
-     * which is never consumed.
+     * Google does not distinguish consumables and entitlements. Entitlement is a consumable which
+     * is never consumed.
      */
     CONSUMABLE_OR_ENTITLEMENT("inapp");
 
@@ -51,7 +51,7 @@ public enum ItemType {
     }
 
     /**
-     * Get Google product type from SKU type.
+     * Gets Google product type from SKU type.
      *
      * @param skuType SKU type to convert.
      *

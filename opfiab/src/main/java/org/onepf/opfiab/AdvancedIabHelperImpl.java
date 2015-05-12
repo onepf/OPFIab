@@ -32,14 +32,13 @@ import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfutils.OPFChecks;
 
 /**
- * This implementation of {@link IabHelper} adds two main features.
- * <p>
- * 1. Pending request queue. With a help of {@link BillingRequestScheduler} subsequent billing
+ * This implementation of {@link IabHelper} adds two main features:
+ * <ol>
+ * <li> Pending request queue. With a help of {@link BillingRequestScheduler} subsequent billing
  * request will be scheduled for execution.
- * <br>
- * Each helper instance has separate queue.
- * <p>
- * 2. API to add listeners for specific billing events.
+ * Each helper instance has a separate queue.
+ * <li> API to add listeners for specific billing events.
+ * </ol>
  */
 class AdvancedIabHelperImpl extends SimpleIabHelperImpl implements AdvancedIabHelper {
 

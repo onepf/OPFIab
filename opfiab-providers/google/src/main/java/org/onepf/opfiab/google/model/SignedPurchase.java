@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import org.onepf.opfiab.model.billing.Purchase;
 
 /**
- * This model is an extension of purchase additionally containing Google specific data.
+ * This model is an extension of purchase that additionally contains Google specific data.
  */
 public class SignedPurchase extends Purchase {
 
@@ -42,7 +42,7 @@ public class SignedPurchase extends Purchase {
     /**
      * Gets this purchase signature. Used for purchase verification.
      *
-     * @return Purchase signature, can be null.
+     * @return Purchase signature, cannot be null.
      */
     @NonNull
     public String getSignature() {

@@ -30,7 +30,7 @@ import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 
 /**
  * This {@link IabHelper} implementation works with supplied fragment instance. {@link
- * OPFIabFragment} will be attached to it to monitor lifecycle and automatically call {@link
+ * OPFIabFragment} is attached to it to monitor lifecycle and automatically call {@link
  * #register()} and {@link #unregister()} when appropriate.
  */
 class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHelper {
@@ -59,7 +59,7 @@ class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHel
         } else if (fragment != null) {
             activity = fragment.getActivity();
         } else {
-            // Fragment is detached from activity.
+            // Fragment is detached from the activity.
             throw new IllegalStateException("Fragment is detached!");
         }
         return activity;

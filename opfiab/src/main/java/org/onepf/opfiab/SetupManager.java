@@ -155,9 +155,9 @@ final class SetupManager {
     }
 
     /**
-     * Tries to start setup process for supplied configuration.
+     * Tries to start setup process for the supplied configuration.
      * <br>
-     * If setup is already in progress, new configuration object will be stored and used after
+     * If setup is already in progress, new configuration object is stored and used after
      * current setup is finished.
      *
      * @param configuration Configuration object to perform setup for.

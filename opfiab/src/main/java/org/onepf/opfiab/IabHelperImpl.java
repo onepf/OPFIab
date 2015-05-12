@@ -31,9 +31,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Very basic {@link IabHelper} implementation.
+ * The Very basic {@link IabHelper} implementation.
  * <br>
- * Responsible for {@link BillingRequest}s creation and handing them to {@link BillingBase}.
+ * Responsible for {@link BillingRequest}s creation and sending them to {@link BillingBase}.
  */
 class IabHelperImpl implements IabHelper {
 

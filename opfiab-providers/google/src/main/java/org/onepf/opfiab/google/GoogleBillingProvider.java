@@ -56,7 +56,7 @@ import java.util.Set;
 import static android.Manifest.permission.GET_ACCOUNTS;
 
 /**
- * This {@link BillingProvider} implementation add support for
+ * This {@link BillingProvider} implementation adds support for
  * <a href="https://play.google.com/store">Google Play</a> App Store.
  */
 @SuppressWarnings("PMD.GodClass")
@@ -92,7 +92,7 @@ public class GoogleBillingProvider
      * @param sku      SKU to resolve type for.
      * @param itemType Supplied SKU type.
      *
-     * @return Resolve SKU type, can't be null.
+     * @return Resolved SKU type, cannot be null.
      */
     @NonNull
     protected SkuType skuType(@NonNull final String sku, @NonNull final ItemType itemType) {
@@ -107,7 +107,7 @@ public class GoogleBillingProvider
     }
 
     /**
-     * Transforms Google product details to library SKU details model.
+     * Transforms Google product details into the library SKU details model.
      *
      * @param googleSkuDetails Google product details to transform.
      *
@@ -273,7 +273,7 @@ public class GoogleBillingProvider
             return;
         }
 
-        // Some detail might not have been loaded
+        // Some details might not have been loaded
         final Collection<SkuDetails> skusDetails = new ArrayList<>();
         final Collection<String> unresolvedSkus = new LinkedList<>(skus);
         for (final String jsonSku : jsonSkuDetails) {
@@ -296,7 +296,7 @@ public class GoogleBillingProvider
     public void inventory(final boolean startOver) {
         final Bundle result = helper.getPurchases(startOver);
         final Response response = GoogleUtils.getResponse(result);
-        //noinspection ConstantConditions
+        // noinspection ConstantConditions
         if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve purchase data.");
             postInventoryResponse(getStatus(response), null, false);
@@ -356,7 +356,6 @@ public class GoogleBillingProvider
         try {
             googlePurchase = new GooglePurchase(purchaseData);
         } catch (JSONException exception) {
-            // Can't parse purchase data
             OPFLog.e("Failed to parse purchase data: " + purchaseData, exception);
             postPurchaseResponse(Status.UNKNOWN_ERROR, null);
             return;

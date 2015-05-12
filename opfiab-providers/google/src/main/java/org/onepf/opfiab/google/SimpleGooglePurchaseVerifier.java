@@ -19,7 +19,7 @@ package org.onepf.opfiab.google;
 import android.support.annotation.NonNull;
 
 /**
- * Simple implementation of {@link GooglePurchaseVerifier} that store public key in insecure way.
+ * Simple implementation of {@link GooglePurchaseVerifier} that stores public key in insecure way.
  * <p>
  * It's strongly recommended to make your own implementation that doesn't store key as a plain
  * string.
