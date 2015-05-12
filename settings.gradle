@@ -17,9 +17,11 @@
 include ':opfiab',
         ':amazon',
         ':google',
+        ':samsung',
         ':trivialdrive'
 
 project(':amazon').projectDir = new File('opfiab-providers/amazon')
 project(':google').projectDir = new File('opfiab-providers/google')
+project(':samsung').projectDir = new File('opfiab-providers/samsung')
 
 project(':trivialdrive').projectDir = new File('samples/trivialdrive')
