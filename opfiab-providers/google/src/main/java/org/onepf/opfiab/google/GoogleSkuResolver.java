@@ -28,7 +28,7 @@ import org.onepf.opfiab.sku.SkuResolver;
 public interface GoogleSkuResolver extends SkuResolver {
 
     /**
-     * Default implementation of {@link GoogleSkuResolver} that maps SKUS to themselves.
+     * Default implementation of {@link GoogleSkuResolver} that maps SKUs to themselves.
      */
     GoogleSkuResolver DEFAULT = new GoogleSkuResolver() {
         @NonNull

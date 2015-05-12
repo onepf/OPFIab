@@ -23,7 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This model represents purchase made from Google Play.
+ * This model represents purchase made in Google Play.
  */
 public class GooglePurchase extends GoogleModel {
 
@@ -75,7 +75,7 @@ public class GooglePurchase extends GoogleModel {
 
 
     /**
-     * Gets a unique order identifier for the transaction. This identifier corresponds to the
+     * Gets a unique order identifier of the transaction. This identifier corresponds to the
      * Google Wallet Order ID.
      *
      * @return Unique order ID, can't be null.
@@ -86,7 +86,7 @@ public class GooglePurchase extends GoogleModel {
     }
 
     /**
-     * Gets application package from which the purchase originated.
+     * Gets application package from which the purchase is originated.
      *
      * @return Package name, can't be null.
      */
@@ -126,7 +126,7 @@ public class GooglePurchase extends GoogleModel {
     }
 
     /**
-     * Gets time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
+     * Gets the time the product was purchased, in milliseconds since the epoch (Jan 1, 1970).
      *
      * @return Time of purchase.
      */

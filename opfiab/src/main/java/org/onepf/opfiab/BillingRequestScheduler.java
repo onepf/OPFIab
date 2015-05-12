@@ -122,16 +122,16 @@ final class BillingRequestScheduler {
     }
 
     /**
-     * Dismisses all pending request associated with supplied helper.
+     * Dismisses all pending requests associated with the supplied helper.
      *
-     * @param iabHelper Helper whos request queue should be dismissed.
+     * @param iabHelper Helper which request queue should be dismissed.
      */
     void dropQueue(@NonNull final AdvancedIabHelperImpl iabHelper) {
         helpers.remove(iabHelper);
     }
 
     /**
-     * Dismisses all pending request for all known helpers.
+     * Dismisses all pending requests for all known helpers.
      */
     void dropQueue() {
         handler.removeCallbacks(handleNextRequest);

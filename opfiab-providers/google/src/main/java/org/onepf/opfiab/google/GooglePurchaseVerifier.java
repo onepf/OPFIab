@@ -25,7 +25,7 @@ import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 
 /**
- * This {@link PurchaseVerifier} checks signatures on Google purchases to verify them.
+ * This {@link PurchaseVerifier} checks signatures on Google purchases in order to verify them.
  */
 public abstract class GooglePurchaseVerifier extends PublicKeyPurchaseVerifier {
 

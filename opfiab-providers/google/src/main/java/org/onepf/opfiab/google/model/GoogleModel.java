@@ -22,7 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Parent for a few Google billing model classes.
+ * Parent of a few Google billing model classes.
  */
 public class GoogleModel {
 
@@ -53,8 +53,8 @@ public class GoogleModel {
     }
 
     /**
-     * Gets item's product identifier. Every item has a product ID, which you must specify in the
-     * application's product list on the Google Play Developer Console.
+     * Gets item's product identifier. Every item has a product ID which you must specify in the
+     * application's product list in the Google Play Developer Console.
      *
      * @return Unique product ID, can't be null.
      */

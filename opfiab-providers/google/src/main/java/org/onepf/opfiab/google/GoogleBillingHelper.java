@@ -67,7 +67,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      * Tries to check if Google billing is available on current device.
      *
      * @return {@link Response#OK} if billing is supported, another corresponding {@link Response}
-     * if it's not. Null if error occurred.
+     * if it's not. Returns null if error has occurred.
      */
     @Nullable
     Response isBillingSupported() {
@@ -97,7 +97,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      * Wraps {@link IInAppBillingService#getBuyIntent(int, String, String, String, String)}
      *
      * @param sku      SKU of a product to purchase.
-     * @param itemType Type of item to purchase.
+     * @param itemType Type of an item to purchase.
      *
      * @return Bundle containing purchase intent. Can be null.
      */
@@ -125,7 +125,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      *
      * @param token Token of a purchase to consume.
      *
-     * @return Result of operation. Can be null.
+     * @return Result of the operation. Can be null.
      */
     @Nullable
     Response consumePurchase(@NonNull final String token) {
@@ -196,8 +196,8 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
     /**
      * Wraps {@link IInAppBillingService#getPurchases(int, String, String, String)}.
      *
-     * @param startOver Flag indicating weather inventory should be loaded from the start, on from
-     *                  the point of previous successful request.
+     * @param startOver Flag indicating whether inventory should be loaded from the start or from
+     *                  the point of the previous successful request.
      *
      * @return Bundle containing user inventory. Can be null.
      */
@@ -213,7 +213,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
             for (final ItemType itemType : ItemType.values()) {
                 final String type = itemType.toString();
                 final String key = KEY_CONTINUATION_TOKEN + type;
-                // Try to use last successful request token is required
+                // Try to use last successful request token if required
                 final String token = startOver ? null : preferences.getString(key);
                 final Bundle purchases = service.getPurchases(API, packageName, type, token);
                 final Response response = GoogleUtils.getResponse(purchases);

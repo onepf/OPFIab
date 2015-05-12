@@ -58,7 +58,7 @@ final class AmazonBillingHelper implements PurchasingListener {
     }
 
     /**
-     * Request user data form Amazon SDK.
+     * Requests user data form Amazon SDK.
      *
      * @return User data if received withing {@link #USER_DATA_TIMEOUT}, null otherwise.
      */

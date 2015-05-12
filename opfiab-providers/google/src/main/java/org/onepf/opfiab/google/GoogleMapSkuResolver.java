@@ -42,7 +42,7 @@ public class GoogleMapSkuResolver implements GoogleSkuResolver {
      * Adds SKU mapping with corresponding SKU type.
      *
      * @param sku         Original SKU.
-     * @param resolvedSku Provider specific SKU. Can be null if there's no need for mapping.
+     * @param resolvedSku Provider specific SKU. Can be null if there's no need in mapping.
      * @param skuType     Type of the mapped SKU.
      */
     public void add(@NonNull final String sku,

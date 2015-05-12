@@ -22,7 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This model represents product available from Google Play.
+ * This model represents product available in Google Play.
  */
 public class GoogleSkuDetails extends GoogleModel {
 
@@ -67,7 +67,7 @@ public class GoogleSkuDetails extends GoogleModel {
     }
 
     /**
-     * Get type of product, can be in-app or subscription.
+     * Gets type of product, can be an in-app or a subscription.
      *
      * @return Product type, can't be null.
      */
@@ -89,9 +89,8 @@ public class GoogleSkuDetails extends GoogleModel {
 
     /**
      * Gets <a href="http://en.wikipedia.org/wiki/ISO_4217#Active_codes">ISO 4217</a> currency code
-     * for
-     * price. For example, if price is specified in British pounds sterling, price_currency_code is
-     * "GBP".
+     * for price. For example, if price is specified in British pounds sterling, then
+     * price_currency_code is "GBP".
      *
      * @return Currency code, can't be null.
      */
@@ -101,7 +100,7 @@ public class GoogleSkuDetails extends GoogleModel {
     }
 
     /**
-     * Gets title of the product.
+     * Gets the title of the product.
      *
      * @return Product title, can't be null.
      */
@@ -111,7 +110,7 @@ public class GoogleSkuDetails extends GoogleModel {
     }
 
     /**
-     * Gets description of the product.
+     * Gets the description of the product.
      *
      * @return Product description, can't be null.
      */
