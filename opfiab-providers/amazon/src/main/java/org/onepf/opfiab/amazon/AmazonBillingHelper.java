@@ -34,12 +34,20 @@ import org.onepf.opfutils.OPFLog;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This class handles all communications between library and Amazon SDK.
+ * <p>
+ * Intended to exist as singleton, which is registered for Amazon callbacks as soon as it's
+ * created.
+ */
 final class AmazonBillingHelper implements PurchasingListener {
 
-    @SuppressWarnings({"checkstyle:magicnumber", "MagicNumber"})
-    private static final int TIMEOUT = 1000;
+    /**
+     * Timeout to give up on waiting for user data.
+     */
+    private static final int USER_DATA_TIMEOUT = 1000;
 
-
+    // User data is requested from library thread, but delivered on main.
     @Nullable
     private volatile CountDownLatch userDataLatch;
     @Nullable
@@ -49,8 +57,14 @@ final class AmazonBillingHelper implements PurchasingListener {
         super();
     }
 
+    /**
+     * Requests user data form Amazon SDK.
+     *
+     * @return User data if received withing {@link #USER_DATA_TIMEOUT}, null otherwise.
+     */
     @Nullable
     UserData getUserData() {
+        // TODO check re-login
         OPFChecks.checkThread(false);
         final UserData localUserData = userData;
         if (localUserData != null) {
@@ -58,6 +72,7 @@ final class AmazonBillingHelper implements PurchasingListener {
         }
 
         if (userDataLatch != null) {
+            // Might happen if library handles request in multithreaded pool
             throw new IllegalStateException("There must be no concurrent requests.");
         }
 
@@ -65,7 +80,7 @@ final class AmazonBillingHelper implements PurchasingListener {
             userDataLatch = new CountDownLatch(1);
             PurchasingService.getUserData();
             //noinspection ConstantConditions
-            if (!userDataLatch.await(TIMEOUT, TimeUnit.MILLISECONDS)) {
+            if (!userDataLatch.await(USER_DATA_TIMEOUT, TimeUnit.MILLISECONDS)) {
                 OPFLog.e("User data request timed out.");
             }
         } catch (InterruptedException exception) {

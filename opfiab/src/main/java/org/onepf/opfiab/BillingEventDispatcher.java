@@ -34,6 +34,12 @@ import org.onepf.opfutils.OPFLog;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+/**
+ * This class helps to deliver all billing events to appropriate listeners.
+ * <br>
+ * It's intended to exist as singletone and allow to add and remove corresponding listeners by
+ * {@link #register(BillingListener)} and {@link #unregister(BillingListener)} methods.
+ */
 final class BillingEventDispatcher extends BillingListenerCompositor {
 
     @Nullable
@@ -53,10 +59,20 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
         super();
     }
 
+    /**
+     * Registers listener to receive all billing events.
+     *
+     * @param billingListener Listener object to register.
+     */
     void register(@NonNull final BillingListener billingListener) {
         addBillingListener(billingListener);
     }
 
+    /**
+     * Unregisters listener from receiving any billing events.
+     *
+     * @param billingListener Listener object to unregister.
+     */
     void unregister(@NonNull final BillingListener billingListener) {
         removeBillingListener(billingListener);
     }

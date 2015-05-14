@@ -34,7 +34,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
-        versionName "0.2.0"
+        versionName "0.2.1"
     }
     buildTypes {
         release {
@@ -73,7 +73,7 @@ dependencies {
     compile 'com.google.code.findbugs:annotations:3.0.0'
     compile 'com.android.support:support-annotations:21.0.3'
 
-    compile 'org.onepf:opfiab:0.2.0@aar'
-    provided 'org.onepf:opfutils:0.1.21'
+    compile 'org.onepf:opfiab:0.2.1@aar'
+    provided 'org.onepf:opfutils:0.1.22'
     provided 'com.amazon:in-app-purchasing:2.0.61'
 }

@@ -28,9 +28,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 28
-        versionName "0.2.0"
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionName "0.2.1"
     }
 
     signingConfigs {
@@ -53,7 +51,8 @@ android {
         checkAllWarnings true
         warningsAsErrors false
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
-                'IconMissingDensityFolder', 'IconExpectedSize', 'RtlSymmetry', 'RtlHardcoded', 'IconDensities', 'ButtonStyle'
+                'IconMissingDensityFolder', 'IconExpectedSize', 'RtlSymmetry', 'RtlHardcoded',
+                'IconDensities', 'ButtonStyle'
     }
 
     packagingOptions {
@@ -76,17 +75,17 @@ check {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.android.support:appcompat-v7:22.0.0'
+    compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.android.support:recyclerview-v7:22.0.0'
 
     // OPFIab core
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'org.onepf:opfutils:0.1.21'
-    compile 'org.onepf:opfiab:0.2.0@aar'
+    compile 'org.onepf:opfutils:0.1.22'
+    compile 'org.onepf:opfiab:0.2.1@aar'
     // OPFIab Google
-    compile 'org.onepf:opfiab-google:0.2.0@aar'
+    compile 'org.onepf:opfiab-google:0.2.1@aar'
     // OPFIab Amazon
-    compile 'org.onepf:opfiab-amazon:0.2.0@aar'
+    compile 'org.onepf:opfiab-amazon:0.2.1@aar'
     compile 'com.amazon:in-app-purchasing:2.0.61'
 
     compile 'com.makeramen:dragsortadapter:1.1.0'

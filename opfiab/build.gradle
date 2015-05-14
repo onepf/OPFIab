@@ -30,7 +30,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
-        versionName "0.2.0"
+        versionName "0.2.1"
     }
 
     buildTypes {
@@ -71,7 +71,7 @@ dependencies {
     compile 'com.android.support:support-annotations:21.0.3'
 
     provided 'de.greenrobot:eventbus:2.4.0'
-    provided 'org.onepf:opfutils:0.1.21'
+    provided 'org.onepf:opfutils:0.1.22'
     //noinspection GradleDependency,GradleCompatible
     provided 'com.android.support:support-v4:13.0.0'
 }

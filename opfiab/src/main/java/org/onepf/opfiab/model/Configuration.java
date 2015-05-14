@@ -30,7 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Model class that represents library configuration.
+ * Model class representing library configuration.
  *
  * @see OPFIab#init(android.app.Application, Configuration)
  */
@@ -61,7 +61,7 @@ public final class Configuration {
     }
 
     /**
-     * Gets supported billing provider.
+     * Gets supported billing providers.
      *
      * @return Collection of BillingProvider objects.
      */
