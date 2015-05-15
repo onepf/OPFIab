@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-include ':opfiab', ':opfiab-testmanager',
+include ':opfiab',
         ':amazon',
         ':google',
         ':trivialdrive',
+        ':opfiab-testmanager',
         ':opfiab-uitest'
 
 project(':amazon').projectDir = new File('opfiab-providers/amazon')
