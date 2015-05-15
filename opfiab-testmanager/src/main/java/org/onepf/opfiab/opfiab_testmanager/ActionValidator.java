@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-include ':opfiab', ':opfiab-testmanager',
-        ':amazon',
-        ':google',
-        ':trivialdrive'
+package org.onepf.opfiab.opfiab_testmanager;
 
-project(':amazon').projectDir = new File('opfiab-providers/amazon')
-project(':google').projectDir = new File('opfiab-providers/google')
-
-project(':trivialdrive').projectDir = new File('samples/trivialdrive')
+/**
+ * @author antonpp
+ * @since 15.05.15
+ */
+public interface ActionValidator<T> {
+    boolean validate(T action);
+}
