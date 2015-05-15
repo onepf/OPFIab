@@ -17,7 +17,8 @@
 <resources>
     <string name="app_name">opfiab-uitest</string>
 
-    <string name="str_init">init</string>
+    <string name="str_init_ok">init OK</string>
+    <string name="str_init_fail">init fail</string>
     <string name="str_setup">setup</string>
     <string name="str_buy_consumable">buy consumable</string>
     <string name="str_buy_nonconsumable">buy nonconsumable</string>

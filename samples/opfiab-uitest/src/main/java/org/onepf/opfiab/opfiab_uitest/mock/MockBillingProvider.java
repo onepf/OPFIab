@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest;
+package org.onepf.opfiab.opfiab_uitest.mock;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.google.GoogleSkuResolver;
 
 /**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ * @author antonpp
+ * @since 14.05.15
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+public abstract class MockBillingProvider implements BillingProvider {
+
+    protected GoogleSkuResolver skuResolver;
+
+    public void setSkuResolver(GoogleSkuResolver skuResolver) {
+        this.skuResolver = skuResolver;
     }
 }

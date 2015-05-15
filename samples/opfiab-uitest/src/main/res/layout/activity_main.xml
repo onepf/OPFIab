@@ -22,11 +22,23 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/button_init"
-        android:text="@string/str_init"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_init_ok"
+            android:text="@string/str_init_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_init_fail"
+            android:text="@string/str_init_fail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/button_setup"
