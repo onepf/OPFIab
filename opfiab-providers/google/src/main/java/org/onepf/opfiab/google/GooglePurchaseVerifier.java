@@ -22,7 +22,11 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.google.model.SignedPurchase;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
+import org.onepf.opfiab.verification.PurchaseVerifier;
 
+/**
+ * This {@link PurchaseVerifier} checks signatures on Google purchases in order to verify them.
+ */
 public abstract class GooglePurchaseVerifier extends PublicKeyPurchaseVerifier {
 
     @Nullable

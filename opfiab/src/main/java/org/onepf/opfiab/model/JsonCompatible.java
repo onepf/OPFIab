@@ -23,7 +23,9 @@ import org.json.JSONObject;
 public interface JsonCompatible {
 
     /**
-     * @return JSON representation of this object data.
+     * Gets JSON representation of this object data.
+     *
+     * @return JSON object, can't be null.
      */
     @NonNull
     JSONObject toJson();

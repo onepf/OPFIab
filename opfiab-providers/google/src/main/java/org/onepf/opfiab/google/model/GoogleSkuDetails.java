@@ -21,6 +21,9 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This model represents product available in Google Play.
+ */
 public class GoogleSkuDetails extends GoogleModel {
 
     private static final String NAME_TYPE = "type";
@@ -63,31 +66,65 @@ public class GoogleSkuDetails extends GoogleModel {
         this(originalJson, new JSONObject(originalJson));
     }
 
+    /**
+     * Gets type of product, can be an in-app or a subscription.
+     *
+     * @return Product type, can't be null.
+     */
     @NonNull
     public ItemType getItemType() {
         return itemType;
     }
 
+    /**
+     * Gets formatted price of the item, including its currency sign. The price does not include
+     * tax.
+     *
+     * @return Product price, can't be null.
+     */
     @NonNull
     public String getPrice() {
         return price;
     }
 
+    /**
+     * Gets <a href="http://en.wikipedia.org/wiki/ISO_4217#Active_codes">ISO 4217</a> currency code
+     * for price. For example, if price is specified in British pounds sterling, then
+     * price_currency_code is "GBP".
+     *
+     * @return Currency code, can't be null.
+     */
     @NonNull
     public String getCurrency() {
         return currency;
     }
 
+    /**
+     * Gets the title of the product.
+     *
+     * @return Product title, can't be null.
+     */
     @NonNull
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Gets the description of the product.
+     *
+     * @return Product description, can't be null.
+     */
     @NonNull
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Gets price in micro-units, where 1,000,000 micro-units equal one unit of the currency. For
+     * example, if price is "€7.99", price_amount_micros is "7990000".
+     *
+     * @return Price amount in micros.
+     */
     public long getMicros() {
         return micros;
     }
