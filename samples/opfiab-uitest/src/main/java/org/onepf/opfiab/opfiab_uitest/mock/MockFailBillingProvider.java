@@ -62,6 +62,7 @@ public class MockFailBillingProvider extends MockBillingProvider {
 
     @Override
     public void onEventAsync(@NonNull BillingRequest billingRequest) {
+        sleep();
         OPFIab.post(new RequestHandledEvent(billingRequest));
         OPFIab.post(OPFIabUtils.emptyResponse(getInfo(), billingRequest, BILLING_UNAVAILABLE));
     }

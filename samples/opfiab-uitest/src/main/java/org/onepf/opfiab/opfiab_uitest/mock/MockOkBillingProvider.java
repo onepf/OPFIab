@@ -25,6 +25,14 @@ import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.Status;
+import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.verification.VerificationResult;
+
+import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 
 /**
  * @author antonpp
@@ -50,6 +58,7 @@ public class MockOkBillingProvider extends MockBillingProvider {
 
     @Override
     public boolean isAvailable() {
+        sleep();
         return true;
     }
 
@@ -61,7 +70,8 @@ public class MockOkBillingProvider extends MockBillingProvider {
     @Override
     public void onEventAsync(@NonNull BillingRequest billingRequest) {
         OPFIab.post(new RequestHandledEvent(billingRequest));
-//        OPFIab.post(new )
+        sleep();
+        OPFIab.post(new PurchaseResponse(SUCCESS, getInfo(), null, VerificationResult.SUCCESS));
     }
 
     @Nullable

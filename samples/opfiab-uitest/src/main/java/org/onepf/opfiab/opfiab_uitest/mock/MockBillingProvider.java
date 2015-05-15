@@ -19,15 +19,22 @@ package org.onepf.opfiab.opfiab_uitest.mock;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleSkuResolver;
 
+import java.util.Random;
+
 /**
  * @author antonpp
  * @since 14.05.15
  */
 public abstract class MockBillingProvider implements BillingProvider {
 
-    protected GoogleSkuResolver skuResolver;
+    public static final long SLEEP_TIME = 50;
+    private static final Random RND = new Random();
 
-    public void setSkuResolver(GoogleSkuResolver skuResolver) {
-        this.skuResolver = skuResolver;
+    protected void sleep() {
+        try {
+            Thread.sleep((SLEEP_TIME + RND.nextLong() % SLEEP_TIME) / 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

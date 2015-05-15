@@ -28,6 +28,7 @@ import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleMapSkuResolver;
 import org.onepf.opfiab.google.GoogleSkuResolver;
 import org.onepf.opfiab.listener.BillingListener;
+import org.onepf.opfiab.listener.BillingListenerCompositor;
 import org.onepf.opfiab.listener.DefaultBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.mock.MockFailBillingProvider;
@@ -43,9 +44,8 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
     private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
     private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
-    private BillingListener billingListener;
-
     private ActivityIabHelper iabHelper;
+    private Configuration customConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,7 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
     private void setup() {
         OPFLog.setEnabled(true, true);
 
+        findViewById(R.id.button_init).setOnClickListener(this);
         findViewById(R.id.button_init_ok).setOnClickListener(this);
         findViewById(R.id.button_init_fail).setOnClickListener(this);
         findViewById(R.id.button_setup).setOnClickListener(this);
@@ -80,6 +81,9 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.button_init:
+                initHelper();
+                break;
             case R.id.button_init_ok:
                 initHelper(true);
                 break;
@@ -101,6 +105,10 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
         }
     }
 
+    public void setCustomConfiguration(Configuration customConfiguration) {
+        this.customConfiguration = customConfiguration;
+    }
+
     private void initHelper(boolean needOkBillingProvider) {
         final BillingProvider billingProvider;
         if (needOkBillingProvider) {
@@ -109,14 +117,24 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
             billingProvider = new MockFailBillingProvider();
         }
 
-        final GoogleSkuResolver skuResolver = new GoogleMapSkuResolver();
-
         OPFIab.init(getApplication(),
                 new Configuration.Builder()
                         .addBillingProvider(billingProvider)
-                        .setBillingListener(billingListener = new DefaultBillingListener())
+                        .setBillingListener(new DefaultBillingListener())
                         .build()
         );
+    }
+
+    private void initHelper() {
+        if (customConfiguration == null) {
+            initHelper(false);
+        } else {
+            OPFIab.init(getApplication(), customConfiguration);
+        }
+    }
+
+    public void setBillingListener(BillingListener listener) {
+        iabHelper.addBillingListener(listener);
     }
 
     private void setupHelper() {

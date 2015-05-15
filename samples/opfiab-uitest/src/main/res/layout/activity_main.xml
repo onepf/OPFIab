@@ -41,6 +41,12 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/button_init"
+        android:text="@string/str_init_custom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
         android:id="@+id/button_setup"
         android:text="@string/str_setup"
         android:layout_width="wrap_content"
