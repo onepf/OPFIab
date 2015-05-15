@@ -14,12 +14,27 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_testmanager;
+package org.onepf.opfiab.opfiab_testmanager.validators;
 
 /**
  * @author antonpp
  * @since 15.05.15
  */
-public interface ActionValidator<T> {
-    boolean validate(T action);
+public abstract class ActionValidator<T> {
+
+    private final Class<?> clazz;
+
+    protected ActionValidator(Class<?> clazz) {
+        this.clazz = clazz;
+    }
+
+    public Class<?> getActionClass() {
+        return clazz;
+    }
+
+    public abstract ValidationResult validate(T action);
+
+    public enum ValidationResult {
+        OK, FAIL
+    }
 }
