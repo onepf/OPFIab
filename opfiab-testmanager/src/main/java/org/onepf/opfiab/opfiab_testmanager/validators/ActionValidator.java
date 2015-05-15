@@ -14,14 +14,27 @@
  * limitations under the License.
  */
 
-include ':opfiab', ':opfiab-testmanager',
-        ':amazon',
-        ':google',
-        ':trivialdrive',
-        ':opfiab-uitest'
+package org.onepf.opfiab.opfiab_testmanager.validators;
 
-project(':amazon').projectDir = new File('opfiab-providers/amazon')
-project(':google').projectDir = new File('opfiab-providers/google')
+/**
+ * @author antonpp
+ * @since 15.05.15
+ */
+public abstract class ActionValidator<T> {
 
-project(':trivialdrive').projectDir = new File('samples/trivialdrive')
-project(':opfiab-uitest').projectDir = new File('samples/opfiab-uitest')
+    private final Class<?> clazz;
+
+    protected ActionValidator(Class<?> clazz) {
+        this.clazz = clazz;
+    }
+
+    public Class<?> getActionClass() {
+        return clazz;
+    }
+
+    public abstract ValidationResult validate(T action);
+
+    public enum ValidationResult {
+        OK, FAIL
+    }
+}

@@ -14,14 +14,25 @@
  * limitations under the License.
  */
 
-include ':opfiab', ':opfiab-testmanager',
-        ':amazon',
-        ':google',
-        ':trivialdrive',
-        ':opfiab-uitest'
+package org.onepf.opfiab.opfiab_testmanager.validators;
 
-project(':amazon').projectDir = new File('opfiab-providers/amazon')
-project(':google').projectDir = new File('opfiab-providers/google')
+import org.onepf.opfiab.model.event.SetupResponse;
 
-project(':trivialdrive').projectDir = new File('samples/trivialdrive')
-project(':opfiab-uitest').projectDir = new File('samples/opfiab-uitest')
+/**
+ * @author antonpp
+ * @since 15.05.15
+ */
+public class ProviderNameValidator extends ActionValidator<SetupResponse> {
+
+    private final String name;
+
+    public ProviderNameValidator(String name) {
+        super(SetupResponse.class);
+        this.name = name;
+    }
+
+    @Override
+    public ValidationResult validate(SetupResponse action) {
+        return action.getBillingProvider().getInfo().getName().equals(name) ? ValidationResult.OK : ValidationResult.FAIL;
+    }
+}

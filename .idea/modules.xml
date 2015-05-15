@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/opfiab-providers/google/google.iml" filepath="$PROJECT_DIR$/opfiab-providers/google/google.iml" />
       <module fileurl="file://$PROJECT_DIR$/opfiab/opfiab.iml" filepath="$PROJECT_DIR$/opfiab/opfiab.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/opfiab-uitest/opfiab-uitest.iml" filepath="$PROJECT_DIR$/samples/opfiab-uitest/opfiab-uitest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opfiab-testmanager/opfiab-testmanager.iml" filepath="$PROJECT_DIR$/opfiab-testmanager/opfiab-testmanager.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/trivialdrive/trivialdrive.iml" filepath="$PROJECT_DIR$/samples/trivialdrive/trivialdrive.iml" />
     </modules>
   </component>
