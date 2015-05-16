@@ -35,6 +35,7 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.trivialdrive.TrivialApplication;
 import org.onepf.trivialdrive.ui.view.TrivialView;
 
 
@@ -88,6 +89,12 @@ public class TrivialFragment extends Fragment
         //noinspection AssignmentToNull
         trivialView = null;
         super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        TrivialApplication.getRefWatcher(getActivity()).watch(this);
     }
 
     @Override
