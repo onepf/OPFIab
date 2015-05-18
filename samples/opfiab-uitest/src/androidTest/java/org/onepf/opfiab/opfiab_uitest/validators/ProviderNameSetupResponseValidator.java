@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_testmanager;
+package org.onepf.opfiab.opfiab_uitest.validators;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import org.onepf.opfiab.model.event.SetupResponse;
 
 /**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ * @author antonpp
+ * @since 15.05.15
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+public class ProviderNameSetupResponseValidator extends ActionValidator<SetupResponse> {
+
+    private final String name;
+
+    public ProviderNameSetupResponseValidator(String name) {
+        super(SetupResponse.class);
+        this.name = name;
+    }
+
+    @Override
+    public ValidationResult validate(SetupResponse action) {
+        return action.getBillingProvider().getInfo().getName().equals(name) ? ValidationResult.OK : ValidationResult.FAIL;
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_testmanager;
+package org.onepf.opfiab.opfiab_uitest;
 
 import android.support.annotation.NonNull;
 
@@ -27,8 +27,8 @@ import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.opfiab.opfiab_testmanager.validators.ActionValidator;
-import org.onepf.opfiab.opfiab_testmanager.validators.ActionValidator.ValidationResult;
+import org.onepf.opfiab.opfiab_uitest.validators.ActionValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.ActionValidator.ValidationResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;

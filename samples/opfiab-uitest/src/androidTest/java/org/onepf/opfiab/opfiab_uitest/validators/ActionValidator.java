@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_testmanager.validators;
+package org.onepf.opfiab.opfiab_uitest.validators;
 
 /**
  * @author antonpp
