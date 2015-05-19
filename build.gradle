@@ -47,4 +47,9 @@ allprojects {
         compileSdkVersion = 21
         buildToolsVersion = "22.0.1"
     }
+
+    configurations.all {
+        // check for updates every build
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
 }

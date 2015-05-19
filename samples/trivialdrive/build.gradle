@@ -17,7 +17,6 @@
 apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 apply plugin: 'idea'
-apply plugin: 'com.noveogroup.android.check'
 
 android {
     compileSdkVersion project.compileSdkVersion
@@ -28,7 +27,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 28
-        versionName "0.2.1"
+        versionName "0.2.2-SNAPSHOT"
     }
 
     signingConfigs {
@@ -56,18 +55,6 @@ android {
     }
 }
 
-check {
-    abortOnError false
-
-    checkstyle {
-        config rootProject.file('config/checkstyle.xml')
-    }
-
-    pmd {
-        config rootProject.file('config/pmd.xml')
-    }
-}
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
@@ -77,12 +64,22 @@ dependencies {
     // OPFIab core
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'org.onepf:opfutils:0.1.22'
-    compile 'org.onepf:opfiab:0.2.1@aar'
+    compile ('org.onepf:opfiab:0.2.+@aar') {
+        changing = true
+    }
     // OPFIab Google
-    compile 'org.onepf:opfiab-google:0.2.1@aar'
+    compile ('org.onepf:opfiab-google:0.2.+@aar') {
+        changing = true
+    }
     // OPFIab Amazon
-    compile 'org.onepf:opfiab-amazon:0.2.1@aar'
+    compile ('org.onepf:opfiab-amazon:0.2.+@aar') {
+        changing = true
+    }
     compile 'com.amazon:in-app-purchasing:2.0.61'
 
     compile 'com.makeramen:dragsortadapter:1.1.0'
+
+    // Leak Canary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3'
 }
