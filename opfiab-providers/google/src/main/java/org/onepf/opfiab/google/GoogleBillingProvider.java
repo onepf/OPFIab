@@ -371,11 +371,14 @@ public class GoogleBillingProvider
             extends BaseBillingProvider.Builder<GoogleSkuResolver, PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
-            super(context, GoogleSkuResolver.DEFAULT, PurchaseVerifier.DEFAULT);
+            super(context, null, PurchaseVerifier.DEFAULT);
         }
 
         @Override
         public GoogleBillingProvider build() {
+            if (skuResolver == null) {
+                throw new IllegalStateException("GoogleSkuResolver must be set.");
+            }
             return new GoogleBillingProvider(context, skuResolver, purchaseVerifier);
         }
 

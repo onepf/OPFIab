@@ -30,8 +30,8 @@ import org.onepf.opfiab.verification.PurchaseVerifier;
 
 import java.util.Set;
 
-public class SamsungBillingProvider extends ActivityBillingProvider<SamsungSkuResolver, PurchaseVerifier> {
-
+public class SamsungBillingProvider
+        extends ActivityBillingProvider<SamsungSkuResolver, PurchaseVerifier> {
 
 
     protected SamsungBillingProvider(@NonNull final Context context,
@@ -39,31 +39,6 @@ public class SamsungBillingProvider extends ActivityBillingProvider<SamsungSkuRe
                                      @NonNull final PurchaseVerifier purchaseVerifier,
                                      @NonNull final BillingMode billingMode) {
         super(context, skuResolver, purchaseVerifier);
-    }
-
-    @Override
-    protected void onActivityResult(final Activity activity, final int i, final int i1,
-                                    final Intent intent) {
-    }
-
-    @Override
-    protected void purchase(final Activity activity, final String s) {
-
-    }
-
-    @Override
-    protected void skuDetails(final Set set) {
-
-    }
-
-    @Override
-    protected void inventory(final boolean b) {
-
-    }
-
-    @Override
-    protected void consume(final Purchase purchase) {
-
     }
 
     @NonNull
@@ -77,8 +52,35 @@ public class SamsungBillingProvider extends ActivityBillingProvider<SamsungSkuRe
 
     }
 
+    @Override
+    protected void purchase(@SuppressWarnings("NullableProblems") @NonNull final Activity activity,
+                            @NonNull final String sku) {
 
-    public static class Builder extends BaseBillingProvider.Builder<SamsungSkuResolver, PurchaseVerifier> {
+    }
+
+    @Override
+    protected void skuDetails(@NonNull final Set<String> skus) {
+
+    }
+
+    @Override
+    protected void inventory(final boolean startOver) {
+
+    }
+
+    @Override
+    protected void consume(@NonNull final Purchase purchase) {
+
+    }
+
+    @Override
+    protected void onActivityResult(@NonNull final Activity activity, final int requestCode,
+                                    final int resultCode, @NonNull final Intent data) {
+
+    }
+
+    public static class Builder
+            extends BaseBillingProvider.Builder<SamsungSkuResolver, PurchaseVerifier> {
 
         @NonNull
         private BillingMode billingMode = BillingMode.PRODUCTION;

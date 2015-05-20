@@ -371,14 +371,14 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
         @NonNull
         protected final Context context;
-        @NonNull
+        @Nullable
         protected R skuResolver;
-        @NonNull
+        @Nullable
         protected V purchaseVerifier;
 
         protected Builder(@NonNull final Context context,
-                          @NonNull final R skuResolver,
-                          @NonNull final V purchaseVerifier) {
+                          @Nullable final R skuResolver,
+                          @Nullable final V purchaseVerifier) {
             this.context = context;
             this.skuResolver = skuResolver;
             this.purchaseVerifier = purchaseVerifier;

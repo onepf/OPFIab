@@ -28,29 +28,6 @@ import org.onepf.opfiab.sku.SkuResolver;
 public interface GoogleSkuResolver extends SkuResolver {
 
     /**
-     * Default implementation of {@link GoogleSkuResolver} that maps SKUs to themselves.
-     */
-    GoogleSkuResolver DEFAULT = new GoogleSkuResolver() {
-        @NonNull
-        @Override
-        public SkuType resolveType(@NonNull final String sku) {
-            return SkuType.UNKNOWN;
-        }
-
-        @NonNull
-        @Override
-        public String resolve(@NonNull final String sku) {
-            return SkuResolver.DEFAULT.resolve(sku);
-        }
-
-        @NonNull
-        @Override
-        public String revert(@NonNull final String resolvedSku) {
-            return SkuResolver.DEFAULT.revert(resolvedSku);
-        }
-    };
-
-    /**
      * Resolves type of supplied SKU.
      *
      * @param sku SKU to resolve type for.

@@ -50,8 +50,8 @@ android {
         checkAllWarnings true
         warningsAsErrors false
         disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
-                'IconMissingDensityFolder', 'IconExpectedSize', 'RtlSymmetry', 'RtlHardcoded',
-                'IconDensities', 'ButtonStyle'
+                'GradleDynamicVersion', 'IconMissingDensityFolder', 'IconExpectedSize',
+                'RtlSymmetry', 'RtlHardcoded', 'IconDensities', 'ButtonStyle'
     }
 }
 
@@ -64,15 +64,15 @@ dependencies {
     // OPFIab core
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'org.onepf:opfutils:0.1.22'
-    compile ('org.onepf:opfiab:0.2.+@aar') {
+    compile('org.onepf:opfiab:0.2.+@aar') {
         changing = true
     }
     // OPFIab Google
-    compile ('org.onepf:opfiab-google:0.2.+@aar') {
+    compile('org.onepf:opfiab-google:0.2.+@aar') {
         changing = true
     }
     // OPFIab Amazon
-    compile ('org.onepf:opfiab-amazon:0.2.+@aar') {
+    compile('org.onepf:opfiab-amazon:0.2.+@aar') {
         changing = true
     }
     compile 'com.amazon:in-app-purchasing:2.0.61'

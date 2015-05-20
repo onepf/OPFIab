@@ -48,7 +48,8 @@ android {
         abortOnError true
         checkAllWarnings true
         warningsAsErrors true
-        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
+        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
+                'GradleDynamicVersion'
     }
 }
 
