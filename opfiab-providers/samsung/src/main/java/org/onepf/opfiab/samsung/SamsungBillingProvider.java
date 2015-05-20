@@ -21,9 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import com.sec.android.iap.lib.helper.SamsungIapHelper;
-
 import org.onepf.opfiab.billing.ActivityBillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.sku.SkuResolver;
@@ -31,13 +30,14 @@ import org.onepf.opfiab.verification.PurchaseVerifier;
 
 import java.util.Set;
 
-public class SamsungBillingProvider extends ActivityBillingProvider<SkuResolver, PurchaseVerifier> {
+public class SamsungBillingProvider extends ActivityBillingProvider<SamsungSkuResolver, PurchaseVerifier> {
 
 
 
     protected SamsungBillingProvider(@NonNull final Context context,
-                                     @NonNull final SkuResolver skuResolver,
-                                     @NonNull final PurchaseVerifier purchaseVerifier) {
+                                     @NonNull final SamsungSkuResolver skuResolver,
+                                     @NonNull final PurchaseVerifier purchaseVerifier,
+                                     @NonNull final BillingMode billingMode) {
         super(context, skuResolver, purchaseVerifier);
     }
 
@@ -75,5 +75,30 @@ public class SamsungBillingProvider extends ActivityBillingProvider<SkuResolver,
     @Override
     public void checkManifest() {
 
+    }
+
+
+    public static class Builder extends BaseBillingProvider.Builder<SamsungSkuResolver, PurchaseVerifier> {
+
+        @NonNull
+        private BillingMode billingMode = BillingMode.PRODUCTION;
+
+        public Builder(@NonNull final Context context) {
+            super(context, null, PurchaseVerifier.DEFAULT);
+        }
+
+        @NonNull
+        public Builder setBillingMode(@NonNull final BillingMode billingMode) {
+            this.billingMode = billingMode;
+            return this;
+        }
+
+        @Override
+        public SamsungBillingProvider build() {
+            if (skuResolver == null) {
+                throw new IllegalStateException("SamsungSkuResolver must be set.");
+            }
+            return null;
+        }
     }
 }

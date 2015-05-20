@@ -5,8 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/OPFIab.iml" filepath="$PROJECT_DIR$/OPFIab.iml" />
       <module fileurl="file://$PROJECT_DIR$/opfiab-providers/amazon/amazon.iml" filepath="$PROJECT_DIR$/opfiab-providers/amazon/amazon.iml" />
       <module fileurl="file://$PROJECT_DIR$/opfiab-providers/google/google.iml" filepath="$PROJECT_DIR$/opfiab-providers/google/google.iml" />
-      <module fileurl="file://$PROJECT_DIR$/opfiab-providers/samsung/samsung.iml" filepath="$PROJECT_DIR$/opfiab-providers/samsung/samsung.iml" />
       <module fileurl="file://$PROJECT_DIR$/opfiab/opfiab.iml" filepath="$PROJECT_DIR$/opfiab/opfiab.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opfiab-providers/samsung/samsung.iml" filepath="$PROJECT_DIR$/opfiab-providers/samsung/samsung.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/trivialdrive/trivialdrive.iml" filepath="$PROJECT_DIR$/samples/trivialdrive/trivialdrive.iml" />
     </modules>
   </component>
