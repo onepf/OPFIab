@@ -34,7 +34,7 @@ Unfortunately OpenIAB has some fundamental flaws.
 It carries heavy burden of legacy architecture from Google's IabHelper it was initially based upon. It adopted unfinished concept of OpenStores and encapsulated a lot of different app stores in one bundle which made it really difficult to maintain.
 
 Most notable advantages for using OPFIab:
-* **Moduled architecture** One appstore - one module. Use only modules you need. It's easy to extend existing module and change their behaviour if you need to.
+* **Moduled architecture** One appstore - one module. Use only modules you need. It's easy to extend existing modules and change their behaviour if you need to.
 * **Straightforward library configuration** It should only be setup once and preferably form `Application#onCreate` since this is the only code guaranteed to be executed if app was started from `BroadcastReceiver`.
 * **Simple listeners API** Library offers one global listener to handle all billing event which is useful to save persistent changes (DataBase, SharedPreferences etc.) as well as dynamic listeners intended to simplify UI updates.
 * Overall better quality code with more android-friendly architecture and less concurrency pitfalls.
