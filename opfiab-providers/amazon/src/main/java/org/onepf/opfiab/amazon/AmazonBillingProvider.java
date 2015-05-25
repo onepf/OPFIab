@@ -339,7 +339,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
         @Override
         public BaseBillingProvider build() {
-            return new AmazonBillingProvider(context, skuResolver, purchaseVerifier);
+            return new AmazonBillingProvider(context,
+                         skuResolver == null ? SkuResolver.DEFAULT : skuResolver,
+                         purchaseVerifier== null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
         }
 
         @Override

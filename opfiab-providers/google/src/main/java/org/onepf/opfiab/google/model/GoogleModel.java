@@ -19,11 +19,12 @@ package org.onepf.opfiab.google.model;
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;
+import org.onepf.opfiab.model.JsonModel;
 
 /**
  * Parent of a few Google billing model classes.
  */
-public class GoogleModel extends BillingModel {
+public class GoogleModel extends JsonModel {
 
     private static final String NAME_PRODUCT_ID = "productId";
 

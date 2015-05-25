@@ -14,24 +14,33 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.samsung.model;
+package org.onepf.opfiab.model;
 
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-abstract class BillingModel {
+/**
+ * Simple model class that represents java object created from JSON.
+ */
+public abstract class JsonModel {
 
     @NonNull
     protected final JSONObject jsonObject;
     @NonNull
     private final String originalJson;
 
-    public BillingModel(@NonNull final String originalJson)
+    public JsonModel(@NonNull final String originalJson)
             throws JSONException {
         this.jsonObject = new JSONObject(originalJson);
         this.originalJson = originalJson;
+    }
+
+    public JsonModel(@NonNull final JSONObject jsonObject)
+            throws JSONException {
+        this.jsonObject = jsonObject;
+        this.originalJson = jsonObject.toString();
     }
 
     /**

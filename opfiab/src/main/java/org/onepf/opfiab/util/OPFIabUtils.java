@@ -212,9 +212,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(skuDetails.getSku(), sku)) {
             return skuDetails;
         }
-        final SkuDetails.Builder builder = new SkuDetails.Builder(sku);
-        builder.setSkuDetails(skuDetails);
-        return builder.build();
+        return skuDetails.substituteSku(sku);
     }
 
     public static Purchase substituteSku(@NonNull final Purchase purchase,
@@ -222,9 +220,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(purchase.getSku(), sku)) {
             return purchase;
         }
-        final Purchase.Builder builder = new Purchase.Builder(sku);
-        builder.setPurchase(purchase);
-        return builder.build();
+        return purchase.substituteSku(sku);
     }
 
     public static SkuDetails resolve(@NonNull final SkuResolver skuResolver,

@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.billing.SignedPurchase;
 import org.onepf.opfutils.OPFLog;
 
 import java.security.InvalidKeyException;
@@ -61,16 +62,9 @@ public abstract class PublicKeyPurchaseVerifier implements PurchaseVerifier {
      * @return Data to verify.
      */
     @Nullable
-    protected abstract String getData(@NonNull final Purchase purchase);
-
-    /**
-     * Gets signature to sign data with.
-     *
-     * @param purchase Purchase to get sighnature from.
-     * @return Signature to sign data.
-     */
-    @Nullable
-    protected abstract String getSignature(@NonNull final Purchase purchase);
+    protected String getData(@NonNull final Purchase purchase) {
+        return purchase.getOriginalJson();
+    }
 
     @NonNull
     private PublicKey publicKey() {
@@ -120,6 +114,11 @@ public abstract class PublicKeyPurchaseVerifier implements PurchaseVerifier {
     @NonNull
     @Override
     public VerificationResult verify(@NonNull final Purchase purchase) {
-        return verify(getData(purchase), getSignature(purchase));
+        if (purchase instanceof SignedPurchase) {
+            final SignedPurchase signedPurchase = (SignedPurchase) purchase;
+            return verify(getData(purchase), signedPurchase.getSignature());
+        }
+        OPFLog.e("Can't verify unsigned purchase!", purchase);
+        return VerificationResult.ERROR;
     }
 }

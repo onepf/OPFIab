@@ -121,6 +121,12 @@ public class SkuDetails extends BillingModel {
                 && TextUtils.isEmpty(description);
     }
 
+    @NonNull
+    @Override
+    public SkuDetails substituteSku(@NonNull final String sku) {
+        return new Builder(sku).setSkuDetails(this).build();
+    }
+
     @SuppressWarnings("PMD.NPathComplexity")
     @NonNull
     @Override
@@ -143,13 +149,13 @@ public class SkuDetails extends BillingModel {
     public static class Builder extends BillingModel.Builder {
 
         @Nullable
-        private String price;
+        protected String price;
         @Nullable
-        private String title;
+        protected String title;
         @Nullable
-        private String description;
+        protected String description;
         @Nullable
-        private String iconUrl;
+        protected String iconUrl;
 
         public Builder(@NonNull final String sku) {
             super(sku);

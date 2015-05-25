@@ -3,8 +3,9 @@ package org.onepf.opfiab.samsung.model;
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;
+import org.onepf.opfiab.model.JsonModel;
 
-public class SamsungVerification extends BillingModel {
+public class SamsungVerification extends JsonModel {
 
     private static final String KEY_ITEM_ID ="itemId";
     private static final String KEY_ITEM_NAME = "itemName";
