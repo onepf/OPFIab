@@ -16,25 +16,20 @@
 
 package org.onepf.opfiab.opfiab_uitest.validators;
 
+import org.onepf.opfiab.model.event.SetupStartedEvent;
+
 /**
  * @author antonpp
- * @since 15.05.15
+ * @since 25.05.15
  */
-public abstract class ActionValidator<T> {
+public class SetupStartedEventValidator extends TypedEventValidator<SetupStartedEvent> {
 
-    private final Class<?> clazz;
-
-    protected ActionValidator(Class<?> clazz) {
-        this.clazz = clazz;
+    public SetupStartedEventValidator() {
+        super(SetupStartedEvent.class);
     }
 
-    public Class<?> getActionClass() {
-        return clazz;
-    }
-
-    public abstract ValidationResult validate(T action);
-
-    public enum ValidationResult {
-        OK, FAIL
+    @Override
+    public boolean validate(Object event) {
+        return super.validate(event);
     }
 }

@@ -16,26 +16,18 @@
 
 package org.onepf.opfiab.opfiab_uitest;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
-
+import android.util.Log;
+import android.util.Pair;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
-import org.onepf.opfiab.model.event.billing.BillingRequest;
-import org.onepf.opfiab.model.event.billing.BillingResponse;
-import org.onepf.opfiab.model.event.billing.ConsumeResponse;
-import org.onepf.opfiab.model.event.billing.InventoryResponse;
-import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.opfiab.opfiab_uitest.validators.ActionValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.ActionValidator.ValidationResult;
+import org.onepf.opfiab.model.event.billing.*;
+import org.onepf.opfiab.opfiab_uitest.validators.EventValidator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 /**
  * @author antonpp
@@ -43,106 +35,161 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestManager implements BillingListener {
 
-    private final List<ActionValidator> actionValidators;
-    private final CountDownLatch testLatch;
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+    private static final String TAG = TestManager.class.getSimpleName();
 
-    private int currentAction;
+    private final Queue<EventValidator> eventValidators;
+    private final List<Pair<Object, Boolean>> receivedEvents;
+    private final boolean skipWrongEvents;
+    private final TestResultListener resultListener;
+
+    private int currentEvent;
     private String errorMsg;
+    private boolean isTestOver = false;
 
-    private TestManager(List<ActionValidator> actionValidators) {
-        this.actionValidators = actionValidators;
-        this.testLatch = new CountDownLatch(actionValidators.size());
+    private Runnable timeoutRunnable;
+
+    private TestManager(Queue<EventValidator> eventValidators, boolean skipWrongEvents, TestResultListener resultListener) {
+        this.eventValidators = eventValidators;
+        this.skipWrongEvents = skipWrongEvents;
+        this.resultListener = resultListener;
+        this.receivedEvents = new ArrayList<>();
     }
 
-    private void validateAction(Object action) {
-        final ActionValidator validator = actionValidators.get(currentAction);
-        if (!action.getClass().equals(validator.getActionClass())) {
-            fail(String.format("Invalid action received. Expected: %s, received: %s.",
-                    validator.getActionClass(), action.getClass()));
+    private void validateEvent(Object event) {
+//        if (isTestOver) {
+//            return;
+//        }
+        final EventValidator validator = eventValidators.peek();
+        final boolean validationResult = validator.validate(event);
+        if (validationResult) {
+            eventValidators.poll();
+        } else if (skipWrongEvents) {
+            Log.d(TAG, "skipping event " + event.getClass().getSimpleName());
+        } else {
+            finishTest(false);
         }
-        final ValidationResult validationResult = validator.validate(validator.getActionClass().cast(action));
-        if (validationResult != ValidationResult.OK) {
-            fail(String.format("Validation failed on %d action. Action:\n%s", currentAction, action));
+        receivedEvents.add(new Pair<>(event, validationResult));
+        if (eventValidators.isEmpty()) {
+            finishTest(true);
         }
-        testLatch.countDown();
-        ++currentAction;
     }
 
-    public boolean startTest(long timeout) throws InterruptedException {
-        return (errorMsg == null) && testLatch.await(timeout, TimeUnit.MILLISECONDS);
+    public void startTest(final long timeout) {
+        HANDLER.postDelayed(timeoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG, String.format("Did not receive all expected events (%d of %d). %s", currentEvent, eventValidators.size(), getStringEvents()));
+                finishTest(false);
+            }
+        }, timeout);
     }
 
-    public String getErrorMsg() {
-        return errorMsg;
+    private void finishTest(boolean result) {
+        HANDLER.removeCallbacks(timeoutRunnable);
+        isTestOver = true;
+        resultListener.onTestResult(result);
     }
 
-    private void fail(String msg) {
-        errorMsg = msg;
-        while (testLatch.getCount() > 0) {
-            testLatch.countDown();
+    public List<Pair<Object, Boolean>> getReceivedEvents() {
+        return receivedEvents;
+    }
+
+    private String getStringEvents() {
+        final StringBuilder sb = new StringBuilder("Received Events: [");
+        if (receivedEvents.isEmpty()) {
+            sb.append(']');
+            return sb.toString();
         }
+        for (Pair<Object, Boolean> event : receivedEvents) {
+            sb.append(event.first.getClass().getSimpleName())
+                    .append(String.format(" (%s)", event.second ? "+" : "-"))
+                    .append(", \n");
+        }
+        sb.delete(sb.length() - 3, sb.length());
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override
     public void onRequest(@NonNull BillingRequest billingRequest) {
-        validateAction(billingRequest);
+        validateEvent(billingRequest);
     }
 
     @Override
     public void onResponse(@NonNull BillingResponse billingResponse) {
-        validateAction(billingResponse);
+        validateEvent(billingResponse);
     }
 
     @Override
     public void onConsume(@NonNull ConsumeResponse consumeResponse) {
-        validateAction(consumeResponse);
+        validateEvent(consumeResponse);
     }
 
     @Override
     public void onInventory(@NonNull InventoryResponse inventoryResponse) {
-        validateAction(inventoryResponse);
+        validateEvent(inventoryResponse);
     }
 
     @Override
     public void onPurchase(@NonNull PurchaseResponse purchaseResponse) {
-        validateAction(purchaseResponse);
+        validateEvent(purchaseResponse);
     }
 
     @Override
     public void onSetupStarted(@NonNull SetupStartedEvent setupStartedEvent) {
-        validateAction(setupStartedEvent);
+        validateEvent(setupStartedEvent);
     }
 
     @Override
     public void onSetupResponse(@NonNull SetupResponse setupResponse) {
-        validateAction(setupResponse);
+        validateEvent(setupResponse);
     }
 
     @Override
     public void onSkuDetails(@NonNull SkuDetailsResponse skuDetailsResponse) {
-        validateAction(skuDetailsResponse);
+        validateEvent(skuDetailsResponse);
+    }
+
+    public interface TestResultListener {
+        void onTestResult(boolean passed);
     }
 
     public final static class Builder {
 
-        private final List<ActionValidator> actionValidators = new ArrayList<>();
+        private final Queue<EventValidator> eventValidators = new LinkedList<>();
+        private boolean skipWrongEvents = true;
+        private TestResultListener resultListener;
 
-        public Builder addAction(ActionValidator actionValidator) {
-            actionValidators.add(actionValidator);
+        public Builder setResultListener(TestResultListener resultListener) {
+            this.resultListener = resultListener;
             return this;
         }
 
-        public Builder addActions(ActionValidator... actionValidators) {
-            return addActions(Arrays.asList(actionValidators));
+        public Builder addEvent(EventValidator eventValidator) {
+            eventValidators.add(eventValidator);
+            return this;
         }
 
-        public Builder addActions(final Collection<ActionValidator> actionValidators) {
-            this.actionValidators.addAll(actionValidators);
+        public Builder addEvents(EventValidator... eventValidators) {
+            return addEvents(Arrays.asList(eventValidators));
+        }
+
+        public Builder addEvents(final Collection<EventValidator> eventValidators) {
+            this.eventValidators.addAll(eventValidators);
+            return this;
+        }
+
+        public Builder setSkipWrongEvents(boolean skipWrongEvents) {
+            this.skipWrongEvents = skipWrongEvents;
             return this;
         }
 
         public TestManager build() {
-            return new TestManager(actionValidators);
+            if (resultListener == null) {
+                throw new IllegalStateException("ResultListener must be set.");
+            }
+            return new TestManager(eventValidators, skipWrongEvents, resultListener);
         }
     }
 }

@@ -16,23 +16,28 @@
 
 package org.onepf.opfiab.opfiab_uitest.validators;
 
-import org.onepf.opfiab.model.event.SetupResponse;
+import android.util.Log;
 
 /**
  * @author antonpp
- * @since 15.05.15
+ * @since 25.05.15
  */
-public class ProviderNameSetupResponseValidator extends ActionValidator<SetupResponse> {
+public abstract class TypedEventValidator<T> implements EventValidator {
 
-    private final String name;
 
-    public ProviderNameSetupResponseValidator(String name) {
-        super(SetupResponse.class);
-        this.name = name;
+    private static final String TAG = TypedEventValidator.class.getSimpleName();
+    protected final Class<T> clazz;
+
+    protected TypedEventValidator(Class<T> clazz) {
+        this.clazz = clazz;
     }
 
     @Override
-    public ValidationResult validate(SetupResponse action) {
-        return action.getBillingProvider().getInfo().getName().equals(name) ? ValidationResult.OK : ValidationResult.FAIL;
+    public boolean validate(Object event) {
+        final boolean result = event.getClass().equals(clazz);
+        if (!result) {
+            Log.d(TAG, String.format("Wrong Type Event. Expected: %s. Received: %s", clazz.getSimpleName(), event.getClass().getSimpleName()));
+        }
+        return result;
     }
 }
