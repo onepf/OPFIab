@@ -14,14 +14,33 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.samsung;
+package org.onepf.opfiab.samsung.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.sku.SkuResolver;
+public enum ItemType {
 
-public interface SamsungSkuResolver extends SkuResolver {
+    CONSUMABLE("00"),
+    NON_CONSUMABLE("01"),
+    SUBSCRIPTION("02"),
+    ALL("10"),;
+
+    @Nullable
+    public static ItemType fromCode(@NonNull final String code) {
+        for (final ItemType itemType : values()) {
+            if (itemType.code.equals(code)) {
+                return itemType;
+            }
+        }
+        return null;
+    }
+
 
     @NonNull
-    String getGroupId();
+    private final String code;
+
+    ItemType(@NonNull final String code) {
+        this.code = code;
+    }
 }

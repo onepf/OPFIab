@@ -14,14 +14,33 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.samsung;
+package org.onepf.opfiab.google.model;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.sku.SkuResolver;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public interface SamsungSkuResolver extends SkuResolver {
+abstract class BillingModel {
 
     @NonNull
-    String getGroupId();
+    protected final JSONObject jsonObject;
+    @NonNull
+    private final String originalJson;
+
+    public BillingModel(@NonNull final String originalJson)
+            throws JSONException {
+        this.jsonObject = new JSONObject(originalJson);
+        this.originalJson = originalJson;
+    }
+
+    /**
+     * Gets JSON data associated with this billing model.
+     *
+     * @return JSON string.
+     */
+    @NonNull
+    public String getOriginalJson() {
+        return originalJson;
+    }
 }

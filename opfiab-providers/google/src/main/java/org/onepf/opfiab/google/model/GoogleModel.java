@@ -19,37 +19,21 @@ package org.onepf.opfiab.google.model;
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Parent of a few Google billing model classes.
  */
-public class GoogleModel {
+public class GoogleModel extends BillingModel {
 
     private static final String NAME_PRODUCT_ID = "productId";
 
 
     @NonNull
-    private final String originalJson;
-    @NonNull
     private final String productId;
 
-
-    protected GoogleModel(@NonNull final String originalJson, @NonNull final JSONObject jsonObject)
-            throws JSONException {
-        super();
-        this.originalJson = originalJson;
+    protected GoogleModel(@NonNull final String originalJson) throws JSONException {
+        super(originalJson);
         this.productId = jsonObject.getString(NAME_PRODUCT_ID);
-    }
-
-    /**
-     * Gets JSON data associated with this billing model.
-     *
-     * @return JSON string.
-     */
-    @NonNull
-    public String getOriginalJson() {
-        return originalJson;
     }
 
     /**

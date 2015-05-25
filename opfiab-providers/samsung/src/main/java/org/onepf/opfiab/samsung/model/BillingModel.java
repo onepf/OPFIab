@@ -14,33 +14,33 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.samsung;
+package org.onepf.opfiab.samsung.model;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-public enum ItemType {
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    CONSUMABLE("00"),
-    NON_CONSUMABLE("01"),
-    SUBSCRIPTION("02"),
-    ALL("10"),;
-
-    @Nullable
-    public static ItemType fromCode(@NonNull final String code) {
-        for (final ItemType itemType : values()) {
-            if (itemType.code.equals(code)) {
-                return itemType;
-            }
-        }
-        return null;
-    }
-
+abstract class BillingModel {
 
     @NonNull
-    private final String code;
+    protected final JSONObject jsonObject;
+    @NonNull
+    private final String originalJson;
 
-    ItemType(@NonNull final String code) {
-        this.code = code;
+    public BillingModel(@NonNull final String originalJson)
+            throws JSONException {
+        this.jsonObject = new JSONObject(originalJson);
+        this.originalJson = originalJson;
+    }
+
+    /**
+     * Gets JSON data associated with this billing model.
+     *
+     * @return JSON string.
+     */
+    @NonNull
+    public String getOriginalJson() {
+        return originalJson;
     }
 }
