@@ -34,6 +34,11 @@ proguard/
 .idea/workspace.xml
 .idea/misc.xml
 .idea/tasks.xml
+.idea/libraries
+.idea/scopes
+.idea/compiler
+.idea/encodings
+.idea/vcs.xml
 # .idea/dictionaries
 # and these sensitive or high-churn files:
 .idea/dataSources.ids
@@ -42,7 +47,8 @@ proguard/
 .idea/dynamic.xml
 # and, if using gradle::
 .idea/gradle.xml
-.idea/libraries
+.idea/modules
+
 
 ## File-based project format
 *.ipr
