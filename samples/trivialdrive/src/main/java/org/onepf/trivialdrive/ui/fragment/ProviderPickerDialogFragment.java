@@ -31,6 +31,7 @@ import android.widget.TextView;
 import org.onepf.trivialdrive.OnProviderPickerListener;
 import org.onepf.trivialdrive.Provider;
 import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.trivialdrive.TrivialApplication;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -93,6 +94,12 @@ public class ProviderPickerDialogFragment extends DialogFragment {
     public void onDetach() {
         listener = null;
         super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        TrivialApplication.getRefWatcher(getActivity()).watch(this);
     }
 
     private class Adapter extends ArrayAdapter<Provider> {

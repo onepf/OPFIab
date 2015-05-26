@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-include ':opfiab',
-        ':amazon',
-        ':google',
-        ':trivialdrive',
-        ':opfiab-uitest'
-        ':samsung'
+package org.onepf.opfiab.samsung;
 
-project(':amazon').projectDir = new File('opfiab-providers/amazon')
-project(':google').projectDir = new File('opfiab-providers/google')
-project(':samsung').projectDir = new File('opfiab-providers/samsung')
+public enum BillingMode {
 
-project(':trivialdrive').projectDir = new File('samples/trivialdrive')
-project(':opfiab-uitest').projectDir = new File('samples/opfiab-uitest')
+    TEST_SUCCESS(1),
+    TEST_FAIL(-1),
+    PRODUCTION(0),;
+
+    private final int code;
+
+    BillingMode(final int code) {
+        this.code = code;
+    }
+
+    public int getCode() {
+        return code;
+    }
+}

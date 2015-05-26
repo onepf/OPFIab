@@ -14,31 +14,33 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.google;
+package org.onepf.opfiab.samsung.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
+public enum ItemType {
 
-/**
- * Simple implementation of {@link PublicKeyPurchaseVerifier} that stores public key in insecure way.
- * <p>
- * It's strongly recommended to make your own implementation that doesn't store key as a plain
- * string.
- */
-public class SimpleGooglePurchaseVerifier extends PublicKeyPurchaseVerifier {
+    CONSUMABLE("00"),
+    NON_CONSUMABLE("01"),
+    SUBSCRIPTION("02"),
+    ALL("10"),;
 
-    @NonNull
-    private final String publicKey;
-
-    public SimpleGooglePurchaseVerifier(@NonNull final String publicKey) {
-        super();
-        this.publicKey = publicKey;
+    @Nullable
+    public static ItemType fromCode(@NonNull final String code) {
+        for (final ItemType itemType : values()) {
+            if (itemType.code.equals(code)) {
+                return itemType;
+            }
+        }
+        return null;
     }
 
+
     @NonNull
-    @Override
-    protected String getPublicKey() {
-        return publicKey;
+    private final String code;
+
+    ItemType(@NonNull final String code) {
+        this.code = code;
     }
 }

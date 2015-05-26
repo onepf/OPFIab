@@ -17,6 +17,10 @@
 package org.onepf.trivialdrive;
 
 import android.app.Application;
+import android.content.Context;
+
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.trivialdrive.BuildConfig;
@@ -24,6 +28,15 @@ import org.onepf.opfutils.OPFLog;
 
 
 public class TrivialApplication extends Application {
+
+    public static RefWatcher getRefWatcher(final Context context) {
+        final Context applicationContext = context.getApplicationContext();
+        final TrivialApplication application = (TrivialApplication) applicationContext;
+        return application.refWatcher;
+    }
+
+
+    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
@@ -33,5 +46,8 @@ public class TrivialApplication extends Application {
 
         OPFLog.setEnabled(true, true);
         OPFIab.init(this, TrivialBilling.getRelevantConfiguration(this));
+
+        refWatcher = LeakCanary.install(this);
     }
+
 }

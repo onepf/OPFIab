@@ -30,7 +30,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
-        versionName "0.2.1"
+        versionName "0.2.2-SNAPSHOT"
     }
 
     buildTypes {
@@ -49,7 +49,8 @@ android {
         abortOnError true
         checkAllWarnings true
         warningsAsErrors true
-        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage'
+        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
+                'GradleDynamicVersion'
     }
 }
 
@@ -67,9 +68,10 @@ check {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.google.code.findbugs:annotations:3.0.0'
+    debugCompile 'com.google.code.findbugs:annotations:3.0.0'
+    releaseCompile 'org.onepf.findbugs:annotations:1.0'
     compile 'com.android.support:support-annotations:21.0.3'
 
-    compile 'org.onepf:opfiab:0.2.1@aar'
+    compile project(':opfiab')
     provided 'org.onepf:opfutils:0.1.22'
 }

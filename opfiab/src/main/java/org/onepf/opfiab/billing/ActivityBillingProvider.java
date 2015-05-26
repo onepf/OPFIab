@@ -21,7 +21,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
@@ -34,13 +33,14 @@ import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 /**
- * Extension of {@link BillingProvider} which guarantees non-null {@link Activity} object in {@link #purchase(Activity, String)}.
+ * Extension of {@link BillingProvider} which guarantees non-null {@link Activity} object in {@link #purchase(Activity,
+ * String)}.
  * <br>
  * New instance of {@link OPFIabActivity} will be launched if necessary.
  */
@@ -48,20 +48,18 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         extends BaseBillingProvider<R, V> {
 
     /**
-     * <a href="http://imgs.xkcd.com/comics/random_number.png">Random Number</a> intended for use in
-     * {@link Activity#startActivityForResult(Intent, int)}.
-     * <p/>
-     * Use reflection if you absolutely need to change it.
+     * Default request code to use with {@link Activity#startActivityForResult(Intent, int)}.
+     * <p>
+     * Can be overridden with {@link #getRequestCodes()}.
      */
-    @SuppressFBWarnings({"NAB_NEEDLESS_BOX_TO_UNBOX"})
-    @SuppressWarnings({"UnnecessaryBoxing", "MagicNumber"})
-    protected static final int REQUEST_CODE = Integer.valueOf(13685093);
+    protected static final int REQUEST_CODE = 13685093;
     /**
      * Timeout to give up on waiting for a new activity instance.
      */
     private static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
 
 
+    private final Collection<Integer> requestCodes = getRequestCodes();
     /**
      * Used to block library thread to wait for a new activity instance.
      */
@@ -84,20 +82,26 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     }
 
     /**
-     * Handles result of activity previously started with {@link #REQUEST_CODE}.
+     * Gets request codes that should be handled by this billing provider.
+     *
+     * @return Collection of request codes that should be handled by this billing provider. Can't be
+     * null.
+     *
+     * @see #REQUEST_CODE
+     * @see Activity#startActivityForResult(Intent, int)
+     * @see Activity#onActivityResult(int, int, Intent)
      */
-    protected abstract void onActivityResult(@NonNull final Activity activity,
-                                             final int requestCode,
-                                             final int resultCode,
-                                             @NonNull final Intent data);
+    @NonNull
+    protected Collection<Integer> getRequestCodes() {
+        return Collections.singletonList(REQUEST_CODE);
+    }
 
     /**
      * @param activity can't be null.
      */
     @Override
-    protected abstract void purchase(
-            @SuppressWarnings("NullableProblems") @NonNull final Activity activity,
-            @NonNull final String sku);
+    protected abstract void purchase(@SuppressWarnings("NullableProblems") @NonNull final Activity activity,
+                                     @NonNull final String sku);
 
     @Override
     public void onEventAsync(@NonNull final BillingRequest billingRequest) {
@@ -145,10 +149,19 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
         final int requestCode = event.getRequestCode();
         final Intent data;
-        if (requestCode == REQUEST_CODE && (data = event.getData()) != null) {
+        if (requestCodes.contains(requestCode) && (data = event.getData()) != null) {
+            // This reqeust code should be hanled by billing provider
             final int resultCode = event.getResultCode();
             final Activity activity = event.getActivity();
             onActivityResult(activity, requestCode, resultCode, data);
         }
     }
+
+    /**
+     * Handles result of activity previously started with {@link #REQUEST_CODE}.
+     */
+    protected abstract void onActivityResult(@NonNull final Activity activity,
+                                             final int requestCode,
+                                             final int resultCode,
+                                             @NonNull final Intent data);
 }

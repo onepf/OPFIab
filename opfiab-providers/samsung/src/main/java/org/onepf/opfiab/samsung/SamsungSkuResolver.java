@@ -14,31 +14,14 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.google;
+package org.onepf.opfiab.samsung;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.verification.PublicKeyPurchaseVerifier;
+import org.onepf.opfiab.sku.SkuResolver;
 
-/**
- * Simple implementation of {@link PublicKeyPurchaseVerifier} that stores public key in insecure way.
- * <p>
- * It's strongly recommended to make your own implementation that doesn't store key as a plain
- * string.
- */
-public class SimpleGooglePurchaseVerifier extends PublicKeyPurchaseVerifier {
+public interface SamsungSkuResolver extends SkuResolver {
 
     @NonNull
-    private final String publicKey;
-
-    public SimpleGooglePurchaseVerifier(@NonNull final String publicKey) {
-        super();
-        this.publicKey = publicKey;
-    }
-
-    @NonNull
-    @Override
-    protected String getPublicKey() {
-        return publicKey;
-    }
+    String getGroupId();
 }

@@ -35,9 +35,9 @@ import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
 import org.onepf.opfiab.google.model.ItemType;
 import org.onepf.opfiab.google.model.PurchaseState;
-import org.onepf.opfiab.google.model.SignedPurchase;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.billing.SignedPurchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.Status;
@@ -136,16 +136,18 @@ public class GoogleBillingProvider
      * @return Newly constructed purchase object, can't be null.
      */
     @NonNull
-    protected Purchase newPurchase(@NonNull final GooglePurchase googlePurchase) {
+    protected Purchase newPurchase(@NonNull final GooglePurchase googlePurchase,
+                                         @Nullable final String signature) {
         final String sku = googlePurchase.getProductId();
         final SkuType skuType = skuResolver.resolveType(sku);
-        return new Purchase.Builder(sku)
+        return new SignedPurchase.Builder(sku)
                 .setType(skuType)
                 .setProviderInfo(getInfo())
                 .setOriginalJson(googlePurchase.getOriginalJson())
                 .setToken(googlePurchase.getPurchaseToken())
                 .setPurchaseTime(googlePurchase.getPurchaseTime())
                 .setCanceled(googlePurchase.getPurchaseState() == PurchaseState.CANCELED)
+                .setSignature(signature)
                 .build();
     }
 
@@ -323,10 +325,9 @@ public class GoogleBillingProvider
             final String data = dataList.get(i);
             try {
                 final GooglePurchase googlePurchase = new GooglePurchase(data);
-                final Purchase purchase = newPurchase(googlePurchase);
                 final String signature = signatureList.get(i);
-                final SignedPurchase signedPurchase = new SignedPurchase(purchase, signature);
-                inventory.add(signedPurchase);
+                final Purchase purchase = newPurchase(googlePurchase, signature);
+                inventory.add(purchase);
             } catch (JSONException exception) {
                 OPFLog.e("Failed to parse purchase data.", exception);
             }
@@ -361,9 +362,8 @@ public class GoogleBillingProvider
             return;
         }
 
-        final Purchase purchase = newPurchase(googlePurchase);
-        final SignedPurchase signedPurchase = new SignedPurchase(purchase, signature);
-        postPurchaseResponse(Status.SUCCESS, signedPurchase);
+        final Purchase purchase = newPurchase(googlePurchase, signature);
+        postPurchaseResponse(Status.SUCCESS, purchase);
     }
 
 
@@ -371,12 +371,16 @@ public class GoogleBillingProvider
             extends BaseBillingProvider.Builder<GoogleSkuResolver, PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
-            super(context, GoogleSkuResolver.DEFAULT, PurchaseVerifier.DEFAULT);
+            super(context, null, PurchaseVerifier.DEFAULT);
         }
 
         @Override
         public GoogleBillingProvider build() {
-            return new GoogleBillingProvider(context, skuResolver, purchaseVerifier);
+            if (skuResolver == null) {
+                throw new IllegalStateException("GoogleSkuResolver must be set.");
+            }
+            return new GoogleBillingProvider(context, skuResolver,
+                         purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
         }
 
         @Override

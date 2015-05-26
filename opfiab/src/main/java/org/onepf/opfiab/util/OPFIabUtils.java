@@ -16,6 +16,10 @@
 
 package org.onepf.opfiab.util;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -45,6 +49,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import static android.content.pm.PackageManager.GET_SIGNATURES;
 
 
 /**
@@ -78,6 +84,30 @@ public final class OPFIabUtils {
             OPFLog.e("", exception);
         }
         return "";
+    }
+
+    /**
+     * Retrieves signature form supplied package.
+     *
+     * @param context Context object to get {@link PackageManager} from.
+     * @param packageName Package to retrieve signature for.
+     *
+     * @return Signature object if package found, null otherwise.
+     */
+    @Nullable
+    public static Signature getPackageSignature(@NonNull final Context context,
+                                                @NonNull final String packageName) {
+        final PackageManager packageManager = context.getPackageManager();
+        try {
+            final PackageInfo info =  packageManager.getPackageInfo(packageName, GET_SIGNATURES);
+            final Signature[] signatures = info.signatures;
+            if (signatures.length > 0) {
+                return signatures[0];
+            }
+        } catch (PackageManager.NameNotFoundException exception) {
+            OPFLog.e("", exception);
+        }
+        return null;
     }
 
     /**
@@ -182,9 +212,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(skuDetails.getSku(), sku)) {
             return skuDetails;
         }
-        final SkuDetails.Builder builder = new SkuDetails.Builder(sku);
-        builder.setSkuDetails(skuDetails);
-        return builder.build();
+        return skuDetails.substituteSku(sku);
     }
 
     public static Purchase substituteSku(@NonNull final Purchase purchase,
@@ -192,9 +220,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(purchase.getSku(), sku)) {
             return purchase;
         }
-        final Purchase.Builder builder = new Purchase.Builder(sku);
-        builder.setPurchase(purchase);
-        return builder.build();
+        return purchase.substituteSku(sku);
     }
 
     public static SkuDetails resolve(@NonNull final SkuResolver skuResolver,
