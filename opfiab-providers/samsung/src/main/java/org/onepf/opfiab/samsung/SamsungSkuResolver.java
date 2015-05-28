@@ -23,5 +23,5 @@ import org.onepf.opfiab.sku.SkuResolver;
 public interface SamsungSkuResolver extends SkuResolver {
 
     @NonNull
-    String resolveGroupId(@NonNull final String sku);
+    String getGroupId();
 }

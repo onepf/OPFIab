@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.samsung;
+package org.onepf.opfiab.samsung.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

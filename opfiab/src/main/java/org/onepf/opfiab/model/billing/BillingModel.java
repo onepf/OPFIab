@@ -62,6 +62,18 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     }
 
     /**
+     * Makes copy of this BillingModel with different SKU.
+     *
+     * @param sku SKU to use for new copy.
+     *
+     * @return BillingModel identical to this one, except for SKU value.
+     *
+     * @see #getSku()
+     */
+    @NonNull
+    public abstract BillingModel substituteSku(@NonNull final String sku);
+
+    /**
      * Gets Store Keeping Unit (SKU) associated with this billing model.
      *
      * @return SKU associated with this billing model.
@@ -117,11 +129,6 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         return jsonObject;
     }
 
-    @Override
-    public String toString() {
-        return OPFIabUtils.toString(this);
-    }
-
     //CHECKSTYLE:OFF
     @SuppressWarnings({"PMD", "RedundantIfStatement"})
     @Override
@@ -147,6 +154,11 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         result = 31 * result + (providerInfo != null ? providerInfo.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return OPFIabUtils.toString(this);
+    }
     //CHECKSTYLE:ON
 
     /**
@@ -168,6 +180,19 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
+         * Sets existing billing model to use as base for a new billing model.
+         *
+         * @param billingModel BillingModel object to copy data from.
+         * @return this object.
+         */
+        protected Builder setBillingModel(@NonNull final BillingModel billingModel) {
+            setType(billingModel.getType());
+            setOriginalJson(billingModel.getOriginalJson());
+            setProviderInfo(billingModel.getProviderInfo());
+            return this;
+        }
+
+        /**
          * Sets type for a new billing model.
          *
          * @param type Type to set.
@@ -175,17 +200,6 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
          */
         protected Builder setType(@Nullable final SkuType type) {
             this.type = type;
-            return this;
-        }
-
-        /**
-         * Sets billing provider info for a new billing model.
-         *
-         * @param providerInfo BillingProviderInfo object to set.
-         * @return this object.
-         */
-        protected Builder setProviderInfo(@Nullable final BillingProviderInfo providerInfo) {
-            this.providerInfo = providerInfo;
             return this;
         }
 
@@ -201,15 +215,13 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
-         * Sets existing billing model to use as base for a new billing model.
+         * Sets billing provider info for a new billing model.
          *
-         * @param billingModel BillingModel object to copy data from.
+         * @param providerInfo BillingProviderInfo object to set.
          * @return this object.
          */
-        protected Builder setBillingModel(@NonNull final BillingModel billingModel) {
-            setType(billingModel.getType());
-            setOriginalJson(billingModel.getOriginalJson());
-            setProviderInfo(billingModel.getProviderInfo());
+        protected Builder setProviderInfo(@Nullable final BillingProviderInfo providerInfo) {
+            this.providerInfo = providerInfo;
             return this;
         }
 

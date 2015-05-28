@@ -19,7 +19,6 @@ package org.onepf.opfiab.google.model;
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * This model represents product available in Google Play.
@@ -45,9 +44,8 @@ public class GoogleSkuDetails extends GoogleModel {
     private final String description;
     private final long micros;
 
-    public GoogleSkuDetails(@NonNull final String originalJson,
-                            @NonNull final JSONObject jsonObject) throws JSONException {
-        super(originalJson, jsonObject);
+    public GoogleSkuDetails(@NonNull final String originalJson) throws JSONException {
+        super(originalJson);
         final String itemTypeCode = jsonObject.getString(NAME_TYPE);
         final ItemType itemType = ItemType.fromCode(itemTypeCode);
         if (itemType == null) {
@@ -60,10 +58,6 @@ public class GoogleSkuDetails extends GoogleModel {
         this.currency = jsonObject.getString(NAME_CURRENCY);
         this.title = jsonObject.getString(NAME_TITLE);
         this.description = jsonObject.getString(NAME_DESCRIPTION);
-    }
-
-    public GoogleSkuDetails(@NonNull final String originalJson) throws JSONException {
-        this(originalJson, new JSONObject(originalJson));
     }
 
     /**

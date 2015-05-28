@@ -20,6 +20,7 @@ import android.support.annotation.Nullable;
 
 @SuppressWarnings("MagicNumber")
 enum Response {
+
     ERROR_NONE(0),
     PAYMENT_IS_CANCELED(1),
     ERROR_INITIALIZATION(-1000),
@@ -29,7 +30,11 @@ enum Response {
     ERROR_WHILE_RUNNING(-1004),
     ERROR_PRODUCT_DOES_NOT_EXIST(-1005),
     ERROR_CONFIRM_INBOX(-1006),
-    ;
+    ERROR_ITEM_GROUP_ID_DOES_NOT_EXIST(-1007),
+    ERROR_NETWORK_NOT_AVAILABLE(-1008),
+    ERROR_IOEXCEPTION_ERROR(-1009),
+    ERROR_SOCKET_TIMEOUT(-1010),
+    ERROR_CONNECT_TIMEOUT(-1011),;
 
     @Nullable
     public static Response fromCode(final int code) {

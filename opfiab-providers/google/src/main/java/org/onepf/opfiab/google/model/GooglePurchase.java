@@ -20,7 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * This model represents purchase made in Google Play.
@@ -50,9 +49,8 @@ public class GooglePurchase extends GoogleModel {
     private final boolean autoRenewing;
 
 
-    public GooglePurchase(@NonNull final String originalJson, @NonNull final JSONObject jsonObject)
-            throws JSONException {
-        super(originalJson, jsonObject);
+    public GooglePurchase(@NonNull final String originalJson) throws JSONException {
+        super(originalJson);
         this.orderId = jsonObject.getString(NAME_ORDER_ID);
         this.packageName = jsonObject.getString(NAME_PACKAGE_NAME);
         this.purchaseToken = jsonObject.getString(NAME_PURCHASE_TOKEN);
@@ -67,12 +65,6 @@ public class GooglePurchase extends GoogleModel {
         }
         this.purchaseState = purchaseState;
     }
-
-    public GooglePurchase(@NonNull final String originalJson)
-            throws JSONException {
-        this(originalJson, new JSONObject(originalJson));
-    }
-
 
     /**
      * Gets a unique order identifier of the transaction. This identifier corresponds to the

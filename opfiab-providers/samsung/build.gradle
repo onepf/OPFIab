@@ -71,9 +71,6 @@ dependencies {
     releaseCompile 'org.onepf.findbugs:annotations:1.0'
     compile 'com.android.support:support-annotations:21.0.3'
 
-//    compile ('org.onepf:opfiab:0.2.+@aar') {
-//        changing = true
-//    }
     compile project(':opfiab')
     provided 'org.onepf:opfutils:0.1.22'
 }

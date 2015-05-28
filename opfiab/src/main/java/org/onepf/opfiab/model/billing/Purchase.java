@@ -90,6 +90,12 @@ public class Purchase extends BillingModel {
 
     @NonNull
     @Override
+    public Purchase substituteSku(@NonNull final String sku) {
+        return new Builder(sku).setPurchase(this).build();
+    }
+
+    @NonNull
+    @Override
     public JSONObject toJson() {
         final JSONObject jsonObject = super.toJson();
         try {
@@ -108,9 +114,9 @@ public class Purchase extends BillingModel {
     public static class Builder extends BillingModel.Builder {
 
         @Nullable
-        private String token;
-        private boolean canceled;
-        private long purchaseTime = -1L;
+        protected String token;
+        protected boolean canceled;
+        protected long purchaseTime = -1L;
 
         public Builder(@NonNull final String sku) {
             super(sku);

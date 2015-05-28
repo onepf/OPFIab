@@ -16,4 +16,7 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="org.onepf.opfiab.samsung">
+
+  <uses-permission android:name="com.sec.android.iap.permission.BILLING"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

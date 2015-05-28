@@ -37,9 +37,8 @@ class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
     private final BillingMode billingMode;
 
     public SamsungBillingHelper(@NonNull final Context context,
-                                @NonNull final Class<IAPConnector> clazz,
                                 @NonNull final BillingMode billingMode) {
-        super(context, clazz);
+        super(context, IAPConnector.class);
         this.billingMode = billingMode;
         this.packageName = context.getPackageName();
     }

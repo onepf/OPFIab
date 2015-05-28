@@ -16,29 +16,39 @@
 
 package org.onepf.opfiab.samsung;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-
 import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfutils.OPFChecks;
 
+import java.util.Collection;
 import java.util.Set;
 
 public class SamsungBillingProvider
         extends ActivityBillingProvider<SamsungSkuResolver, PurchaseVerifier> {
 
+    protected static final String NAME = "Samsung";
+    protected static final String PACKAGE = "com.sec.android.app.samsungapps";
+    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE);
+    protected static final String PERMISSION_BILLING = "com.sec.android.iap.permission.BILLING";
+    protected static final int REQUST_CODE_PURCHASE = REQUEST_CODE;
+    protected static final int REQUST_CODE_ACCOUNT = REQUEST_CODE + 1;
+    @NonNull
+    private final SamsungBillingHelper helper;
 
     protected SamsungBillingProvider(@NonNull final Context context,
                                      @NonNull final SamsungSkuResolver skuResolver,
                                      @NonNull final PurchaseVerifier purchaseVerifier,
                                      @NonNull final BillingMode billingMode) {
         super(context, skuResolver, purchaseVerifier);
+        this.helper = new SamsungBillingHelper(context, billingMode);
     }
 
     @NonNull
@@ -49,11 +59,18 @@ public class SamsungBillingProvider
 
     @Override
     public void checkManifest() {
+        OPFChecks.checkPermission(context, Manifest.permission.INTERNET);
+        OPFChecks.checkPermission(context, PERMISSION_BILLING);
+    }
 
+    @NonNull
+    @Override
+    protected Collection<Integer> getRequestCodes() {
+        return super.getRequestCodes();
     }
 
     @Override
-    protected void purchase(@SuppressWarnings("NullableProblems") @NonNull final Activity activity,
+    protected void purchase(@NonNull final Activity activity,
                             @NonNull final String sku) {
 
     }
@@ -74,9 +91,16 @@ public class SamsungBillingProvider
     }
 
     @Override
-    protected void onActivityResult(@NonNull final Activity activity, final int requestCode,
-                                    final int resultCode, @NonNull final Intent data) {
-
+    protected void onActivityResult(@NonNull final Activity activity,
+                                    final int requestCode,
+                                    final int resultCode,
+                                    @NonNull final Intent data) {
+        switch (requestCode) {
+            case REQUST_CODE_ACCOUNT:
+                break;
+            case REQUST_CODE_PURCHASE:
+                break;
+        }
     }
 
     public static class Builder
