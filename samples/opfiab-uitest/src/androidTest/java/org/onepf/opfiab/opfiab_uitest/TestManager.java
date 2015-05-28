@@ -21,6 +21,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Pair;
+
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
@@ -28,6 +29,8 @@ import org.onepf.opfiab.model.event.billing.*;
 import org.onepf.opfiab.opfiab_uitest.validators.EventValidator;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author antonpp
@@ -41,25 +44,25 @@ public class TestManager implements BillingListener {
     private final Queue<EventValidator> eventValidators;
     private final List<Pair<Object, Boolean>> receivedEvents;
     private final boolean skipWrongEvents;
-    private final TestResultListener resultListener;
 
     private int currentEvent;
     private String errorMsg;
     private boolean isTestOver = false;
 
     private Runnable timeoutRunnable;
+    private CountDownLatch testLatch;
+    private boolean testResult;
 
-    private TestManager(Queue<EventValidator> eventValidators, boolean skipWrongEvents, TestResultListener resultListener) {
+    private TestManager(Queue<EventValidator> eventValidators, boolean skipWrongEvents) {
         this.eventValidators = eventValidators;
         this.skipWrongEvents = skipWrongEvents;
-        this.resultListener = resultListener;
         this.receivedEvents = new ArrayList<>();
     }
 
     private void validateEvent(Object event) {
-//        if (isTestOver) {
-//            return;
-//        }
+        if (isTestOver) {
+            return;
+        }
         final EventValidator validator = eventValidators.peek();
         final boolean validationResult = validator.validate(event);
         if (validationResult) {
@@ -75,20 +78,23 @@ public class TestManager implements BillingListener {
         }
     }
 
-    public void startTest(final long timeout) {
-        HANDLER.postDelayed(timeoutRunnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, String.format("Did not receive all expected events (%d of %d). %s", currentEvent, eventValidators.size(), getStringEvents()));
-                finishTest(false);
-            }
-        }, timeout);
+    public boolean startTest(final long timeout) throws InterruptedException {
+        testResult = false;
+        testLatch = new CountDownLatch(1);
+        final boolean isTimeOver = !testLatch.await(timeout, TimeUnit.MILLISECONDS);
+        if (isTimeOver) {
+            Log.d(TAG,
+                  String.format("Did not receive all expected events (%d not received). %s",
+                                eventValidators.size(), getStringEvents()));
+            finishTest(false);
+        }
+        return testResult;
     }
 
     private void finishTest(boolean result) {
-        HANDLER.removeCallbacks(timeoutRunnable);
         isTestOver = true;
-        resultListener.onTestResult(result);
+        testResult = result;
+        testLatch.countDown();
     }
 
     public List<Pair<Object, Boolean>> getReceivedEvents() {
@@ -159,23 +165,17 @@ public class TestManager implements BillingListener {
 
         private final Queue<EventValidator> eventValidators = new LinkedList<>();
         private boolean skipWrongEvents = true;
-        private TestResultListener resultListener;
 
-        public Builder setResultListener(TestResultListener resultListener) {
-            this.resultListener = resultListener;
-            return this;
-        }
-
-        public Builder addEvent(EventValidator eventValidator) {
+        public Builder expectEvent(EventValidator eventValidator) {
             eventValidators.add(eventValidator);
             return this;
         }
 
-        public Builder addEvents(EventValidator... eventValidators) {
-            return addEvents(Arrays.asList(eventValidators));
+        public Builder expectEvents(EventValidator... eventValidators) {
+            return expectEvents(Arrays.asList(eventValidators));
         }
 
-        public Builder addEvents(final Collection<EventValidator> eventValidators) {
+        public Builder expectEvents(final Collection<EventValidator> eventValidators) {
             this.eventValidators.addAll(eventValidators);
             return this;
         }
@@ -186,10 +186,7 @@ public class TestManager implements BillingListener {
         }
 
         public TestManager build() {
-            if (resultListener == null) {
-                throw new IllegalStateException("ResultListener must be set.");
-            }
-            return new TestManager(eventValidators, skipWrongEvents, resultListener);
+            return new TestManager(eventValidators, skipWrongEvents);
         }
     }
 }

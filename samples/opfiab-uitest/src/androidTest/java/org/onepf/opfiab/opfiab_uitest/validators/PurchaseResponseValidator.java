@@ -35,7 +35,7 @@ public class PurchaseResponseValidator extends TypedEventValidator<PurchaseRespo
 
     @Override
     public boolean validate(Object event) {
-        if (super.validate(event)) {
+        if (!super.validate(event)) {
             return false;
         }
         final PurchaseResponse response = (PurchaseResponse) event;

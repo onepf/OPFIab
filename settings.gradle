@@ -18,7 +18,7 @@ include ':opfiab',
         ':amazon',
         ':google',
         ':trivialdrive',
-        ':opfiab-uitest'
+        ':opfiab-uitest',
         ':samsung'
 
 project(':amazon').projectDir = new File('opfiab-providers/amazon')

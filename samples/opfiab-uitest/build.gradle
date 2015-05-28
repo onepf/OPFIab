@@ -45,12 +45,11 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.1.1'
 
+    compile project(':opfiab')
+
     // OPFIab core
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'org.onepf:opfutils:0.1.21'
-    compile 'org.onepf:opfiab:0.2.1@aar'
-    // OPFIab Google
-    compile 'org.onepf:opfiab-google:0.2.1@aar'
 
     // App's dependencies, including test
     compile 'com.android.support:support-annotations:22.1.1'

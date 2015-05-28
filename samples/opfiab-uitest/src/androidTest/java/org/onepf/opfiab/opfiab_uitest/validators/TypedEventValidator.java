@@ -34,9 +34,10 @@ public abstract class TypedEventValidator<T> implements EventValidator {
 
     @Override
     public boolean validate(Object event) {
-        final boolean result = event.getClass().equals(clazz);
+        final boolean result = clazz.isInstance(event);
         if (!result) {
-            Log.d(TAG, String.format("Wrong Type Event. Expected: %s. Received: %s", clazz.getSimpleName(), event.getClass().getSimpleName()));
+            Log.d(TAG, String.format("Wrong Type Event. Expected: %s. Received: %s",
+                                     clazz.getSimpleName(), event.getClass().getSimpleName()));
         }
         return result;
     }

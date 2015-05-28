@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest.mock;
+package org.onepf.opfiab.opfiab_uitest;
 
-import org.onepf.opfiab.billing.BillingProvider;
+import android.app.Activity;
+import android.content.Intent;
 
-import java.util.Random;
+import org.onepf.opfiab.api.ActivityIabHelper;
 
 /**
  * @author antonpp
- * @since 14.05.15
+ * @since 26.05.15
  */
-public abstract class MockBillingProvider implements BillingProvider {
+public class EmptyActivity extends Activity {
 
-    public static final long SLEEP_TIME = 50;
-    private static final Random RND = new Random();
+    private ActivityIabHelper helper;
 
-    protected void sleep() {
-        try {
-            Thread.sleep((SLEEP_TIME + RND.nextLong() % SLEEP_TIME) / 2);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void setHelper(final ActivityIabHelper helper) {
+        this.helper = helper;
+    }
+
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode,
+                                    final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        helper.onActivityResult(this, requestCode, resultCode, data);
     }
 }
