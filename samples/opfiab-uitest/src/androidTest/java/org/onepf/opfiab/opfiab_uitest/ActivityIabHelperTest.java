@@ -35,6 +35,7 @@ import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
 import org.onepf.opfiab.opfiab_uitest.validators.EventValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
 
@@ -93,6 +94,7 @@ public class ActivityIabHelperTest {
         final BillingProvider billingProvider = prepareMockProvider(name);
         final Collection<EventValidator> eventValidators = new ArrayList<>(NUM_TESTS);
         eventValidators.add(new PurchaseRequestValidator(SKU_CONSUMABLE));
+        eventValidators.add(new PurchaseResponseValidator(name));
 
         final TestManager testManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
@@ -129,7 +131,7 @@ public class ActivityIabHelperTest {
         final BillingProvider billingProvider = prepareMockProvider(name);
 
         final TestManager testManager = new TestManager.Builder()
-                //                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupStartedEventValidator())
                 .expectEvent(new SetupResponseValidator(name))
                 .build();
 

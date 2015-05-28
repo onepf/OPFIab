@@ -31,8 +31,13 @@ import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
 import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -42,7 +47,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class AdvancedHelperTest {
 
-    private static final long MAX_WAIT_TIME = 5000L;
+    private static final long MAX_WAIT_TIME = 2000L;
 
     private static final int NUM_TESTS = 10;
 
@@ -114,6 +119,9 @@ public class AdvancedHelperTest {
                 .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
                 .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
                 .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
+                .expectEvent(new PurchaseResponseValidator(name))
+                .expectEvent(new PurchaseResponseValidator(name))
+                .expectEvent(new PurchaseResponseValidator(name))
                 .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .build();
 
@@ -136,6 +144,56 @@ public class AdvancedHelperTest {
                     iabHelper.purchase(SKU_CONSUMABLE);
                     iabHelper.purchase(SKU_NONCONSUMABLE);
                     iabHelper.purchase(SKU_SUBSCRIPTION);
+                }
+            }
+        });
+
+        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
+    }
+
+    @Test
+    public void testMultipleHelpersMultipleRequests() throws Exception {
+        final int n = 5;
+        final String name = "Absolutely random name";
+        final BillingProvider billingProvider = prepareMockProvider(name);
+        final List<AdvancedIabHelper> helpers = new ArrayList<>(n);
+
+        final TestManager testManager = new TestManager.Builder()
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(name))
+                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
+                .expectEvent(new PurchaseResponseValidator(name))
+                .expectEvent(new PurchaseResponseValidator(name))
+                .expectEvent(new PurchaseResponseValidator(name))
+                .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
+                .build();
+
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(testManager)
+                .build();
+
+        final Random rnd = new Random();
+        final String[] skus = new String[]{SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION};
+
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < NUM_TESTS; ++i) {
+                    OPFIab.init(activity.getApplication(), configuration);
+
+                    for (int j = 0; j < n; ++j) {
+                        helpers.add(OPFIab.getAdvancedHelper());
+                    }
+
+                    OPFIab.setup();
+
+                    for (int j = 0; j < NUM_TESTS; ++j) {
+                        helpers.get(rnd.nextInt(n)).purchase(skus[j % skus.length]);
+                    }
+
                 }
             }
         });
