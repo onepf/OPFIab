@@ -29,7 +29,7 @@ public class SetupStartedEventValidator extends TypedEventValidator<SetupStarted
     }
 
     @Override
-    public boolean validate(Object event) {
-        return super.validate(event);
+    public boolean validate(Object event, final boolean isLogging) {
+        return super.validate(event, isLogging);
     }
 }

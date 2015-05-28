@@ -16,11 +16,23 @@
 
 package org.onepf.opfiab.opfiab_uitest.util;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.model.event.RequestHandledEvent;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.verification.VerificationResult;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 
 /**
  * @author antonpp
@@ -30,7 +42,39 @@ public class MockBillingProviderBuilder {
 
     private final BillingProvider mock = mock(BillingProvider.class);
 
+    private static final long SLEEP_TIME = 50L;
+
     public MockBillingProviderBuilder() {
+        setWillPostSuccess(true);
+    }
+
+    public MockBillingProviderBuilder setWillPostSuccess(boolean willPostSuccess) {
+        final Answer<Void> answer;
+        if (willPostSuccess) {
+            answer = new Answer<Void>() {
+                @Override
+                public Void answer(final InvocationOnMock invocationOnMock) throws Throwable {
+                    final BillingRequest billingRequest = (BillingRequest)invocationOnMock.getArguments()[0];
+                    OPFIab.post(new RequestHandledEvent(billingRequest));
+                    sleep(SLEEP_TIME);
+                    OPFIab.post(new PurchaseResponse(SUCCESS, mock.getInfo(), null, VerificationResult.SUCCESS));
+                    return null;
+                }
+            };
+        } else {
+            answer = new Answer<Void>() {
+                @Override
+                public Void answer(final InvocationOnMock invocationOnMock) throws Throwable {
+                    final BillingRequest billingRequest = (BillingRequest)invocationOnMock.getArguments()[0];
+                    sleep(SLEEP_TIME);
+                    OPFIab.post(new RequestHandledEvent(billingRequest));
+                    OPFIab.post(OPFIabUtils.emptyResponse(mock.getInfo(), billingRequest, BILLING_UNAVAILABLE));
+                    return null;
+                }
+            };
+        }
+        doAnswer(answer).when(mock).onEventAsync(any(BillingRequest.class));
+        return this;
     }
 
     public MockBillingProviderBuilder setIsAuthorised(boolean isAuthorised) {
@@ -50,5 +94,13 @@ public class MockBillingProviderBuilder {
 
     public BillingProvider build() {
         return mock;
+    }
+
+    private static void sleep(long time) {
+        try {
+            Thread.sleep(SLEEP_TIME);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -34,8 +34,9 @@ import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
 import org.onepf.opfiab.opfiab_uitest.validators.EventValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,6 +57,7 @@ public class ActivityIabHelperTest {
     private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
     private static final int NUM_TESTS = 10;
+
     @Rule
     public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
 
@@ -90,13 +92,13 @@ public class ActivityIabHelperTest {
         final String name = "Absolutely random name";
         final BillingProvider billingProvider = prepareMockProvider(name);
         final Collection<EventValidator> eventValidators = new ArrayList<>(NUM_TESTS);
-        for (int i = 0; i < NUM_TESTS; ++i) {
-            eventValidators.add(new PurchaseResponseValidator(name));
-        }
+        eventValidators.add(new PurchaseRequestValidator(SKU_CONSUMABLE));
+
         final TestManager testManager = new TestManager.Builder()
-//                .expectEvent(new SetupStartedEventValidator())
-//                .expectEvent(new SetupResponseValidator(name))
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(name))
                 .expectEvents(eventValidators)
+                .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .build();
 
         final Configuration configuration = new Configuration.Builder()
@@ -117,7 +119,8 @@ public class ActivityIabHelperTest {
                 }
             }
         });
-        assertTrue(testManager.startTest(MAX_WAIT_TIME * NUM_TESTS));
+
+        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
     }
 
     @Test
@@ -126,7 +129,7 @@ public class ActivityIabHelperTest {
         final BillingProvider billingProvider = prepareMockProvider(name);
 
         final TestManager testManager = new TestManager.Builder()
-//                .expectEvent(new SetupStartedEventValidator())
+                //                .expectEvent(new SetupStartedEventValidator())
                 .expectEvent(new SetupResponseValidator(name))
                 .build();
 
@@ -145,7 +148,7 @@ public class ActivityIabHelperTest {
             }
         });
 
-        assertTrue(testManager.startTest(MAX_WAIT_TIME));
+        assertTrue(testManager.await(MAX_WAIT_TIME));
     }
 
     @Test
@@ -172,7 +175,7 @@ public class ActivityIabHelperTest {
             }
         });
 
-        assertTrue(testManager.startTest(MAX_WAIT_TIME * NUM_TESTS));
+        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
     }
 
     /**
@@ -180,7 +183,7 @@ public class ActivityIabHelperTest {
      * java.lang.IllegalArgumentException: dexcache == null
      *
      * @see <a href="https://code.google.com/p/dexmaker/issues/detail?id=2">
-     *     https://code.google.com/p/dexmaker/issues/detail?id=2</a>
+     * https://code.google.com/p/dexmaker/issues/detail?id=2</a>
      */
     private void setupDexmaker() {
         // Explicitly set the Dexmaker cache, so tests that use mockito work

@@ -20,6 +20,6 @@ package org.onepf.opfiab.opfiab_uitest.validators;
  * @author antonpp
  * @since 15.05.15
  */
-public interface EventValidator<T> {
-    boolean validate(Object event);
+public interface EventValidator {
+    boolean validate(Object event, final boolean isLogging);
 }

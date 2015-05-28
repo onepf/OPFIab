@@ -16,8 +16,8 @@
 
 package org.onepf.opfiab.opfiab_uitest.validators;
 
-import android.util.Log;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfutils.OPFLog;
 
 /**
  * @author antonpp
@@ -25,7 +25,6 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
  */
 public class PurchaseResponseValidator extends TypedEventValidator<PurchaseResponse> {
 
-    private static final String TAG = PurchaseResponseValidator.class.getSimpleName();
     private final String name;
 
     public PurchaseResponseValidator(String name) {
@@ -34,18 +33,22 @@ public class PurchaseResponseValidator extends TypedEventValidator<PurchaseRespo
     }
 
     @Override
-    public boolean validate(Object event) {
-        if (!super.validate(event)) {
+    public boolean validate(Object event, final boolean isLogging) {
+        if (!super.validate(event, isLogging)) {
             return false;
         }
         final PurchaseResponse response = (PurchaseResponse) event;
         if (response.getProviderInfo() == null) {
-            Log.d(TAG, "Provider info is set to null");
+            if (isLogging) {
+                OPFLog.e("Provider info is set to null");
+            }
             return false;
         } else if (response.getProviderInfo().getName().equals(name)) {
             return true;
         } else {
-            Log.d(TAG, "Wrong provider's name");
+            if (isLogging) {
+                OPFLog.e("Wrong provider's name");
+            }
             return false;
         }
     }

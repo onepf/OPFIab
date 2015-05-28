@@ -25,10 +25,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.AdvancedIabHelper;
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
+import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
 
@@ -40,7 +42,13 @@ import static junit.framework.Assert.assertTrue;
  */
 public class AdvancedHelperTest {
 
-    private static final long MAX_WAIT_TIME = 1000L;
+    private static final long MAX_WAIT_TIME = 5000L;
+
+    private static final int NUM_TESTS = 10;
+
+    private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
+    private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
+    private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
     @Rule
     public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
@@ -74,25 +82,65 @@ public class AdvancedHelperTest {
                 .expectEvent(new SetupResponseValidator(name))
                 .build();
 
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(testManager)
+                .build();
+
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(500L);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                final Configuration configuration = new Configuration.Builder()
-                        .addBillingProvider(billingProvider)
-                        .setBillingListener(testManager)
-                        .build();
+
                 OPFIab.init(activity.getApplication(), configuration);
+
+                testManager.startTest();
+
                 iabHelper = OPFIab.getAdvancedHelper();
+
                 OPFIab.setup();
             }
         });
+        assertTrue(testManager.await(MAX_WAIT_TIME));
+    }
 
-        assertTrue(testManager.startTest(MAX_WAIT_TIME));
+    @Test
+    public void testMultiRequest() throws InterruptedException {
+        final String name = "Absolutely random name";
+        final BillingProvider billingProvider = prepareMockProvider(name);
+
+        final TestManager testManager = new TestManager.Builder()
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(name))
+                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
+                .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
+                .build();
+
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(testManager)
+                .build();
+
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+
+                OPFIab.init(activity.getApplication(), configuration);
+                iabHelper = OPFIab.getAdvancedHelper();
+                OPFIab.setup();
+
+                final IabHelper iabHelper = OPFIab.getAdvancedHelper();
+
+                for (int i = 0; i < NUM_TESTS; ++i) {
+                    iabHelper.purchase(SKU_CONSUMABLE);
+                    iabHelper.purchase(SKU_NONCONSUMABLE);
+                    iabHelper.purchase(SKU_SUBSCRIPTION);
+                }
+            }
+        });
+
+        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
     }
 
     /**
