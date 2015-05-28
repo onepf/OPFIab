@@ -78,7 +78,7 @@ public class AdvancedHelperTest {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(500L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
