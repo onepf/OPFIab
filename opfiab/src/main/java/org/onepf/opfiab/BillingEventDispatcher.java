@@ -140,6 +140,16 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
     }
 
     @Override
+    public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
+        OPFLog.logMethod(setupStartedEvent);
+        final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
+        if (billingListener != null) {
+            billingListener.onSetupStarted(setupStartedEvent);
+        }
+        super.onSetupStarted(setupStartedEvent);
+    }
+
+    @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         OPFLog.logMethod(setupResponse);
         final BillingListener billingListener = OPFIab.getConfiguration().getBillingListener();
