@@ -38,18 +38,21 @@ public class SetupResponseValidator extends TypedEventValidator<SetupResponse> {
             return false;
         }
         final SetupResponse setupResponse = (SetupResponse) event;
+        final boolean result;
+        final String msg;
         if (setupResponse.getBillingProvider() == null) {
-            if (isLogging) {
-                OPFLog.e("Billing provider is set to null");
-            }
-            return false;
+            msg = "Billing provider is set to null";
+            result =  false;
         } else if (setupResponse.getBillingProvider().getInfo().getName().equals(name)) {
-            return true;
+            msg = "";
+            result = true;
         } else {
-            if (isLogging) {
-                OPFLog.e("Wrong provider's name");
-            }
-            return false;
+            msg = "Wrong provider's name";
+            result = false;
         }
+        if (isLogging && !msg.isEmpty()) {
+            OPFLog.e(msg);
+        }
+        return result;
     }
 }

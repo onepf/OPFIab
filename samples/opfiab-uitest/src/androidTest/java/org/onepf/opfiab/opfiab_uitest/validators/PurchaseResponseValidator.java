@@ -26,10 +26,12 @@ import org.onepf.opfutils.OPFLog;
 public class PurchaseResponseValidator extends TypedEventValidator<PurchaseResponse> {
 
     private final String name;
+    private final boolean isSuccessful;
 
-    public PurchaseResponseValidator(String name) {
+    public PurchaseResponseValidator(String name, final boolean isSuccessful) {
         super(PurchaseResponse.class);
         this.name = name;
+        this.isSuccessful = isSuccessful;
     }
 
     @Override
@@ -38,18 +40,24 @@ public class PurchaseResponseValidator extends TypedEventValidator<PurchaseRespo
             return false;
         }
         final PurchaseResponse response = (PurchaseResponse) event;
-        if (response.getProviderInfo() == null) {
-            if (isLogging) {
-                OPFLog.e("Provider info is set to null");
-            }
-            return false;
+        final boolean result;
+        final String msg;
+        if (response.isSuccessful() != isSuccessful) {
+            msg = "Not expected success result";
+            result = false;
+        } else if (response.getProviderInfo() == null) {
+            msg = "Provider info is set to null";
+            result = false;
         } else if (response.getProviderInfo().getName().equals(name)) {
-            return true;
+            msg = "";
+            result = true;
         } else {
-            if (isLogging) {
-                OPFLog.e("Wrong provider's name");
-            }
-            return false;
+            msg = "Wrong provider's name";
+            result = false;
         }
+        if (isLogging && !msg.isEmpty()) {
+            OPFLog.e(msg);
+        }
+        return result;
     }
 }

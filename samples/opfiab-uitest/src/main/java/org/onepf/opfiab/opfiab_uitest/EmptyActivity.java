@@ -18,8 +18,10 @@ package org.onepf.opfiab.opfiab_uitest;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 
-import org.onepf.opfiab.api.ActivityIabHelper;
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
 
 /**
  * @author antonpp
@@ -27,16 +29,15 @@ import org.onepf.opfiab.api.ActivityIabHelper;
  */
 public class EmptyActivity extends Activity {
 
-    private ActivityIabHelper helper;
-
-    public void setHelper(final ActivityIabHelper helper) {
-        this.helper = helper;
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        helper.onActivityResult(this, requestCode, resultCode, data);
+        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
     }
 }

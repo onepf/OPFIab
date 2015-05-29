@@ -28,20 +28,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
-import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
-import org.onepf.opfiab.opfiab_uitest.validators.EventValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -63,7 +59,6 @@ public class ActivityIabHelperTest {
     @Rule
     public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
 
-    private ActivityIabHelper iabHelper;
     private EmptyActivity activity;
     private Instrumentation instrumentation;
 
@@ -82,40 +77,36 @@ public class ActivityIabHelperTest {
                 .build();
     }
 
-    private void initSetup(final Configuration configuration) {
-        OPFIab.init(activity.getApplication(), configuration);
-        iabHelper = OPFIab.getActivityHelper(activity);
-        activity.setHelper(iabHelper);
-        OPFIab.setup();
-    }
-
     @Test
     public void testPurchase() throws InterruptedException {
         final String name = "Absolutely random name";
         final BillingProvider billingProvider = prepareMockProvider(name);
-        final Collection<EventValidator> eventValidators = new ArrayList<>(NUM_TESTS);
-        eventValidators.add(new PurchaseRequestValidator(SKU_CONSUMABLE));
-        eventValidators.add(new PurchaseResponseValidator(name));
 
         final TestManager testManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
                 .expectEvent(new SetupResponseValidator(name))
-                .expectEvents(eventValidators)
+                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
+                .expectEvent(new PurchaseResponseValidator(name, true))
                 .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .build();
 
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(testManager)
+                .setBillingListener(testAdapter)
                 .build();
+
+        testAdapter.addTestManager(testManager);
+
+        testManager.startTest();
 
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
 
-                initSetup(configuration);
-
-                final IabHelper iabHelper = OPFIab.getAdvancedHelper();
+                OPFIab.init(activity.getApplication(), configuration);
+                final ActivityIabHelper iabHelper = OPFIab.getActivityHelper(activity);
+                OPFIab.setup();
 
                 for (int i = 0; i < NUM_TESTS; ++i) {
                     iabHelper.purchase(SKU_CONSUMABLE);
@@ -127,7 +118,7 @@ public class ActivityIabHelperTest {
     }
 
     @Test
-    public void testSimpleSetup() throws InterruptedException {
+    public void testSingleSetup() throws InterruptedException {
         final String name = "Absolutely random name";
         final BillingProvider billingProvider = prepareMockProvider(name);
 
@@ -136,17 +127,20 @@ public class ActivityIabHelperTest {
                 .expectEvent(new SetupResponseValidator(name))
                 .build();
 
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(testAdapter)
+                .build();
+
+        testAdapter.addTestManager(testManager);
+
+        testManager.startTest();
+
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-
-                final Configuration configuration = new Configuration.Builder()
-                        .addBillingProvider(billingProvider)
-                        .setBillingListener(testManager)
-                        .build();
                 OPFIab.init(activity.getApplication(), configuration);
-                iabHelper = OPFIab.getActivityHelper(activity);
-                activity.setHelper(iabHelper);
                 OPFIab.setup();
             }
         });
@@ -163,17 +157,21 @@ public class ActivityIabHelperTest {
         final TestManager.Builder builder = new TestManager.Builder()
                 .expectEvent(new SetupResponseValidator(bpNames[NUM_TESTS - 1]));
 
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
         final TestManager testManager = builder.build();
+        testAdapter.addTestManager(testManager);
 
+        testManager.startTest();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < NUM_TESTS; ++i) {
-                    initSetup(new Configuration.Builder()
-                                      .addBillingProvider(prepareMockProvider(bpNames[i]))
-                                      .setBillingListener(testManager)
-                                      .build()
-                    );
+                    final Configuration configuration = new Configuration.Builder()
+                            .addBillingProvider(prepareMockProvider(bpNames[i]))
+                            .setBillingListener(testAdapter)
+                            .build();
+                    OPFIab.init(activity.getApplication(), configuration);
+                    OPFIab.setup();
                 }
             }
         });

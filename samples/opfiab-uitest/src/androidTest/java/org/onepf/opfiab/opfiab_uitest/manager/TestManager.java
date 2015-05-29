@@ -16,20 +16,8 @@
 
 package org.onepf.opfiab.opfiab_uitest.manager;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.util.Pair;
 
-import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.model.event.SetupResponse;
-import org.onepf.opfiab.model.event.SetupStartedEvent;
-import org.onepf.opfiab.model.event.billing.BillingRequest;
-import org.onepf.opfiab.model.event.billing.BillingResponse;
-import org.onepf.opfiab.model.event.billing.ConsumeResponse;
-import org.onepf.opfiab.model.event.billing.InventoryResponse;
-import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.opfiab_uitest.validators.EventValidator;
 import org.onepf.opfutils.OPFLog;
 
@@ -46,9 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author antonpp
  * @since 15.05.15
  */
-public class TestManager implements BillingListener {
-
-    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+public class TestManager {
 
     private final Queue<EventValidator> eventValidators;
     private final List<Pair<Object, Boolean>> receivedEvents;
@@ -57,7 +43,6 @@ public class TestManager implements BillingListener {
 
     private int currentEvent;
     private String errorMsg;
-    private volatile boolean isTestOver = false;
 
     private Runnable timeoutRunnable;
     private volatile CountDownLatch testLatch;
@@ -71,8 +56,8 @@ public class TestManager implements BillingListener {
         this.receivedEvents = new ArrayList<>();
     }
 
-    private synchronized void validateEvent(Object event) {
-        if (isTestOver) {
+    synchronized void validateEvent(Object event) {
+        if (testLatch.getCount() == 0) {
             return;
         }
         final boolean validationResult;
@@ -87,6 +72,13 @@ public class TestManager implements BillingListener {
                 throw new IllegalArgumentException();
         }
         receivedEvents.add(new Pair<>(event, validationResult));
+        if (!validationResult) {
+            if (skipWrongEvents) {
+                OPFLog.e("skipping event " + event.getClass().getSimpleName());
+            } else {
+                finishTest(false);
+            }
+        }
         if (eventValidators.isEmpty()) {
             finishTest(true);
         }
@@ -103,10 +95,6 @@ public class TestManager implements BillingListener {
         final boolean validationResult = (matchedValidator != null);
         if (validationResult) {
             eventValidators.remove(matchedValidator);
-        } else if (skipWrongEvents) {
-            OPFLog.e("skipping event " + event.getClass().getSimpleName());
-        } else {
-            finishTest(false);
         }
         return validationResult;
     }
@@ -116,23 +104,18 @@ public class TestManager implements BillingListener {
         final boolean validationResult = validator.validate(event, true);
         if (validationResult) {
             eventValidators.poll();
-        } else if (skipWrongEvents) {
-            OPFLog.e("skipping event " + event.getClass().getSimpleName());
-        } else {
-            finishTest(false);
         }
         return validationResult;
     }
 
     public void startTest() {
-        isTestOver = false;
         testResult = false;
         testLatch = new CountDownLatch(1);
     }
 
     public boolean await(final long timeout) throws InterruptedException {
-        if (testLatch == null || isTestOver) {
-            startTest();
+        if (testLatch == null) {
+            throw new IllegalStateException();
         }
         final boolean isTimeOver = !testLatch.await(timeout, TimeUnit.MILLISECONDS);
         if (isTimeOver) {
@@ -144,7 +127,6 @@ public class TestManager implements BillingListener {
     }
 
     private synchronized void finishTest(boolean result) {
-        isTestOver = true;
         testResult = result;
         testLatch.countDown();
     }
@@ -155,62 +137,16 @@ public class TestManager implements BillingListener {
 
     private synchronized String getStringEvents() {
         final StringBuilder sb = new StringBuilder("Received Events: [");
-        if (receivedEvents.isEmpty()) {
-            sb.append(']');
-            return sb.toString();
-        }
         for (Pair<Object, Boolean> event : receivedEvents) {
             sb.append(event.first.getClass().getSimpleName())
                     .append(String.format(" (%s)", event.second ? "+" : "-"))
                     .append(", \n");
         }
-        sb.delete(sb.length() - 3, sb.length());
-        sb.append("]");
+        if (!receivedEvents.isEmpty()) {
+            sb.delete(sb.length() - 3, sb.length());
+        }
+        sb.append(']');
         return sb.toString();
-    }
-
-    @Override
-    public void onRequest(@NonNull BillingRequest billingRequest) {
-        validateEvent(billingRequest);
-    }
-
-    @Override
-    public void onResponse(@NonNull BillingResponse billingResponse) {
-        validateEvent(billingResponse);
-    }
-
-    @Override
-    public void onConsume(@NonNull ConsumeResponse consumeResponse) {
-        validateEvent(consumeResponse);
-    }
-
-    @Override
-    public void onInventory(@NonNull InventoryResponse inventoryResponse) {
-        validateEvent(inventoryResponse);
-    }
-
-    @Override
-    public void onPurchase(@NonNull PurchaseResponse purchaseResponse) {
-        validateEvent(purchaseResponse);
-    }
-
-    @Override
-    public void onSetupStarted(@NonNull SetupStartedEvent setupStartedEvent) {
-        validateEvent(setupStartedEvent);
-    }
-
-    @Override
-    public void onSetupResponse(@NonNull SetupResponse setupResponse) {
-        validateEvent(setupResponse);
-    }
-
-    @Override
-    public void onSkuDetails(@NonNull SkuDetailsResponse skuDetailsResponse) {
-        validateEvent(skuDetailsResponse);
-    }
-
-    public interface TestResultListener {
-        void onTestResult(boolean passed);
     }
 
     public final static class Builder {
@@ -218,6 +154,7 @@ public class TestManager implements BillingListener {
         private final Collection<EventValidator> eventValidators = new ArrayList<>();
         private boolean skipWrongEvents = true;
         private Strategy strategy = Strategy.ORDERED_EVENTS;
+        private TestManagerAdapter adapter = null;
 
         public Builder setStrategy(Strategy strategy) {
             this.strategy = strategy;
@@ -243,8 +180,17 @@ public class TestManager implements BillingListener {
             return this;
         }
 
+        public Builder setAdapter(TestManagerAdapter adapter) {
+            this.adapter = adapter;
+            return this;
+        }
+
         public TestManager build() {
-            return new TestManager(eventValidators, skipWrongEvents, strategy);
+            final TestManager testManager = new TestManager(eventValidators, skipWrongEvents, strategy);
+            if (adapter != null) {
+                adapter.addTestManager(testManager);
+            }
+            return testManager;
         }
     }
 

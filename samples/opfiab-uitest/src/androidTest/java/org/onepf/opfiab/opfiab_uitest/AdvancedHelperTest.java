@@ -29,6 +29,7 @@ import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
 import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
@@ -90,19 +91,15 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(testManager)
+                .setBillingListener(new BillingManagerAdapter(testManager))
                 .build();
+
+        testManager.startTest();
 
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-
                 OPFIab.init(activity.getApplication(), configuration);
-
-                testManager.startTest();
-
-                iabHelper = OPFIab.getAdvancedHelper();
-
                 OPFIab.setup();
             }
         });
@@ -120,17 +117,21 @@ public class AdvancedHelperTest {
                 .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
                 .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
                 .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
-                .expectEvent(new PurchaseResponseValidator(name))
-                .expectEvent(new PurchaseResponseValidator(name))
-                .expectEvent(new PurchaseResponseValidator(name))
+                .expectEvent(new PurchaseResponseValidator(name, true))
+                .expectEvent(new PurchaseResponseValidator(name, true))
+                .expectEvent(new PurchaseResponseValidator(name, true))
                 .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .build();
 
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(testManager)
+                .setBillingListener(testAdapter)
                 .build();
 
+        testAdapter.addTestManager(testManager);
+
+        testManager.startTest();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
@@ -153,6 +154,40 @@ public class AdvancedHelperTest {
     }
 
     @Test
+    public void testFailPurchase() throws Exception {
+        final String name = "Absolutely random name";
+        final BillingProvider billingProvider = new MockBillingProviderBuilder()
+                .setIsAuthorised(true)
+                .setWillPostSuccess(false)
+                .setInfo(new BillingProviderInfo(name, null))
+                .setIsAvailable(true)
+                .build();
+
+        final TestManager testManager = new TestManager.Builder()
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(name))
+                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
+                .expectEvent(new PurchaseResponseValidator(name, false))
+                .build();
+
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(new BillingManagerAdapter(testManager))
+                .build();
+
+        testManager.startTest();
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                OPFIab.init(activity.getApplication(), configuration);
+                OPFIab.getAdvancedHelper().purchase(SKU_CONSUMABLE);
+            }
+        });
+
+        testManager.await(MAX_WAIT_TIME);
+    }
+
+    @Test
     public void testMultipleHelpersMultipleRequests() throws Exception {
         final int n = 5;
         final String name = "Absolutely random name";
@@ -165,20 +200,24 @@ public class AdvancedHelperTest {
                 .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
                 .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
                 .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
-                .expectEvent(new PurchaseResponseValidator(name))
-                .expectEvent(new PurchaseResponseValidator(name))
-                .expectEvent(new PurchaseResponseValidator(name))
+                .expectEvent(new PurchaseResponseValidator(name, true))
+                .expectEvent(new PurchaseResponseValidator(name, true))
+                .expectEvent(new PurchaseResponseValidator(name, true))
                 .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .build();
 
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(testManager)
+                .setBillingListener(testAdapter)
                 .build();
+
+        testAdapter.addTestManager(testManager);
 
         final Random rnd = new Random();
         final String[] skus = new String[]{SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION};
 
+        testManager.startTest();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {

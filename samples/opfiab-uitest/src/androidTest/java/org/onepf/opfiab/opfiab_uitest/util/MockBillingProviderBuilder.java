@@ -49,31 +49,7 @@ public class MockBillingProviderBuilder {
     }
 
     public MockBillingProviderBuilder setWillPostSuccess(boolean willPostSuccess) {
-        final Answer<Void> answer;
-        if (willPostSuccess) {
-            answer = new Answer<Void>() {
-                @Override
-                public Void answer(final InvocationOnMock invocationOnMock) throws Throwable {
-                    final BillingRequest billingRequest = (BillingRequest)invocationOnMock.getArguments()[0];
-                    OPFIab.post(new RequestHandledEvent(billingRequest));
-                    sleep(SLEEP_TIME);
-                    OPFIab.post(new PurchaseResponse(SUCCESS, mock.getInfo(), null, VerificationResult.SUCCESS));
-                    return null;
-                }
-            };
-        } else {
-            answer = new Answer<Void>() {
-                @Override
-                public Void answer(final InvocationOnMock invocationOnMock) throws Throwable {
-                    final BillingRequest billingRequest = (BillingRequest)invocationOnMock.getArguments()[0];
-                    sleep(SLEEP_TIME);
-                    OPFIab.post(new RequestHandledEvent(billingRequest));
-                    OPFIab.post(OPFIabUtils.emptyResponse(mock.getInfo(), billingRequest, BILLING_UNAVAILABLE));
-                    return null;
-                }
-            };
-        }
-        doAnswer(answer).when(mock).onEventAsync(any(BillingRequest.class));
+        doAnswer(new MyAnswer(willPostSuccess)).when(mock).onEventAsync(any(BillingRequest.class));
         return this;
     }
 
@@ -96,11 +72,26 @@ public class MockBillingProviderBuilder {
         return mock;
     }
 
-    private static void sleep(long time) {
-        try {
+    private final class MyAnswer implements Answer<Void> {
+
+        private final boolean willPostSuccess;
+
+        public MyAnswer(boolean willPostSuccess) {
+            this.willPostSuccess = willPostSuccess;
+        }
+
+        @Override
+        public Void answer(final InvocationOnMock invocationOnMock) throws Throwable {
+            final BillingRequest billingRequest = (BillingRequest)invocationOnMock.getArguments()[0];
             Thread.sleep(SLEEP_TIME);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            OPFIab.post(new RequestHandledEvent(billingRequest));
+            if (willPostSuccess) {
+                OPFIab.post(new PurchaseResponse(SUCCESS, mock.getInfo(), null, VerificationResult.SUCCESS));
+            } else {
+                OPFIab.post(OPFIabUtils.emptyResponse(mock.getInfo(), billingRequest,
+                                                      BILLING_UNAVAILABLE));
+            }
+            return null;
         }
     }
 }
