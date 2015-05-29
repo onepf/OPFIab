@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest;
+package org.onepf.opfiab.opfiab_uitest.manager;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -57,11 +57,11 @@ public class TestManager implements BillingListener {
 
     private int currentEvent;
     private String errorMsg;
-    private boolean isTestOver = false;
+    private volatile boolean isTestOver = false;
 
     private Runnable timeoutRunnable;
-    private CountDownLatch testLatch;
-    private boolean testResult;
+    private volatile CountDownLatch testLatch;
+    private volatile boolean testResult;
 
     private TestManager(Collection<EventValidator> eventValidators, boolean skipWrongEvents,
                         final Strategy strategy) {

@@ -29,6 +29,7 @@ import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
 import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
 import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
