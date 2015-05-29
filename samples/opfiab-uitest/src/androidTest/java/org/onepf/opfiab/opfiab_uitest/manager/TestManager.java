@@ -37,23 +37,19 @@ import java.util.concurrent.TimeUnit;
 public class TestManager {
 
     private final Queue<EventValidator> eventValidators;
-    private final List<Pair<Object, Boolean>> receivedEvents;
+    private final List<Pair<Object, Boolean>> receivedEvents = new ArrayList<>();
     private final boolean skipWrongEvents;
     private final Strategy strategy;
-
+    private final CountDownLatch testLatch = new CountDownLatch(1);
     private int currentEvent;
     private String errorMsg;
-
-    private Runnable timeoutRunnable;
-    private volatile CountDownLatch testLatch;
-    private volatile boolean testResult;
+    private volatile boolean testResult = false;
 
     private TestManager(Collection<EventValidator> eventValidators, boolean skipWrongEvents,
                         final Strategy strategy) {
         this.eventValidators = new LinkedList<>(eventValidators);
         this.skipWrongEvents = skipWrongEvents;
         this.strategy = strategy;
-        this.receivedEvents = new ArrayList<>();
     }
 
     synchronized void validateEvent(Object event) {
@@ -84,6 +80,15 @@ public class TestManager {
         }
     }
 
+    private boolean orderedValidate(Object event) {
+        final EventValidator validator = eventValidators.peek();
+        final boolean validationResult = validator.validate(event, true);
+        if (validationResult) {
+            eventValidators.poll();
+        }
+        return validationResult;
+    }
+
     private boolean unorderedValidate(Object event) {
         EventValidator matchedValidator = null;
         for (EventValidator eventValidator : eventValidators) {
@@ -99,18 +104,9 @@ public class TestManager {
         return validationResult;
     }
 
-    private boolean orderedValidate(Object event) {
-        final EventValidator validator = eventValidators.peek();
-        final boolean validationResult = validator.validate(event, true);
-        if (validationResult) {
-            eventValidators.poll();
-        }
-        return validationResult;
-    }
-
-    public void startTest() {
-        testResult = false;
-        testLatch = new CountDownLatch(1);
+    private synchronized void finishTest(boolean result) {
+        testResult = result;
+        testLatch.countDown();
     }
 
     public boolean await(final long timeout) throws InterruptedException {
@@ -126,15 +122,6 @@ public class TestManager {
         return testResult;
     }
 
-    private synchronized void finishTest(boolean result) {
-        testResult = result;
-        testLatch.countDown();
-    }
-
-    public List<Pair<Object, Boolean>> getReceivedEvents() {
-        return receivedEvents;
-    }
-
     private synchronized String getStringEvents() {
         final StringBuilder sb = new StringBuilder("Received Events: [");
         for (Pair<Object, Boolean> event : receivedEvents) {
@@ -147,6 +134,14 @@ public class TestManager {
         }
         sb.append(']');
         return sb.toString();
+    }
+
+    public List<Pair<Object, Boolean>> getReceivedEvents() {
+        return receivedEvents;
+    }
+
+    public enum Strategy {
+        ORDERED_EVENTS, UNORDERED_EVENTS
     }
 
     public final static class Builder {
@@ -192,9 +187,5 @@ public class TestManager {
             }
             return testManager;
         }
-    }
-
-    public enum Strategy {
-        ORDERED_EVENTS, UNORDERED_EVENTS
     }
 }

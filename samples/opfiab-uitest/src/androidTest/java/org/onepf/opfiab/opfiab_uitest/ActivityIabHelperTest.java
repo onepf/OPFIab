@@ -69,12 +69,17 @@ public class ActivityIabHelperTest {
         instrumentation = InstrumentationRegistry.getInstrumentation();
     }
 
-    private BillingProvider prepareMockProvider(String name) {
-        return new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
-                .setIsAvailable(true)
-                .setInfo(new BillingProviderInfo(name, null))
-                .build();
+    /**
+     * Workaround for Mockito and JB-MR2 incompatibility to avoid
+     * java.lang.IllegalArgumentException: dexcache == null
+     *
+     * @see <a href="https://code.google.com/p/dexmaker/issues/detail?id=2">
+     * https://code.google.com/p/dexmaker/issues/detail?id=2</a>
+     */
+    private void setupDexmaker() {
+        // Explicitly set the Dexmaker cache, so tests that use mockito work
+        final String dexCache = activity.getCacheDir().getPath();
+        System.setProperty("dexmaker.dexcache", dexCache);
     }
 
     @Test
@@ -98,8 +103,6 @@ public class ActivityIabHelperTest {
 
         testAdapter.addTestManager(testManager);
 
-        testManager.startTest();
-
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
@@ -115,6 +118,14 @@ public class ActivityIabHelperTest {
         });
 
         assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
+    }
+
+    private BillingProvider prepareMockProvider(String name) {
+        return new MockBillingProviderBuilder()
+                .setIsAuthorised(true)
+                .setIsAvailable(true)
+                .setInfo(new BillingProviderInfo(name, null))
+                .build();
     }
 
     @Test
@@ -134,8 +145,6 @@ public class ActivityIabHelperTest {
                 .build();
 
         testAdapter.addTestManager(testManager);
-
-        testManager.startTest();
 
         instrumentation.runOnMainSync(new Runnable() {
             @Override
@@ -161,7 +170,6 @@ public class ActivityIabHelperTest {
         final TestManager testManager = builder.build();
         testAdapter.addTestManager(testManager);
 
-        testManager.startTest();
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
@@ -177,18 +185,5 @@ public class ActivityIabHelperTest {
         });
 
         assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
-    }
-
-    /**
-     * Workaround for Mockito and JB-MR2 incompatibility to avoid
-     * java.lang.IllegalArgumentException: dexcache == null
-     *
-     * @see <a href="https://code.google.com/p/dexmaker/issues/detail?id=2">
-     * https://code.google.com/p/dexmaker/issues/detail?id=2</a>
-     */
-    private void setupDexmaker() {
-        // Explicitly set the Dexmaker cache, so tests that use mockito work
-        final String dexCache = activity.getCacheDir().getPath();
-        System.setProperty("dexmaker.dexcache", dexCache);
     }
 }
