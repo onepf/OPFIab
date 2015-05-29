@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest;
+package org.onepf.opfiab.opfiab_uitest.tests;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,6 +33,8 @@ import org.onepf.opfiab.listener.SimpleBillingListener;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.opfiab_uitest.ActivityHelperActivity;
+import org.onepf.opfiab.opfiab_uitest.R;
 import org.onepf.opfiab.opfiab_uitest.mock.MockBillingProvider;
 import org.onepf.opfiab.opfiab_uitest.mock.MockFailBillingProvider;
 import org.onepf.opfiab.opfiab_uitest.mock.MockOkBillingProvider;
@@ -77,29 +79,22 @@ public class ActivityHelperTest extends ActivityInstrumentationTestCase2<Activit
         activity = getActivity();
     }
 
-    private void prepareSetupListener(final CountDownLatch successLatch) {
-        final CountDownLatch threadSyncLatch = new CountDownLatch(1);
-        final BillingListener listener = new SimpleBillingListener() {
-            @Override
-            public void onSetupResponse(@NonNull SetupResponse setupResponse) {
-                super.onSetupResponse(setupResponse);
-                if (setupResponse.isSuccessful()) {
-                    successLatch.countDown();
-                }
-            }
-        };
+    @After
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        activity = null;
+    }
 
-        assert activity != null;
+    @Test
+    public void testSuccessfulPurchase() {
+        final CountDownLatch purchaseLatch = new CountDownLatch(1);
+        prepareBillingListener(purchaseLatch, null);
 
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                activity.setBillingListener(listener);
-                threadSyncLatch.countDown();
-            }
-        });
+        initSetupBuy(R.id.button_init_ok);
 
-        awaitLatch(threadSyncLatch);
+        checkExpectedCalls(purchaseLatch, MAX_WAIT_TIME,
+                           "Failed to receive a correct purchase callback");
     }
 
     private void prepareBillingListener(CountDownLatch successLatch, CountDownLatch failLatch) {
@@ -119,21 +114,17 @@ public class ActivityHelperTest extends ActivityInstrumentationTestCase2<Activit
         awaitLatch(threadSyncLatch);
     }
 
+    private void initSetupBuy(int initBtnId) {
+        onView(withId(initBtnId)).perform(click());
+        onView(withId(R.id.button_setup)).perform(click());
+        onView(withId(R.id.button_buy_consumable)).perform(click());
+    }
+
     private void checkExpectedCalls(CountDownLatch latch, long timeout, String msg) {
         awaitLatch(latch, timeout);
         if (latch.getCount() != 0) {
             Assert.fail(msg);
         }
-    }
-
-    @Test
-    public void testSuccessfulPurchase() {
-        final CountDownLatch purchaseLatch = new CountDownLatch(1);
-        prepareBillingListener(purchaseLatch, null);
-
-        initSetupBuy(R.id.button_init_ok);
-
-        checkExpectedCalls(purchaseLatch, MAX_WAIT_TIME, "Failed to receive a correct purchase callback");
     }
 
     private void awaitLatch(CountDownLatch latch) {
@@ -159,13 +150,8 @@ public class ActivityHelperTest extends ActivityInstrumentationTestCase2<Activit
 
         initSetupBuy(R.id.button_init_fail);
 
-        checkExpectedCalls(purchaseLatch, MAX_WAIT_TIME, "Failed to receive a correct purchase callback");
-    }
-
-    private void initSetupBuy(int initBtnId) {
-        onView(withId(initBtnId)).perform(click());
-        onView(withId(R.id.button_setup)).perform(click());
-        onView(withId(R.id.button_buy_consumable)).perform(click());
+        checkExpectedCalls(purchaseLatch, MAX_WAIT_TIME,
+                           "Failed to receive a correct purchase callback");
     }
 
     @Test
@@ -219,6 +205,31 @@ public class ActivityHelperTest extends ActivityInstrumentationTestCase2<Activit
         checkExpectedCalls(setupLatch, MAX_WAIT_TIME, msg);
     }
 
+    private void prepareSetupListener(final CountDownLatch successLatch) {
+        final CountDownLatch threadSyncLatch = new CountDownLatch(1);
+        final BillingListener listener = new SimpleBillingListener() {
+            @Override
+            public void onSetupResponse(@NonNull SetupResponse setupResponse) {
+                super.onSetupResponse(setupResponse);
+                if (setupResponse.isSuccessful()) {
+                    successLatch.countDown();
+                }
+            }
+        };
+
+        assert activity != null;
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.setBillingListener(listener);
+                threadSyncLatch.countDown();
+            }
+        });
+
+        awaitLatch(threadSyncLatch);
+    }
+
     private Configuration getRandomConfiguration(boolean isOk) {
         return new Configuration.Builder()
                 .addBillingProvider(isOk ? new MockOkBillingProvider() : new MockFailBillingProvider())
@@ -226,13 +237,6 @@ public class ActivityHelperTest extends ActivityInstrumentationTestCase2<Activit
                 .setSkipUnauthorised(RND.nextBoolean())
                 .setSubsequentRequestDelay(RND.nextLong() % MAX_SUBSEQUENT_DELAY)
                 .build();
-    }
-
-    @After
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-        activity = null;
     }
 
     private static final class TestBillingListener extends SimpleBillingListener {
