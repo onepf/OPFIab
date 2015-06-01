@@ -158,7 +158,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
                 final Activity activity = purchaseRequest.getActivity();
-                if (activity != null && !purchaseRequest.isActivityFake()
+                if (activity != null && OPFIabUtils.isActivityFake(activity)
                         && !ActivityMonitor.isResumed(activity)) {
                     postEmptyResponse(billingRequest, USER_CANCELED);
                     break;

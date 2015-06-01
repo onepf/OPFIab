@@ -104,13 +104,16 @@ public final class OPFIab {
      * Intend to be used by {@link BillingProvider} implementations.
      *
      * @param event Event object to deliver.
+     * @return True if event was delivered, false if it was skipped due to the lack of subscribers.
      */
-    public static void post(@NonNull final Object event) {
-        if (EVENT_BUS.hasSubscriberForEvent(event.getClass())) {
+    public static boolean post(@NonNull final Object event) {
+        final boolean hasSubscriber = EVENT_BUS.hasSubscriberForEvent(event.getClass());
+        if (hasSubscriber) {
             EVENT_BUS.post(event);
         } else {
             OPFLog.d("Skipping event delivery: %s", event);
         }
+        return hasSubscriber;
     }
 
     /**

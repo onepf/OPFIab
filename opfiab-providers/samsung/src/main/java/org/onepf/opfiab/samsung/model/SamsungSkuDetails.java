@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 import org.onepf.opfiab.samsung.SamsungUtils;
 
-public class SamsungItem extends SamsungModel {
+public class SamsungSkuDetails extends SamsungModel {
 
     private static final String KEY_SUBSCRIPTION_UNIT = "mSubscriptionDurationUnit";
     private static final String KEY_SUBSCRIPTION_MULTIPLIER = "mSubscriptionDurationMultiplier";
@@ -18,7 +18,7 @@ public class SamsungItem extends SamsungModel {
     @NonNull
     private final String subscriptionMultiplier;
 
-    public SamsungItem(@NonNull final String originalJson) throws JSONException {
+    public SamsungSkuDetails(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
         this.subscriptionUnit = jsonObject.getString(KEY_SUBSCRIPTION_UNIT);
         this.subscriptionMultiplier = jsonObject.getString(KEY_SUBSCRIPTION_MULTIPLIER);

@@ -37,14 +37,13 @@ public abstract class JsonModel {
         this.originalJson = originalJson;
     }
 
-    public JsonModel(@NonNull final JSONObject jsonObject)
-            throws JSONException {
+    public JsonModel(@NonNull final JSONObject jsonObject) {
         this.jsonObject = jsonObject;
         this.originalJson = jsonObject.toString();
     }
 
     /**
-     * Gets JSON data associated with this billing model.
+     * Gets JSON data associated with this model.
      *
      * @return JSON string.
      */

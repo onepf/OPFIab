@@ -4,6 +4,9 @@ import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 import org.onepf.opfiab.model.JsonModel;
+import org.onepf.opfiab.samsung.SamsungUtils;
+
+import java.util.Date;
 
 public class SamsungVerification extends JsonModel {
 
@@ -23,7 +26,7 @@ public class SamsungVerification extends JsonModel {
     @NonNull
     private final String description;
     @NonNull
-    private final String purchaseDate;
+    private final Date purchaseDate;
     @NonNull
     private final String paymentId;
     @NonNull
@@ -36,10 +39,16 @@ public class SamsungVerification extends JsonModel {
         this.itemId = jsonObject.getString(KEY_ITEM_ID);
         this.name = jsonObject.getString(KEY_ITEM_NAME);
         this.description = jsonObject.getString(KEY_ITEM_DESC);
-        this.purchaseDate = jsonObject.getString(KEY_PURCHASE_DATE);
         this.paymentId = jsonObject.getString(KEY_PAYMENT_ID);
         this.paymentAmount = jsonObject.getString(KEY_PAYMENT_AMOUNT);
         this.status = jsonObject.getString(KEY_STATUS);
+
+        final String dateString = jsonObject.getString(KEY_PURCHASE_DATE);
+        final Date date = SamsungUtils.parseDate(dateString);
+        if (date == null) {
+            throw new JSONException("Invalid purchase date: " + dateString);
+        }
+        this.purchaseDate = date;
     }
 
     @NonNull
@@ -58,7 +67,7 @@ public class SamsungVerification extends JsonModel {
     }
 
     @NonNull
-    public String getPurchaseDate() {
+    public Date getPurchaseDate() {
         return purchaseDate;
     }
 

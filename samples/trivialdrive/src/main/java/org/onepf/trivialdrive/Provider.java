@@ -21,11 +21,14 @@ import android.support.annotation.StringRes;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.samsung.SamsungBillingProvider;
 import org.onepf.opfiab.trivialdrive.R;
 
 public enum Provider {
     AMAZON(R.string.name_amazon, AmazonBillingProvider.INFO),
-    GOOGLE(R.string.name_google, GoogleBillingProvider.INFO),;
+    GOOGLE(R.string.name_google, GoogleBillingProvider.INFO),
+    SAMSUNG(R.string.name_samsung, SamsungBillingProvider.INFO),;
+
 
     public static Provider getByInfo(final BillingProviderInfo info) {
         for (final Provider provider : values()) {

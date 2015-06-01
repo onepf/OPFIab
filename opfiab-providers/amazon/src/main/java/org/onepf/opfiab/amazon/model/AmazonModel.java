@@ -14,40 +14,25 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.samsung.model;
+package org.onepf.opfiab.amazon.model;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-public enum ItemType {
+import org.json.JSONException;
+import org.onepf.opfiab.model.JsonModel;
 
-    CONSUMABLE("00"),
-    NON_CONSUMABLE("01"),
-    SUBSCRIPTION("02"),
-    //TODO
-    WTF("03"),
-    ALL("10"),;
+abstract class AmazonModel extends JsonModel {
 
-    @Nullable
-    public static ItemType fromCode(@NonNull final String code) {
-        for (final ItemType itemType : values()) {
-            if (itemType.code.equals(code)) {
-                return itemType;
-            }
-        }
-        return null;
-    }
-
+    private static final String NAME_SKU = "sku";
 
     @NonNull
-    private final String code;
+    protected final String sku;
 
-    ItemType(@NonNull final String code) {
-        this.code = code;
+    public AmazonModel(@NonNull final String originalJson) throws JSONException {
+        super(originalJson);
+        this.sku = jsonObject.getString(NAME_SKU);
     }
 
     @NonNull
-    public String getCode() {
-        return code;
-    }
+    public abstract String getSku();
 }

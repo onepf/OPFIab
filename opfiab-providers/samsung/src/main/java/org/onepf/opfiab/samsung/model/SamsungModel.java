@@ -5,14 +5,14 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 import org.onepf.opfiab.model.JsonModel;
 
-public abstract class SamsungModel extends JsonModel {
+abstract class SamsungModel extends JsonModel {
 
     private static final String KEY_ITEM_ID = "mItemId";
     private static final String KEY_ITEM_NAME = "mItemName";
     private static final String KEY_PRICE = "mItemPrice";
     private static final String KEY_PRICE_STRING = "mItemPriceString";
     private static final String KEY_CURRENCY_UNIT = "mCurrencyUnit";
-    private static final String KEY_ITEM_DESC = "itemDesc";
+    private static final String KEY_ITEM_DESC = "mItemDesc";
     private static final String KEY_IMAGE_URL = "mItemImageUrl";
     private static final String KEY_ITEM_DOWNLOAD_URL = "mItemDownloadUrl";
 

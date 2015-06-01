@@ -34,6 +34,9 @@ import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.opfiab.samsung.BillingMode;
+import org.onepf.opfiab.samsung.SamsungBillingProvider;
+import org.onepf.opfiab.samsung.SamsungMapSkuResolver;
 import org.onepf.opfiab.sku.MapSkuResolver;
 import org.onepf.opfiab.verification.VerificationResult;
 
@@ -69,6 +72,11 @@ public final class TrivialBilling {
             "k9ErEOFBqb4dGBNswH5JRm68r/u7a2XzEoo40dXQQH2/5tMy3AQCzVakHnfcIQcZO0BkQOh4o52ahhy3vcCUha" +
             "uN61YA492k+DmKT5GgSH+KxwgK5dcorjbh94E9e03dZwIDAQAB";
 
+    public static final String SAMSUNG_SKU_GAS = "000001006336";
+    public static final String SAMSUNG_SKU_PREMIUM = "000001004349";
+    public static final String SAMSUNG_SKU_SUBSCRIPTION = "";
+    public static final String SAMSUNG_GROUP_ID = "100000100845";
+
     public static final String SKU_GAS = "sku_gas";
     public static final String SKU_PREMIUM = "sku_premium";
     public static final String SKU_SUBSCRIPTION = "sku_subscription";
@@ -88,6 +96,8 @@ public final class TrivialBilling {
                 return newAmazonProvider();
             case GOOGLE:
                 return newGoogleProvider();
+            case SAMSUNG:
+                return newSamsungProvider();
             default:
                 throw new IllegalStateException();
         }
@@ -112,6 +122,19 @@ public final class TrivialBilling {
         skuResolver.add(SKU_SUBSCRIPTION, AMAZON_SKU_SUBSCRIPTION);
 
         return new AmazonBillingProvider.Builder(context)
+                .setSkuResolver(skuResolver)
+                .build();
+    }
+
+    private static BillingProvider newSamsungProvider() {
+        // TODO
+        final SamsungMapSkuResolver skuResolver = new SamsungMapSkuResolver(SAMSUNG_GROUP_ID);
+        skuResolver.add(SKU_GAS, SAMSUNG_SKU_GAS);
+        skuResolver.add(SKU_PREMIUM, SAMSUNG_SKU_PREMIUM);
+        skuResolver.add(SKU_SUBSCRIPTION, SAMSUNG_SKU_SUBSCRIPTION);
+
+        return new SamsungBillingProvider.Builder(context)
+                .setBillingMode(BillingMode.TEST_SUCCESS)
                 .setSkuResolver(skuResolver)
                 .build();
     }

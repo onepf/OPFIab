@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -26,6 +27,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
+import org.onepf.opfiab.android.OPFIabActivity;
+import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.JsonCompatible;
@@ -36,6 +39,7 @@ import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
@@ -84,6 +88,20 @@ public final class OPFIabUtils {
             OPFLog.e("", exception);
         }
         return "";
+    }
+
+    /**
+     * Indicates whether this activity was started by library to handle some specific action.
+     *
+     * @param activity Activity object to check.
+     *
+     * @return True if activity was started by library, false otherwise.
+     *
+     * @see PurchaseRequest
+     * @see ActivityBillingProvider
+     */
+    public static boolean isActivityFake(@NonNull final Activity activity) {
+        return activity.getClass() == OPFIabActivity.class;
     }
 
     /**

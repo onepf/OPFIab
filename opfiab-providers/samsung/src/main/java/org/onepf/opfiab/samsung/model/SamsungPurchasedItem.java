@@ -1,11 +1,14 @@
 package org.onepf.opfiab.samsung.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.onepf.opfiab.samsung.SamsungUtils;
 
-public class SamsungInboxItem extends SamsungBillingModel {
+import java.util.Date;
+
+public class SamsungPurchasedItem extends SamsungBillingModel {
 
     private static final String KEY_TYPE = "mType";
     private static final String KEY_SUBSCRIPTION_END_DATE = "mSubscriptionEndDate";
@@ -13,13 +16,15 @@ public class SamsungInboxItem extends SamsungBillingModel {
 
     @NonNull
     private final ItemType itemType;
-    @NonNull
-    private final String subscriptionEndDate;
+    @Nullable
+    private final Date subscriptionEndDate;
 
-    public SamsungInboxItem(@NonNull final String originalJson) throws JSONException {
+    public SamsungPurchasedItem(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
-        this.subscriptionEndDate = jsonObject.getString(KEY_SUBSCRIPTION_END_DATE);
         this.itemType = SamsungUtils.getItemType(jsonObject);
+
+        final String dateString = jsonObject.optString(KEY_SUBSCRIPTION_END_DATE);
+        this.subscriptionEndDate = SamsungUtils.parseDate(dateString);
     }
 
     @NonNull
@@ -27,8 +32,8 @@ public class SamsungInboxItem extends SamsungBillingModel {
         return itemType;
     }
 
-    @NonNull
-    public String getSubscriptionEndDate() {
+    @Nullable
+    public Date getSubscriptionEndDate() {
         return subscriptionEndDate;
     }
 }

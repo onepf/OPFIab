@@ -100,18 +100,6 @@ public class PurchaseRequest extends BillingRequest {
         return needsFakeActivity;
     }
 
-    /**
-     * Indicates whether this request has instance of {@link OPFIabActivity}.
-     * <br>
-     * Intended for internal usage only.
-     *
-     * @return True if instance of {@link OPFIabActivity} was launched for this request, false
-     * otherwise.
-     */
-    public boolean isActivityFake() {
-        return getActivity() instanceof OPFIabActivity;
-    }
-
     @NonNull
     @Override
     public JSONObject toJson() {

@@ -46,7 +46,7 @@ public class OPFIabActivity extends Activity {
     /**
      * If activity is not expecting {@link #onActivityResult(int, int, Intent)} call, it will auto-finish after this timeout.
      */
-    protected static final long FINISH_DELAY = 300L; // 0.3 second
+    protected static final long FINISH_DELAY = 500L; // 0.5 second
 
 
     /**
@@ -128,15 +128,13 @@ public class OPFIabActivity extends Activity {
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
-        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
-        if (data != null || resultCode == RESULT_OK) {
-            // Result was delivered successfully, there's no further need for this activity.
+        if (!OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data))) {
+            // No one received this event, finishing
             finish();
-        } else {
-            // May indicated that this activity is used for something else, for example - to start
-            // another activity.
-            scheduleFinish(true);
         }
+        // Result event subscriber should finish activity when it's done with it.
+        // Schedule finish just in case
+        scheduleFinish(true);
     }
 
     @Override

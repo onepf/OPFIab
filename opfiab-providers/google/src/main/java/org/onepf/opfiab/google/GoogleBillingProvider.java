@@ -232,7 +232,7 @@ public class GoogleBillingProvider
 
         final IntentSender sender = intent.getIntentSender();
         try {
-            activity.startIntentSenderForResult(sender, REQUEST_CODE, new Intent(), 0, 0, 0);
+            activity.startIntentSenderForResult(sender, requestCode, new Intent(), 0, 0, 0);
         } catch (IntentSender.SendIntentException exception) {
             OPFLog.e("Failed to send buy intent.", exception);
             postPurchaseResponse(Status.UNKNOWN_ERROR, null);
@@ -364,6 +364,8 @@ public class GoogleBillingProvider
 
         final Purchase purchase = newPurchase(googlePurchase, signature);
         postPurchaseResponse(Status.SUCCESS, purchase);
+
+        super.onActivityResult(activity, requestCode, resultCode, data);
     }
 
 

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
@@ -30,6 +31,7 @@ import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
 
@@ -49,10 +51,10 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     /**
      * Default request code to use with {@link Activity#startActivityForResult(Intent, int)}.
-     * <p>
+     * <p/>
      * Can be overridden with {@link #getRequestCodes()}.
      */
-    protected static final int REQUEST_CODE = 13685093;
+    protected static final int DEFAULT_REQUEST_CODE = 13685;
     /**
      * Timeout to give up on waiting for a new activity instance.
      */
@@ -60,6 +62,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
 
     private final Collection<Integer> requestCodes = getRequestCodes();
+    protected final int requestCode = requestCodes.iterator().next();
     /**
      * Used to block library thread to wait for a new activity instance.
      */
@@ -83,25 +86,27 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     /**
      * Gets request codes that should be handled by this billing provider.
+     * <p/>
+     * Must return non-empty collection.
      *
      * @return Collection of request codes that should be handled by this billing provider. Can't be
      * null.
-     *
-     * @see #REQUEST_CODE
+     * @see #DEFAULT_REQUEST_CODE
      * @see Activity#startActivityForResult(Intent, int)
      * @see Activity#onActivityResult(int, int, Intent)
      */
     @NonNull
     protected Collection<Integer> getRequestCodes() {
-        return Collections.singletonList(REQUEST_CODE);
+        return Collections.singletonList(DEFAULT_REQUEST_CODE);
     }
 
     /**
      * @param activity can't be null.
      */
     @Override
-    protected abstract void purchase(@SuppressWarnings("NullableProblems") @NonNull final Activity activity,
-                                     @NonNull final String sku);
+    protected abstract void purchase(
+            @SuppressWarnings("NullableProblems") @NonNull final Activity activity,
+            @NonNull final String sku);
 
     @Override
     public void onEventAsync(@NonNull final BillingRequest billingRequest) {
@@ -148,20 +153,26 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
         final int requestCode = event.getRequestCode();
-        final Intent data;
-        if (requestCodes.contains(requestCode) && (data = event.getData()) != null) {
-            // This reqeust code should be hanled by billing provider
+        if (requestCodes.contains(requestCode)) {
+            // This request code should be handled by billing provider
             final int resultCode = event.getResultCode();
             final Activity activity = event.getActivity();
+            final Intent data = event.getData();
             onActivityResult(activity, requestCode, resultCode, data);
         }
     }
 
     /**
-     * Handles result of activity previously started with {@link #REQUEST_CODE}.
+     * Handles result of activity previously started with {@link #DEFAULT_REQUEST_CODE}.
+     * </p>
+     * Calls {@link Activity#finish()} by default.
      */
-    protected abstract void onActivityResult(@NonNull final Activity activity,
-                                             final int requestCode,
-                                             final int resultCode,
-                                             @NonNull final Intent data);
+    protected void onActivityResult(@NonNull final Activity activity,
+                                    final int requestCode,
+                                    final int resultCode,
+                                    @Nullable final Intent data) {
+        if (OPFIabUtils.isActivityFake(activity)) {
+            activity.finish();
+        }
+    }
 }
