@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestManager {
 
+    private final String tag;
     private final Queue<EventValidator> eventValidators;
     private final List<Pair<Object, Boolean>> receivedEvents = new ArrayList<>();
     private final boolean skipWrongEvents;
@@ -45,8 +46,10 @@ public class TestManager {
     private String errorMsg;
     private volatile boolean testResult = false;
 
-    private TestManager(Collection<EventValidator> eventValidators, boolean skipWrongEvents,
+    private TestManager(Collection<EventValidator> eventValidators, final String tag,
+                        boolean skipWrongEvents,
                         final Strategy strategy) {
+        this.tag = tag;
         this.eventValidators = new LinkedList<>(eventValidators);
         this.skipWrongEvents = skipWrongEvents;
         this.strategy = strategy;
@@ -70,7 +73,8 @@ public class TestManager {
         receivedEvents.add(new Pair<>(event, validationResult));
         if (!validationResult) {
             if (skipWrongEvents) {
-                OPFLog.e("skipping event " + event.getClass().getSimpleName());
+                OPFLog.e(String.format("[%s]: %s", tag,
+                                       "skipping event " + event.getClass().getSimpleName()));
             } else {
                 finishTest(false);
             }
@@ -82,7 +86,7 @@ public class TestManager {
 
     private boolean orderedValidate(Object event) {
         final EventValidator validator = eventValidators.peek();
-        final boolean validationResult = validator.validate(event, true);
+        final boolean validationResult = validator.validate(event, true, tag);
         if (validationResult) {
             eventValidators.poll();
         }
@@ -92,7 +96,7 @@ public class TestManager {
     private boolean unorderedValidate(Object event) {
         EventValidator matchedValidator = null;
         for (EventValidator eventValidator : eventValidators) {
-            if (eventValidator.validate(event, false)) {
+            if (eventValidator.validate(event, false, tag)) {
                 matchedValidator = eventValidator;
                 break;
             }
@@ -115,14 +119,15 @@ public class TestManager {
         }
         final boolean isTimeOver = !testLatch.await(timeout, TimeUnit.MILLISECONDS);
         if (isTimeOver) {
-            OPFLog.e(String.format("Did not receive all expected events (%d not received). %s",
-                                   eventValidators.size(), getStringEvents()));
+            OPFLog.e(
+                    String.format("[%s]: Did not receive all expected events (%d not received). %s",
+                                  tag, eventValidators.size(), getStringEvents()));
             finishTest(false);
         }
         return testResult;
     }
 
-    private synchronized String getStringEvents() {
+    public synchronized String getStringEvents() {
         final StringBuilder sb = new StringBuilder("Received Events: [");
         for (Pair<Object, Boolean> event : receivedEvents) {
             sb.append(event.first.getClass().getSimpleName())
@@ -150,6 +155,7 @@ public class TestManager {
         private boolean skipWrongEvents = true;
         private Strategy strategy = Strategy.ORDERED_EVENTS;
         private TestManagerAdapter adapter = null;
+        private String tag = "TestManager";
 
         public Builder setStrategy(Strategy strategy) {
             this.strategy = strategy;
@@ -180,8 +186,14 @@ public class TestManager {
             return this;
         }
 
+        public Builder setTag(String tag) {
+            this.tag = tag;
+            return this;
+        }
+
         public TestManager build() {
-            final TestManager testManager = new TestManager(eventValidators, skipWrongEvents, strategy);
+            final TestManager testManager = new TestManager(eventValidators, tag, skipWrongEvents,
+                                                            strategy);
             if (adapter != null) {
                 adapter.addTestManager(testManager);
             }

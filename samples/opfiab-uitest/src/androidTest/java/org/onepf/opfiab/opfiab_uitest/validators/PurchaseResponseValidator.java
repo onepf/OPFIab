@@ -35,8 +35,8 @@ public class PurchaseResponseValidator extends TypedEventValidator<PurchaseRespo
     }
 
     @Override
-    public boolean validate(Object event, final boolean isLogging) {
-        if (!super.validate(event, isLogging)) {
+    public boolean validate(Object event, final boolean isLogging, final String logTag) {
+        if (!super.validate(event, isLogging, logTag)) {
             return false;
         }
         final PurchaseResponse response = (PurchaseResponse) event;
@@ -56,7 +56,7 @@ public class PurchaseResponseValidator extends TypedEventValidator<PurchaseRespo
             result = false;
         }
         if (isLogging && !msg.isEmpty()) {
-            OPFLog.e(msg);
+            OPFLog.e(String.format("[%s]: %s", logTag, msg));
         }
         return result;
     }

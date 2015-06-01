@@ -21,5 +21,5 @@ package org.onepf.opfiab.opfiab_uitest.validators;
  * @since 15.05.15
  */
 public interface EventValidator {
-    boolean validate(Object event, final boolean isLogging);
+    boolean validate(Object event, final boolean isLogging, final String logTag);
 }

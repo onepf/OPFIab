@@ -16,34 +16,40 @@
 
 package org.onepf.opfiab.opfiab_uitest.validators;
 
-import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfutils.OPFLog;
 
 /**
  * @author antonpp
- * @since 15.05.15
+ * @since 01.06.15
  */
-public class SetupResponseValidator extends TypedEventValidator<SetupResponse> {
+public class SkuDetailsResponseValidator extends TypedEventValidator<SkuDetailsResponse> {
 
     private final String name;
+    private final boolean isSuccessful;
 
-    public SetupResponseValidator(String name) {
-        super(SetupResponse.class);
+    public SkuDetailsResponseValidator(final String name, final boolean isSuccessful) {
+        super(SkuDetailsResponse.class);
         this.name = name;
+        this.isSuccessful = isSuccessful;
     }
 
     @Override
-    public boolean validate(Object event, final boolean isLogging, final String logTag) {
+    public boolean validate(final Object event, final boolean isLogging, final String logTag) {
         if (!super.validate(event, isLogging, logTag)) {
             return false;
         }
-        final SetupResponse setupResponse = (SetupResponse) event;
+
+        final SkuDetailsResponse response = (SkuDetailsResponse) event;
         final boolean result;
         final String msg;
-        if (setupResponse.getBillingProvider() == null) {
-            msg = "Billing provider is set to null";
-            result =  false;
-        } else if (setupResponse.getBillingProvider().getInfo().getName().equals(name)) {
+        if (response.isSuccessful() != isSuccessful) {
+            msg = "Not expected success result";
+            result = false;
+        } else if (response.getProviderInfo() == null) {
+            msg = "Provider info is set to null";
+            result = false;
+        } else if (response.getProviderInfo().getName().equals(name)) {
             msg = "";
             result = true;
         } else {

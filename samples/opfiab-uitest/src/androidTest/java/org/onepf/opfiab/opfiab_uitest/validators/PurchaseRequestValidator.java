@@ -33,8 +33,8 @@ public class PurchaseRequestValidator extends TypedEventValidator<PurchaseReques
     }
 
     @Override
-    public boolean validate(Object event, final boolean isLogging) {
-        if (!super.validate(event, isLogging)) {
+    public boolean validate(Object event, final boolean isLogging, final String logTag) {
+        if (!super.validate(event, isLogging, logTag)) {
             return false;
         }
         final PurchaseRequest request = (PurchaseRequest) event;
@@ -42,7 +42,7 @@ public class PurchaseRequestValidator extends TypedEventValidator<PurchaseReques
             return true;
         } else {
             if (isLogging) {
-                OPFLog.e("Wrong provider's sku");
+                OPFLog.e(String.format("[%s]: %s", logTag, "Wrong provider's sku"));
             }
             return false;
         }

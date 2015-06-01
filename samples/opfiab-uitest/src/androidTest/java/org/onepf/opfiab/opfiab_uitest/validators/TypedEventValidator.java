@@ -31,10 +31,10 @@ public abstract class TypedEventValidator<T> implements EventValidator {
     }
 
     @Override
-    public boolean validate(Object event, final boolean isLogging) {
+    public boolean validate(Object event, final boolean isLogging, final String logTag) {
         final boolean result = clazz.isInstance(event);
         if (isLogging && !result) {
-            OPFLog.e(String.format("Wrong Type Event. Expected: %s. Received: %s",
+            OPFLog.e(String.format("[%s]: Wrong Type Event. Expected: %s. Received: %s", logTag,
                                    clazz.getSimpleName(), event.getClass().getSimpleName()));
         }
         return result;
