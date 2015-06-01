@@ -16,251 +16,175 @@
 
 package org.onepf.opfiab.opfiab_uitest.tests;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.app.Instrumentation;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.LargeTest;
 
-import junit.framework.Assert;
-
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onepf.opfiab.listener.BillingListener;
-import org.onepf.opfiab.listener.SimpleBillingListener;
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.api.ActivityIabHelper;
+import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.SetupResponse;
-import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.opfiab_uitest.ActivityHelperActivity;
-import org.onepf.opfiab.opfiab_uitest.R;
-import org.onepf.opfiab.opfiab_uitest.mock.MockBillingProvider;
-import org.onepf.opfiab.opfiab_uitest.mock.MockFailBillingProvider;
-import org.onepf.opfiab.opfiab_uitest.mock.MockOkBillingProvider;
+import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
+import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
+import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
+import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
+import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Random;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author antonpp
- * @since 14.05.15
+ * @since 15.05.15
  */
 @RunWith(AndroidJUnit4.class)
-public class ActivityHelperTest extends ActivityInstrumentationTestCase2<ActivityHelperActivity> {
+@LargeTest
+public class ActivityHelperTest {
 
-    private static final String TAG = ActivityHelperTest.class.getSimpleName();
-    private static final long MAX_WAIT_TIME = MockBillingProvider.SLEEP_TIME * 4l;
-    private static final int TESTS_COUNT = 20;
-    private static final Random RND = new Random();
-    private static final long MAX_SUBSEQUENT_DELAY = 300L;
+    private static final long MAX_WAIT_TIME = 1000L;
+    private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
+    private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
+    private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
-    @Nullable
-    private ActivityHelperActivity activity;
+    private static final int NUM_TESTS = 10;
 
-    public ActivityHelperTest() {
-        super(ActivityHelperActivity.class);
-    }
+    @Rule
+    public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
+
+    private EmptyActivity activity;
+    private Instrumentation instrumentation;
 
     @Before
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
-
-        injectInstrumentation(InstrumentationRegistry.getInstrumentation());
-
-        activity = getActivity();
+        activity = testRule.getActivity();
+        setupDexmaker();
+        instrumentation = InstrumentationRegistry.getInstrumentation();
     }
 
-    @After
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-        activity = null;
+    /**
+     * Workaround for Mockito and JB-MR2 incompatibility to avoid
+     * java.lang.IllegalArgumentException: dexcache == null
+     *
+     * @see <a href="https://code.google.com/p/dexmaker/issues/detail?id=2">
+     * https://code.google.com/p/dexmaker/issues/detail?id=2</a>
+     */
+    private void setupDexmaker() {
+        // Explicitly set the Dexmaker cache, so tests that use mockito work
+        final String dexCache = activity.getCacheDir().getPath();
+        System.setProperty("dexmaker.dexcache", dexCache);
     }
 
     @Test
-    public void testSuccessfulPurchase() {
-        final CountDownLatch purchaseLatch = new CountDownLatch(1);
-        prepareBillingListener(purchaseLatch, null);
+    public void testPurchase() throws InterruptedException {
+        final String name = "Absolutely random name";
+        final BillingProvider billingProvider = prepareMockProvider(name);
 
-        initSetupBuy(R.id.button_init_ok);
+        final TestManager testManager = new TestManager.Builder()
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(name))
+                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
+                .expectEvent(new PurchaseResponseValidator(name, true))
+                .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
+                .build();
 
-        checkExpectedCalls(purchaseLatch, MAX_WAIT_TIME,
-                           "Failed to receive a correct purchase callback");
-    }
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(testAdapter)
+                .build();
 
-    private void prepareBillingListener(CountDownLatch successLatch, CountDownLatch failLatch) {
-        final CountDownLatch threadSyncLatch = new CountDownLatch(1);
-        final BillingListener listener = new TestBillingListener(successLatch, failLatch);
+        testAdapter.addTestManager(testManager);
 
-        assert activity != null;
-
-        activity.runOnUiThread(new Runnable() {
+        instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
-                activity.setBillingListener(listener);
-                threadSyncLatch.countDown();
-            }
-        });
 
-        awaitLatch(threadSyncLatch);
-    }
+                OPFIab.init(activity.getApplication(), configuration);
+                final ActivityIabHelper iabHelper = OPFIab.getActivityHelper(activity);
+                OPFIab.setup();
 
-    private void initSetupBuy(int initBtnId) {
-        onView(withId(initBtnId)).perform(click());
-        onView(withId(R.id.button_setup)).perform(click());
-        onView(withId(R.id.button_buy_consumable)).perform(click());
-    }
-
-    private void checkExpectedCalls(CountDownLatch latch, long timeout, String msg) {
-        awaitLatch(latch, timeout);
-        if (latch.getCount() != 0) {
-            Assert.fail(msg);
-        }
-    }
-
-    private void awaitLatch(CountDownLatch latch) {
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void awaitLatch(CountDownLatch latch, long ms) {
-        try {
-            latch.await(ms, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testFailedPurchase() {
-        final CountDownLatch purchaseLatch = new CountDownLatch(1);
-        prepareBillingListener(null, purchaseLatch);
-
-        initSetupBuy(R.id.button_init_fail);
-
-        checkExpectedCalls(purchaseLatch, MAX_WAIT_TIME,
-                           "Failed to receive a correct purchase callback");
-    }
-
-    @Test
-    public void testMultipleSuccessfulPurchases() {
-        final CountDownLatch purchaseLatch = new CountDownLatch(TESTS_COUNT);
-        prepareBillingListener(purchaseLatch, null);
-
-        onView(withId(R.id.button_init_ok)).perform(click());
-        onView(withId(R.id.button_setup)).perform(click());
-
-        for (int i = 0; i < TESTS_COUNT; ++i) {
-            onView(withId(R.id.button_buy_consumable)).perform(click());
-        }
-
-        checkExpectedCalls(purchaseLatch, MAX_WAIT_TIME * TESTS_COUNT, "Failed to receive a correct number of purchase callbacks");
-    }
-
-    @Test
-    public void testMultiInitSetup() {
-        final int expectedOk = RND.nextInt(TESTS_COUNT);
-        final Collection<Boolean> tests = new ArrayList<>(TESTS_COUNT);
-        for (int i = 0; i < expectedOk; ++i) {
-            tests.add(true);
-        }
-        for (int i = expectedOk; i < TESTS_COUNT; ++i) {
-            tests.add(false);
-        }
-        final CountDownLatch okLatch = new CountDownLatch(expectedOk);
-        final CountDownLatch failLatch = new CountDownLatch(TESTS_COUNT - expectedOk);
-        final CountDownLatch setupLatch = new CountDownLatch(expectedOk);
-
-
-        prepareBillingListener(okLatch, failLatch);
-        prepareSetupListener(setupLatch);
-
-        Assert.assertNotNull(activity);
-
-        for (boolean isOk : tests) {
-            activity.setCustomConfiguration(getRandomConfiguration(isOk));
-            initSetupBuy(R.id.button_init);
-        }
-
-        String msg = String.format("Failed to receive all successful purchases callbacks (%d of %d)"
-                , expectedOk - okLatch.getCount(), expectedOk);
-        checkExpectedCalls(okLatch, MAX_WAIT_TIME * TESTS_COUNT, msg);
-        msg = String.format("Failed to receive all failed purchases callbacks (%d of %d)"
-                , TESTS_COUNT - expectedOk - failLatch.getCount(), TESTS_COUNT - expectedOk);
-        checkExpectedCalls(failLatch, MAX_WAIT_TIME, msg);
-        msg = String.format("Not all registrations were successful (%d of %d[%d])"
-                , TESTS_COUNT - setupLatch.getCount(), TESTS_COUNT, expectedOk);
-        checkExpectedCalls(setupLatch, MAX_WAIT_TIME, msg);
-    }
-
-    private void prepareSetupListener(final CountDownLatch successLatch) {
-        final CountDownLatch threadSyncLatch = new CountDownLatch(1);
-        final BillingListener listener = new SimpleBillingListener() {
-            @Override
-            public void onSetupResponse(@NonNull SetupResponse setupResponse) {
-                super.onSetupResponse(setupResponse);
-                if (setupResponse.isSuccessful()) {
-                    successLatch.countDown();
+                for (int i = 0; i < NUM_TESTS; ++i) {
+                    iabHelper.purchase(SKU_CONSUMABLE);
                 }
             }
-        };
-
-        assert activity != null;
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                activity.setBillingListener(listener);
-                threadSyncLatch.countDown();
-            }
         });
 
-        awaitLatch(threadSyncLatch);
+        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
     }
 
-    private Configuration getRandomConfiguration(boolean isOk) {
-        return new Configuration.Builder()
-                .addBillingProvider(isOk ? new MockOkBillingProvider() : new MockFailBillingProvider())
-                .setAutoRecover(RND.nextBoolean())
-                .setSkipUnauthorised(RND.nextBoolean())
-                .setSubsequentRequestDelay(RND.nextLong() % MAX_SUBSEQUENT_DELAY)
+    private BillingProvider prepareMockProvider(String name) {
+        return new MockBillingProviderBuilder()
+                .setIsAuthorised(true)
+                .setIsAvailable(true)
+                .setInfo(new BillingProviderInfo(name, null))
                 .build();
     }
 
-    private static final class TestBillingListener extends SimpleBillingListener {
+    @Test
+    public void testSingleSetup() throws InterruptedException {
+        final String name = "Absolutely random name";
+        final BillingProvider billingProvider = prepareMockProvider(name);
 
-        private final CountDownLatch successLatch;
-        private final CountDownLatch failLatch;
+        final TestManager testManager = new TestManager.Builder()
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(name))
+                .build();
 
-        public TestBillingListener(CountDownLatch successLatch, CountDownLatch failLatch) {
-            this.successLatch = successLatch;
-            this.failLatch = failLatch;
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(testAdapter)
+                .build();
+
+        testAdapter.addTestManager(testManager);
+
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                OPFIab.init(activity.getApplication(), configuration);
+                OPFIab.setup();
+            }
+        });
+
+        assertTrue(testManager.await(MAX_WAIT_TIME));
+    }
+
+    @Test
+    public void testMultiSetup() throws InterruptedException {
+        final String[] bpNames = new String[NUM_TESTS];
+        for (int i = 0; i < NUM_TESTS; ++i) {
+            bpNames[i] = String.format("BillingProviderN%d", i);
         }
+        final TestManager.Builder builder = new TestManager.Builder()
+                .expectEvent(new SetupResponseValidator(bpNames[NUM_TESTS - 1]));
 
-        @Override
-        public void onPurchase(@NonNull PurchaseResponse purchaseResponse) {
-            super.onPurchase(purchaseResponse);
-            if (purchaseResponse.isSuccessful()) {
-                if (successLatch != null) {
-                    successLatch.countDown();
-                }
-            } else {
-                if (failLatch != null) {
-                    failLatch.countDown();
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter();
+        final TestManager testManager = builder.build();
+        testAdapter.addTestManager(testManager);
+
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i < NUM_TESTS; ++i) {
+                    final Configuration configuration = new Configuration.Builder()
+                            .addBillingProvider(prepareMockProvider(bpNames[i]))
+                            .setBillingListener(testAdapter)
+                            .build();
+                    OPFIab.init(activity.getApplication(), configuration);
+                    OPFIab.setup();
                 }
             }
-        }
+        });
+
+        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
     }
 }
