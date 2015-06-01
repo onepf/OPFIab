@@ -402,12 +402,115 @@ public class AdvancedHelperTest {
 
     @Test
     public void testUnregister() throws Exception {
+        final BillingProvider billingProvider = new MockBillingProviderBuilder()
+                .setIsAuthorised(true)
+                .setWillPostSuccess(true)
+                .setInfo(new BillingProviderInfo(TEST_PROVIDER_NAME, TEST_PROVIDER_PACKAGE))
+                .setIsAvailable(true)
+                .build();
 
+        final TestManager testBeforeUnregistrationManager = new TestManager.Builder()
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
+                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
+                .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
+                .expectEvent(new InventoryResponseValidator(TEST_PROVIDER_NAME, true, null))
+                .expectEvent(new SkuDetailsResponseValidator(TEST_PROVIDER_NAME, true))
+                .expectEvent(new ConsumeResponseValidator(TEST_PROVIDER_NAME, true))
+                .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
+                .setTag("BeforeUnreg")
+                .build();
+
+        final BillingManagerAdapter testAdapter = new BillingManagerAdapter(
+                testBeforeUnregistrationManager);
+        final Configuration configuration = new Configuration.Builder()
+                .addBillingProvider(billingProvider)
+                .setBillingListener(testAdapter)
+                .build();
+
+        final TestBillingListener[] listeners = {new TestBillingListener(), // setup
+                new TestBillingListener(),                                  // purchase
+                new TestBillingListener(),                                  // inventory
+                new TestBillingListener(),                                  // skuDetails
+                new TestBillingListener()};                                 // consume
+
+        final AdvancedIabHelper[] helpers = new AdvancedIabHelper[1];
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                OPFIab.init(activity.getApplication(), configuration);
+                helpers[0] = OPFIab.getAdvancedHelper();
+                final AdvancedIabHelper helper = helpers[0];
+
+                helper.addSetupListener(listeners[0]);
+                helper.addPurchaseListener(listeners[1]);
+                helper.addInventoryListener(listeners[2]);
+                helper.addSkuDetailsListener(listeners[3]);
+                helper.addConsumeListener(listeners[4]);
+
+                helper.addPurchaseListener(new OnPurchaseListener() {
+                    @Override
+                    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+                        if (purchaseResponse.getPurchase() != null) {
+                            helper.consume(purchaseResponse.getPurchase());
+                        }
+                    }
+                });
+                helper.register();
+
+                OPFIab.setup();
+                helper.purchase(SKU_CONSUMABLE);
+                helper.purchase(SKU_SUBSCRIPTION);
+                helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
+                helper.inventory(true);
+            }
+        });
+
+        Assert.assertTrue(testBeforeUnregistrationManager.await(MAX_WAIT_TIME * 4));
+
+        final TestManager testAfterUnRegistrationManager = new TestManager.Builder()
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
+                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
+                .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
+                .expectEvent(new InventoryResponseValidator(TEST_PROVIDER_NAME, true, null))
+                .expectEvent(new SkuDetailsResponseValidator(TEST_PROVIDER_NAME, true))
+                .expectEvent(new ConsumeResponseValidator(TEST_PROVIDER_NAME, true))
+                .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
+                .setTag("AfterUnreg")
+                .build();
+
+        testAdapter.addTestManager(testAfterUnRegistrationManager);
+
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                final AdvancedIabHelper helper = helpers[0];
+
+                helper.unregister();
+
+                OPFIab.setup();
+                helper.purchase(SKU_CONSUMABLE);
+                helper.purchase(SKU_SUBSCRIPTION);
+                helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
+                helper.inventory(true);
+            }
+        });
+
+        Assert.assertTrue(testAfterUnRegistrationManager.await(MAX_WAIT_TIME * 4));
     }
 
     private static final class TestBillingListener implements BillingListener {
 
-        private boolean failOnReceive = false;
+        private boolean failOnReceive;
+
+        private TestBillingListener() {
+            failOnReceive = false;
+        }
+
+        public TestBillingListener(final boolean failOnReceive) {
+            this.failOnReceive = failOnReceive;
+        }
 
         public void setFailOnReceive(final boolean failOnReceive) {
             this.failOnReceive = failOnReceive;
@@ -446,11 +549,6 @@ public class AdvancedHelperTest {
         }
 
         @Override
-        public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-            fail();
-        }
-
-        @Override
         public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
             fail();
         }
@@ -459,6 +557,13 @@ public class AdvancedHelperTest {
         public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
             fail();
         }
+
+        @Override
+        public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+            fail();
+        }
+
+
 
 
     }
