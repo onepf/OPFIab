@@ -22,7 +22,7 @@ android {
 
     defaultConfig {
         applicationId "org.onepf.opfiab.opfiab_uitest"
-        minSdkVersion 15
+        minSdkVersion 18
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -43,7 +43,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'com.android.support:appcompat-v7:22.2.0'
 
     compile project(':opfiab')
 
@@ -52,20 +52,15 @@ dependencies {
     compile 'org.onepf:opfutils:0.1.21'
 
     // App's dependencies, including test
-    compile 'com.android.support:support-annotations:22.1.1'
+    compile 'com.android.support:support-annotations:22.2.0'
+    androidTestCompile 'com.android.support:support-annotations:22.2.0'
 
     // Testing-only dependencies
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.1') {
-        exclude module: 'support-annotations'
-    }
-
-    androidTestCompile('com.android.support.test:runner:0.2') {
-        exclude module: 'support-annotations'
-    }
-    androidTestCompile('com.android.support.test:rules:0.2') {
-        exclude module: 'support-annotations'
-    }
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
+    androidTestCompile 'com.android.support.test:runner:0.2'
+    androidTestCompile 'com.android.support.test:rules:0.2'
     androidTestCompile 'org.mockito:mockito-core:1.10.19'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.0'
 }

@@ -34,10 +34,10 @@ import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
-import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseRequestValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.SetupResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.SetupStartedEventValidator;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

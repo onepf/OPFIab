@@ -49,16 +49,14 @@ import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
  */
 public class MockBillingProviderBuilder {
 
-    private static final long SLEEP_TIME = 50L;
+    private static final long DEFAULT_SLEEP_TIME = 50L;
     private final BillingProvider mock = mock(BillingProvider.class);
 
-    public MockBillingProviderBuilder() {
-        setWillPostSuccess(true);
-    }
+    private long sleepTime = DEFAULT_SLEEP_TIME;
+    private boolean willPostSuccess = true;
 
     public MockBillingProviderBuilder setWillPostSuccess(boolean willPostSuccess) {
-        doAnswer(new BillingAnswer(willPostSuccess)).when(mock).onEventAsync(
-                any(BillingRequest.class));
+        this.willPostSuccess = willPostSuccess;
         return this;
     }
 
@@ -77,22 +75,31 @@ public class MockBillingProviderBuilder {
         return this;
     }
 
+    public MockBillingProviderBuilder setSleepTime(long sleepTime) {
+        this.sleepTime = sleepTime;
+        return this;
+    }
+
     public BillingProvider build() {
+        doAnswer(new BillingAnswer(willPostSuccess, sleepTime)).when(mock).onEventAsync(
+                any(BillingRequest.class));
         return mock;
     }
 
     private final class BillingAnswer implements Answer<Void> {
 
         private final boolean willPostSuccess;
+        private final long sleepTime;
 
-        public BillingAnswer(boolean willPostSuccess) {
+        public BillingAnswer(boolean willPostSuccess, final long sleepTime) {
             this.willPostSuccess = willPostSuccess;
+            this.sleepTime = sleepTime;
         }
 
         @Override
         public Void answer(final InvocationOnMock invocationOnMock) throws Throwable {
             final BillingRequest billingRequest = (BillingRequest)invocationOnMock.getArguments()[0];
-            Thread.sleep(SLEEP_TIME);
+            Thread.sleep(sleepTime);
             switch (billingRequest.getType()) {
                 case CONSUME:
                     return answerConsume((ConsumeRequest) billingRequest);

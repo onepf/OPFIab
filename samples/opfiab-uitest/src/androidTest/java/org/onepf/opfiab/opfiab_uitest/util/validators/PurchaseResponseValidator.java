@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest.validators;
+package org.onepf.opfiab.opfiab_uitest.util.validators;
 
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfutils.OPFLog;

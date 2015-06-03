@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest.validators;
+package org.onepf.opfiab.opfiab_uitest.util.validators;
 
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfutils.OPFLog;
 
 /**
  * @author antonpp
  * @since 01.06.15
  */
-public class SkuDetailsResponseValidator extends TypedEventValidator<SkuDetailsResponse> {
+public class ConsumeResponseValidator extends TypedEventValidator<ConsumeResponse> {
 
     private final String name;
     private final boolean isSuccessful;
 
-    public SkuDetailsResponseValidator(final String name, final boolean isSuccessful) {
-        super(SkuDetailsResponse.class);
+    public ConsumeResponseValidator(final String name, final boolean isSuccessful) {
+        super(ConsumeResponse.class);
         this.name = name;
         this.isSuccessful = isSuccessful;
     }
@@ -39,8 +39,7 @@ public class SkuDetailsResponseValidator extends TypedEventValidator<SkuDetailsR
         if (!super.validate(event, isLogging, logTag)) {
             return false;
         }
-
-        final SkuDetailsResponse response = (SkuDetailsResponse) event;
+        final ConsumeResponse response = (ConsumeResponse) event;
         final boolean result;
         final String msg;
         if (response.isSuccessful() != isSuccessful) {

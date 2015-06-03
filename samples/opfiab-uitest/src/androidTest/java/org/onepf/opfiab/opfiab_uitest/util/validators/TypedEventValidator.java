@@ -14,37 +14,29 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest.validators;
+package org.onepf.opfiab.opfiab_uitest.util.validators;
 
-import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfutils.OPFLog;
 
 /**
  * @author antonpp
- * @since 28.05.15
+ * @since 25.05.15
  */
-public class PurchaseRequestValidator extends TypedEventValidator<PurchaseRequest> {
+public abstract class TypedEventValidator<T> implements EventValidator {
 
-    private final String sku;
+    protected final Class<T> clazz;
 
-    public PurchaseRequestValidator(String sku) {
-        super(PurchaseRequest.class);
-        this.sku = sku;
+    protected TypedEventValidator(Class<T> clazz) {
+        this.clazz = clazz;
     }
 
     @Override
     public boolean validate(Object event, final boolean isLogging, final String logTag) {
-        if (!super.validate(event, isLogging, logTag)) {
-            return false;
+        final boolean result = clazz.isInstance(event);
+        if (isLogging && !result) {
+            OPFLog.e(String.format("[%s]: Wrong Type Event. Expected: %s. Received: %s", logTag,
+                                   clazz.getSimpleName(), event.getClass().getSimpleName()));
         }
-        final PurchaseRequest request = (PurchaseRequest) event;
-        if (request.getSku().equals(sku)) {
-            return true;
-        } else {
-            if (isLogging) {
-                OPFLog.e(String.format("[%s]: %s", logTag, "Wrong provider's sku"));
-            }
-            return false;
-        }
+        return result;
     }
 }

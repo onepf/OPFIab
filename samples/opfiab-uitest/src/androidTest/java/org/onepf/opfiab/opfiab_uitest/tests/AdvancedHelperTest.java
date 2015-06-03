@@ -29,7 +29,6 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.AdvancedIabHelper;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.OnConsumeListener;
 import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
@@ -37,26 +36,19 @@ import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
-import org.onepf.opfiab.model.event.SetupResponse;
-import org.onepf.opfiab.model.event.SetupStartedEvent;
-import org.onepf.opfiab.model.event.billing.BillingRequest;
-import org.onepf.opfiab.model.event.billing.BillingResponse;
-import org.onepf.opfiab.model.event.billing.ConsumeResponse;
-import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
-import org.onepf.opfiab.opfiab_uitest.validators.ConsumeResponseValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.InventoryResponseValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.PurchaseRequestValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.PurchaseResponseValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.SetupResponseValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.SetupStartedEventValidator;
-import org.onepf.opfiab.opfiab_uitest.validators.SkuDetailsResponseValidator;
-import org.onepf.opfutils.OPFLog;
+import org.onepf.opfiab.opfiab_uitest.util.validators.ConsumeResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.EventValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.InventoryResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseRequestValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.SetupResponseValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.SetupStartedEventValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.SkuDetailsResponseValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -409,32 +401,41 @@ public class AdvancedHelperTest {
                 .setIsAvailable(true)
                 .build();
 
+        final EventValidator[] eventValidators = {
+                new SetupStartedEventValidator(),
+                new SetupResponseValidator(TEST_PROVIDER_NAME),
+                new PurchaseResponseValidator(TEST_PROVIDER_NAME, true),
+                new InventoryResponseValidator(TEST_PROVIDER_NAME, true, null),
+                new SkuDetailsResponseValidator(TEST_PROVIDER_NAME, true),
+        };
+
         final TestManager testBeforeUnregistrationManager = new TestManager.Builder()
-                .expectEvent(new SetupStartedEventValidator())
-                .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
-                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
-                .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
-                .expectEvent(new InventoryResponseValidator(TEST_PROVIDER_NAME, true, null))
-                .expectEvent(new SkuDetailsResponseValidator(TEST_PROVIDER_NAME, true))
+                .expectEvents(eventValidators)
                 .expectEvent(new ConsumeResponseValidator(TEST_PROVIDER_NAME, true))
                 .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .setTag("BeforeUnreg")
                 .build();
-
         final BillingManagerAdapter testAdapter = new BillingManagerAdapter(
                 testBeforeUnregistrationManager);
+
+        final TestManager subscribeSensitiveManager = new TestManager.Builder()
+                .expectEvents(eventValidators)
+                .expectEvent(new ConsumeResponseValidator(TEST_PROVIDER_NAME, true))
+                .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
+                .setFailOnReceive(true)
+                .setSkipWrongEvents(false)
+                .setTag("RegisterSensitive")
+                .build();
+        final BillingManagerAdapter subscribeSensitiveAdapter = new BillingManagerAdapter(
+                subscribeSensitiveManager);
+
+        final AdvancedIabHelper[] helpers = new AdvancedIabHelper[1];
+
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
                 .setBillingListener(testAdapter)
                 .build();
 
-        final TestBillingListener[] listeners = {new TestBillingListener(), // setup
-                new TestBillingListener(),                                  // purchase
-                new TestBillingListener(),                                  // inventory
-                new TestBillingListener(),                                  // skuDetails
-                new TestBillingListener()};                                 // consume
-
-        final AdvancedIabHelper[] helpers = new AdvancedIabHelper[1];
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
@@ -442,11 +443,11 @@ public class AdvancedHelperTest {
                 helpers[0] = OPFIab.getAdvancedHelper();
                 final AdvancedIabHelper helper = helpers[0];
 
-                helper.addSetupListener(listeners[0]);
-                helper.addPurchaseListener(listeners[1]);
-                helper.addInventoryListener(listeners[2]);
-                helper.addSkuDetailsListener(listeners[3]);
-                helper.addConsumeListener(listeners[4]);
+                helper.addSetupListener(subscribeSensitiveAdapter);
+                helper.addPurchaseListener(subscribeSensitiveAdapter);
+                helper.addInventoryListener(subscribeSensitiveAdapter);
+                helper.addSkuDetailsListener(subscribeSensitiveAdapter);
+                helper.addConsumeListener(subscribeSensitiveAdapter);
 
                 helper.addPurchaseListener(new OnPurchaseListener() {
                     @Override
@@ -460,7 +461,6 @@ public class AdvancedHelperTest {
 
                 OPFIab.setup();
                 helper.purchase(SKU_CONSUMABLE);
-                helper.purchase(SKU_SUBSCRIPTION);
                 helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
                 helper.inventory(true);
             }
@@ -469,13 +469,7 @@ public class AdvancedHelperTest {
         Assert.assertTrue(testBeforeUnregistrationManager.await(MAX_WAIT_TIME * 4));
 
         final TestManager testAfterUnRegistrationManager = new TestManager.Builder()
-                .expectEvent(new SetupStartedEventValidator())
-                .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
-                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
-                .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
-                .expectEvent(new InventoryResponseValidator(TEST_PROVIDER_NAME, true, null))
-                .expectEvent(new SkuDetailsResponseValidator(TEST_PROVIDER_NAME, true))
-                .expectEvent(new ConsumeResponseValidator(TEST_PROVIDER_NAME, true))
+                .expectEvents(eventValidators)
                 .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .setTag("AfterUnreg")
                 .build();
@@ -486,86 +480,16 @@ public class AdvancedHelperTest {
             @Override
             public void run() {
                 final AdvancedIabHelper helper = helpers[0];
-
                 helper.unregister();
 
                 OPFIab.setup();
                 helper.purchase(SKU_CONSUMABLE);
-                helper.purchase(SKU_SUBSCRIPTION);
                 helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
                 helper.inventory(true);
             }
         });
 
         Assert.assertTrue(testAfterUnRegistrationManager.await(MAX_WAIT_TIME * 4));
+        Assert.assertTrue(subscribeSensitiveManager.await(MAX_WAIT_TIME));
     }
-
-    private static final class TestBillingListener implements BillingListener {
-
-        private boolean failOnReceive;
-
-        private TestBillingListener() {
-            failOnReceive = false;
-        }
-
-        public TestBillingListener(final boolean failOnReceive) {
-            this.failOnReceive = failOnReceive;
-        }
-
-        public void setFailOnReceive(final boolean failOnReceive) {
-            this.failOnReceive = failOnReceive;
-        }
-
-        @Override
-        public void onRequest(@NonNull final BillingRequest billingRequest) {
-            fail();
-        }
-
-        private void fail() {
-            if (failOnReceive) {
-                OPFLog.e("Received unexpected event");
-                Assert.fail();
-            }
-        }
-
-        @Override
-        public void onResponse(@NonNull final BillingResponse billingResponse) {
-            fail();
-        }
-
-        @Override
-        public void onConsume(@NonNull final ConsumeResponse consumeResponse) {
-            fail();
-        }
-
-        @Override
-        public void onInventory(@NonNull final InventoryResponse inventoryResponse) {
-            fail();
-        }
-
-        @Override
-        public void onSetupStarted(@NonNull final SetupStartedEvent setupStartedEvent) {
-            fail();
-        }
-
-        @Override
-        public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
-            fail();
-        }
-
-        @Override
-        public void onSkuDetails(@NonNull final SkuDetailsResponse skuDetailsResponse) {
-            fail();
-        }
-
-        @Override
-        public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-            fail();
-        }
-
-
-
-
-    }
-
 }
