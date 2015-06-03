@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.Signature;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -57,6 +58,7 @@ public final class SamsungUtils {
     private static final String BILLING_PACKAGE_NAME = "com.sec.android.iap";
     private static final String ACCOUNT_ACTIVITY = "com.sec.android.iap.activity.AccountActivity";
     private static final String PURCHASE_ACTIVITY = "com.sec.android.iap.activity.PaymentMethodListActivity";
+    private static final String INSTALL_URI = "samsungapps://ProductDetail/com.sec.android.iap";
 
     private static final String KEY_TYPE = "mType";
 
@@ -116,6 +118,21 @@ public final class SamsungUtils {
                 return Status.SERVICE_UNAVAILABLE;
             default:
                 return Status.UNKNOWN_ERROR;
+        }
+    }
+
+    public static void promptInstall(@NonNull final Context context) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(INSTALL_URI));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+        }
+
+        try {
+            context.startActivity(intent);
+        } catch (ActivityNotFoundException exception) {
+            OPFLog.e("", exception);
         }
     }
 
@@ -336,11 +353,11 @@ public final class SamsungUtils {
 
     @NonNull
     public static Purchase convertPurchase(@NonNull final BillingProviderInfo info,
-                                           @NonNull final SamsungPurchase purchase) {
+                                           @NonNull final SamsungPurchase purchase,
+                                           @NonNull final ItemType itemType) {
         return new Purchase.Builder(purchase.getItemId())
                 .setOriginalJson(purchase.getOriginalJson())
-                // TODO
-                .setType(SkuType.UNKNOWN)
+                .setType(convertType(itemType))
                 .setToken(purchase.getPaymentId())
                 .setPurchaseTime(purchase.getPurchaseDate().getTime())
                 .setProviderInfo(info)

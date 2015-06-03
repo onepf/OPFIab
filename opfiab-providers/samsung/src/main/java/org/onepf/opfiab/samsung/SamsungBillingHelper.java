@@ -29,11 +29,12 @@ import com.sec.android.iap.IAPConnector;
 import org.onepf.opfiab.billing.AidlBillingHelper;
 import org.onepf.opfiab.samsung.model.ItemType;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
 class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
 
-    private static final String INTENT_PACKAGE = "com.sec.android.iap";
-    private static final String INTENT_CLASS = "com.sec.android.iap.service.IAPService";
+    private static final String IAP_PACKAGE = "com.sec.android.iap";
+    private static final String SERVICE_CLASS = "com.sec.android.iap.service.IAPService";
 
     private static final String START_DATE = "20130101";
 
@@ -49,11 +50,21 @@ class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
         this.packageName = context.getPackageName();
     }
 
+    @Nullable
+    @Override
+    public IAPConnector getService() {
+        if (!OPFUtils.isInstalled(context, IAP_PACKAGE)) {
+            SamsungUtils.promptInstall(context);
+            return null;
+        }
+        return super.getService();
+    }
+
     @NonNull
     @Override
     protected Intent getServiceIntent() {
         final Intent intent = new Intent();
-        intent.setComponent(new ComponentName(INTENT_PACKAGE, INTENT_CLASS));
+        intent.setComponent(new ComponentName(IAP_PACKAGE, SERVICE_CLASS));
         return intent;
     }
 

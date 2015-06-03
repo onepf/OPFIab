@@ -54,15 +54,13 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
      * <p/>
      * Can be overridden with {@link #getRequestCodes()}.
      */
-    protected static final int DEFAULT_REQUEST_CODE = 13685;
+    protected static final int REQUEST_CODE = 13685;
     /**
      * Timeout to give up on waiting for a new activity instance.
      */
     private static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
 
 
-    private final Collection<Integer> requestCodes = getRequestCodes();
-    protected final int requestCode = requestCodes.iterator().next();
     /**
      * Used to block library thread to wait for a new activity instance.
      */
@@ -91,13 +89,13 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
      *
      * @return Collection of request codes that should be handled by this billing provider. Can't be
      * null.
-     * @see #DEFAULT_REQUEST_CODE
+     * @see #REQUEST_CODE
      * @see Activity#startActivityForResult(Intent, int)
      * @see Activity#onActivityResult(int, int, Intent)
      */
     @NonNull
     protected Collection<Integer> getRequestCodes() {
-        return Collections.singletonList(DEFAULT_REQUEST_CODE);
+        return Collections.singletonList(REQUEST_CODE);
     }
 
     /**
@@ -153,7 +151,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
         final int requestCode = event.getRequestCode();
-        if (requestCodes.contains(requestCode)) {
+        if (getRequestCodes().contains(requestCode)) {
             // This request code should be handled by billing provider
             final int resultCode = event.getResultCode();
             final Activity activity = event.getActivity();
@@ -163,7 +161,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     }
 
     /**
-     * Handles result of activity previously started with {@link #DEFAULT_REQUEST_CODE}.
+     * Handles result of activity previously started with {@link #REQUEST_CODE}.
      * </p>
      * Calls {@link Activity#finish()} by default.
      */

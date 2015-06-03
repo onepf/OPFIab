@@ -24,8 +24,6 @@ public enum ItemType {
     CONSUMABLE("00"),
     NON_CONSUMABLE("01"),
     SUBSCRIPTION("02"),
-    //TODO
-    WTF("03"),
     ALL("10"),;
 
     @Nullable
