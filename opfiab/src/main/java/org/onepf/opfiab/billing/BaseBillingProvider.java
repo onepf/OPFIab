@@ -111,12 +111,11 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      * <br>
      * At this point sku should be already resolved with supplied {@link SkuResolver}.
      *
-     * @param activity can be null. Activity object to use for purchase if necessary.
      * @param sku      SKU to purchase.
      * @see Purchase
      * @see #postResponse(BillingResponse)
      */
-    protected abstract void purchase(@Nullable final Activity activity, @NonNull final String sku);
+    protected abstract void purchase(@NonNull final String sku);
 
     /**
      * Consumes specified Purchase.
@@ -139,7 +138,11 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
         OPFLog.logMethod(billingRequest);
-
+        final Activity activity = billingRequest.getActivity();
+        if (activity != null && !ActivityMonitor.isResumed(activity)) {
+            postEmptyResponse(billingRequest, USER_CANCELED);
+            return;
+        }
         final String resolvedSku;
         switch (billingRequest.getType()) {
             case CONSUME:
@@ -157,14 +160,8 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
                 break;
             case PURCHASE:
                 final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
-                final Activity activity = purchaseRequest.getActivity();
-                if (activity != null && OPFIabUtils.isActivityFake(activity)
-                        && !ActivityMonitor.isResumed(activity)) {
-                    postEmptyResponse(billingRequest, USER_CANCELED);
-                    break;
-                }
                 resolvedSku = skuResolver.resolve(purchaseRequest.getSku());
-                purchase(activity, resolvedSku);
+                purchase(resolvedSku);
                 break;
             case SKU_DETAILS:
                 final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) billingRequest;

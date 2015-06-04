@@ -50,7 +50,7 @@ public abstract class BillingResponse extends BillingEvent {
     @NonNull
     private final Status status;
 
-    protected BillingResponse(@NonNull final Type type,
+    protected BillingResponse(@NonNull final BillingEventType type,
                               @NonNull final Status status,
                               @Nullable final BillingProviderInfo providerInfo) {
         super(type);

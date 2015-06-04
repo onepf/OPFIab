@@ -71,7 +71,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
      * @see #getSku()
      */
     @NonNull
-    public abstract BillingModel substituteSku(@NonNull final String sku);
+    public abstract BillingModel copyWithSku(@NonNull final String sku);
 
     /**
      * Gets Store Keeping Unit (SKU) associated with this billing model.

@@ -45,7 +45,7 @@ public class SkuDetailsResponse extends BillingResponse {
     public SkuDetailsResponse(@NonNull final Status status,
                               @Nullable final BillingProviderInfo providerInfo,
                               @Nullable final Collection<SkuDetails> skusDetails) {
-        super(Type.SKU_DETAILS, status, providerInfo);
+        super(BillingEventType.SKU_DETAILS, status, providerInfo);
         this.skusDetails = skusDetails == null
                 ? null
                 : Collections.unmodifiableCollection(skusDetails);

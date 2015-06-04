@@ -90,7 +90,7 @@ public class Purchase extends BillingModel {
 
     @NonNull
     @Override
-    public Purchase substituteSku(@NonNull final String sku) {
+    public Purchase copyWithSku(@NonNull final String sku) {
         return new Builder(sku).setPurchase(this).build();
     }
 

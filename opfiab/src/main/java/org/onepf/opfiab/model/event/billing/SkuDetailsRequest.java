@@ -16,7 +16,9 @@
 
 package org.onepf.opfiab.model.event.billing;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,14 +42,18 @@ public class SkuDetailsRequest extends BillingRequest {
     // Must use serializable Set
     @SuppressWarnings("PMD.LooseCoupling")
     @NonNull
-    private final HashSet<String> skus;
+    private final HashSet<String> skus = new HashSet<>();
 
     public SkuDetailsRequest(@NonNull final Set<String> skus) {
-        super(Type.SKU_DETAILS);
-        if (skus.isEmpty()) {
-            throw new IllegalArgumentException("Sku list is empty.");
-        }
-        this.skus = new HashSet<>(skus);
+        this(null, false, skus);
+    }
+
+    @SuppressWarnings("TypeMayBeWeakened")
+    public SkuDetailsRequest(@Nullable final Activity activity,
+                                final boolean activityHandlesResult,
+                                @NonNull final Set<String> skus) {
+        super(BillingEventType.SKU_DETAILS, activity, activityHandlesResult);
+        this.skus.addAll(skus);
     }
 
     /**

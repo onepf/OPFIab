@@ -25,6 +25,12 @@ import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.ComponentState;
+import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
+
+import java.util.Set;
 
 /**
  * This {@link IabHelper} implementation works with supplied Activity instance. {@link
@@ -86,5 +92,20 @@ class ActivityIabHelperImpl extends ComponentIabHelper implements ActivityIabHel
     @Override
     public void purchase(@NonNull final String sku) {
         purchase(getActivity(), sku);
+    }
+
+    @Override
+    public void consume(@NonNull final Purchase purchase) {
+        postRequest(new ConsumeRequest(getActivity(), true, purchase));
+    }
+
+    @Override
+    public void inventory(final boolean startOver) {
+        postRequest(new InventoryRequest(getActivity(), true, startOver));
+    }
+
+    @Override
+    public void skuDetails(@NonNull final Set<String> skus) {
+        postRequest(new SkuDetailsRequest(getActivity(), true, skus));
     }
 }

@@ -240,7 +240,7 @@ public class GoogleBillingProvider
     }
 
     @Override
-    public void consume(@NonNull final Purchase purchase) {
+    public void consume(final Activity activity, @NonNull final Purchase purchase) {
         final String token = purchase.getToken();
         if (TextUtils.isEmpty(token)) {
             OPFLog.e("Purchase toke in empty.");
@@ -259,7 +259,7 @@ public class GoogleBillingProvider
     }
 
     @Override
-    public void skuDetails(@NonNull final Set<String> skus) {
+    public void skuDetails(final Activity activity, @NonNull final Set<String> skus) {
         final Bundle result = helper.getSkuDetails(skus);
         final Response response = GoogleUtils.getResponse(result);
         //noinspection ConstantConditions
@@ -295,7 +295,7 @@ public class GoogleBillingProvider
     }
 
     @Override
-    public void inventory(final boolean startOver) {
+    public void inventory(final Activity activity, final boolean startOver) {
         final Bundle result = helper.getPurchases(startOver);
         final Response response = GoogleUtils.getResponse(result);
         // noinspection ConstantConditions
@@ -364,8 +364,6 @@ public class GoogleBillingProvider
 
         final Purchase purchase = newPurchase(googlePurchase, signature);
         postPurchaseResponse(Status.SUCCESS, purchase);
-
-        super.onActivityResult(activity, requestCode, resultCode, data);
     }
 
 

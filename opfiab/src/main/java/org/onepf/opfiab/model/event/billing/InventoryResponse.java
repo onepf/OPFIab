@@ -49,7 +49,7 @@ public class InventoryResponse extends BillingResponse {
                              @Nullable final BillingProviderInfo providerInfo,
                              @Nullable final Map<Purchase, VerificationResult> inventory,
                              final boolean hasMore) {
-        super(Type.INVENTORY, status, providerInfo);
+        super(BillingEventType.INVENTORY, status, providerInfo);
         this.inventory = inventory == null ? null : Collections.unmodifiableMap(inventory);
         this.hasMore = hasMore;
     }

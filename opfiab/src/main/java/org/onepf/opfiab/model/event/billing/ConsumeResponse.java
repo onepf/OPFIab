@@ -39,7 +39,7 @@ public class ConsumeResponse extends BillingResponse {
     public ConsumeResponse(@NonNull final Status status,
                            @Nullable final BillingProviderInfo providerInfo,
                            @NonNull final Purchase purchase) {
-        super(Type.CONSUME, status, providerInfo);
+        super(BillingEventType.CONSUME, status, providerInfo);
         this.purchase = purchase;
     }
 

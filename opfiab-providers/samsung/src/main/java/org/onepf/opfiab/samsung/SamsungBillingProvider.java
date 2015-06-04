@@ -136,7 +136,7 @@ public class SamsungBillingProvider
     }
 
     @Override
-    protected void skuDetails(@NonNull final Set<String> skus) {
+    protected void skuDetails(final Activity activity, @NonNull final Set<String> skus) {
         final Bundle bundle = helper.getItemList(skuResolver.getGroupId());
         final Status error = SamsungUtils.getStatusForError(context, bundle);
         if (error != null) {
@@ -167,7 +167,7 @@ public class SamsungBillingProvider
     }
 
     @Override
-    protected void inventory(final boolean startOver) {
+    protected void inventory(final Activity activity, final boolean startOver) {
         final Bundle bundle = helper.getItemsInbox(skuResolver.getGroupId());
         final Status error = SamsungUtils.getStatusForError(context, bundle);
         if (error != null) {
@@ -192,7 +192,7 @@ public class SamsungBillingProvider
     }
 
     @Override
-    protected void consume(@NonNull final Purchase purchase) {
+    protected void consume(final Activity activity, @NonNull final Purchase purchase) {
         // Samsung doesn't support consume http://developer.samsung.com/forum/thread/a/201/244297
         postConsumeResponse(SUCCESS, purchase);
     }
@@ -245,7 +245,6 @@ public class SamsungBillingProvider
                     break;
             }
         }
-        super.onActivityResult(activity, requestCode, resultCode, data);
     }
 
     public static class Builder

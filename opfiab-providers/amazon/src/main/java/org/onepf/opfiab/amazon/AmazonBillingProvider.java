@@ -310,7 +310,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     }
 
     @Override
-    public void purchase(@Nullable final Activity activity, @NonNull final String sku) {
+    public void purchase(@NonNull final String sku) {
         PurchasingService.purchase(sku);
     }
 

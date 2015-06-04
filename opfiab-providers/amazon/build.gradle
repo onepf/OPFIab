@@ -69,7 +69,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     debugCompile 'com.google.code.findbugs:annotations:3.0.0'
     releaseCompile 'org.onepf.findbugs:annotations:1.0'
-    compile 'com.android.support:support-annotations:21.0.3'
 
     compile project(':opfiab')
     provided 'org.onepf:opfutils:0.1.22'

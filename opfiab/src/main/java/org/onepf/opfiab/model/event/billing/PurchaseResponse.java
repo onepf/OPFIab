@@ -48,7 +48,7 @@ public class PurchaseResponse extends BillingResponse {
                             @Nullable final BillingProviderInfo providerInfo,
                             @Nullable final Purchase purchase,
                             @Nullable final VerificationResult verificationResult) {
-        super(Type.PURCHASE, status, providerInfo);
+        super(BillingEventType.PURCHASE, status, providerInfo);
         this.purchase = purchase;
         this.verificationResult = verificationResult;
     }

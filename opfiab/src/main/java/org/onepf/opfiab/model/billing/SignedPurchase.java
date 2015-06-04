@@ -66,7 +66,7 @@ public class SignedPurchase extends Purchase {
 
     @NonNull
     @Override
-    public Purchase substituteSku(@NonNull final String sku) {
+    public Purchase copyWithSku(@NonNull final String sku) {
         return new Builder(sku).setSignedPurchase(this).build();
     }
 

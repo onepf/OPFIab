@@ -19,30 +19,31 @@ package org.onepf.opfiab.billing;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.android.OPFIabActivity;
-import org.onepf.opfiab.model.event.RequestHandledEvent;
+import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
 import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.billing.BillingEventType;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
-import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.Set;
 
 /**
- * Extension of {@link BillingProvider} which guarantees non-null {@link Activity} object in {@link #purchase(Activity,
- * String)}.
+ * Extension of {@link BillingProvider} which guarantees non-null {@link Activity} object for all
+ * requests matching {@link #needsActivity(BillingRequest)}.
  * <br>
  * New instance of {@link OPFIabActivity} will be launched if necessary.
  */
@@ -60,21 +61,8 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
      */
     private static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
 
-
-    /**
-     * Used to block library thread to wait for a new activity instance.
-     */
-    private final Semaphore semaphore = new Semaphore(0);
-    /**
-     * Request waiting for a new activity instance.
-     */
     @Nullable
-    private volatile PurchaseRequest pendingRequest;
-    /**
-     * Copy of {@link #pendingRequest} but with a newly created activity instance attached to it.
-     */
-    @Nullable
-    private volatile PurchaseRequest activityRequest;
+    private volatile SyncedReference<Activity> syncActivity;
 
     protected ActivityBillingProvider(@NonNull final Context context,
                                       @NonNull final R skuResolver,
@@ -89,6 +77,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
      *
      * @return Collection of request codes that should be handled by this billing provider. Can't be
      * null.
+     *
      * @see #REQUEST_CODE
      * @see Activity#startActivityForResult(Intent, int)
      * @see Activity#onActivityResult(int, int, Intent)
@@ -98,79 +87,120 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         return Collections.singletonList(REQUEST_CODE);
     }
 
-    /**
-     * @param activity can't be null.
-     */
-    @Override
-    protected abstract void purchase(
-            @SuppressWarnings("NullableProblems") @NonNull final Activity activity,
-            @NonNull final String sku);
+    protected boolean needsActivity(@NonNull final BillingRequest billingRequest) {
+        return billingRequest.getType() == BillingEventType.PURCHASE;
+    }
+
+    @Nullable
+    private Activity getActivity() {
+        final SyncedReference<Activity> syncedReference = syncActivity;
+        return syncedReference == null ? null : syncedReference.get();
+    }
 
     @Override
-    public void onEventAsync(@NonNull final BillingRequest billingRequest) {
-        final PurchaseRequest purchaseRequest;
-        if (billingRequest.getType() != BillingRequest.Type.PURCHASE
-                || !(purchaseRequest = (PurchaseRequest) billingRequest).needsFakeActivity()) {
-            super.onEventAsync(billingRequest);
-            return;
-        }
-        // We have to start OPFIabActivity to properly handle this request
-        pendingRequest = (PurchaseRequest) billingRequest;
-        semaphore.drainPermits();
-        activityRequest = null;
-        final Activity activity = purchaseRequest.getActivity();
-        OPFIabActivity.start(activity == null ? context : activity);
+    protected final void purchase(@NonNull final String sku) {
+        purchase(getActivity(), sku);
+    }
+
+    @Override
+    protected final void consume(@NonNull final Purchase purchase) {
+        consume(getActivity(), purchase);
+    }
+
+    @Override
+    protected final void inventory(final boolean startOver) {
+        inventory(getActivity(), startOver);
+    }
+
+    @Override
+    protected final void skuDetails(@NonNull final Set<String> skus) {
+        skuDetails(getActivity(), skus);
+    }
+
+    protected abstract void purchase(final Activity activity, @NonNull final String sku);
+
+    protected abstract void consume(final Activity activity, @NonNull final Purchase purchase);
+
+    protected abstract void inventory(final Activity activity, final boolean startOver);
+
+    protected abstract void skuDetails(final Activity activity, @NonNull final Set<String> skus);
+
+    @Override
+    protected void handleRequest(@NonNull final BillingRequest billingRequest) {
+        final SyncedReference<Activity> syncedReference = new SyncedReference<>();
         try {
-            // Wait for activity to start
-            if (!semaphore.tryAcquire(ACTIVITY_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                OPFLog.e("Fake activity start time out. Request: %s", billingRequest);
+            this.syncActivity = syncedReference;
+            final Activity activity = billingRequest.getActivity();
+            final boolean handlesResult = billingRequest.isActivityHandlesResult();
+            if (!needsActivity(billingRequest) || (activity != null && handlesResult)) {
+                syncedReference.set(activity);
+                super.handleRequest(billingRequest);
+                return;
             }
-        } catch (InterruptedException exception) {
-            OPFLog.e("", exception);
-        }
-        pendingRequest = null;
-        final BillingRequest activityRequest = this.activityRequest;
-        if (activityRequest == null) {
-            // Can't process request without activity
-            OPFLog.e("Failed to add activity to request: %s", billingRequest);
-            OPFIab.post(new RequestHandledEvent(billingRequest));
-            postEmptyResponse(billingRequest, Status.UNKNOWN_ERROR);
-        } else {
-            super.onEventAsync(activityRequest);
+            // We have to start OPFIabActivity to properly handle this request
+            OPFIabActivity.start(activity == null ? context : activity);
+            final Activity newActivity = syncedReference.get(ACTIVITY_TIMEOUT);
+            if (newActivity == null) {
+                OPFLog.e("Failed to make new activity for request.");
+                postEmptyResponse(billingRequest, Status.UNKNOWN_ERROR);
+            } else {
+                super.handleRequest(billingRequest);
+            }
+        } finally {
+            this.syncActivity = null;
         }
     }
 
+    @CallSuper
     public void onEventMainThread(@NonNull final ActivityNewIntentEvent intentEvent) {
-        final PurchaseRequest pendingRequest = this.pendingRequest;
-        if (pendingRequest != null) {
+        final SyncedReference<Activity> syncedReference = syncActivity;
+        if (syncedReference != null) {
             final Activity activity = intentEvent.getActivity();
-            activityRequest = new PurchaseRequest(activity, pendingRequest.getSku());
-            semaphore.release();
+            syncedReference.set(activity);
         }
     }
 
     public final void onEventAsync(@NonNull final ActivityResultEvent event) {
+        deliverActivityResult(event);
+    }
+
+    public final void onEventMainThread(@NonNull final ActivityResultEvent event) {
+        deliverActivityResult(event);
+    }
+
+    private void deliverActivityResult(@NonNull final ActivityResultEvent event) {
         final int requestCode = event.getRequestCode();
-        if (getRequestCodes().contains(requestCode)) {
-            // This request code should be handled by billing provider
-            final int resultCode = event.getResultCode();
-            final Activity activity = event.getActivity();
-            final Intent data = event.getData();
+        if (!getRequestCodes().contains(requestCode)) {
+            return;
+        }
+        // This request code should be handled by billing provider
+        final int resultCode = event.getResultCode();
+        final Activity activity = event.getActivity();
+        final Intent data = event.getData();
+        if (OPFUtils.isMainThread()) {
+            onActivityResultSync(activity, requestCode, resultCode, data);
+        } else {
             onActivityResult(activity, requestCode, resultCode, data);
+            if (OPFIabUtils.isActivityFake(activity)) {
+                activity.finish();
+            }
         }
     }
 
     /**
      * Handles result of activity previously started with {@link #REQUEST_CODE}.
-     * </p>
-     * Calls {@link Activity#finish()} by default.
      */
-    protected void onActivityResult(@NonNull final Activity activity,
-                                    final int requestCode,
-                                    final int resultCode,
-                                    @Nullable final Intent data) {
-        if (OPFIabUtils.isActivityFake(activity)) {
-            activity.finish();
-        }
+    protected abstract void onActivityResult(@NonNull final Activity activity,
+                                             final int requestCode,
+                                             final int resultCode,
+                                             @Nullable final Intent data);
+
+    /**
+     * Same as {@link #onActivityResult(Activity, int, int, Intent)} but called on <b>main thread</b>.
+     */
+    protected void onActivityResultSync(@NonNull final Activity activity,
+                                        final int requestCode,
+                                        final int resultCode,
+                                        @Nullable final Intent data) {
     }
 }

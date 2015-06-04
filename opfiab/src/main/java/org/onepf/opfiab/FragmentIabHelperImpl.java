@@ -26,7 +26,13 @@ import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.ComponentState;
+import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
+
+import java.util.Set;
 
 /**
  * This {@link IabHelper} implementation works with supplied fragment instance. {@link
@@ -84,7 +90,26 @@ class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHel
 
     @Override
     public void purchase(@NonNull final String sku) {
-        // Automatically use fragment parent Activity
-        postRequest(new PurchaseRequest(getActivity(), sku, true));
+        postRequest(new PurchaseRequest(getActivity(), false, sku));
+    }
+
+    @Override
+    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
+        postRequest(new PurchaseRequest(getActivity(), true, sku));
+    }
+
+    @Override
+    public void consume(@NonNull final Purchase purchase) {
+        postRequest(new ConsumeRequest(getActivity(), false, purchase));
+    }
+
+    @Override
+    public void inventory(final boolean startOver) {
+        postRequest(new InventoryRequest(getActivity(), false, startOver));
+    }
+
+    @Override
+    public void skuDetails(@NonNull final Set<String> skus) {
+        postRequest(new SkuDetailsRequest(getActivity(), false, skus));
     }
 }

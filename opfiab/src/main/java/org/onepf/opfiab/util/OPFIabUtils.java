@@ -230,7 +230,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(skuDetails.getSku(), sku)) {
             return skuDetails;
         }
-        return skuDetails.substituteSku(sku);
+        return skuDetails.copyWithSku(sku);
     }
 
     public static Purchase substituteSku(@NonNull final Purchase purchase,
@@ -238,7 +238,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(purchase.getSku(), sku)) {
             return purchase;
         }
-        return purchase.substituteSku(sku);
+        return purchase.copyWithSku(sku);
     }
 
     public static SkuDetails resolve(@NonNull final SkuResolver skuResolver,

@@ -40,7 +40,7 @@ class SimpleIabHelperImpl extends IabHelperImpl implements SimpleIabHelper {
 
     @Override
     public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
-        postRequest(new PurchaseRequest(activity, sku));
+        postRequest(new PurchaseRequest(activity, true, sku));
     }
 
     @Override

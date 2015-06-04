@@ -16,7 +16,9 @@
 
 package org.onepf.opfiab.model.event.billing;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,7 +39,13 @@ public class ConsumeRequest extends BillingRequest {
     private final Purchase purchase;
 
     public ConsumeRequest(@NonNull final Purchase purchase) {
-        super(Type.CONSUME);
+        this(null, false, purchase);
+    }
+
+    public ConsumeRequest(@Nullable final Activity activity,
+                          final boolean activityHandlesResult,
+                          @NonNull final Purchase purchase) {
+        super(BillingEventType.CONSUME, activity, activityHandlesResult);
         this.purchase = purchase;
     }
 

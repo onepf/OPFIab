@@ -16,7 +16,9 @@
 
 package org.onepf.opfiab.model.event.billing;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +37,14 @@ public class InventoryRequest extends BillingRequest {
     private final boolean startOver;
 
     public InventoryRequest(final boolean startOver) {
-        super(Type.INVENTORY);
+        this(null, false, startOver);
+    }
+
+    @SuppressWarnings("BooleanParameter")
+    public InventoryRequest(@Nullable final Activity activity,
+                            final boolean activityHandlesResult,
+                            final boolean startOver) {
+        super(BillingEventType.INVENTORY, activity, activityHandlesResult);
         this.startOver = startOver;
     }
 

@@ -123,7 +123,7 @@ public class SkuDetails extends BillingModel {
 
     @NonNull
     @Override
-    public SkuDetails substituteSku(@NonNull final String sku) {
+    public SkuDetails copyWithSku(@NonNull final String sku) {
         return new Builder(sku).setSkuDetails(this).build();
     }
 
