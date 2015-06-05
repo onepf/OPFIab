@@ -19,6 +19,7 @@ package org.onepf.opfiab.amazon;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -53,6 +54,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -73,8 +75,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     protected static final String NAME = "Amazon";
     protected static final String INSTALLER = "com.amazon.venezia";
-    protected static final Collection<String> PACKAGES = Collections.unmodifiableList(
-            Arrays.asList("com.amazon.venezia", "com.amazon.mShop.android"));
+    protected static final Pattern PACKAGE_PATTERN = Pattern.compile("(com\\.amazon\\.venezia)|([a-z]{2,3}\\.amazon\\.mShop\\.android(\\.apk)?)");
 
     public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, INSTALLER);
 
@@ -277,8 +278,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     @Override
     public boolean isAvailable() {
-        for (final String packageName : PACKAGES) {
-            if (OPFUtils.isInstalled(context, packageName)) {
+        final PackageManager packageManager = context.getPackageManager();
+        for (final PackageInfo info : packageManager.getInstalledPackages(0)) {
+            if (PACKAGE_PATTERN.matcher(info.packageName).matches()) {
                 return true;
             }
         }
