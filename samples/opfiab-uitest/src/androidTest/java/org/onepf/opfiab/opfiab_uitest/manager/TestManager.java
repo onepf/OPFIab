@@ -46,7 +46,7 @@ public class TestManager {
     private final CountDownLatch testLatch = new CountDownLatch(1);
     private int currentEvent;
     private String errorMsg;
-    private volatile boolean testResult;
+    private volatile boolean testResult = false;
 
     private TestManager(Collection<EventValidator> eventValidators, final String tag,
                         boolean skipWrongEvents,
@@ -62,7 +62,6 @@ public class TestManager {
         if (testLatch == null) {
             throw new IllegalStateException();
         }
-        testResult = true;
         final boolean isTimeOver = !testLatch.await(timeout, TimeUnit.MILLISECONDS);
         if (isTimeOver && !failOnReceive) {
             OPFLog.e(String.format("[%s]: Did not receive all events (%d not received). %s", tag,

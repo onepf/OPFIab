@@ -32,9 +32,10 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
  * @author antonpp
  * @since 29.05.15
  */
-public class BillingManagerAdapter extends TestManagerAdapter implements BillingListener{
+public class BillingManagerAdapter extends TestManagerAdapter implements BillingListener {
 
-    public BillingManagerAdapter(final TestManager testManager) {
+    public BillingManagerAdapter(final TestManager testManager,
+                                 final boolean isHandledInOnResponse) {
         super(testManager);
     }
 
@@ -49,7 +50,7 @@ public class BillingManagerAdapter extends TestManagerAdapter implements Billing
 
     @Override
     public void onResponse(@NonNull BillingResponse billingResponse) {
-        validateEvent(billingResponse);
+        // already handled
     }
 
     @Override

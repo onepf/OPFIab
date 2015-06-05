@@ -221,7 +221,7 @@ public class SimpleHelperTest {
 
     private final class MyAdapter extends BillingManagerAdapter {
         public MyAdapter(final TestManager testManager) {
-            super(testManager);
+            super(testManager, false);
         }
 
         @Override

@@ -32,14 +32,14 @@ import org.junit.Test;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.listener.OnPurchaseListener;
-import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
+import org.onepf.opfiab.opfiab_uitest.util.validators.AlwaysFailValidator;
+import org.onepf.opfiab.opfiab_uitest.util.validators.EventValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseRequestValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.SetupResponseValidator;
@@ -58,13 +58,14 @@ public class ActivityHelperTest {
     private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
     private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
     private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
-    private static final long MAX_WAIT_TIME = 5000L;
+    private static final long MAX_WAIT_TIME = 1000L;
     private static final long WAIT_LAUNCH_SCREEN = 5000L;
     private static final long WAIT_REOPEN_ACTIVITY = 500L;
     private static final long WAIT_BILLING_PROVIDER = 1000L;
     private static final Intent START_EMPTY_ACTIVITY = new Intent(Intent.ACTION_MAIN)
             .setComponent(new ComponentName(TEST_APP_PKG, TEST_APP_PKG + ".EmptyActivity"))
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
     @Rule
     public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
     private Instrumentation instrumentation;
@@ -79,8 +80,7 @@ public class ActivityHelperTest {
     }
 
     @Test
-    public void testUnregister() throws InterruptedException {
-
+    public void testRegisterUnregister() throws InterruptedException {
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
                 .setIsAuthorised(true)
                 .setWillPostSuccess(true)
@@ -92,61 +92,61 @@ public class ActivityHelperTest {
         final TestManager testSetupManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
                 .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
-                .setFailOnReceive(true)
+                .expectEvent(new AlwaysFailValidator())
+                .expectEvent(new SetupStartedEventValidator())
+                .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
                 .setTag("Setup")
                 .build();
-        final OnSetupListener setupListenerAdapter = new BillingManagerAdapter(testSetupManager);
+        final BillingManagerAdapter setupListenerAdapter = new BillingManagerAdapter(
+                testSetupManager,
+                false);
 
         final TestManager testPurchaseManager = new TestManager.Builder()
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
-                .setFailOnReceive(true)
+                .expectEvent(new AlwaysFailValidator())
+                .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
                 .setTag("Purchase")
                 .build();
-        final OnPurchaseListener purchaseListenerAdapter = new BillingManagerAdapter(
-                testPurchaseManager);
+        final BillingManagerAdapter purchaseListenerAdapter = new BillingManagerAdapter(
+                testPurchaseManager, false);
 
+        final EventValidator[] validators = {
+                new SetupStartedEventValidator(),
+                new SetupResponseValidator(TEST_PROVIDER_NAME),
+                new PurchaseRequestValidator(SKU_CONSUMABLE),
+                new PurchaseResponseValidator(TEST_PROVIDER_NAME, true)
+        };
         final TestManager testGlobalListenerManager = new TestManager.Builder()
-                .expectEvent(new SetupStartedEventValidator())
-                .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
-                .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
-                .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
+                .expectEvents(validators)
+                .expectEvents(validators)
+                .expectEvents(validators)
                 .setStrategy(TestManager.Strategy.UNORDERED_EVENTS)
                 .setTag("Global")
                 .build();
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager))
+                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
                 .build();
-
-
-        final TestManager notReceivingEventTestManager = new TestManager.Builder()
-                .setFailOnReceive(true)
-                .setSkipWrongEvents(false)
-                .build();
-        final BillingManagerAdapter notReceivingEventsAdapter = new BillingManagerAdapter(
-                notReceivingEventTestManager);
 
         final ActivityIabHelper[] helperArray = new ActivityIabHelper[1];
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
                 OPFIab.init(activity.getApplication(), configuration);
-                helperArray[0] = OPFIab.getActivityHelper(activity);
+                final ActivityIabHelper helper = OPFIab.getActivityHelper(activity);
+                helper.addSetupListener(setupListenerAdapter);
+                helper.addPurchaseListener(purchaseListenerAdapter);
+                helperArray[0] = helper;
+
+                OPFIab.setup();
+                helper.purchase(SKU_CONSUMABLE);
             }
         });
         final ActivityIabHelper helper = helperArray[0];
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                helper.addSetupListener(setupListenerAdapter);
-                helper.addSetupListener(notReceivingEventsAdapter);
-                helper.addPurchaseListener(purchaseListenerAdapter);
-                helper.addPurchaseListener(notReceivingEventsAdapter);
-            }
-        });
+        final TestManager[] managers = {testGlobalListenerManager, testSetupManager, testPurchaseManager};
 
-        final TestManager[] managers = {testSetupManager, testPurchaseManager, testGlobalListenerManager};
+        Thread.sleep(MAX_WAIT_TIME);
 
         uiDevice.pressHome();
 
@@ -155,18 +155,26 @@ public class ActivityHelperTest {
             public void run() {
                 OPFIab.setup();
                 helper.purchase(SKU_CONSUMABLE);
-                helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
-                helper.inventory(true);
             }
         });
 
         Thread.sleep(WAIT_LAUNCH_SCREEN);
-        Assert.assertTrue(notReceivingEventTestManager.await(0));
         reopenActivity();
         Thread.sleep(WAIT_REOPEN_ACTIVITY);
 
+        setupListenerAdapter.validateEvent(AlwaysFailValidator.getStopObject());
+        purchaseListenerAdapter.validateEvent(AlwaysFailValidator.getStopObject());
+
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                OPFIab.setup();
+                helper.purchase(SKU_CONSUMABLE);
+            }
+        });
+
         for (TestManager manager : managers) {
-            Assert.assertTrue(manager.await(MAX_WAIT_TIME * 2));
+            Assert.assertTrue(manager.await(MAX_WAIT_TIME));
         }
     }
 
@@ -176,6 +184,7 @@ public class ActivityHelperTest {
         final Intent intent = ((ActivityManager) context.getSystemService(
                 Context.ACTIVITY_SERVICE))
                 .getRecentTasks(2, 0).get(1).baseIntent;
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         instrumentation.getContext().startActivity(intent);
     }
 }

@@ -16,6 +16,8 @@
 
 package org.onepf.opfiab.opfiab_uitest.util.validators;
 
+import org.onepf.opfutils.OPFLog;
+
 /**
  * @author antonpp
  * @since 03.06.15
@@ -29,10 +31,15 @@ public class AlwaysFailValidator implements EventValidator {
 
     @Override
     public boolean validate(final Object event, final boolean isLogging, final String logTag) {
-        return event == STOP_OBJECT;
+        final boolean result = event == STOP_OBJECT;
+        if (isLogging && !result) {
+            OPFLog.e(String.format("[%s]: Received %s when STOP_OBJECT was expected", logTag,
+                                   event.getClass().getSimpleName()));
+        }
+        return result;
     }
 
-    public static final class StopObject {
+    private static final class StopObject {
         private StopObject() {}
     }
 }

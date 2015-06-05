@@ -110,7 +110,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testManager))
+                .setBillingListener(new BillingManagerAdapter(testManager, false))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -194,7 +194,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testManager))
+                .setBillingListener(new BillingManagerAdapter(testManager, false))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -227,7 +227,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testManager))
+                .setBillingListener(new BillingManagerAdapter(testManager, false))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -307,35 +307,36 @@ public class AdvancedHelperTest {
                 .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
                 .setTag("Setup")
                 .build();
-        final OnSetupListener setupListenerAdapter = new BillingManagerAdapter(testSetupManager);
+        final OnSetupListener setupListenerAdapter = new BillingManagerAdapter(testSetupManager,
+                                                                               false);
 
         final TestManager testPurchaseManager = new TestManager.Builder()
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
                 .setTag("Purchase")
                 .build();
         final OnPurchaseListener purchaseListenerAdapter = new BillingManagerAdapter(
-                testPurchaseManager);
+                testPurchaseManager, false);
 
         final TestManager testInventoryManager = new TestManager.Builder()
                 .expectEvent(new InventoryResponseValidator(TEST_PROVIDER_NAME, true, null))
                 .setTag("Inventory")
                 .build();
         final OnInventoryListener inventoryListenerAdapter = new BillingManagerAdapter(
-                testInventoryManager);
+                testInventoryManager, false);
 
         final TestManager testSkuDetailsManager = new TestManager.Builder()
                 .expectEvent(new SkuDetailsResponseValidator(TEST_PROVIDER_NAME, true))
                 .setTag("SkuDetails")
                 .build();
         final OnSkuDetailsListener skuDetailsListenerAdapter = new BillingManagerAdapter(
-                testSkuDetailsManager);
+                testSkuDetailsManager, false);
 
         final TestManager testConsumeManager = new TestManager.Builder()
                 .expectEvent(new ConsumeResponseValidator(TEST_PROVIDER_NAME, true))
                 .setTag("Consume")
                 .build();
         final OnConsumeListener consumeListenerAdapter = new BillingManagerAdapter(
-                testConsumeManager);
+                testConsumeManager, false);
 
         final TestManager testGlobalListenerManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
@@ -351,7 +352,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager))
+                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -416,7 +417,7 @@ public class AdvancedHelperTest {
                 .setTag("BeforeUnreg")
                 .build();
         final BillingManagerAdapter testAdapter = new BillingManagerAdapter(
-                testBeforeUnregistrationManager);
+                testBeforeUnregistrationManager, false);
 
         final TestManager subscribeSensitiveManager = new TestManager.Builder()
                 .expectEvents(eventValidators)
@@ -427,7 +428,7 @@ public class AdvancedHelperTest {
                 .setTag("RegisterSensitive")
                 .build();
         final BillingManagerAdapter subscribeSensitiveAdapter = new BillingManagerAdapter(
-                subscribeSensitiveManager);
+                subscribeSensitiveManager, false);
 
         final AdvancedIabHelper[] helpers = new AdvancedIabHelper[1];
 
