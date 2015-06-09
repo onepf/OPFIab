@@ -24,20 +24,21 @@ import android.support.test.uiautomator.UiDevice;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
+import org.onepf.opfiab.opfiab_uitest.EmptyFragmentActivity;
 
 /**
  * @author antonpp
  * @since 04.06.15
  */
-public class FragmentHelperTest {
+public class SupportFragmentHelperTest {
 
     @Rule
-    public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
+    public ActivityTestRule<EmptyFragmentActivity> testRule = new ActivityTestRule<>(
+            EmptyFragmentActivity.class);
 
     private Instrumentation instrumentation;
     private UiDevice uiDevice;
-    private EmptyActivity activity;
+    private EmptyFragmentActivity activity;
 
     @Before
     public void setUp() {
