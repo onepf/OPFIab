@@ -31,6 +31,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
+import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
@@ -62,6 +63,7 @@ public class ActivityHelperTest {
     private static final long WAIT_LAUNCH_SCREEN = 5000L;
     private static final long WAIT_REOPEN_ACTIVITY = 500L;
     private static final long WAIT_BILLING_PROVIDER = 1000L;
+    private static final long WAIT_PURCHASE = 2 * WAIT_BILLING_PROVIDER;
     private static final Intent START_EMPTY_ACTIVITY = new Intent(Intent.ACTION_MAIN)
             .setComponent(new ComponentName(TEST_APP_PKG, TEST_APP_PKG + ".EmptyActivity"))
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -124,6 +126,8 @@ public class ActivityHelperTest {
                 .setTag("Global")
                 .build();
 
+        final TestManager[] managers = {testGlobalListenerManager, testSetupManager, testPurchaseManager};
+
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
                 .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
@@ -138,53 +142,54 @@ public class ActivityHelperTest {
                 helper.addSetupListener(setupListenerAdapter);
                 helper.addPurchaseListener(purchaseListenerAdapter);
                 helperArray[0] = helper;
-
-                OPFIab.setup();
-                helper.purchase(SKU_CONSUMABLE);
             }
         });
+
         final ActivityIabHelper helper = helperArray[0];
-        final TestManager[] managers = {testGlobalListenerManager, testSetupManager, testPurchaseManager};
 
-        Thread.sleep(MAX_WAIT_TIME);
+        purchase(helper, SKU_CONSUMABLE);
+        Thread.sleep(WAIT_PURCHASE);
 
-        uiDevice.pressHome();
+        changeToHomeScreen();
 
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                OPFIab.setup();
-                helper.purchase(SKU_CONSUMABLE);
-            }
-        });
-
+        purchase(helper, SKU_CONSUMABLE);
         Thread.sleep(WAIT_LAUNCH_SCREEN);
+
         reopenActivity();
-        Thread.sleep(WAIT_REOPEN_ACTIVITY);
 
         setupListenerAdapter.validateEvent(AlwaysFailValidator.getStopObject());
         purchaseListenerAdapter.validateEvent(AlwaysFailValidator.getStopObject());
 
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                OPFIab.setup();
-                helper.purchase(SKU_CONSUMABLE);
-            }
-        });
+        purchase(helper, SKU_CONSUMABLE);
+        Thread.sleep(WAIT_PURCHASE);
 
         for (TestManager manager : managers) {
             Assert.assertTrue(manager.await(MAX_WAIT_TIME));
         }
     }
 
+    private void purchase(final IabHelper helper, final String skuConsumable) {
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                OPFIab.setup();
+                helper.purchase(SKU_CONSUMABLE);
+            }
+        });
+    }
 
-    private void reopenActivity() {
+
+    private void changeToHomeScreen() throws InterruptedException {
+        uiDevice.pressHome();
+        Thread.sleep(WAIT_REOPEN_ACTIVITY);
+    }
+
+    private void reopenActivity() throws InterruptedException {
         final Context context = instrumentation.getContext();
-        final Intent intent = ((ActivityManager) context.getSystemService(
-                Context.ACTIVITY_SERVICE))
+        final Intent intent = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
                 .getRecentTasks(2, 0).get(1).baseIntent;
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         instrumentation.getContext().startActivity(intent);
+        Thread.sleep(WAIT_REOPEN_ACTIVITY);
     }
 }
