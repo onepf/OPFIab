@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.Instrumentation;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.uiautomator.UiDevice;
@@ -43,28 +42,21 @@ import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.SetupResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.SetupStartedEventValidator;
 
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_NAME_FMT;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_PACKAGE;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_BILLING_PROVIDER;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_INIT;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_LAUNCH_SCREEN;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_PURCHASE;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_REOPEN_ACTIVITY;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_TEST_MANAGER;
+
 /**
  * @author antonpp
  * @since 04.06.15
  */
 public class UnifiedFragmentHelperTest {
-
-    private static final String TEST_APP_PKG = "org.onepf.opfiab.opfiab_uitest";
-    private static final String TEST_PROVIDER_PACKAGE = "org.onepf.opfiab.uitest";
-    private static final String TEST_PROVIDER_NAME_FMT = "TEST_PROVIDER_NAME_%s";
-    private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
-    private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
-    private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
-    private static final long WAIT_BILLING_PROVIDER = 1000L;
-    private static final long WAIT_PURCHASE = 2 * WAIT_BILLING_PROVIDER;
-    private static final long WAIT_INIT = 2 * WAIT_BILLING_PROVIDER;
-    private static final long WAIT_LAUNCH_SCREEN = 5000L;
-    private static final long WAIT_REOPEN_ACTIVITY = 2000L;
-    private static final long WAIT_TEST_MANAGER = 2 * WAIT_BILLING_PROVIDER;
-    private static final Intent START_EMPTY_ACTIVITY = new Intent(Intent.ACTION_MAIN)
-            .setComponent(new ComponentName(TEST_APP_PKG, TEST_APP_PKG + ".EmptyActivity"))
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
 
     public static void testRegisterUnregisterHomeButton(Instrumentation instrumentation,
                                                         final Activity activity, UiDevice uiDevice)
