@@ -148,12 +148,10 @@ public class ActivityHelperTest {
         final ActivityIabHelper helper = helperArray[0];
 
         purchase(helper, SKU_CONSUMABLE);
-        Thread.sleep(WAIT_PURCHASE);
 
         changeToHomeScreen();
 
-        purchase(helper, SKU_CONSUMABLE);
-        Thread.sleep(WAIT_LAUNCH_SCREEN);
+        purchase(helper, SKU_CONSUMABLE, WAIT_LAUNCH_SCREEN);
 
         reopenActivity();
 
@@ -161,14 +159,24 @@ public class ActivityHelperTest {
         purchaseListenerAdapter.validateEvent(AlwaysFailValidator.getStopObject());
 
         purchase(helper, SKU_CONSUMABLE);
-        Thread.sleep(WAIT_PURCHASE);
 
         for (TestManager manager : managers) {
             Assert.assertTrue(manager.await(MAX_WAIT_TIME));
         }
     }
 
-    private void purchase(final IabHelper helper, final String skuConsumable) {
+    private void purchase(final IabHelper helper, final String skuConsumable)
+            throws InterruptedException {
+        purchase(helper, skuConsumable, WAIT_PURCHASE);
+    }
+
+    private void changeToHomeScreen() throws InterruptedException {
+        uiDevice.pressHome();
+        Thread.sleep(WAIT_REOPEN_ACTIVITY);
+    }
+
+    private void purchase(final IabHelper helper, final String skuConsumable, long timeout)
+            throws InterruptedException {
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
@@ -176,12 +184,7 @@ public class ActivityHelperTest {
                 helper.purchase(SKU_CONSUMABLE);
             }
         });
-    }
-
-
-    private void changeToHomeScreen() throws InterruptedException {
-        uiDevice.pressHome();
-        Thread.sleep(WAIT_REOPEN_ACTIVITY);
+        Thread.sleep(timeout);
     }
 
     private void reopenActivity() throws InterruptedException {

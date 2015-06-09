@@ -143,19 +143,16 @@ public class UnifiedFragmentHelperTest {
         final FragmentIabHelper helper = helpers[0];
 
         purchase(instrumentation, helper, SKU_CONSUMABLE);
-        Thread.sleep(WAIT_PURCHASE);
 
         changeToHomeScreen(uiDevice);
 
         purchase(instrumentation, helper, SKU_CONSUMABLE);
-        Thread.sleep(WAIT_LAUNCH_SCREEN);
 
         reopenActivity(instrumentation);
 
-        uiDevice.pressBack();
+        pressBackButton(uiDevice);
 
         purchase(instrumentation, helper, SKU_CONSUMABLE);
-        Thread.sleep(WAIT_LAUNCH_SCREEN);
 
         purchaseListenerAdapter.validateEvent(AlwaysFailValidator.getStopObject());
 
@@ -164,8 +161,9 @@ public class UnifiedFragmentHelperTest {
         }
     }
 
-    private static void purchase(Instrumentation instrumentation, IabHelper helper, String sku) {
-        instrumentation.runOnMainSync(new PurchaseRunnable(helper, sku));
+    private static void purchase(Instrumentation instrumentation, IabHelper helper, String sku)
+            throws InterruptedException {
+        purchase(instrumentation, helper, sku, WAIT_PURCHASE);
     }
 
     private static void changeToHomeScreen(UiDevice uiDevice) throws InterruptedException {
@@ -181,6 +179,18 @@ public class UnifiedFragmentHelperTest {
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         instrumentation.getContext().startActivity(intent);
         Thread.sleep(WAIT_REOPEN_ACTIVITY);
+    }
+
+    private static void pressBackButton(UiDevice uiDevice) throws InterruptedException {
+        uiDevice.pressBack();
+        Thread.sleep(WAIT_REOPEN_ACTIVITY);
+    }
+
+    private static void purchase(Instrumentation instrumentation, IabHelper helper, String sku,
+                                 long timeout)
+            throws InterruptedException {
+        instrumentation.runOnMainSync(new PurchaseRunnable(helper, sku));
+        Thread.sleep(timeout);
     }
 
     public static void testRegisterUnregisterFragmentReplace(Instrumentation instrumentation,
