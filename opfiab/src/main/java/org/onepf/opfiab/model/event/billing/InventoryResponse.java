@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFLog;
@@ -46,10 +45,10 @@ public class InventoryResponse extends BillingResponse {
     private final boolean hasMore;
 
     public InventoryResponse(@NonNull final Status status,
-                             @Nullable final BillingProviderInfo providerInfo,
+                             @Nullable final String providerName,
                              @Nullable final Map<Purchase, VerificationResult> inventory,
                              final boolean hasMore) {
-        super(BillingEventType.INVENTORY, status, providerInfo);
+        super(BillingEventType.INVENTORY, status, providerName);
         this.inventory = inventory == null ? null : Collections.unmodifiableMap(inventory);
         this.hasMore = hasMore;
     }

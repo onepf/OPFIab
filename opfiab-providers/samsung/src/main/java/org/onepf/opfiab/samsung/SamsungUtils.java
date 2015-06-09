@@ -29,7 +29,6 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
@@ -78,6 +77,7 @@ public final class SamsungUtils {
         }
     };
 
+
     private SamsungUtils() {
         throw new IllegalStateException();
     }
@@ -92,8 +92,8 @@ public final class SamsungUtils {
     }
 
     @Nullable
-    public static Status getStatusForError(@NonNull final Context context,
-                                           @Nullable final Bundle bundle) {
+    public static Status handleError(@NonNull final Context context,
+            @Nullable final Bundle bundle) {
         final Response response = getResponse(bundle);
         if (response == Response.ERROR_NONE) {
             return null;
@@ -137,7 +137,7 @@ public final class SamsungUtils {
     }
 
     public static void promptUpgrade(@NonNull final Context context,
-                                     @Nullable final Bundle bundle) {
+            @Nullable final Bundle bundle) {
         final String uri;
         if (bundle == null || (uri = bundle.getString(KEY_IAP_UPGRADE_URL)) == null) {
             OPFLog.e("No upgrade url.");
@@ -182,8 +182,8 @@ public final class SamsungUtils {
 
     @NonNull
     public static Intent getPurchaseIntent(@NonNull final Context context,
-                                           @NonNull final String groupId,
-                                           @NonNull final String itemId) {
+            @NonNull final String groupId,
+            @NonNull final String itemId) {
         final Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -282,7 +282,7 @@ public final class SamsungUtils {
 
     @Nullable
     public static Bundle putItems(@NonNull final Bundle from,
-                                  @Nullable final Bundle to) {
+            @Nullable final Bundle to) {
         final Collection<String> fromItems = getItems(from);
         if (fromItems == null || fromItems.isEmpty() || to == null) {
             return to;
@@ -325,21 +325,21 @@ public final class SamsungUtils {
     }
 
     @NonNull
-    public static SkuDetails convertSkuDetails(@NonNull final BillingProviderInfo info,
-                                               @NonNull final SamsungSkuDetails samsungSkuDetails) {
+    public static SkuDetails convertSkuDetails(@NonNull final String providerName,
+            @NonNull final SamsungSkuDetails samsungSkuDetails) {
         return new SkuDetails.Builder(samsungSkuDetails.getItemId())
                 .setOriginalJson(samsungSkuDetails.getOriginalJson())
                 .setType(convertType(samsungSkuDetails.getItemType()))
                 .setTitle(samsungSkuDetails.getName())
                 .setDescription(samsungSkuDetails.getDescription())
                 .setPrice(samsungSkuDetails.getPriceString())
-                .setProviderInfo(info)
+                .setProviderName(providerName)
                 .build();
     }
 
     @NonNull
-    public static Purchase convertPurchasedItems(@NonNull final BillingProviderInfo info,
-                                                 @NonNull final SamsungPurchasedItem purchasedItem) {
+    public static Purchase convertPurchasedItems(@NonNull final String providerName,
+            @NonNull final SamsungPurchasedItem purchasedItem) {
         final Date endDate = purchasedItem.getSubscriptionEndDate();
         return new Purchase.Builder(purchasedItem.getItemId())
                 .setOriginalJson(purchasedItem.getOriginalJson())
@@ -347,20 +347,20 @@ public final class SamsungUtils {
                 .setToken(purchasedItem.getPaymentId())
                 .setPurchaseTime(purchasedItem.getPurchaseDate().getTime())
                 .setCanceled(endDate != null && endDate.before(new Date()))
-                .setProviderInfo(info)
+                .setProviderName(providerName)
                 .build();
     }
 
     @NonNull
-    public static Purchase convertPurchase(@NonNull final BillingProviderInfo info,
-                                           @NonNull final SamsungPurchase purchase,
-                                           @NonNull final ItemType itemType) {
+    public static Purchase convertPurchase(@NonNull final String providerName,
+            @NonNull final SamsungPurchase purchase,
+            @NonNull final ItemType itemType) {
         return new Purchase.Builder(purchase.getItemId())
                 .setOriginalJson(purchase.getOriginalJson())
                 .setType(convertType(itemType))
                 .setToken(purchase.getPaymentId())
                 .setPurchaseTime(purchase.getPurchaseDate().getTime())
-                .setProviderInfo(info)
+                .setProviderName(providerName)
                 .build();
     }
 }

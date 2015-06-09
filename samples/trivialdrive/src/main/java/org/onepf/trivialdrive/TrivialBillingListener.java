@@ -25,6 +25,7 @@ import org.onepf.opfiab.listener.DefaultBillingListener;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
+import org.onepf.opfiab.model.event.billing.BillingEventType;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
@@ -52,7 +53,7 @@ public class TrivialBillingListener extends DefaultBillingListener {
     @Override
     public void onSetupResponse(@NonNull final SetupResponse setupResponse) {
         super.onSetupResponse(setupResponse);
-        if (setupResponse.isSuccessful() && setupResponse.isAuthorized()) {
+        if (setupResponse.isSuccessful()) {
             // update inventory and sku data every time provider is picked
             getHelper().inventory(true);
             getHelper().skuDetails(TrivialView.SKUS);
@@ -63,7 +64,7 @@ public class TrivialBillingListener extends DefaultBillingListener {
     public void onResponse(@NonNull final BillingResponse billingResponse) {
         super.onResponse(billingResponse);
         if (!billingResponse.isSuccessful()) {
-            final BillingResponse.Type type = billingResponse.getType();
+            final BillingEventType type = billingResponse.getType();
             final Status status = billingResponse.getStatus();
             final String msg = context.getString(R.string.msg_request_failed, type, status);
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();

@@ -23,8 +23,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -46,8 +46,8 @@ import com.makeramen.dragsortadapter.DragSortShadowBuilder;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.AdvancedIabHelper;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.OnSetupListener;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.trivialdrive.R;
@@ -68,7 +68,7 @@ import java.util.List;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-abstract class TrivialActivity extends ActionBarActivity
+abstract class TrivialActivity extends AppCompatActivity
         implements OnProviderPickerListener {
 
     private static final String FRAGMENT_PROVIDER_PICKER = "provider_picker";
@@ -129,10 +129,7 @@ abstract class TrivialActivity extends ActionBarActivity
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return drawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -273,12 +270,10 @@ abstract class TrivialActivity extends ActionBarActivity
         private final Spinner spinHelper;
         private final TextView tvSetupStatus;
         private final TextView tvSetupProvider;
-        private final TextView tvSetupAuthorisation;
         private final ProgressBar pbSetup;
         private final Button btnForget;
         private final Button btnInit;
         private final Button btnSetup;
-        private final CheckedTextView ctvSkipUnauthorized;
         private final CheckedTextView ctvAutoRecover;
 
         public HeaderViewHolder(final DragSortAdapter<?> dragSortAdapter, final View itemView) {
@@ -286,14 +281,11 @@ abstract class TrivialActivity extends ActionBarActivity
             spinHelper = (Spinner) itemView.findViewById(R.id.spin_helper);
             tvSetupStatus = (TextView) itemView.findViewById(R.id.tv_setup_status);
             tvSetupProvider = (TextView) itemView.findViewById(R.id.tv_setup_provider);
-            tvSetupAuthorisation = (TextView) itemView.findViewById(R.id.tv_setup_authorisation);
             pbSetup = (ProgressBar) itemView.findViewById(R.id.pb_setup);
             btnForget = (Button) itemView.findViewById(R.id.btn_forget);
             btnInit = (Button) itemView.findViewById(R.id.btn_init);
             btnSetup = (Button) itemView.findViewById(R.id.btn_setup);
             ctvAutoRecover = (CheckedTextView) itemView.findViewById(R.id.ctv_auto_recover);
-            ctvSkipUnauthorized = (CheckedTextView) itemView
-                    .findViewById(R.id.ctv_skip_unauthorized);
 
             final HelpersAdapter adapter = new HelpersAdapter();
             spinHelper.setAdapter(adapter);
@@ -305,8 +297,6 @@ abstract class TrivialActivity extends ActionBarActivity
             btnSetup.setOnClickListener(this);
             ctvAutoRecover.setChecked(TrivialBilling.isAutoRecover());
             ctvAutoRecover.setOnClickListener(this);
-            ctvSkipUnauthorized.setOnClickListener(this);
-            ctvSkipUnauthorized.setChecked(TrivialBilling.isSkipUnauthorized());
 
             iabHelper.addSetupListener(this);
         }
@@ -318,18 +308,13 @@ abstract class TrivialActivity extends ActionBarActivity
             final boolean setupSuccessful = setupResponse != null && setupResponse.isSuccessful();
             final int visibility = setupSuccessful ? VISIBLE : INVISIBLE;
             tvSetupStatus.setVisibility(visibility);
-            tvSetupAuthorisation.setVisibility(visibility);
             if (setupSuccessful) {
+                final BillingProvider billingProvider = setupResponse.getBillingProvider();
                 //noinspection ConstantConditions
-                final BillingProviderInfo info = setupResponse.getBillingProvider().getInfo();
-                final Provider provider = Provider.getByInfo(info);
-                tvSetupProvider.setText(provider == null
-                                                ? info.getName()
-                                                : getString(provider.getNameId()));
+                final String name = billingProvider.getName();
+                final Provider provider = Provider.getByName(name);
+                tvSetupProvider.setText(provider == null ? name : getString(provider.getNameId()));
                 tvSetupStatus.setText(setupResponse.getStatus().toString());
-                tvSetupAuthorisation.setText(setupResponse.isAuthorized()
-                                                     ? R.string.setup_authorized
-                                                     : R.string.setup_unauthorized);
             } else {
                 tvSetupProvider.setText(R.string.setup_no_provider);
             }
@@ -370,9 +355,6 @@ abstract class TrivialActivity extends ActionBarActivity
             } else if (v == ctvAutoRecover) {
                 ctvAutoRecover.toggle();
                 TrivialBilling.setAutoRecover(ctvAutoRecover.isChecked());
-            } else if (v == ctvSkipUnauthorized) {
-                ctvSkipUnauthorized.toggle();
-                TrivialBilling.setSkipUnauthorized(ctvSkipUnauthorized.isChecked());
             }
         }
 
@@ -381,7 +363,6 @@ abstract class TrivialActivity extends ActionBarActivity
             pbSetup.setVisibility(VISIBLE);
             tvSetupStatus.setVisibility(INVISIBLE);
             tvSetupProvider.setVisibility(INVISIBLE);
-            tvSetupAuthorisation.setVisibility(INVISIBLE);
         }
 
         @Override

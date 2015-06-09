@@ -27,7 +27,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.billing.Status;
@@ -35,37 +35,43 @@ import org.onepf.opfiab.samsung.model.ItemType;
 import org.onepf.opfiab.samsung.model.SamsungPurchase;
 import org.onepf.opfiab.samsung.model.SamsungPurchasedItem;
 import org.onepf.opfiab.samsung.model.SamsungSkuDetails;
+import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFPreferences;
+import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
+import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
+import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 import static org.onepf.opfiab.verification.PurchaseVerifier.DEFAULT;
 
 public class SamsungBillingProvider
         extends ActivityBillingProvider<SamsungSkuResolver, PurchaseVerifier> {
 
-    protected static final String NAME = "Samsung";
+    public static final String NAME = "Samsung";
     protected static final String PACKAGE = "com.sec.android.app.samsungapps";
-    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, PACKAGE);
+    protected static final String INSTALLER = PACKAGE;
     protected static final String PERMISSION_BILLING = "com.sec.android.iap.permission.BILLING";
-    protected static final String KEY_SKU = "sku";
-    protected static final String KEY_ITEM_TYPE = "item_type";
 
     protected static final int REQUEST_CODE_ACCOUNT = REQUEST_CODE;
     protected static final int REQUEST_CODE_PURCHASE = REQUEST_CODE + 1;
 
+    protected static final long ACCOUNT_TIMEOUT = 5000;
 
-    protected final OPFPreferences preferences = new OPFPreferences(context);
+
     @NonNull
     protected final SamsungBillingHelper helper;
+    @Nullable
+    protected SyncedReference<Boolean> syncAuthorisationResult;
+    @Nullable
+    protected ItemType pendingType;
 
     protected SamsungBillingProvider(@NonNull final Context context,
                                      @NonNull final SamsungSkuResolver skuResolver,
@@ -79,7 +85,7 @@ public class SamsungBillingProvider
     public ItemType resolveItemType(@NonNull final String sku) {
         // Ridiculously inefficient...
         final Bundle bundle = helper.getItemList(skuResolver.getGroupId());
-        final Status error = SamsungUtils.getStatusForError(context, bundle);
+        final Status error = SamsungUtils.handleError(context, bundle);
         if (error != null) {
             return null;
         }
@@ -97,8 +103,26 @@ public class SamsungBillingProvider
 
     @NonNull
     @Override
-    public BillingProviderInfo getInfo() {
-        return INFO;
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return OPFUtils.isInstalled(context, PACKAGE);
+    }
+
+    @NonNull
+    @Override
+    public Compatibility checkCompatibility() {
+        final Bundle bundle = helper.init();
+        if (SamsungUtils.getResponse(bundle) != Response.ERROR_NONE) {
+            return Compatibility.INCOMPATIBLE;
+        }
+        if (INSTALLER.equals(OPFUtils.getPackageInstaller(context))) {
+            return Compatibility.PREFERRED;
+        }
+        return Compatibility.COMPATIBLE;
     }
 
     @Override
@@ -114,31 +138,9 @@ public class SamsungBillingProvider
     }
 
     @Override
-    protected void purchase(@NonNull final Activity activity,
-                            @NonNull final String sku) {
-        final Bundle bundle = helper.init();
-        final Status error = SamsungUtils.getStatusForError(context, bundle);
-        if (error != null) {
-            postPurchaseResponse(error, null);
-            return;
-        }
-
-        final Intent intent = SamsungUtils.getAccountIntent();
-        preferences.put(KEY_SKU, sku);
-        try {
-            activity.startActivityForResult(intent, REQUEST_CODE_ACCOUNT);
-            return;
-        } catch (ActivityNotFoundException exception) {
-            OPFLog.e("Can't start Samsung authentication activity.", exception);
-        }
-
-        postPurchaseResponse(UNKNOWN_ERROR, null);
-    }
-
-    @Override
     protected void skuDetails(final Activity activity, @NonNull final Set<String> skus) {
         final Bundle bundle = helper.getItemList(skuResolver.getGroupId());
-        final Status error = SamsungUtils.getStatusForError(context, bundle);
+        final Status error = SamsungUtils.handleError(context, bundle);
         if (error != null) {
             postSkuDetailsResponse(error, null);
             return;
@@ -151,7 +153,7 @@ public class SamsungBillingProvider
             for (final SamsungSkuDetails item : items) {
                 final String sku = item.getItemId();
                 if (unloadedItems.contains(sku)) {
-                    final SkuDetails skuDetails = SamsungUtils.convertSkuDetails(INFO, item);
+                    final SkuDetails skuDetails = SamsungUtils.convertSkuDetails(getName(), item);
                     skusDetails.add(skuDetails);
                     unloadedItems.remove(sku);
                 }
@@ -169,7 +171,7 @@ public class SamsungBillingProvider
     @Override
     protected void inventory(final Activity activity, final boolean startOver) {
         final Bundle bundle = helper.getItemsInbox(skuResolver.getGroupId());
-        final Status error = SamsungUtils.getStatusForError(context, bundle);
+        final Status error = SamsungUtils.handleError(context, bundle);
         if (error != null) {
             postInventoryResponse(error, null, false);
             return;
@@ -181,7 +183,8 @@ public class SamsungBillingProvider
             for (final SamsungPurchasedItem item : items) {
                 //TODO check if consumables should be loaded
                 if (item.getItemType() != ItemType.CONSUMABLE) {
-                    purchases.add(SamsungUtils.convertPurchasedItems(INFO, item));
+                    // Don't load consumables by default
+                    purchases.add(SamsungUtils.convertPurchasedItems(getName(), item));
                 }
             }
             postInventoryResponse(SUCCESS, purchases, false);
@@ -198,52 +201,87 @@ public class SamsungBillingProvider
     }
 
     @Override
+    protected void purchase(@NonNull final Activity activity,
+                            @NonNull final String sku) {
+        final Bundle bundle = helper.init();
+        final Status error = SamsungUtils.handleError(context, bundle);
+        if (error != null) {
+            postPurchaseResponse(error, null);
+            return;
+        }
+
+        final ItemType itemType = resolveItemType(sku);
+        if (itemType == null) {
+            postPurchaseResponse(ITEM_UNAVAILABLE, null);
+            return;
+        } else {
+            this.pendingType = itemType;
+        }
+
+        final Intent intent = SamsungUtils.getAccountIntent();
+        final SyncedReference<Boolean> syncAuthorisationResult = new SyncedReference<>();
+        try {
+            this.syncAuthorisationResult = syncAuthorisationResult;
+            activity.startActivityForResult(intent, REQUEST_CODE_ACCOUNT);
+            final Boolean authorisationResult = syncAuthorisationResult.get(ACCOUNT_TIMEOUT);
+            if (authorisationResult == null || !authorisationResult) {
+                OPFLog.d("Samsung authorisation result: " + authorisationResult);
+                postPurchaseResponse(UNAUTHORISED, null);
+            } else {
+                final String groupId = skuResolver.getGroupId();
+                final Intent purchaseIntent = SamsungUtils.getPurchaseIntent(context, groupId, sku);
+                activity.startActivityForResult(purchaseIntent, REQUEST_CODE_PURCHASE);
+            }
+        } catch (ActivityNotFoundException exception) {
+            OPFLog.e("Can't start Samsung authentication activity.", exception);
+            postPurchaseResponse(UNKNOWN_ERROR, null);
+        } finally {
+            this.syncAuthorisationResult = null;
+        }
+    }
+
+    @Override
+    protected void onActivityResultSync(@NonNull final Activity activity,
+                                        final int requestCode,
+                                        final int resultCode,
+                                        @Nullable final Intent data) {
+        super.onActivityResultSync(activity, requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_ACCOUNT) {
+            final SyncedReference<Boolean> syncAuthorisationResult = this.syncAuthorisationResult;
+            if (syncAuthorisationResult != null) {
+                syncAuthorisationResult.set(resultCode == Activity.RESULT_OK);
+            }
+        }
+    }
+
+    @Override
     protected void onActivityResult(@NonNull final Activity activity,
                                     final int requestCode,
                                     final int resultCode,
                                     @Nullable final Intent data) {
+        if (requestCode != REQUEST_CODE_PURCHASE) {
+            return;
+        }
         if (resultCode != Activity.RESULT_OK) {
             postPurchaseResponse(Status.USER_CANCELED, null);
+            return;
+        }
+
+        final SamsungPurchase samsungPurchase;
+        final Bundle bundle = data == null ? null : data.getExtras();
+        final Status error = SamsungUtils.handleError(context, bundle);
+        if (error != null) {
+            postPurchaseResponse(error, null);
+        } else if (data == null ||
+                (samsungPurchase = SamsungUtils.getPurchase(bundle)) == null) {
+            postPurchaseResponse(UNKNOWN_ERROR, null);
+            OPFLog.e("Purchase data is null");
         } else {
-            switch (requestCode) {
-                case REQUEST_CODE_ACCOUNT:
-                    final String groupId = skuResolver.getGroupId();
-                    final String sku = preferences.getString(KEY_SKU);
-                    if (sku == null) {
-                        break;
-                    }
-                    final ItemType itemType = resolveItemType(sku);
-                    if (itemType == null) {
-                        postPurchaseResponse(Status.ITEM_UNAVAILABLE, null);
-                        OPFLog.e("Failed to resolve purchaseType: " + sku);
-                        break;
-                    }
-                    preferences.put(KEY_ITEM_TYPE, itemType.name());
-                    preferences.remove(KEY_SKU);
-                    final Intent intent = SamsungUtils.getPurchaseIntent(context, groupId, sku);
-                    activity.startActivityForResult(intent, REQUEST_CODE_PURCHASE);
-                    return;
-                case REQUEST_CODE_PURCHASE:
-                    final SamsungPurchase samsungPurchase;
-                    final Bundle bundle = data == null ? null : data.getExtras();
-                    final Status error = SamsungUtils.getStatusForError(context, bundle);
-                    if (error != null) {
-                        postPurchaseResponse(error, null);
-                    } else if (data == null ||
-                            (samsungPurchase = SamsungUtils.getPurchase(bundle)) == null) {
-                        postPurchaseResponse(UNKNOWN_ERROR, null);
-                        OPFLog.e("Purchase data is null");
-                    } else {
-                        final ItemType type = preferences.contains(KEY_ITEM_TYPE)
-                                ? ItemType.valueOf(preferences.getString(KEY_ITEM_TYPE))
-                                : null;
-                        final Purchase purchase = type != null
-                                ? SamsungUtils.convertPurchase(INFO, samsungPurchase, type)
-                                : null;
-                        postPurchaseResponse(purchase != null ? SUCCESS : UNKNOWN_ERROR, purchase);
-                    }
-                    break;
-            }
+            final Purchase purchase = this.pendingType != null
+                    ? SamsungUtils.convertPurchase(getName(), samsungPurchase, this.pendingType)
+                    : null;
+            this.pendingType = null;
+            postPurchaseResponse(purchase != null ? SUCCESS : UNKNOWN_ERROR, purchase);
         }
     }
 
@@ -269,8 +307,8 @@ public class SamsungBillingProvider
                 throw new IllegalStateException("SamsungSkuResolver must be set.");
             }
             return new SamsungBillingProvider(context, skuResolver,
-                                              purchaseVerifier == null ? DEFAULT : purchaseVerifier,
-                                              billingMode);
+                    purchaseVerifier == null ? DEFAULT : purchaseVerifier,
+                    billingMode);
         }
 
         @Override

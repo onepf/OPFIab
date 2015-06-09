@@ -55,7 +55,6 @@ public final class TrivialBilling {
     private static final String KEY_HELPER = "helper";
     private static final String KEY_PROVIDERS = "providers";
     private static final String KEY_AUTO_RECOVER = "auto_recover";
-    private static final String KEY_SKIP_UNAUTHORIZED = "skip_unauthorized";
 
     private static final String AMAZON_SKU_GAS = "org.onepf.opfiab.trivialdrive.sku_gas";
     private static final String AMAZON_SKU_PREMIUM = "org.onepf.opfiab.trivialdrive.sku_premium";
@@ -72,10 +71,10 @@ public final class TrivialBilling {
             "k9ErEOFBqb4dGBNswH5JRm68r/u7a2XzEoo40dXQQH2/5tMy3AQCzVakHnfcIQcZO0BkQOh4o52ahhy3vcCUha" +
             "uN61YA492k+DmKT5GgSH+KxwgK5dcorjbh94E9e03dZwIDAQAB";
 
-    public static final String SAMSUNG_SKU_GAS = "000001006336";
-    public static final String SAMSUNG_SKU_PREMIUM = "000001004349";
-    public static final String SAMSUNG_SKU_SUBSCRIPTION = "";
-    public static final String SAMSUNG_GROUP_ID = "100000100845";
+    public static final String SAMSUNG_SKU_GAS = "org.onepf.trivialdrivegame.sku_gas";
+    public static final String SAMSUNG_SKU_PREMIUM = "org.onepf.trivialdrivegame.sku_premium";
+    public static final String SAMSUNG_SKU_SUBSCRIPTION = "org.onepf.trivialdrivegame.sku_infinite_gas";
+    public static final String SAMSUNG_GROUP_ID = "100000104947";
 
     public static final String SKU_GAS = "sku_gas";
     public static final String SKU_PREMIUM = "sku_premium";
@@ -153,7 +152,6 @@ public final class TrivialBilling {
             setHelper(Helper.ACTIVITY);
             setProviders(Arrays.asList(Provider.values()));
             setAutoRecover(true);
-            setSkipUnauthorized(false);
             TrivialData.resetGas();
         }
     }
@@ -165,7 +163,6 @@ public final class TrivialBilling {
             builder.addBillingProvider(newProvider(provider));
         }
         builder.setAutoRecover(preferences.getBoolean(KEY_AUTO_RECOVER, false));
-        builder.setSkipUnauthorised(preferences.getBoolean(KEY_SKIP_UNAUTHORIZED, false));
         return builder.build();
     }
 
@@ -212,17 +209,6 @@ public final class TrivialBilling {
 
     public static void setAutoRecover(final boolean autoRecover) {
         preferences.edit().putBoolean(KEY_AUTO_RECOVER, autoRecover).apply();
-    }
-
-    public static boolean isSkipUnauthorized() {
-        if (!preferences.contains(KEY_SKIP_UNAUTHORIZED)) {
-            throw new IllegalStateException();
-        }
-        return preferences.getBoolean(KEY_SKIP_UNAUTHORIZED, false);
-    }
-
-    public static void setSkipUnauthorized(final boolean skipUnauthorized) {
-        preferences.edit().putBoolean(KEY_SKIP_UNAUTHORIZED, skipUnauthorized).apply();
     }
 
     public static void updateSetup() {

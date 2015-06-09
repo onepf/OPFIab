@@ -59,7 +59,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     /**
      * Timeout to give up on waiting for a new activity instance.
      */
-    private static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
+    protected static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
 
     @Nullable
     private volatile SyncedReference<Activity> syncActivity;
@@ -127,19 +127,19 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     @Override
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
-        final SyncedReference<Activity> syncedReference = new SyncedReference<>();
+        final SyncedReference<Activity> syncActivity = new SyncedReference<>();
         try {
-            this.syncActivity = syncedReference;
+            this.syncActivity = syncActivity;
             final Activity activity = billingRequest.getActivity();
             final boolean handlesResult = billingRequest.isActivityHandlesResult();
             if (!needsActivity(billingRequest) || (activity != null && handlesResult)) {
-                syncedReference.set(activity);
+                syncActivity.set(activity);
                 super.handleRequest(billingRequest);
                 return;
             }
             // We have to start OPFIabActivity to properly handle this request
             OPFIabActivity.start(activity == null ? context : activity);
-            final Activity newActivity = syncedReference.get(ACTIVITY_TIMEOUT);
+            final Activity newActivity = syncActivity.get(ACTIVITY_TIMEOUT);
             if (newActivity == null) {
                 OPFLog.e("Failed to make new activity for request.");
                 postEmptyResponse(billingRequest, Status.UNKNOWN_ERROR);

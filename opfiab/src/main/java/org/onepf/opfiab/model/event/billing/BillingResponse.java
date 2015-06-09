@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.BillingModel;
 import org.onepf.opfutils.OPFLog;
 
@@ -39,35 +38,35 @@ import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
  */
 public abstract class BillingResponse extends BillingEvent {
 
-    private static final String NAME_PROVIDER_INFO = "provider_info";
+    private static final String NAME_PROVIDER_NAME = "provider_info";
     private static final String NAME_STATUS = "status";
 
     private static final Collection<Status> SUCCESSFUL = Arrays.asList(SUCCESS, PENDING);
 
 
     @Nullable
-    private final BillingProviderInfo providerInfo;
+    private final String providerName;
     @NonNull
     private final Status status;
 
     protected BillingResponse(@NonNull final BillingEventType type,
                               @NonNull final Status status,
-                              @Nullable final BillingProviderInfo providerInfo) {
+                              @Nullable final String providerName) {
         super(type);
         this.status = status;
-        this.providerInfo = providerInfo;
+        this.providerName = providerName;
     }
 
     /**
-     * Gets information about {@link BillingProvider} which is responsible for this BillingResponse.
-     * <br>
+     * Gets name of {@link BillingProvider} responsible for this BillingResponse.
+     * <p/>
      * Might be useful to properly handle some data from {@link BillingModel#getOriginalJson()}.
      *
-     * @return BillingProviderInfo object from corresponding {@link BillingProvider}.
+     * @return Name of corresponding {@link BillingProvider}.
      */
     @Nullable
-    public BillingProviderInfo getProviderInfo() {
-        return providerInfo;
+    public String getProviderInfo() {
+        return providerName;
     }
 
     /**
@@ -96,7 +95,7 @@ public abstract class BillingResponse extends BillingEvent {
         final JSONObject jsonObject = super.toJson();
         try {
             jsonObject.put(NAME_STATUS, status);
-            jsonObject.put(NAME_PROVIDER_INFO, providerInfo == null ? NULL : providerInfo.toJson());
+            jsonObject.put(NAME_PROVIDER_NAME, providerName == null ? NULL : providerName);
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }
@@ -108,15 +107,15 @@ public abstract class BillingResponse extends BillingEvent {
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof BillingResponse)) return false;
         if (!super.equals(o)) return false;
 
         final BillingResponse that = (BillingResponse) o;
 
-        if (providerInfo != null ? !providerInfo.equals(
-                that.providerInfo) : that.providerInfo != null)
+        if (providerName != null ? !providerName.equals(
+                that.providerName) : that.providerName != null)
             return false;
-        if (status != that.status) return false;
+        if (getStatus() != that.getStatus()) return false;
 
         return true;
     }
@@ -124,8 +123,8 @@ public abstract class BillingResponse extends BillingEvent {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (providerInfo != null ? providerInfo.hashCode() : 0);
-        result = 31 * result + status.hashCode();
+        result = 31 * result + (providerName != null ? providerName.hashCode() : 0);
+        result = 31 * result + getStatus().hashCode();
         return result;
     }
     //CHECKSTYLE:ON

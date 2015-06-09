@@ -30,7 +30,6 @@ import org.json.JSONException;
 import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -148,51 +147,9 @@ public final class OPFIabUtils {
     }
 
     /**
-     * Looks for a provider with supplied {@link BillingProviderInfo}.
+     * Constructs empty response corresponding to supplied request.
      *
-     * @param providers Providers to look among.
-     * @param info      Info to look up.
-     *
-     * @return BillingProvider if it was found, null otherwise.
-     */
-    @Nullable
-    public static BillingProvider findWithInfo(@NonNull final Iterable<BillingProvider> providers,
-                                               @NonNull final BillingProviderInfo info) {
-        for (final BillingProvider billingProvider : providers) {
-            if (info.equals(billingProvider.getInfo())) {
-                return billingProvider;
-            }
-        }
-        return null;
-    }
-
-    // where are you stream API...
-
-    /**
-     * Looks for a provider with supplied installer.
-     *
-     * @param providers   Providers to look among.
-     * @param packageName Installer to look for.
-     *
-     * @return BillingProvider if it was found, null otherwise.
-     */
-    @Nullable
-    public static BillingProvider withInstaller(
-            @NonNull final Iterable<BillingProvider> providers,
-            @NonNull final String packageName) {
-        for (final BillingProvider billingProvider : providers) {
-            final BillingProviderInfo info = billingProvider.getInfo();
-            if (packageName.equals(info.getInstaller())) {
-                return billingProvider;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Constructs empty response corresponding to supplied request.`
-     *
-     * @param providerInfo   Info of provider handling request, can be null.
+     * @param providerName   Name of the provider handling request, can be null.
      * @param billingRequest Request to make response for.
      * @param status         Status for newly constructed response.
      *
@@ -200,7 +157,7 @@ public final class OPFIabUtils {
      */
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     @NonNull
-    public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
+    public static BillingResponse emptyResponse(@Nullable final String providerName,
                                                 @NonNull final BillingRequest billingRequest,
                                                 @NonNull final Status status) {
         final BillingResponse billingResponse;
@@ -208,16 +165,16 @@ public final class OPFIabUtils {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
                 final Purchase purchase = consumeRequest.getPurchase();
-                billingResponse = new ConsumeResponse(status, providerInfo, purchase);
+                billingResponse = new ConsumeResponse(status, providerName, purchase);
                 break;
             case PURCHASE:
-                billingResponse = new PurchaseResponse(status, providerInfo, null, null);
+                billingResponse = new PurchaseResponse(status, providerName, null, null);
                 break;
             case SKU_DETAILS:
-                billingResponse = new SkuDetailsResponse(status, providerInfo, null);
+                billingResponse = new SkuDetailsResponse(status, providerName, null);
                 break;
             case INVENTORY:
-                billingResponse = new InventoryResponse(status, providerInfo, null, false);
+                billingResponse = new InventoryResponse(status, providerName, null, false);
                 break;
             default:
                 throw new IllegalArgumentException();

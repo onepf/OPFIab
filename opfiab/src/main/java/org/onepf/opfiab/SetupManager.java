@@ -19,10 +19,9 @@ package org.onepf.opfiab;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.Configuration.Builder;
 import org.onepf.opfiab.model.event.SetupResponse;
@@ -31,7 +30,6 @@ import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
-import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
@@ -44,9 +42,9 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
  * Providers are picked according to this priority rules:
  * <ul>
  * <li> Only available providers will be considered, according to {@link BillingProvider#isAvailable()}.
- * <li> If provider had been already used by this app, it is considered first.
- * <li> If provider has {@link BillingProviderInfo#getInstaller()} that matches this application
- * package installer, it is considered next.
+ * <li> If some provider had been already used by this app, it is considered first.
+ * <li> If provider returns {@link Compatibility#PREFERRED} from
+ * {@link BillingProvider#checkCompatibility()} it is considered next.
  * <li> First suitable provider will be picked according to order it was added in
  * {@link Builder#addBillingProvider(BillingProvider)}.
  * </ul>
@@ -67,7 +65,6 @@ final class SetupManager {
     }
 
 
-    private final Context context;
     private final OPFPreferences preferences;
     /**
      * Flag indicating whether setup process is happening at the moment.
@@ -75,7 +72,7 @@ final class SetupManager {
     private boolean setupInProgress;
     /**
      * Configuration object from last received setup request.
-     * <br>
+     * <p/>
      * Used to determine whether {@link SetupResponse} is relevant when it's ready.
      */
     @Nullable
@@ -83,23 +80,7 @@ final class SetupManager {
 
     private SetupManager(@NonNull final Context context) {
         super();
-        this.context = context.getApplicationContext();
         preferences = new OPFPreferences(context);
-    }
-
-    @Nullable
-    private SetupResponse withProvider(@NonNull final Configuration configuration,
-                                       @NonNull final BillingProvider billingProvider,
-                                       final boolean providerChanged) {
-        final boolean authorized = billingProvider.isAuthorised();
-        OPFLog.d(billingProvider.getInfo().getName() + " isAuthorized = " + authorized);
-        if (authorized || !configuration.skipUnauthorised()) {
-            // Provider is authorized or we don't care about authorization
-            final SetupResponse.Status status = providerChanged ? PROVIDER_CHANGED : SUCCESS;
-            return new SetupResponse(configuration, status, billingProvider, authorized);
-        }
-        OPFLog.d("Skipping: %s", billingProvider);
-        return null;
     }
 
     @NonNull
@@ -114,40 +95,34 @@ final class SetupManager {
         if (hadProvider) {
             // Try previously used provider
             final String lastProvider = preferences.getString(KEY_LAST_PROVIDER, "");
-            final BillingProviderInfo info = BillingProviderInfo.fromJson(lastProvider);
-            final BillingProvider provider;
-            final SetupResponse setupResponse;
             OPFLog.d("Previous provider: %s", lastProvider);
-            if (info != null
-                    // Last provider info is valid
-                    && (provider = OPFIabUtils.findWithInfo(availableProviders, info)) != null
-                    // Provider is present in configuration
-                    && (setupResponse = withProvider(configuration, provider, false)) != null) {
-                return setupResponse;
+            for (final BillingProvider provider : availableProviders) {
+                if (lastProvider.equals(provider.getName())) {
+                    // Use last provider if it's compatible.
+                    if (provider.checkCompatibility() != Compatibility.INCOMPATIBLE) {
+                        return new SetupResponse(configuration, SUCCESS, provider);
+                    }
+                    break;
+                }
             }
         }
 
-        final String packageInstaller = OPFUtils.getPackageInstaller(context);
-        OPFLog.d("Package installer: %s", packageInstaller);
-        if (!TextUtils.isEmpty(packageInstaller)) {
-            // If package installer is set, try it before anything else
-            final BillingProvider installerProvider = OPFIabUtils
-                    .withInstaller(availableProviders, packageInstaller);
-            final SetupResponse setupResponse;
-            if (installerProvider != null
-                    // Provider is present in configuration
-                    && (setupResponse = withProvider(configuration, installerProvider,
-                                                     hadProvider)) != null) {
-                return setupResponse;
-            }
-        }
+        // Use appropriate success status
+        final SetupResponse.Status successStatus = hadProvider ? PROVIDER_CHANGED : SUCCESS;
 
-        // Pick first available provider that satisfies current configuration
+        BillingProvider compatibleProvider = null;
         for (final BillingProvider provider : availableProviders) {
-            final SetupResponse setupResponse = withProvider(configuration, provider, hadProvider);
-            if (setupResponse != null) {
-                return setupResponse;
+            final Compatibility compatibility = provider.checkCompatibility();
+            OPFLog.d("Checking provider: %s, compatibility: %s", provider.getName(), compatibility);
+            if (compatibility == Compatibility.PREFERRED) {
+                return new SetupResponse(configuration, successStatus, provider);
+            } else if (compatibility == Compatibility.COMPATIBLE && compatibleProvider == null) {
+                compatibleProvider = provider;
             }
+        }
+
+        if (compatibleProvider != null) {
+            return new SetupResponse(configuration, successStatus, compatibleProvider);
         }
 
         // No suitable provider was found
@@ -161,6 +136,7 @@ final class SetupManager {
      * current setup is finished.
      *
      * @param configuration Configuration object to perform setup for.
+     *
      * @see OPFIab#setup()
      */
     void startSetup(@NonNull final Configuration configuration) {
@@ -187,12 +163,10 @@ final class SetupManager {
 
     public void onEventAsync(@NonNull final SetupStartedEvent setupStartedEvent) {
         final SetupResponse setupResponse = newResponse(setupStartedEvent);
-        final BillingProvider provider;
-        if (setupResponse.isSuccessful()
-                && (provider = setupResponse.getBillingProvider()) != null) {
-            // Suitable provider successfully picked, remember it to prioritize for next setup.
-            final BillingProviderInfo info = provider.getInfo();
-            preferences.put(KEY_LAST_PROVIDER, info.toJson().toString());
+        if (setupResponse.isSuccessful()) {
+            // Suitable provider successfully picked, save it for next setup.
+            //noinspection ConstantConditions
+            preferences.put(KEY_LAST_PROVIDER, setupResponse.getBillingProvider().getName());
         }
         OPFIab.post(setupResponse);
     }

@@ -16,7 +16,9 @@
 
 package org.onepf.opfiab.google;
 
+import android.accounts.AccountManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +32,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @SuppressWarnings("PMD.LooseCoupling")
 public final class GoogleUtils {
 
+    private static final String ACCOUNT_TYPE_GOOGLE = "com.google";
+
     private static final String RESPONSE_CODE = "RESPONSE_CODE";
     private static final String SKU_DETAILS_LIST = "DETAILS_LIST";
     private static final String SKU_LIST = "ITEM_ID_LIST";
@@ -41,6 +45,13 @@ public final class GoogleUtils {
     private static final String SIGNATURE_LIST = "INAPP_DATA_SIGNATURE_LIST";
     private static final String CONTINUATION_TOKEN = "INAPP_CONTINUATION_TOKEN";
 
+
+    public static boolean hasGoogleAccount(@NonNull final Context context) {
+        final Object service = context.getSystemService(Context.ACCOUNT_SERVICE);
+        final AccountManager accountManager = (AccountManager) service;
+        // At least one Google account is present on device
+        return accountManager.getAccountsByType(ACCOUNT_TYPE_GOOGLE).length > 0;
+    }
 
     @Nullable
     private static ArrayList<String> getList(@Nullable final Bundle bundle,

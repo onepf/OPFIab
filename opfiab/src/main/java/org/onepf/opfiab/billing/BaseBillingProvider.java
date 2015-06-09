@@ -21,11 +21,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import org.onepf.opfiab.ActivityMonitor;
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
@@ -45,7 +43,6 @@ import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -148,10 +145,11 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
                 final Purchase purchase = consumeRequest.getPurchase();
-                final BillingProviderInfo providerInfo = purchase.getProviderInfo();
-                if (!getInfo().equals(providerInfo)) {
+                final String purchaseProviderName = purchase.getProviderName();
+                final String providerName = getName();
+                if (!providerName.equals(purchaseProviderName)) {
                     OPFLog.e("Attempt to consume purchase from wrong provider: %s.\n"
-                                     + "Current provider: %s", providerInfo, getInfo());
+                                     + "Current provider: %s", purchaseProviderName, providerName);
                     postEmptyResponse(billingRequest, ITEM_UNAVAILABLE);
                     break;
                 }
@@ -197,7 +195,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      */
     protected void postEmptyResponse(@NonNull final BillingRequest billingRequest,
                                      @NonNull final Status status) {
-        postResponse(OPFIabUtils.emptyResponse(getInfo(), billingRequest, status));
+        postResponse(OPFIabUtils.emptyResponse(getName(), billingRequest, status));
     }
 
     /**
@@ -214,13 +212,13 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
                                           @Nullable final Collection<SkuDetails> skusDetails) {
         final SkuDetailsResponse response;
         if (skusDetails == null) {
-            response = new SkuDetailsResponse(status, getInfo(), null);
+            response = new SkuDetailsResponse(status, getName(), null);
         } else {
             final Collection<SkuDetails> revertedSkusDetails = new ArrayList<>(skusDetails.size());
             for (final SkuDetails skuDetails : skusDetails) {
                 revertedSkusDetails.add(OPFIabUtils.revert(skuResolver, skuDetails));
             }
-            response = new SkuDetailsResponse(status, getInfo(), revertedSkusDetails);
+            response = new SkuDetailsResponse(status, getName(), revertedSkusDetails);
         }
         postResponse(response);
     }
@@ -241,7 +239,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
                                          final boolean hasMore) {
         final InventoryResponse response;
         if (inventory == null) {
-            response = new InventoryResponse(status, getInfo(), null, hasMore);
+            response = new InventoryResponse(status, getName(), null, hasMore);
         } else {
             final Map<Purchase, VerificationResult> verifiedRevertedInventory = new HashMap<>();
             for (final Purchase purchase : inventory) {
@@ -249,7 +247,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
                 final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
                 verifiedRevertedInventory.put(revertedPurchase, result);
             }
-            response = new InventoryResponse(status, getInfo(), verifiedRevertedInventory, hasMore);
+            response = new InventoryResponse(status, getName(), verifiedRevertedInventory, hasMore);
         }
         postResponse(response);
     }
@@ -268,11 +266,11 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
                                         @Nullable final Purchase purchase) {
         final PurchaseResponse response;
         if (purchase == null) {
-            response = new PurchaseResponse(status, getInfo(), null, null);
+            response = new PurchaseResponse(status, getName(), null, null);
         } else {
             final VerificationResult result = purchaseVerifier.verify(purchase);
             final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
-            response = new PurchaseResponse(status, getInfo(), revertedPurchase, result);
+            response = new PurchaseResponse(status, getName(), revertedPurchase, result);
         }
         postResponse(response);
     }
@@ -289,7 +287,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     protected void postConsumeResponse(@NonNull final Status status,
                                        @NonNull final Purchase purchase) {
         final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
-        postResponse(new ConsumeResponse(status, getInfo(), revertedPurchase));
+        postResponse(new ConsumeResponse(status, getName(), revertedPurchase));
     }
 
     @Override
@@ -300,21 +298,6 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             handleRequest(billingRequest);
         }
         OPFIab.post(new RequestHandledEvent(billingRequest));
-    }
-
-    @Override
-    public boolean isAvailable() {
-        final String packageName = getInfo().getPackageName();
-        if (TextUtils.isEmpty(packageName)) {
-            throw new UnsupportedOperationException(
-                    "You must override this method for packageless Billing Providers.");
-        }
-        return OPFUtils.isInstalled(context, packageName);
-    }
-
-    @Override
-    public boolean isAuthorised() {
-        return true;
     }
 
     @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
@@ -335,25 +318,25 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     @SuppressWarnings({"PMD", "TypeMayBeWeakened", "RedundantIfStatement"})
     @Override
     public boolean equals(final Object o) {
-        final BillingProviderInfo info = getInfo();
+        final String name = getName();
         if (this == o) return true;
         if (!(o instanceof BaseBillingProvider)) return false;
 
         final BaseBillingProvider that = (BaseBillingProvider) o;
 
-        if (!info.equals(that.getInfo())) return false;
+        if (!name.equals(that.getName())) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return getInfo().hashCode();
+        return getName().hashCode();
     }
 
     @Override
     public String toString() {
-        return getInfo().toString();
+        return getName();
     }
     //CHECKSTYLE:ON
 

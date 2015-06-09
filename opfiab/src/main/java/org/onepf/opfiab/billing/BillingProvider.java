@@ -22,7 +22,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -35,19 +34,22 @@ import org.onepf.opfiab.model.event.billing.BillingResponse;
 public interface BillingProvider {
 
     /**
-     * Retrieves information about this BillingProvider.
+     * Get unique name of this BillingProvider to serve as identifier.
      *
-     * @return single immutable object containing all relevant information about this provider.
+     * @return this BillingProvider name;
      */
     @NonNull
-    BillingProviderInfo getInfo();
+    String getName();
 
     /**
      * Checks if Manifest contains all necessary entries.
      *
-     * @throws java.lang.IllegalStateException if manifest doesn't contain all necessary entries.
+     * @throws IllegalStateException if manifest doesn't contain all necessary entries.
      */
     void checkManifest();
+
+    @NonNull
+    Compatibility checkCompatibility();
 
     /**
      * Indicates whether this provider is available on the system.
@@ -57,13 +59,6 @@ public interface BillingProvider {
      * @return true if BillingProvider is currently available, false otherwise.
      */
     boolean isAvailable();
-
-    /**
-     * Indicates whether user is current logged in with this provider.
-     *
-     * @return <b>false</b> if user is <b>not</b> authorised, true otherwise.
-     */
-    boolean isAuthorised();
 
     /**
      * Entry point for all billing requests.

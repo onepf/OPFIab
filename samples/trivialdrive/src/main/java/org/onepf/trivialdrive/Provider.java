@@ -20,32 +20,31 @@ import android.support.annotation.StringRes;
 
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.samsung.SamsungBillingProvider;
 import org.onepf.opfiab.trivialdrive.R;
 
 public enum Provider {
-    AMAZON(R.string.name_amazon, AmazonBillingProvider.INFO),
-    GOOGLE(R.string.name_google, GoogleBillingProvider.INFO),
-    SAMSUNG(R.string.name_samsung, SamsungBillingProvider.INFO),;
+    AMAZON(R.string.name_amazon, AmazonBillingProvider.NAME),
+    GOOGLE(R.string.name_google, GoogleBillingProvider.NAME),
+    SAMSUNG(R.string.name_samsung, SamsungBillingProvider.NAME),;
 
 
-    public static Provider getByInfo(final BillingProviderInfo info) {
+    public static Provider getByName(final String name) {
         for (final Provider provider : values()) {
-            if (provider.info.equals(info)) {
+            if (provider.name.equals(name)) {
                 return provider;
             }
         }
         return null;
     }
 
-    private final BillingProviderInfo info;
+    private final String name;
     @StringRes
     private final int nameId;
 
-    Provider(final int nameId, final BillingProviderInfo info) {
+    Provider(final int nameId, final String name) {
         this.nameId = nameId;
-        this.info = info;
+        this.name = name;
     }
 
     public int getNameId() {

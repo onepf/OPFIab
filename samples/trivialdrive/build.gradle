@@ -27,7 +27,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 28
-        versionName "0.2.2-SNAPSHOT"
+        versionName "0.3.0-SNAPSHOT"
     }
 
     signingConfigs {
@@ -58,8 +58,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.android.support:recyclerview-v7:22.0.0'
+//    compile 'com.android.support:appcompat-v7:22.2.0'
+//    compile 'com.android.support:recyclerview-v7:22.2.0'
 
     // OPFIab core
     compile 'de.greenrobot:eventbus:2.4.0'
@@ -81,7 +81,7 @@ dependencies {
     compile project(':amazon')
     compile 'com.amazon:in-app-purchasing:2.0.61'
 
-    compile 'com.makeramen:dragsortadapter:1.1.0'
+    compile 'com.makeramen:dragsortadapter:1.2.0'
 
     // Leak Canary
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3'

@@ -45,19 +45,16 @@ public final class Configuration {
     @Nullable
     private final BillingListener billingListener;
     private final long subsequentRequestDelay;
-    private final boolean skipUnauthorised;
     private final boolean autoRecover;
 
     Configuration(@NonNull final Set<BillingProvider> providers,
                   @Nullable final BillingListener billingListener,
                   final long subsequentRequestDelay,
-                  final boolean skipUnauthorised,
                   final boolean autoRecover) {
         this.subsequentRequestDelay = subsequentRequestDelay;
         this.autoRecover = autoRecover;
         this.providers = Collections.unmodifiableSet(providers);
         this.billingListener = billingListener;
-        this.skipUnauthorised = skipUnauthorised;
     }
 
     /**
@@ -91,17 +88,6 @@ public final class Configuration {
     }
 
     /**
-     * Indicates whether unauthorized {@link BillingProvider}s should be skipped during setup
-     * process.
-     *
-     * @return True if unauthorized BillingProviders should be skipped. False otherwise.
-     * @see BillingProvider#isAuthorised()
-     */
-    public boolean skipUnauthorised() {
-        return skipUnauthorised;
-    }
-
-    /**
      * Indicates whether library should attempt to pick another suitable {@link BillingProvider} if
      * current one becomes unavailable.
      *
@@ -121,15 +107,15 @@ public final class Configuration {
         @Nullable
         private BillingListener billingListener;
         private long subsequentRequestDelay = DEFAULT_REQUEST_DELAY;
-        private boolean skipUnauthorised;
         private boolean autoRecover;
 
         /**
          * Adds supported billing provider.
-         * <br>
+         * <p/>
          * During setup process billing providers will be considered in the order they were added.
          *
          * @param provider BillingProvider object to add.
+         *
          * @return this object.
          */
         public Builder addBillingProvider(@NonNull final BillingProvider provider) {
@@ -139,11 +125,13 @@ public final class Configuration {
 
         /**
          * Sets global listener to handle all billing events.
-         * <br>
+         * <p/>
          * This listener will be stored in a static reference.
          *
          * @param billingListener BillingListener object to use.
+         *
          * @return this object.
+         *
          * @see DefaultBillingListener
          */
         public Builder setBillingListener(@Nullable final BillingListener billingListener) {
@@ -153,10 +141,11 @@ public final class Configuration {
 
         /**
          * Sets time gap between attempts to execute enqueued requests.
-         * <br>
+         * <p/>
          * Default value is 50ms.
          *
          * @param subsequentRequestDelay Time gap in milliseconds.
+         *
          * @see #getSubsequentRequestDelay()
          * @see AdvancedIabHelper
          */
@@ -166,24 +155,13 @@ public final class Configuration {
         }
 
         /**
-         * Sets flag indicating whether unauthorized {@link BillingProvider}s should be skipped
-         * during setup.
-         *
-         * @param skipUnauthorised True to skip unauthorized BillingProviders.
-         * @return this object.
-         * @see BillingProvider#isAuthorised()
-         */
-        public Builder setSkipUnauthorised(final boolean skipUnauthorised) {
-            this.skipUnauthorised = skipUnauthorised;
-            return this;
-        }
-
-        /**
          * Sets flag indicating whether library should attempt to substitute current
          * {@link BillingProvider} if it becomes unavailable.
          *
          * @param autoRecover True to attempt substitution of unavailable provider.
+         *
          * @return this object.
+         *
          * @see BillingProvider#isAvailable()
          */
         public Builder setAutoRecover(final boolean autoRecover) {
@@ -198,7 +176,7 @@ public final class Configuration {
          */
         public Configuration build() {
             return new Configuration(providers, billingListener, subsequentRequestDelay,
-                                     skipUnauthorised, autoRecover);
+                                     autoRecover);
         }
     }
 }

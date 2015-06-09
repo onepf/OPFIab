@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfutils.OPFLog;
 
@@ -43,9 +42,9 @@ public class SkuDetailsResponse extends BillingResponse {
     private final Collection<SkuDetails> skusDetails;
 
     public SkuDetailsResponse(@NonNull final Status status,
-                              @Nullable final BillingProviderInfo providerInfo,
+                              @Nullable final String providerName,
                               @Nullable final Collection<SkuDetails> skusDetails) {
-        super(BillingEventType.SKU_DETAILS, status, providerInfo);
+        super(BillingEventType.SKU_DETAILS, status, providerName);
         this.skusDetails = skusDetails == null
                 ? null
                 : Collections.unmodifiableCollection(skusDetails);

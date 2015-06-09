@@ -20,7 +20,6 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
-import org.onepf.opfutils.OPFUtils;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +32,9 @@ public class SyncedReference<E> {
 
     public void set(@Nullable final E model) {
         if (latch.getCount() == 0L) {
-            throw new IllegalStateException();
+            OPFLog.logMethod(model);
+            OPFLog.e("Attempt to re-set SyncedReference value.");
+            return;
         }
         this.model = model;
         latch.countDown();

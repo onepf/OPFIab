@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfiab.verification.VerificationResult;
@@ -45,10 +44,10 @@ public class PurchaseResponse extends BillingResponse {
     private final VerificationResult verificationResult;
 
     public PurchaseResponse(@NonNull final Status status,
-                            @Nullable final BillingProviderInfo providerInfo,
+                            @Nullable final String providerName,
                             @Nullable final Purchase purchase,
                             @Nullable final VerificationResult verificationResult) {
-        super(BillingEventType.PURCHASE, status, providerInfo);
+        super(BillingEventType.PURCHASE, status, providerName);
         this.purchase = purchase;
         this.verificationResult = verificationResult;
     }

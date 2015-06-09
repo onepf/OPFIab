@@ -28,7 +28,7 @@ import org.onepf.opfiab.sku.SkuResolver;
 public interface GoogleSkuResolver extends SkuResolver {
 
     /**
-     * Resolves type of supplied SKU.
+     * Resolves type of supplied SKU. SKU should not yet be resolved.
      *
      * @param sku SKU to resolve type for.
      *

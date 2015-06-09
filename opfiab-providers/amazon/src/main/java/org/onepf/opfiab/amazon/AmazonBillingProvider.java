@@ -16,13 +16,11 @@
 
 package org.onepf.opfiab.amazon;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.amazon.device.iap.PurchasingService;
@@ -36,7 +34,7 @@ import com.amazon.device.iap.model.Receipt;
 import org.json.JSONException;
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
@@ -49,9 +47,7 @@ import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -73,16 +69,14 @@ import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 @SuppressWarnings("PMD.GodClass")
 public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, PurchaseVerifier> {
 
-    protected static final String NAME = "Amazon";
+    public static final String NAME = "Amazon";
     protected static final String INSTALLER = "com.amazon.venezia";
     protected static final Pattern PACKAGE_PATTERN = Pattern.compile("(com\\.amazon\\.venezia)|([a-z]{2,3}\\.amazon\\.mShop\\.android(\\.apk)?)");
-
-    public static final BillingProviderInfo INFO = new BillingProviderInfo(NAME, INSTALLER);
 
     /**
      * Helper object handles all Amazon SDK related calls.
      */
-    protected static AmazonBillingHelper billingHelper;
+    protected final AmazonBillingHelper billingHelper;
 
 
     @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
@@ -91,11 +85,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             @NonNull final SkuResolver skuResolver,
             @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
-        if (billingHelper == null) {
-            billingHelper = new AmazonBillingHelper();
-            // Register Amazon callbacks handler, it's never unregistered.
-            PurchasingService.registerListener(context, billingHelper);
-        }
+        this.billingHelper = AmazonBillingHelper.getInstance(context);
     }
 
     /**
@@ -123,8 +113,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         builder.setTitle(product.getTitle());
         builder.setDescription(product.getDescription());
         builder.setPrice(product.getPrice());
-        builder.setIconUrl(product.getSmallIconUrl());
-        builder.setProviderInfo(getInfo());
+        builder.setProviderName(getName());
         try {
             builder.setOriginalJson(product.toJSON().toString());
         } catch (JSONException exception) {
@@ -158,7 +147,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         builder.setToken(receipt.getReceiptId());
         builder.setCanceled(receipt.isCanceled());
         builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
-        builder.setProviderInfo(getInfo());
+        builder.setProviderName(getName());
         builder.setOriginalJson(receipt.toJSON().toString());
         return builder.build();
     }
@@ -262,6 +251,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     @SuppressFBWarnings({"EXS_EXCEPTION_SOFTENING_NO_CONSTRAINTS"})
     @Override
     public void checkManifest() {
+        OPFChecks.checkPermission(context, ACCESS_NETWORK_STATE);
         //TODO OPFCheck.checkReceiver
         final PackageManager packageManager = context.getPackageManager();
         final ComponentName componentName = new ComponentName(context, ResponseReceiver.class);
@@ -273,7 +263,6 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             throw new IllegalStateException(
                     "You must declare Amazon receiver to use Amazon billing provider.", exception);
         }
-        OPFChecks.checkPermission(context, ACCESS_NETWORK_STATE);
     }
 
     @Override
@@ -287,14 +276,19 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         return false;
     }
 
+    @NonNull
     @Override
-    public boolean isAuthorised() {
-        return billingHelper.getUserData() != null;
+    public Compatibility checkCompatibility() {
+        //TODO Check Amazon classes
+        if (INSTALLER.equals(OPFUtils.getPackageInstaller(context))) {
+            return Compatibility.PREFERRED;
+        }
+        return Compatibility.COMPATIBLE;
     }
 
     @Override
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
-        if (!isAuthorised()) {
+        if (billingHelper.getUserData() == null) {
             postEmptyResponse(billingRequest, UNAUTHORISED);
         } else {
             super.handleRequest(billingRequest);
@@ -329,8 +323,8 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     @NonNull
     @Override
-    public BillingProviderInfo getInfo() {
-        return INFO;
+    public String getName() {
+        return NAME;
     }
 
     public static class Builder extends BaseBillingProvider.Builder<SkuResolver, PurchaseVerifier> {

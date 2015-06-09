@@ -23,7 +23,6 @@ import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.trivialdrive.BuildConfig;
 import org.onepf.opfutils.OPFLog;
 
 
