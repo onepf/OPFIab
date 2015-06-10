@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab.samsung;
 
+import android.accounts.AccountManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
@@ -58,6 +59,7 @@ public final class SamsungUtils {
     private static final String ACCOUNT_ACTIVITY = "com.sec.android.iap.activity.AccountActivity";
     private static final String PURCHASE_ACTIVITY = "com.sec.android.iap.activity.PaymentMethodListActivity";
     private static final String INSTALL_URI = "samsungapps://ProductDetail/com.sec.android.iap";
+    private static final String ACCOUNT_TYPE_SAMSUNG = "com.osp.app.signin";
 
     private static final String KEY_TYPE = "mType";
 
@@ -89,6 +91,12 @@ public final class SamsungUtils {
             OPFLog.e("Samsung signature check failed.");
         }
         return result;
+    }
+
+    public static boolean hasSamsungAccount(@NonNull final Context context) {
+        final Object service = context.getSystemService(Context.ACCOUNT_SERVICE);
+        final AccountManager accountManager = (AccountManager) service;
+        return accountManager.getAccountsByType(ACCOUNT_TYPE_SAMSUNG).length > 0;
     }
 
     @Nullable

@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.onepf.opfutils.OPFUtils;
 
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
@@ -136,7 +137,8 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
         OPFLog.logMethod(billingRequest);
         final Activity activity = billingRequest.getActivity();
-        if (activity != null && !ActivityMonitor.isResumed(activity)) {
+        // Filter not relevant requests
+        if (activity != null && !OPFIabUtils.isActivityFake(activity) && !ActivityMonitor.isStarted(activity)) {
             postEmptyResponse(billingRequest, USER_CANCELED);
             return;
         }

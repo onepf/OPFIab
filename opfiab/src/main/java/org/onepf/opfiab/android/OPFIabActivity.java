@@ -44,7 +44,8 @@ import org.onepf.opfutils.OPFLog;
 public class OPFIabActivity extends Activity {
 
     /**
-     * If activity is not expecting {@link #onActivityResult(int, int, Intent)} call, it will auto-finish after this timeout.
+     * If activity is not expecting {@link #onActivityResult(int, int, Intent)} call, it will
+     * auto-finish after this timeout.
      */
     protected static final long FINISH_DELAY = 500L; // 0.5 second
 
@@ -52,9 +53,10 @@ public class OPFIabActivity extends Activity {
     /**
      * Start new instance of this activity.
      *
-     * @param context Can't be null. Context object witch will be used to start new instance of {@link OPFIabActivity}.
-     *                If passed object is not <code>instanceof</code> {@link Activity},
-     *                new activity will be started with {@link Intent#FLAG_ACTIVITY_NEW_TASK} flag.
+     * @param context Can't be null. Context object witch will be used to start new instance of
+     *                {@link OPFIabActivity}. If passed object is not <code>instanceof</code>
+     *                {@link Activity}, new activity will be started with
+     *                {@link Intent#FLAG_ACTIVITY_NEW_TASK} flag.
      */
     public static void start(@NonNull final Context context) {
         final Intent intent = new Intent(context, OPFIabActivity.class);

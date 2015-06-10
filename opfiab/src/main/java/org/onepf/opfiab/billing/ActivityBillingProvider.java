@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
@@ -77,7 +76,6 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
      *
      * @return Collection of request codes that should be handled by this billing provider. Can't be
      * null.
-     *
      * @see #REQUEST_CODE
      * @see Activity#startActivityForResult(Intent, int)
      * @see Activity#onActivityResult(int, int, Intent)
@@ -181,19 +179,24 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
             onActivityResultSync(activity, requestCode, resultCode, data);
         } else {
             onActivityResult(activity, requestCode, resultCode, data);
-            if (OPFIabUtils.isActivityFake(activity)) {
-                activity.finish();
-            }
         }
     }
 
     /**
      * Handles result of activity previously started with {@link #REQUEST_CODE}.
+     * <p>
+     * By default finishes activity if it was automatically created for some request.
+     *
+     * @see OPFIabActivity
      */
-    protected abstract void onActivityResult(@NonNull final Activity activity,
-                                             final int requestCode,
-                                             final int resultCode,
-                                             @Nullable final Intent data);
+    protected void onActivityResult(@NonNull final Activity activity,
+                                    final int requestCode,
+                                    final int resultCode,
+                                    @Nullable final Intent data) {
+        if (OPFIabUtils.isActivityFake(activity)) {
+            activity.finish();
+        }
+    }
 
     /**
      * Same as {@link #onActivityResult(Activity, int, int, Intent)} but called on <b>main thread</b>.
@@ -202,5 +205,8 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
                                         final int requestCode,
                                         final int resultCode,
                                         @Nullable final Intent data) {
+        if (OPFIabUtils.isActivityFake(activity)) {
+            activity.finish();
+        }
     }
 }

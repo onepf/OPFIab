@@ -25,11 +25,14 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfutils.OPFChecks;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import static org.onepf.opfiab.model.ComponentState.*;
 
 /**
  * This class is designed to monitor the existing {@link Activity}s lifecycle.
@@ -88,7 +91,11 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
      * @see {@link Activity#onResume()}
      */
     public static boolean isResumed(@NonNull final Activity activity) {
-        return getState(activity) == ComponentState.RESUME;
+        return getState(activity) == RESUME;
+    }
+
+    public static boolean isStarted(@NonNull final Activity activity) {
+        return Arrays.asList(RESUME, PAUSE, START).contains(getState(activity));
     }
 
 
@@ -108,7 +115,7 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
     @Override
     public void onActivityResumed(final Activity activity) {
-        setState(activity, ComponentState.RESUME);
+        setState(activity, RESUME);
     }
 
     @Override
