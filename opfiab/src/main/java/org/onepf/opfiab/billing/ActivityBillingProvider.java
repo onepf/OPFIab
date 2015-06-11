@@ -89,6 +89,12 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         return billingRequest.getType() == BillingEventType.PURCHASE;
     }
 
+    protected void releaseActivity(@Nullable final Activity activity) {
+        if (activity != null && OPFIabUtils.isActivityFake(activity)) {
+            activity.finish();
+        }
+    }
+
     @Nullable
     private Activity getActivity() {
         final SyncedReference<Activity> syncedReference = syncActivity;
@@ -184,19 +190,13 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     /**
      * Handles result of activity previously started with {@link #REQUEST_CODE}.
-     * <p>
-     * By default finishes activity if it was automatically created for some request.
      *
      * @see OPFIabActivity
      */
     protected void onActivityResult(@NonNull final Activity activity,
                                     final int requestCode,
                                     final int resultCode,
-                                    @Nullable final Intent data) {
-        if (OPFIabUtils.isActivityFake(activity)) {
-            activity.finish();
-        }
-    }
+                                    @Nullable final Intent data) { }
 
     /**
      * Same as {@link #onActivityResult(Activity, int, int, Intent)} but called on <b>main thread</b>.
@@ -204,9 +204,5 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     protected void onActivityResultSync(@NonNull final Activity activity,
                                         final int requestCode,
                                         final int resultCode,
-                                        @Nullable final Intent data) {
-        if (OPFIabUtils.isActivityFake(activity)) {
-            activity.finish();
-        }
-    }
+                                        @Nullable final Intent data) { }
 }

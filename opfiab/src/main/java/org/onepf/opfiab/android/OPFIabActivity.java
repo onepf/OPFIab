@@ -47,7 +47,7 @@ public class OPFIabActivity extends Activity {
      * If activity is not expecting {@link #onActivityResult(int, int, Intent)} call, it will
      * auto-finish after this timeout.
      */
-    protected static final long FINISH_DELAY = 500L; // 0.5 second
+    protected static final long FINISH_DELAY = 1000L;
 
 
     /**

@@ -92,10 +92,6 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
             return null;
         }
         try {
-            final Bundle bundle = init();
-            if (SamsungUtils.getResponse(bundle) != Response.ERROR_NONE) {
-                return bundle;
-            }
             return iapConnector.getItemsInbox(packageName, groupId, 1, Integer.MAX_VALUE,
                     START_DATE, SamsungUtils.getNowDate());
         } catch (RemoteException exception) {
@@ -112,10 +108,6 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
             return null;
         }
         try {
-            final Bundle bundle = init();
-            if (SamsungUtils.getResponse(bundle) != Response.ERROR_NONE) {
-                return bundle;
-            }
             return iapConnector.getItemList(billingMode, packageName, groupId, 1, Integer.MAX_VALUE,
                     ItemType.ALL.getCode());
         } catch (RemoteException exception) {

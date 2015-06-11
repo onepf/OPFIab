@@ -51,6 +51,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static org.onepf.opfiab.samsung.SamsungBillingProvider.NAME;
+
 
 public final class SamsungUtils {
 
@@ -101,7 +103,7 @@ public final class SamsungUtils {
 
     @Nullable
     public static Status handleError(@NonNull final Context context,
-            @Nullable final Bundle bundle) {
+                                     @Nullable final Bundle bundle) {
         final Response response = getResponse(bundle);
         if (response == Response.ERROR_NONE) {
             return null;
@@ -145,7 +147,7 @@ public final class SamsungUtils {
     }
 
     public static void promptUpgrade(@NonNull final Context context,
-            @Nullable final Bundle bundle) {
+                                     @Nullable final Bundle bundle) {
         final String uri;
         if (bundle == null || (uri = bundle.getString(KEY_IAP_UPGRADE_URL)) == null) {
             OPFLog.e("No upgrade url.");
@@ -190,8 +192,8 @@ public final class SamsungUtils {
 
     @NonNull
     public static Intent getPurchaseIntent(@NonNull final Context context,
-            @NonNull final String groupId,
-            @NonNull final String itemId) {
+                                           @NonNull final String groupId,
+                                           @NonNull final String itemId) {
         final Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
 
@@ -250,58 +252,75 @@ public final class SamsungUtils {
     }
 
     @Nullable
-    public static Collection<SamsungPurchasedItem> getPurchasedItems(
-            @Nullable final Bundle bundle) {
+    public static Collection<Purchase> getPurchasedItems(@Nullable final Bundle bundle,
+                                                         final boolean loadConsumable) {
         final Collection<String> items = getItems(bundle);
         if (items == null) {
             return null;
         }
 
-        final Collection<SamsungPurchasedItem> samsungItems = new ArrayList<>(items.size());
+        final Collection<Purchase> purchases = new ArrayList<>();
         for (final String item : items) {
             try {
-                samsungItems.add(new SamsungPurchasedItem(item));
+                final SamsungPurchasedItem purchasedItem = new SamsungPurchasedItem(item);
+                if (loadConsumable || purchasedItem.getItemType() != ItemType.CONSUMABLE) {
+                    purchases.add(SamsungUtils.convertPurchasedItem(purchasedItem));
+                }
             } catch (JSONException exception) {
-                OPFLog.e("Filed to decode Samsung inventory item", exception);
+                OPFLog.e("Filed to decode Samsung inventory item.", exception);
             }
         }
 
-        return samsungItems;
+        return purchases;
     }
 
     @Nullable
-    public static Collection<SamsungSkuDetails> getSkusDetails(@Nullable final Bundle bundle) {
+    public static Collection<SkuDetails> getSkusDetails(@Nullable final Bundle bundle,
+                                                        @NonNull final Collection<String> skus) {
         final Collection<String> items = getItems(bundle);
         if (items == null) {
             return null;
         }
 
-        final Collection<SamsungSkuDetails> samsungItems = new ArrayList<>(items.size());
+        final Collection<SkuDetails> skusDetails = new ArrayList<>(skus.size());
+        final Collection<String> unloadedItems = new ArrayList<>(skus);
         for (final String item : items) {
             try {
-                samsungItems.add(new SamsungSkuDetails(item));
+                final SamsungSkuDetails skuDetails = new SamsungSkuDetails(item);
+                final String sku = skuDetails.getItemId();
+                if (unloadedItems.contains(sku)) {
+                    skusDetails.add(convertSkuDetails(skuDetails));
+                    unloadedItems.remove(sku);
+                }
             } catch (JSONException exception) {
-                OPFLog.e("Filed to decode Samsung inventory item", exception);
+                OPFLog.e("Filed to decode Samsung sku details.", exception);
             }
         }
+        for (final String sku : unloadedItems) {
+            skusDetails.add(new SkuDetails(sku));
+        }
 
-        return samsungItems;
+        return skusDetails;
     }
 
     @Nullable
-    public static Bundle putItems(@NonNull final Bundle from,
-            @Nullable final Bundle to) {
-        final Collection<String> fromItems = getItems(from);
-        if (fromItems == null || fromItems.isEmpty() || to == null) {
-            return to;
+    public static ItemType getItemType(@Nullable final Bundle bundle,
+                                       @NonNull final String sku) {
+        final Collection<String> items = getItems(bundle);
+        if (items == null) {
+            return null;
         }
-        final ArrayList<String> mergedItems = new ArrayList<>(fromItems);
-        final Collection<String> toItems = getItems(to);
-        if (toItems != null) {
-            mergedItems.addAll(toItems);
+        for (final String item : items) {
+            try {
+                final SamsungSkuDetails skuDetails = new SamsungSkuDetails(item);
+                if (sku.equals(skuDetails.getItemId())) {
+                    return skuDetails.getItemType();
+                }
+            } catch (JSONException exception) {
+                OPFLog.e("Filed to decode Samsung sku details.", exception);
+            }
         }
-        to.putStringArrayList(KEY_RESULT_LIST, mergedItems);
-        return to;
+        return null;
     }
 
     @Nullable
@@ -333,21 +352,19 @@ public final class SamsungUtils {
     }
 
     @NonNull
-    public static SkuDetails convertSkuDetails(@NonNull final String providerName,
-            @NonNull final SamsungSkuDetails samsungSkuDetails) {
+    public static SkuDetails convertSkuDetails(@NonNull final SamsungSkuDetails samsungSkuDetails) {
         return new SkuDetails.Builder(samsungSkuDetails.getItemId())
                 .setOriginalJson(samsungSkuDetails.getOriginalJson())
                 .setType(convertType(samsungSkuDetails.getItemType()))
                 .setTitle(samsungSkuDetails.getName())
                 .setDescription(samsungSkuDetails.getDescription())
                 .setPrice(samsungSkuDetails.getPriceString())
-                .setProviderName(providerName)
+                .setProviderName(NAME)
                 .build();
     }
 
     @NonNull
-    public static Purchase convertPurchasedItems(@NonNull final String providerName,
-            @NonNull final SamsungPurchasedItem purchasedItem) {
+    public static Purchase convertPurchasedItem(@NonNull final SamsungPurchasedItem purchasedItem) {
         final Date endDate = purchasedItem.getSubscriptionEndDate();
         return new Purchase.Builder(purchasedItem.getItemId())
                 .setOriginalJson(purchasedItem.getOriginalJson())
@@ -355,20 +372,19 @@ public final class SamsungUtils {
                 .setToken(purchasedItem.getPaymentId())
                 .setPurchaseTime(purchasedItem.getPurchaseDate().getTime())
                 .setCanceled(endDate != null && endDate.before(new Date()))
-                .setProviderName(providerName)
+                .setProviderName(NAME)
                 .build();
     }
 
     @NonNull
-    public static Purchase convertPurchase(@NonNull final String providerName,
-            @NonNull final SamsungPurchase purchase,
-            @NonNull final ItemType itemType) {
+    public static Purchase convertPurchase(@NonNull final SamsungPurchase purchase,
+                                           @NonNull final ItemType itemType) {
         return new Purchase.Builder(purchase.getItemId())
                 .setOriginalJson(purchase.getOriginalJson())
                 .setType(convertType(itemType))
                 .setToken(purchase.getPaymentId())
                 .setPurchaseTime(purchase.getPurchaseDate().getTime())
-                .setProviderName(providerName)
+                .setProviderName(NAME)
                 .build();
     }
 }
