@@ -54,6 +54,7 @@ import java.util.Locale;
 import static org.onepf.opfiab.samsung.SamsungBillingProvider.NAME;
 
 
+@SuppressWarnings({"ClassWithTooManyMethods", "PMD.GodClass"})
 public final class SamsungUtils {
 
     private static final int BILLING_SIGNATURE_HASHCODE = 0x7a7eaf4b;
@@ -87,12 +88,14 @@ public final class SamsungUtils {
     }
 
     public static boolean checkSignature(@NonNull final Context context) {
-        final Signature signature = OPFIabUtils.getPackageSignature(context, BILLING_PACKAGE_NAME);
-        final boolean result = signature != null && signature.hashCode() == BILLING_SIGNATURE_HASHCODE;
-        if (!result) {
-            OPFLog.e("Samsung signature check failed.");
+        final Signature[] signatures = OPFIabUtils.getPackageSignatures(context, BILLING_PACKAGE_NAME);
+        for (final Signature signature : signatures) {
+            if (signature.hashCode() == BILLING_SIGNATURE_HASHCODE) {
+                return true;
+            }
         }
-        return result;
+        OPFLog.e("Samsung signature check failed.");
+        return false;
     }
 
     public static boolean hasSamsungAccount(@NonNull final Context context) {
@@ -101,6 +104,7 @@ public final class SamsungUtils {
         return accountManager.getAccountsByType(ACCOUNT_TYPE_SAMSUNG).length > 0;
     }
 
+    @SuppressWarnings("PMD.MissingBreakInSwitch")
     @Nullable
     public static Status handleError(@NonNull final Context context,
                                      @Nullable final Bundle bundle) {

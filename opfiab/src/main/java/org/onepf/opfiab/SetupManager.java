@@ -49,6 +49,7 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
  * {@link Builder#addBillingProvider(BillingProvider)}.
  * </ul>
  */
+@SuppressWarnings({"PMD.ModifiedCyclomaticComplexity", "PMD.StdCyclomaticComplexity"})
 final class SetupManager {
 
     private static final String KEY_LAST_PROVIDER = SetupManager.class.getName() + ".last_provider";
@@ -83,6 +84,7 @@ final class SetupManager {
         preferences = new OPFPreferences(context);
     }
 
+    @SuppressWarnings({"PMD.NPathComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
     @NonNull
     private SetupResponse newResponse(@NonNull final SetupStartedEvent setupStartedEvent) {
         OPFLog.logMethod(setupStartedEvent);
@@ -115,12 +117,14 @@ final class SetupManager {
             final Compatibility compatibility = provider.checkCompatibility();
             OPFLog.d("Checking provider: %s, compatibility: %s", provider.getName(), compatibility);
             if (compatibility == Compatibility.PREFERRED) {
+                // Pick preferred provider
                 return new SetupResponse(configuration, successStatus, provider);
             } else if (compatibility == Compatibility.COMPATIBLE && compatibleProvider == null) {
                 compatibleProvider = provider;
             }
         }
 
+        // Pick first compatible provider
         if (compatibleProvider != null) {
             return new SetupResponse(configuration, successStatus, compatibleProvider);
         }

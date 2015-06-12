@@ -106,25 +106,26 @@ public final class OPFIabUtils {
     /**
      * Retrieves signature form supplied package.
      *
-     * @param context Context object to get {@link PackageManager} from.
+     * @param context     Context object to get {@link PackageManager} from.
      * @param packageName Package to retrieve signature for.
      *
      * @return Signature object if package found, null otherwise.
      */
-    @Nullable
-    public static Signature getPackageSignature(@NonNull final Context context,
-                                                @NonNull final String packageName) {
+    @SuppressWarnings("PackageManagerGetSignatures")
+    @NonNull
+    public static Signature[] getPackageSignatures(@NonNull final Context context,
+                                                   @NonNull final String packageName) {
         final PackageManager packageManager = context.getPackageManager();
         try {
-            final PackageInfo info =  packageManager.getPackageInfo(packageName, GET_SIGNATURES);
+            final PackageInfo info = packageManager.getPackageInfo(packageName, GET_SIGNATURES);
             final Signature[] signatures = info.signatures;
-            if (signatures.length > 0) {
-                return signatures[0];
+            if (signatures != null) {
+                return signatures;
             }
         } catch (PackageManager.NameNotFoundException exception) {
             OPFLog.e("", exception);
         }
-        return null;
+        return new Signature[0];
     }
 
     /**

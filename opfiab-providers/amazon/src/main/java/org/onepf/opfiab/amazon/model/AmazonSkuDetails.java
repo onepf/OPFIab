@@ -37,16 +37,16 @@ public class AmazonSkuDetails extends AmazonModel {
 
     public AmazonSkuDetails(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
+        final ProductType productType = ProductType.valueOf(jsonObject.getString(NAME_ITEM_TYPE));
+        if (productType == null) {
+            throw new JSONException("Unknown product type.");
+        }
         final ProductBuilder builder = new ProductBuilder()
                 .setSku(sku)
                 .setTitle(jsonObject.getString(NAME_TITLE))
                 .setDescription(jsonObject.getString(NAME_DESCRIPTION))
                 .setPrice(jsonObject.getString(NAME_PRICE))
                 .setSmallIconUrl(jsonObject.getString(NAME_SMALL_ICON_URL));
-        final ProductType productType = ProductType.valueOf(jsonObject.getString(NAME_ITEM_TYPE));
-        if (productType == null) {
-            throw new JSONException("Unknown product type.");
-        }
         builder.setProductType(productType);
         this.product = new Product(builder);
     }

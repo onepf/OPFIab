@@ -24,7 +24,7 @@ public enum ItemType {
     CONSUMABLE("00"),
     NON_CONSUMABLE("01"),
     SUBSCRIPTION("02"),
-    ALL("10"),;
+    ALL("10");
 
     @Nullable
     public static ItemType fromCode(@NonNull final String code) {

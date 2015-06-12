@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class SamsungVerification extends JsonModel {
 
-    private static final String KEY_ITEM_ID ="itemId";
+    private static final String KEY_ITEM_ID = "itemId";
     private static final String KEY_ITEM_NAME = "itemName";
     private static final String KEY_ITEM_DESC = "itemDesc";
     private static final String KEY_PURCHASE_DATE = "purchaseDate";

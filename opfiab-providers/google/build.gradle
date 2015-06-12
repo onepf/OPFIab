@@ -15,17 +15,10 @@
  */
 
 apply plugin: 'idea'
-apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.library'
-apply plugin: 'com.noveogroup.android.check'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/OPF-mvn-push.gradle'
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle'
 
 android {
-    //noinspection GroovyAssignabilityCheck
-    compileSdkVersion project.compileSdkVersion
-    //noinspection GroovyAssignabilityCheck
-    buildToolsVersion project.buildToolsVersion
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
@@ -39,38 +32,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-
-    lintOptions {
-        abortOnError true
-        checkAllWarnings true
-        warningsAsErrors true
-        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
-                'GradleDynamicVersion'
-    }
-}
-
-check {
-    abortOnError false
-
-    checkstyle {
-        config rootProject.file('config/checkstyle.xml')
-    }
-
-    pmd {
-        config rootProject.file('config/pmd.xml')
-    }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    debugCompile 'com.google.code.findbugs:annotations:3.0.0'
-    releaseCompile 'org.onepf.findbugs:annotations:1.0'
-
     compile project(':opfiab')
     provided 'org.onepf:opfutils:0.1.22'
 }

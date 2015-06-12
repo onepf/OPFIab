@@ -43,7 +43,7 @@ import java.util.Set;
 /**
  * Extension of {@link BillingProvider} which guarantees non-null {@link Activity} object for all
  * requests matching {@link #needsActivity(BillingRequest)}.
- * <br>
+ * <p>
  * New instance of {@link OPFIabActivity} will be launched if necessary.
  */
 public abstract class ActivityBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
@@ -51,7 +51,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     /**
      * Default request code to use with {@link Activity#startActivityForResult(Intent, int)}.
-     * <p/>
+     * <p>
      * Can be overridden with {@link #getRequestCodes()}.
      */
     protected static final int REQUEST_CODE = 13685;
@@ -71,7 +71,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
 
     /**
      * Gets request codes that should be handled by this billing provider.
-     * <p/>
+     * <p>
      * Must return non-empty collection.
      *
      * @return Collection of request codes that should be handled by this billing provider. Can't be
@@ -135,8 +135,8 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         try {
             this.syncActivity = syncActivity;
             final Activity activity = billingRequest.getActivity();
-            final boolean handlesResult = billingRequest.isActivityHandlesResult();
-            if (!needsActivity(billingRequest) || (activity != null && handlesResult)) {
+            final boolean hasActivity = activity != null && billingRequest.isActivityHandlesResult();
+            if (!needsActivity(billingRequest) || hasActivity) {
                 syncActivity.set(activity);
                 super.handleRequest(billingRequest);
                 return;
@@ -193,16 +193,19 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
      *
      * @see OPFIabActivity
      */
-    protected void onActivityResult(@NonNull final Activity activity,
+    protected abstract void onActivityResult(@NonNull final Activity activity,
                                     final int requestCode,
                                     final int resultCode,
-                                    @Nullable final Intent data) { }
+                                    @Nullable final Intent data);
 
     /**
      * Same as {@link #onActivityResult(Activity, int, int, Intent)} but called on <b>main thread</b>.
      */
+    @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
     protected void onActivityResultSync(@NonNull final Activity activity,
                                         final int requestCode,
                                         final int resultCode,
-                                        @Nullable final Intent data) { }
+                                        @Nullable final Intent data) {
+        // ignore by default
+    }
 }

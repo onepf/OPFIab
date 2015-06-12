@@ -37,6 +37,7 @@ public class SignedPurchase extends Purchase {
     @Nullable
     private final String signature;
 
+    @SuppressWarnings({"checkstyle:parameternumber"})
     public SignedPurchase(@NonNull final String sku,
                           @Nullable final SkuType type,
                           @Nullable final String providerName,

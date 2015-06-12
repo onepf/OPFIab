@@ -26,18 +26,14 @@ import android.text.TextUtils;
 import com.amazon.device.iap.PurchasingService;
 import com.amazon.device.iap.ResponseReceiver;
 import com.amazon.device.iap.model.FulfillmentResult;
-import com.amazon.device.iap.model.Product;
 import com.amazon.device.iap.model.ProductDataResponse;
+import com.amazon.device.iap.model.PurchaseResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
-import com.amazon.device.iap.model.Receipt;
 
-import org.json.JSONException;
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
@@ -46,9 +42,7 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -71,7 +65,8 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     public static final String NAME = "Amazon";
     protected static final String INSTALLER = "com.amazon.venezia";
-    protected static final Pattern PACKAGE_PATTERN = Pattern.compile("(com\\.amazon\\.venezia)|([a-z]{2,3}\\.amazon\\.mShop\\.android(\\.apk)?)");
+    protected static final Pattern PACKAGE_PATTERN = Pattern.compile(
+            "(com\\.amazon\\.venezia)|([a-z]{2,3}\\.amazon\\.mShop\\.android(\\.apk)?)");
 
     /**
      * Helper object handles all Amazon SDK related calls.
@@ -86,70 +81,6 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
         this.billingHelper = AmazonBillingHelper.getInstance(context);
-    }
-
-    /**
-     * Transforms Amazon product into library SKU details model.
-     *
-     * @param product Amazon product to transform.
-     *
-     * @return Newly constructed SkuDetails object.
-     */
-    protected SkuDetails newSkuDetails(@NonNull final Product product) {
-        final SkuDetails.Builder builder = new SkuDetails.Builder(product.getSku());
-        switch (product.getProductType()) {
-            case CONSUMABLE:
-                builder.setType(SkuType.CONSUMABLE);
-                break;
-            case ENTITLED:
-                builder.setType(SkuType.ENTITLEMENT);
-                break;
-            case SUBSCRIPTION:
-                builder.setType(SkuType.SUBSCRIPTION);
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-        builder.setTitle(product.getTitle());
-        builder.setDescription(product.getDescription());
-        builder.setPrice(product.getPrice());
-        builder.setProviderName(getName());
-        try {
-            builder.setOriginalJson(product.toJSON().toString());
-        } catch (JSONException exception) {
-            OPFLog.e("Failed to set original JSON for SkuDetails.", exception);
-        }
-        return builder.build();
-    }
-
-    /**
-     * Transforms Amazon receipt into library purchase model.
-     *
-     * @param receipt Amazon receipt to transform.
-     *
-     * @return Newly constructed purchase object.
-     */
-    protected Purchase newPurchase(@NonNull final Receipt receipt) {
-        final Purchase.Builder builder = new Purchase.Builder(receipt.getSku());
-        switch (receipt.getProductType()) {
-            case CONSUMABLE:
-                builder.setType(SkuType.CONSUMABLE);
-                break;
-            case ENTITLED:
-                builder.setType(SkuType.ENTITLEMENT);
-                break;
-            case SUBSCRIPTION:
-                builder.setType(SkuType.SUBSCRIPTION);
-                break;
-            default:
-                throw new IllegalStateException();
-        }
-        builder.setToken(receipt.getReceiptId());
-        builder.setCanceled(receipt.isCanceled());
-        builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
-        builder.setProviderName(getName());
-        builder.setOriginalJson(receipt.toJSON().toString());
-        return builder.build();
     }
 
     /**
@@ -172,17 +103,10 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
      * @param productDataResponse Response to handle.
      */
     public void onEventAsync(@NonNull final ProductDataResponse productDataResponse) {
-        switch (productDataResponse.getRequestStatus()) {
+        final ProductDataResponse.RequestStatus status = productDataResponse.getRequestStatus();
+        switch (status) {
             case SUCCESSFUL:
-                final Collection<SkuDetails> skusDetails = new ArrayList<>();
-                final Collection<Product> products = productDataResponse.getProductData().values();
-                for (final Product product : products) {
-                    skusDetails.add(newSkuDetails(product));
-                }
-                for (final String sku : productDataResponse.getUnavailableSkus()) {
-                    skusDetails.add(new SkuDetails(sku));
-                }
-                postSkuDetailsResponse(SUCCESS, skusDetails);
+                postSkuDetailsResponse(SUCCESS, AmazonUtils.getSkusDetails(productDataResponse));
                 break;
             case FAILED:
             case NOT_SUPPORTED:
@@ -190,7 +114,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 OPFLog.e("Product data request failed: %s", productDataResponse);
                 break;
             default:
-                throw new IllegalStateException();
+                OPFLog.e("Unknows status: " + status);
+                postSkuDetailsResponse(UNKNOWN_ERROR, null);
+                break;
         }
     }
 
@@ -200,15 +126,14 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
      * @param purchaseUpdatesResponse Response to handle.
      */
     public void onEventAsync(@NonNull final PurchaseUpdatesResponse purchaseUpdatesResponse) {
-        switch (purchaseUpdatesResponse.getRequestStatus()) {
+        final PurchaseUpdatesResponse.RequestStatus status = purchaseUpdatesResponse
+                .getRequestStatus();
+        switch (status) {
             case SUCCESSFUL:
-                final List<Receipt> receipts = purchaseUpdatesResponse.getReceipts();
-                final Collection<Purchase> purchases = new ArrayList<>(receipts.size());
-                for (final Receipt receipt : receipts) {
-                    purchases.add(newPurchase(receipt));
-                }
+                final Collection<Purchase> inventory = AmazonUtils
+                        .getInventory(purchaseUpdatesResponse);
                 final boolean hasMore = purchaseUpdatesResponse.hasMore();
-                postInventoryResponse(SUCCESS, purchases, hasMore);
+                postInventoryResponse(SUCCESS, inventory, hasMore);
                 break;
             case FAILED:
             case NOT_SUPPORTED:
@@ -216,7 +141,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 OPFLog.e("Purchase updates request failed: %s", purchaseUpdatesResponse);
                 break;
             default:
-                throw new IllegalStateException();
+                OPFLog.e("Unknows status: " + status);
+                postInventoryResponse(UNKNOWN_ERROR, null, false);
+                break;
         }
     }
 
@@ -225,11 +152,12 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
      *
      * @param purchaseResponse Response to handle.`
      */
-    public void onEventAsync(
-            @NonNull final com.amazon.device.iap.model.PurchaseResponse purchaseResponse) {
-        switch (purchaseResponse.getRequestStatus()) {
+    public void onEventAsync(@NonNull final PurchaseResponse purchaseResponse) {
+        final PurchaseResponse.RequestStatus status = purchaseResponse.getRequestStatus();
+        switch (status) {
             case SUCCESSFUL:
-                final Purchase purchase = newPurchase(purchaseResponse.getReceipt());
+                final Purchase purchase = AmazonUtils.convertPurchase(
+                        purchaseResponse.getReceipt());
                 postPurchaseResponse(SUCCESS, purchase);
                 break;
             case INVALID_SKU:
@@ -244,7 +172,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 OPFLog.e("Purchase request failed: %s", purchaseResponse);
                 break;
             default:
-                throw new IllegalStateException();
+                OPFLog.e("Unknows status: " + status);
+                postPurchaseResponse(UNKNOWN_ERROR, null);
+                break;
         }
     }
 
@@ -290,9 +220,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
         if (billingHelper.getUserData() == null) {
             postEmptyResponse(billingRequest, UNAUTHORISED);
-        } else {
-            super.handleRequest(billingRequest);
+            return;
         }
+        super.handleRequest(billingRequest);
     }
 
     @Override
@@ -336,8 +266,8 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         @Override
         public BaseBillingProvider build() {
             return new AmazonBillingProvider(context,
-                         skuResolver == null ? SkuResolver.DEFAULT : skuResolver,
-                         purchaseVerifier== null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
+                    skuResolver == null ? SkuResolver.DEFAULT : skuResolver,
+                    purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
         }
 
         @Override

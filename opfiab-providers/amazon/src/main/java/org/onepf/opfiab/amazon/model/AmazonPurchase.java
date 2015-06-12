@@ -40,14 +40,14 @@ public class AmazonPurchase extends AmazonModel {
 
     public AmazonPurchase(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
-        final ReceiptBuilder builder = new ReceiptBuilder()
-                .setSku(sku)
-                .setReceiptId(jsonObject.getString(NAME_RECEIPT_ID))
-                .setPurchaseDate(AmazonUtils.readDate(jsonObject, NAME_PURCHASE_DATE));
         final ProductType productType = ProductType.valueOf(jsonObject.getString(NAME_ITEM_TYPE));
         if (productType == null) {
             throw new JSONException("Unknown product type.");
         }
+        final ReceiptBuilder builder = new ReceiptBuilder()
+                .setSku(sku)
+                .setReceiptId(jsonObject.getString(NAME_RECEIPT_ID))
+                .setPurchaseDate(AmazonUtils.readDate(jsonObject, NAME_PURCHASE_DATE));
         builder.setProductType(productType);
         if (jsonObject.has(NAME_CANCEL_DATE)) {
             builder.setCancelDate(AmazonUtils.readDate(jsonObject, NAME_CANCEL_DATE));

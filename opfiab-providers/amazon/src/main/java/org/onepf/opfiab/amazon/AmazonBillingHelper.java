@@ -47,6 +47,7 @@ final class AmazonBillingHelper implements PurchasingListener {
 
     private static AmazonBillingHelper instance;
 
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
     public static AmazonBillingHelper getInstance(@NonNull final Context context) {
         if (instance == null) {
             instance = new AmazonBillingHelper();

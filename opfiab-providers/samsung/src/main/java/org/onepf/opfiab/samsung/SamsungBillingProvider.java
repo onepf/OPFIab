@@ -246,12 +246,12 @@ public class SamsungBillingProvider
         }
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     @Override
     protected void onActivityResult(@NonNull final Activity activity,
                                     final int requestCode,
                                     final int resultCode,
                                     @Nullable final Intent data) {
-        super.onActivityResult(activity, requestCode, resultCode, data);
         if (requestCode != REQUEST_CODE_PURCHASE) {
             return;
         }
@@ -264,8 +264,8 @@ public class SamsungBillingProvider
             final Status error = SamsungUtils.handleError(context, bundle);
             if (error != null) {
                 postPurchaseResponse(error, null);
-            } else if (data == null ||
-                    (samsungPurchase = SamsungUtils.getPurchase(bundle)) == null) {
+            } else if (data == null
+                    || (samsungPurchase = SamsungUtils.getPurchase(bundle)) == null) {
                 postPurchaseResponse(UNKNOWN_ERROR, null);
                 OPFLog.e("Purchase data is null");
             } else {

@@ -34,7 +34,7 @@ enum Response {
     ERROR_NETWORK_NOT_AVAILABLE(-1008),
     ERROR_IOEXCEPTION_ERROR(-1009),
     ERROR_SOCKET_TIMEOUT(-1010),
-    ERROR_CONNECT_TIMEOUT(-1011),;
+    ERROR_CONNECT_TIMEOUT(-1011);
 
     @Nullable
     public static Response fromCode(final int code) {

@@ -10,7 +10,6 @@ import java.util.Date;
 
 public class SamsungPurchasedItem extends SamsungBillingModel {
 
-    private static final String KEY_TYPE = "mType";
     private static final String KEY_SUBSCRIPTION_END_DATE = "mSubscriptionEndDate";
 
 

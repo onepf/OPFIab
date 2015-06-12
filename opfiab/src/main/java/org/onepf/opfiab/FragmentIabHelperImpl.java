@@ -22,7 +22,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.ComponentState;
@@ -35,9 +34,10 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import java.util.Set;
 
 /**
- * This {@link IabHelper} implementation works with supplied fragment instance. {@link
- * OPFIabFragment} is attached to it to monitor lifecycle and automatically call {@link
- * #register()} and {@link #unregister()} when appropriate.
+ * This {@link IabHelper} implementation works with supplied fragment instance.
+ * <p>
+ * {@link org.onepf.opfiab.android.OPFIabFragment} is attached to it to monitor lifecycle and
+ * automatically call {@link #register()} and {@link #unregister()} when appropriate.
  */
 class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHelper {
 
@@ -51,7 +51,7 @@ class FragmentIabHelperImpl extends ComponentIabHelper implements FragmentIabHel
             @Nullable final android.support.v4.app.Fragment supportFragment,
             @Nullable final android.app.Fragment fragment) {
         super(supportFragment == null ? null : supportFragment.getChildFragmentManager(),
-              fragment == null ? null : fragment.getChildFragmentManager());
+                fragment == null ? null : fragment.getChildFragmentManager());
         this.fragment = fragment;
         this.supportFragment = supportFragment;
     }

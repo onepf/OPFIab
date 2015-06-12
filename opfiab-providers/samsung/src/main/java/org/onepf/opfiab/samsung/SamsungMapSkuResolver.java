@@ -10,6 +10,7 @@ public class SamsungMapSkuResolver extends MapSkuResolver implements SamsungSkuR
     private final String groupId;
 
     public SamsungMapSkuResolver(@NonNull final String groupId) {
+        super();
         this.groupId = groupId;
     }
 

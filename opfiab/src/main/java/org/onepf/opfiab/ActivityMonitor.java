@@ -32,20 +32,26 @@ import java.util.WeakHashMap;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import static org.onepf.opfiab.model.ComponentState.*;
+import static org.onepf.opfiab.model.ComponentState.CREATE;
+import static org.onepf.opfiab.model.ComponentState.DESTROY;
+import static org.onepf.opfiab.model.ComponentState.PAUSE;
+import static org.onepf.opfiab.model.ComponentState.RESUME;
+import static org.onepf.opfiab.model.ComponentState.START;
+import static org.onepf.opfiab.model.ComponentState.STOP;
 
 /**
  * This class is designed to monitor the existing {@link Activity}s lifecycle.
- * <br>
+ * <p>
  * Intended for internal use.
  */
 public final class ActivityMonitor implements Application.ActivityLifecycleCallbacks {
 
     /**
      * Map of the existing activities lifecycle states.
-     * <br>
+     * <p>
      * Backed up by {@link WeakHashMap} to avoid memory leaks.
      */
+    @SuppressWarnings("Convert2Diamond")
     @SuppressFBWarnings({"PMB_POSSIBLE_MEMORY_BLOAT"})
     private static final Map<Activity, ComponentState> STATE_MAP =
             Collections.synchronizedMap(new WeakHashMap<Activity, ComponentState>());
@@ -76,6 +82,7 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
      * Gets last known lifecycle state of the supplied activity.
      *
      * @param activity Activity object to get lifecycle state for.
+     *
      * @return Current lifecycle state if known, null otherwise.
      */
     @Nullable
@@ -87,7 +94,9 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
      * Checks if supplied activity is in resumed state.
      *
      * @param activity Activity object to check lifecycle state for.
+     *
      * @return True if supplied activity is resumed.
+     *
      * @see {@link Activity#onResume()}
      */
     public static boolean isResumed(@NonNull final Activity activity) {
@@ -105,12 +114,12 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
     @Override
     public void onActivityCreated(final Activity activity, final Bundle savedInstanceState) {
-        setState(activity, ComponentState.CREATE);
+        setState(activity, CREATE);
     }
 
     @Override
     public void onActivityStarted(final Activity activity) {
-        setState(activity, ComponentState.START);
+        setState(activity, START);
     }
 
     @Override
@@ -120,12 +129,12 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
     @Override
     public void onActivityPaused(final Activity activity) {
-        setState(activity, ComponentState.PAUSE);
+        setState(activity, PAUSE);
     }
 
     @Override
     public void onActivityStopped(final Activity activity) {
-        setState(activity, ComponentState.STOP);
+        setState(activity, STOP);
     }
 
     @Override
@@ -135,6 +144,6 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
     @Override
     public void onActivityDestroyed(final Activity activity) {
-        setState(activity, ComponentState.DESTROY);
+        setState(activity, DESTROY);
     }
 }
