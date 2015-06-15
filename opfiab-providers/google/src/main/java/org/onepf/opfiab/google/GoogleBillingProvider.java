@@ -310,6 +310,13 @@ public class GoogleBillingProvider
         postInventoryResponse(Status.SUCCESS, inventory, hasMore);
     }
 
+    protected void postPurchaseResponse(@NonNull final Status status,
+                                        @Nullable final Purchase purchase,
+                                        @NonNull final Activity activity) {
+        releaseActivity(activity);
+        postPurchaseResponse(status, purchase);
+    }
+
     @Override
     public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
         final SkuType skuType = skuResolver.resolveType(sku);
@@ -317,7 +324,7 @@ public class GoogleBillingProvider
         // Google can't process purchase with unknown type
         if (itemType == null) {
             OPFLog.e("Unknown sku type: %s", sku);
-            postPurchaseResponse(Status.ITEM_UNAVAILABLE, null);
+            postPurchaseResponse(Status.ITEM_UNAVAILABLE, null, activity);
             return;
         }
 
@@ -326,7 +333,7 @@ public class GoogleBillingProvider
         final PendingIntent intent = GoogleUtils.getBuyIntent(result);
         if (response != Response.OK || intent == null) {
             OPFLog.e("Failed to retrieve buy intent.");
-            postPurchaseResponse(getStatus(response), null);
+            postPurchaseResponse(getStatus(response), null, activity);
             return;
         }
 
@@ -335,7 +342,7 @@ public class GoogleBillingProvider
             activity.startIntentSenderForResult(sender, REQUEST_CODE, new Intent(), 0, 0, 0);
         } catch (IntentSender.SendIntentException exception) {
             OPFLog.e("Failed to send buy intent.", exception);
-            postPurchaseResponse(Status.UNKNOWN_ERROR, null);
+            postPurchaseResponse(Status.UNKNOWN_ERROR, null, activity);
         }
     }
 
@@ -352,7 +359,7 @@ public class GoogleBillingProvider
         if (resultCode != Activity.RESULT_OK || response != Response.OK || purchaseData == null || signature == null) {
             OPFLog.e("Failed to handle activity result. Code:%s, Data:%s",
                      resultCode, OPFUtils.toString(data));
-            postPurchaseResponse(getStatus(response), null);
+            postPurchaseResponse(getStatus(response), null, activity);
             return;
         }
 
@@ -361,12 +368,12 @@ public class GoogleBillingProvider
             googlePurchase = new GooglePurchase(purchaseData);
         } catch (JSONException exception) {
             OPFLog.e("Failed to parse purchase data: " + purchaseData, exception);
-            postPurchaseResponse(Status.UNKNOWN_ERROR, null);
+            postPurchaseResponse(Status.UNKNOWN_ERROR, null, activity);
             return;
         }
 
         final Purchase purchase = newPurchase(googlePurchase, signature);
-        postPurchaseResponse(Status.SUCCESS, purchase);
+        postPurchaseResponse(Status.SUCCESS, purchase, activity);
     }
 
 
