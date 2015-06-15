@@ -34,7 +34,7 @@ import org.onepf.opfutils.OPFLog;
 
 /**
  * This class handles all communications between library and Amazon SDK.
- * <p/>
+ * <p>
  * Intended to exist as singleton, which is registered for Amazon callbacks as soon as it's
  * created.
  */

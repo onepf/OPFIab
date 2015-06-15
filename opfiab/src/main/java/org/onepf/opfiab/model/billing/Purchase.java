@@ -78,7 +78,7 @@ public class Purchase extends BillingModel {
 
     /**
      * Indicates whether this purchase is still valid or not.
-     * <br>
+     * <p>
      * This will return <b>true</b> if this purchase represents a subscription and it's expired.
      *
      * @return True if this purchase is no longer valid, false otherwise.

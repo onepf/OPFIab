@@ -52,7 +52,7 @@ public class SkuDetailsResponse extends BillingResponse {
 
     /**
      * Gets details for corresponding SKUs.
-     * <br>
+     * <p>
      * Some SKUs might not have been recognized by {@link BillingProvider} and are left empty.
      *
      * @return Collection of SkuDetails objects. Can be null.

@@ -59,7 +59,7 @@ public abstract class BillingResponse extends BillingEvent {
 
     /**
      * Gets name of {@link BillingProvider} responsible for this BillingResponse.
-     * <p/>
+     * <p>
      * Might be useful to properly handle some data from {@link BillingModel#getOriginalJson()}.
      *
      * @return Name of corresponding {@link BillingProvider}.

@@ -54,9 +54,9 @@ public interface AdvancedIabHelper extends SimpleIabHelper, ListenersSupport {
 
     /**
      * Registers all listeners associated with this helper to receive appropriate callbacks.
-     * <p/>
+     * <p>
      * In case of activity best called from {@link Activity#onCreate(Bundle)}
-     * <br>
+     * <p>
      * In case of fragment best called from {@link Fragment#onCreateView(LayoutInflater, ViewGroup, Bundle)}
      *
      * @see #unregister()
@@ -65,11 +65,11 @@ public interface AdvancedIabHelper extends SimpleIabHelper, ListenersSupport {
 
     /**
      * Unregisters all listeners associated with this helpers from receiving any callbacks.
-     * <p/>
+     * <p>
      * All pending requests from this helper <b>will be dropped</b>.
-     * <p/>
+     * <p>
      * In case of activity best called from {@link Activity#onDestroy()}
-     * <br>
+     * <p>
      * In case of fragment best called from {@link Fragment#onDestroyView()}
      *
      * @see #register()

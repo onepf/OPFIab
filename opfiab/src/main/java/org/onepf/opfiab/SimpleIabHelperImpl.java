@@ -30,7 +30,7 @@ import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 /**
  * This implementation of {@link IabHelper} allows passing existing {@link Activity} object thus
  * avoiding usage of {@link OPFIabActivity}.
- * <br>
+ * <p>
  * Supplied Activity <b>must</b> delegate {@link Activity#onActivityResult(int, int, Intent)}
  * callback to this helper.
  *

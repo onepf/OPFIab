@@ -36,7 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This class helps to deliver all billing events to appropriate listeners.
- * <br>
+ * <p>
  * It's intended to exist as singleton and allow to add and remove corresponding listeners by
  * {@link #register(BillingListener)} and {@link #unregister(BillingListener)} methods.
  */

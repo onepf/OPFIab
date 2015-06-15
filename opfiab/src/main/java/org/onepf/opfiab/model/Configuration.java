@@ -111,7 +111,7 @@ public final class Configuration {
 
         /**
          * Adds supported billing provider.
-         * <p/>
+         * <p>
          * During setup process billing providers will be considered in the order they were added.
          *
          * @param provider BillingProvider object to add.
@@ -125,7 +125,7 @@ public final class Configuration {
 
         /**
          * Sets global listener to handle all billing events.
-         * <p/>
+         * <p>
          * This listener will be stored in a static reference.
          *
          * @param billingListener BillingListener object to use.
@@ -141,7 +141,7 @@ public final class Configuration {
 
         /**
          * Sets time gap between attempts to execute enqueued requests.
-         * <p/>
+         * <p>
          * Default value is 50ms.
          *
          * @param subsequentRequestDelay Time gap in milliseconds.

@@ -38,7 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Public key based implementation of {@link PurchaseVerifier} interface.
- * <br>
+ * <p>
  * This class attempts to confirm that purchase data which was returned from {@link #getData(Purchase)}
  * was signed with a private key corresponding to one returned from {@link #getPublicKey()}.
  */

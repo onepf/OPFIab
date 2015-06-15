@@ -55,7 +55,7 @@ public interface IabHelper {
 
     /**
      * Sends {@link InventoryRequest} to current {@link BillingProvider}.
-     * <p/>
+     * <p>
      * For the sake of performance, large inventory might not be loaded within one request.
      * Maximum number of items queried per request depends on {@link BillingProvider} implementation.
      *

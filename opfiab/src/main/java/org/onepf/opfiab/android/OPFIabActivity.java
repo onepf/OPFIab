@@ -36,7 +36,7 @@ import org.onepf.opfutils.OPFLog;
 
 /**
  * Untouchable activity without UI.
- * <p/>
+ * <p>
  * Intended to intercept {@link Activity#onActivityResult(int, int, Intent)} callback,
  * or to be used as Activity {@link Context} when one is not available.
  */
@@ -88,7 +88,7 @@ public class OPFIabActivity extends Activity {
 
     /**
      * Used to schedule {@link #finishTask} call after timeout.
-     * <br>
+     * <p>
      * Resets timeout if task has been already scheduled.
      *
      * @param schedule True if finish should be scheduled, false otherwise.

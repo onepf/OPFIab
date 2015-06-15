@@ -58,7 +58,7 @@ import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
 /**
  * Base implementation of {@link BillingProvider}.
- * <br>
+ * <p>
  * Most implementations should extend this one unless implementation from scratch is absolutely necessary.
  *
  * @param <R> {@link SkuResolver} subclass to use with this BillingProvider.
@@ -84,7 +84,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Loads details for specified SKUs.
-     * <br>
+     * <p>
      * At this point all SKUs should be resolved with provided {@link SkuResolver}.
      *
      * @param skus skus to load details for.
@@ -105,7 +105,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Purchase specified SKU.
-     * <br>
+     * <p>
      * At this point sku should be already resolved with supplied {@link SkuResolver}.
      *
      * @param sku      SKU to purchase.
@@ -116,7 +116,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Consumes specified Purchase.
-     * <br>
+     * <p>
      * SKU available from {@link Purchase#getSku()} should be already resolved with supplied
      * {@link SkuResolver}.
      *
@@ -127,7 +127,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Entry point for all incoming billing requests.
-     * <br>
+     * <p>
      * Might be a good place for intercepting request.
      *
      * @param billingRequest incoming BillingRequest object.
@@ -201,7 +201,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Constructs and sends {@link SkuDetailsResponse}.
-     * <br>
+     * <p>
      * SKUs available from {@link SkuDetails#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *
@@ -226,7 +226,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Constructs and sends {@link InventoryResponse}.
-     * <br>
+     * <p>
      * SKUs available from {@link Purchase#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *
@@ -255,7 +255,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Constructs and sends {@link PurchaseResponse}.
-     * <br>
+     * <p>
      * SKU available from {@link Purchase#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *
@@ -278,7 +278,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Constructs and sends {@link ConsumeResponse}.
-     * <br>
+     * <p>
      * SKU available from {@link Purchase#getSku()} will be reverted with supplied
      * {@link SkuResolver}.
      *

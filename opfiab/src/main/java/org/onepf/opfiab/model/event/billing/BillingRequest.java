@@ -30,7 +30,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Model class representing request for some action from {@link BillingProvider}.
- * <br>
+ * <p>
  * Please note that not every single request will lead to a corresponding {@link BillingResponse},
  * different {@link BillingProvider}s can behave differently.
  */

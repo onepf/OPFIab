@@ -58,7 +58,7 @@ import static android.content.pm.PackageManager.GET_SIGNATURES;
 
 /**
  * Collection of handy utility methods.
- * <br>
+ * <p>
  * Intended for internal use.
  */
 public final class OPFIabUtils {

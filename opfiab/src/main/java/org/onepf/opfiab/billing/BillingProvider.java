@@ -28,7 +28,7 @@ import org.onepf.opfiab.model.event.billing.BillingResponse;
 
 /**
  * This interface represents billing service provider, capable of handling in-app purchases.
- * <p/>
+ * <p>
  * All methods of this class should be suitable for calling from <b>single</b> background thread.
  */
 public interface BillingProvider {
@@ -53,7 +53,7 @@ public interface BillingProvider {
 
     /**
      * Indicates whether this provider is available on the system.
-     * <br>
+     * <p>
      * Called before each request, thus it might be a good idea to cache intermediate result.
      *
      * @return true if BillingProvider is currently available, false otherwise.
@@ -62,9 +62,9 @@ public interface BillingProvider {
 
     /**
      * Entry point for all billing requests.
-     * <br>
+     * <p>
      * Called from <b>single</b> background thread.
-     * <p/>
+     * <p>
      * As soon as billing request is handled, BillingProvider <b>must</b> notify library with
      * {@link RequestHandledEvent} using {@link OPFIab#post(Object)}. Same method should be used
      * with proper {@link BillingResponse} object when result of performed action becomes available.
