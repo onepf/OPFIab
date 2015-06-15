@@ -21,7 +21,7 @@ import android.support.annotation.StringRes;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
 import org.onepf.opfiab.samsung.SamsungBillingProvider;
-import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.trivialdrive.R;
 
 public enum Provider {
     AMAZON(R.string.name_amazon, AmazonBillingProvider.NAME),

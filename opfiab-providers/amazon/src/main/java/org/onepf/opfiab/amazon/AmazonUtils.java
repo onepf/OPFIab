@@ -97,7 +97,7 @@ public final class AmazonUtils {
                 builder.setType(SkuType.SUBSCRIPTION);
                 break;
             default:
-                OPFLog.e("Unknow Amazon product type: " + productType);
+                OPFLog.e("Unknown Amazon product type: " + productType);
                 return null;
         }
         builder.setTitle(product.getTitle());
@@ -131,7 +131,7 @@ public final class AmazonUtils {
                 builder.setType(SkuType.SUBSCRIPTION);
                 break;
             default:
-                OPFLog.e("Unknow Amazon product type: " + productType);
+                OPFLog.e("Unknown Amazon product type: " + productType);
                 return null;
         }
         builder.setToken(receipt.getReceiptId());

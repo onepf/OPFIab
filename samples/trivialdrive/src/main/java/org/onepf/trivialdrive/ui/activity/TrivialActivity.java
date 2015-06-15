@@ -50,7 +50,7 @@ import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
-import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.trivialdrive.R;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.trivialdrive.Helper;
 import org.onepf.trivialdrive.OnProviderPickerListener;

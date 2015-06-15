@@ -27,6 +27,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.view.WindowManager;
 
+import org.onepf.opfiab.BuildConfig;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.android.ActivityLifecycleEvent;
@@ -79,6 +80,9 @@ public class OPFIabActivity extends Activity {
         @Override
         public void run() {
             if (!isFinishing()) {
+                if (BuildConfig.DEBUG) {
+                    throw new IllegalStateException();
+                }
                 OPFLog.e("OPFIabActivity wasn't utilised! Finishing: %s", OPFIabActivity.this);
                 finish();
             }

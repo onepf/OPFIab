@@ -27,7 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.onepf.opfiab.model.billing.SkuDetails;
-import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.trivialdrive.R;
 
 public class SkuDetailsView extends LinearLayout {
 

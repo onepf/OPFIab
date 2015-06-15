@@ -45,6 +45,10 @@ import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfutils.OPFLog;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -58,7 +62,7 @@ import static android.content.pm.PackageManager.GET_SIGNATURES;
 
 /**
  * Collection of handy utility methods.
- * <p>
+ * <p/>
  * Intended for internal use.
  */
 public final class OPFIabUtils {
@@ -84,6 +88,21 @@ public final class OPFIabUtils {
         try {
             return jsonCompatible.toJson().toString(JSON_SPACES);
         } catch (JSONException exception) {
+            OPFLog.e("", exception);
+        }
+        return "";
+    }
+
+    @NonNull
+    public static String toString(@NonNull final InputStream inputStream) {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        final StringBuilder builder = new StringBuilder();
+        try {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                builder.append(line);
+            }
+            return builder.toString();
+        } catch (IOException exception) {
             OPFLog.e("", exception);
         }
         return "";

@@ -34,7 +34,7 @@ import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.trivialdrive.R;
 import org.onepf.trivialdrive.TrivialApplication;
 import org.onepf.trivialdrive.ui.view.TrivialView;
 

@@ -373,7 +373,7 @@ public final class SamsungUtils {
         return new Purchase.Builder(purchasedItem.getItemId())
                 .setOriginalJson(purchasedItem.getOriginalJson())
                 .setType(convertType(purchasedItem.getItemType()))
-                .setToken(purchasedItem.getPaymentId())
+                .setToken(purchasedItem.getPurchaseId())
                 .setPurchaseTime(purchasedItem.getPurchaseDate().getTime())
                 .setCanceled(endDate != null && endDate.before(new Date()))
                 .setProviderName(NAME)
@@ -386,7 +386,7 @@ public final class SamsungUtils {
         return new Purchase.Builder(purchase.getItemId())
                 .setOriginalJson(purchase.getOriginalJson())
                 .setType(convertType(itemType))
-                .setToken(purchase.getPaymentId())
+                .setToken(purchase.getPurchaseId())
                 .setPurchaseTime(purchase.getPurchaseDate().getTime())
                 .setProviderName(NAME)
                 .build();

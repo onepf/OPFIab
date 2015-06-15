@@ -114,7 +114,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 OPFLog.e("Product data request failed: %s", productDataResponse);
                 break;
             default:
-                OPFLog.e("Unknows status: " + status);
+                OPFLog.e("Unknown status: " + status);
                 postSkuDetailsResponse(UNKNOWN_ERROR, null);
                 break;
         }
@@ -141,7 +141,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 OPFLog.e("Purchase updates request failed: %s", purchaseUpdatesResponse);
                 break;
             default:
-                OPFLog.e("Unknows status: " + status);
+                OPFLog.e("Unknown status: " + status);
                 postInventoryResponse(UNKNOWN_ERROR, null, false);
                 break;
         }
@@ -172,7 +172,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 OPFLog.e("Purchase request failed: %s", purchaseResponse);
                 break;
             default:
-                OPFLog.e("Unknows status: " + status);
+                OPFLog.e("Unknown status: " + status);
                 postPurchaseResponse(UNKNOWN_ERROR, null);
                 break;
         }

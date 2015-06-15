@@ -9,10 +9,12 @@ import java.util.Date;
 
 abstract class SamsungBillingModel extends SamsungModel {
 
+    private static final String KEY_PURCHASE_ID = "mPurchaseId";
     private static final String KEY_PAYMENT_ID = "mPaymentId";
     private static final String KEY_PURCHASE_DATE = "mPurchaseDate";
 
-
+    @NonNull
+    private final String purchaseId;
     @NonNull
     private final String paymentId;
     @NonNull
@@ -20,6 +22,7 @@ abstract class SamsungBillingModel extends SamsungModel {
 
     public SamsungBillingModel(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
+        this.purchaseId = jsonObject.getString(KEY_PURCHASE_ID);
         this.paymentId = jsonObject.getString(KEY_PAYMENT_ID);
 
         final String dateString = jsonObject.getString(KEY_PURCHASE_DATE);
@@ -28,6 +31,11 @@ abstract class SamsungBillingModel extends SamsungModel {
             throw new JSONException("Invalid purchase date: " + dateString);
         }
         this.purchaseDate = date;
+    }
+
+    @NonNull
+    public String getPurchaseId() {
+        return purchaseId;
     }
 
     @NonNull

@@ -18,7 +18,7 @@
 
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.onepf.opfiab.trivialdrive"
+    package="org.onepf.trivialdrive"
     android:installLocation="auto">
 
     <application

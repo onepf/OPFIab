@@ -344,6 +344,7 @@ public class GoogleBillingProvider
                                  final int requestCode,
                                  final int resultCode,
                                  @Nullable final Intent data) {
+        //TODO release activity
         // Handle purchase result
         final Response response = GoogleUtils.getResponse(data);
         final String purchaseData = GoogleUtils.getPurchaseData(data);

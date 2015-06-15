@@ -37,6 +37,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.samsung.BillingMode;
 import org.onepf.opfiab.samsung.SamsungBillingProvider;
 import org.onepf.opfiab.samsung.SamsungMapSkuResolver;
+import org.onepf.opfiab.samsung.SamsungPurchaseVerifier;
 import org.onepf.opfiab.sku.MapSkuResolver;
 import org.onepf.opfiab.verification.VerificationResult;
 
@@ -58,22 +59,25 @@ public final class TrivialBilling {
 
     private static final String AMAZON_SKU_GAS = "org.onepf.opfiab.trivialdrive.sku_gas";
     private static final String AMAZON_SKU_PREMIUM = "org.onepf.opfiab.trivialdrive.sku_premium";
-    private static final String AMAZON_SKU_SUBSCRIPTION = "org.onepf.opfiab.trivialdrive.sku_infinite_gas.month";
+    private static final String AMAZON_SKU_SUBSCRIPTION
+            = "org.onepf.opfiab.trivialdrive.sku_infinite_gas.month";
 
     private static final String GOOGLE_SKU_GAS = "sku_gas";
+    @SuppressWarnings("SpellCheckingInspection")
     private static final String GOOGLE_SKU_PREMIUM = "sku_premum";
     private static final String GOOGLE_SKU_SUBSCRIPTION = "sku_infinite_gas";
     @SuppressWarnings("SpellCheckingInspection")
     private static final String GOOGLE_PLAY_KEY
-            = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsTvSvwlDqz/wNr5UXD/rNxl+hs1vbbhta0O3g+NS" +
-            "+jChs9+zhRCZScvQT1QzsAg6GNPCyoDXpYa9WWcZQ7kC4scQYQ6pYUUQDNaTwEqDRbmkesx5iRxEqoD9LUhhaO" +
-            "L55NbFUPhiypkMww0t2768fuyxRnmBl2RZdQvM+paMDEDU2CtUMqrx4St3huGkFSjWlYMrU5vKELoLu9acThoM" +
-            "k9ErEOFBqb4dGBNswH5JRm68r/u7a2XzEoo40dXQQH2/5tMy3AQCzVakHnfcIQcZO0BkQOh4o52ahhy3vcCUha" +
-            "uN61YA492k+DmKT5GgSH+KxwgK5dcorjbh94E9e03dZwIDAQAB";
+            = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsTvSvwlDqz/wNr5UXD/rNxl+hs1vbbhta0O3g+" +
+            "NS+jChs9+zhRCZScvQT1QzsAg6GNPCyoDXpYa9WWcZQ7kC4scQYQ6pYUUQDNaTwEqDRbmkesx5iRxEqoD9LU" +
+            "hhaOL55NbFUPhiypkMww0t2768fuyxRnmBl2RZdQvM+paMDEDU2CtUMqrx4St3huGkFSjWlYMrU5vKELoLu9" +
+            "acThoMk9ErEOFBqb4dGBNswH5JRm68r/u7a2XzEoo40dXQQH2/5tMy3AQCzVakHnfcIQcZO0BkQOh4o52ahh" +
+            "y3vcCUhauN61YA492k+DmKT5GgSH+KxwgK5dcorjbh94E9e03dZwIDAQAB";
 
     public static final String SAMSUNG_SKU_GAS = "org.onepf.trivialdrivegame.sku_gas";
     public static final String SAMSUNG_SKU_PREMIUM = "org.onepf.trivialdrivegame.sku_premium";
-    public static final String SAMSUNG_SKU_SUBSCRIPTION = "org.onepf.trivialdrivegame.sku_infinite_gas";
+    public static final String SAMSUNG_SKU_SUBSCRIPTION =
+            "org.onepf.trivialdrivegame.sku_infinite_gas";
     public static final String SAMSUNG_GROUP_ID = "100000104947";
 
     public static final String SKU_GAS = "sku_gas";
@@ -126,7 +130,6 @@ public final class TrivialBilling {
     }
 
     private static BillingProvider newSamsungProvider() {
-        // TODO
         final SamsungMapSkuResolver skuResolver = new SamsungMapSkuResolver(SAMSUNG_GROUP_ID);
         skuResolver.add(SKU_GAS, SAMSUNG_SKU_GAS);
         skuResolver.add(SKU_PREMIUM, SAMSUNG_SKU_PREMIUM);
@@ -134,6 +137,7 @@ public final class TrivialBilling {
 
         return new SamsungBillingProvider.Builder(context)
                 .setBillingMode(BillingMode.TEST_SUCCESS)
+                .setPurchaseVerifier(new SamsungPurchaseVerifier(context))
                 .setSkuResolver(skuResolver)
                 .build();
     }
