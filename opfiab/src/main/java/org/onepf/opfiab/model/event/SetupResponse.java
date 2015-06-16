@@ -47,7 +47,6 @@ public class SetupResponse implements JsonCompatible {
 
     private static final String NAME_STATUS = "status";
     private static final String NAME_PROVIDER = "provider";
-    private static final String NAME_AUTHORIZED = "authorized";
 
     /**
      * Status of corresponding {@link SetupResponse}.
@@ -81,32 +80,23 @@ public class SetupResponse implements JsonCompatible {
     private final Status status;
     @Nullable
     private final BillingProvider billingProvider;
-    private final boolean authorized;
 
     public SetupResponse(@NonNull final Configuration configuration,
                          @NonNull final Status status,
-                         @Nullable final BillingProvider billingProvider,
-                         final boolean authorized) {
+                         @Nullable final BillingProvider billingProvider) {
         this.configuration = configuration;
         this.status = status;
         this.billingProvider = billingProvider;
-        this.authorized = authorized;
         if (billingProvider == null && isSuccessful()) {
             throw new IllegalArgumentException();
         }
-    }
-
-    public SetupResponse(final Configuration configuration,
-                         @NonNull final Status status,
-                         @Nullable final BillingProvider billingProvider) {
-        this(configuration, status, billingProvider,
-             billingProvider != null && billingProvider.isAuthorised());
     }
 
     /**
      * Gets configuration object which is used for the setup.
      *
      * @return Configuration object.
+     *
      * @see OPFIab#init(Application, Configuration)
      */
     @NonNull
@@ -128,22 +118,12 @@ public class SetupResponse implements JsonCompatible {
      * Gets billing provider that was picked during setup.
      *
      * @return BillingProvider object if setup was successful, null otherwise.
+     *
      * @see #isSuccessful()
      */
     @Nullable
     public BillingProvider getBillingProvider() {
         return billingProvider;
-    }
-
-    /**
-     * Indicates whether picked billing provider is authorised or not.
-     *
-     * @return True if picked BillingProvider is authorized, false
-     * otherwise.
-     * @see BillingProvider#isAuthorised()
-     */
-    public boolean isAuthorized() {
-        return authorized;
     }
 
     /**
@@ -161,10 +141,7 @@ public class SetupResponse implements JsonCompatible {
         final JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(NAME_STATUS, status);
-            jsonObject.put(NAME_PROVIDER, billingProvider == null
-                    ? NULL
-                    : billingProvider.getInfo().toJson());
-            jsonObject.put(NAME_AUTHORIZED, authorized);
+            jsonObject.put(NAME_PROVIDER, billingProvider == null ? NULL : billingProvider);
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }

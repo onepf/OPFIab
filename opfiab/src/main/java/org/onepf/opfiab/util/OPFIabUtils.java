@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -26,8 +27,9 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
+import org.onepf.opfiab.android.OPFIabActivity;
+import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -36,12 +38,17 @@ import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
 import org.onepf.opfutils.OPFLog;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -55,7 +62,7 @@ import static android.content.pm.PackageManager.GET_SIGNATURES;
 
 /**
  * Collection of handy utility methods.
- * <br>
+ * <p/>
  * Intended for internal use.
  */
 public final class OPFIabUtils {
@@ -86,28 +93,58 @@ public final class OPFIabUtils {
         return "";
     }
 
+    @NonNull
+    public static String toString(@NonNull final InputStream inputStream) {
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        final StringBuilder builder = new StringBuilder();
+        try {
+            for (String line = reader.readLine(); line != null; line = reader.readLine()) {
+                builder.append(line);
+            }
+            return builder.toString();
+        } catch (IOException exception) {
+            OPFLog.e("", exception);
+        }
+        return "";
+    }
+
+    /**
+     * Indicates whether this activity was started by library to handle some specific action.
+     *
+     * @param activity Activity object to check.
+     *
+     * @return True if activity was started by library, false otherwise.
+     *
+     * @see PurchaseRequest
+     * @see ActivityBillingProvider
+     */
+    public static boolean isActivityFake(@NonNull final Activity activity) {
+        return activity.getClass() == OPFIabActivity.class;
+    }
+
     /**
      * Retrieves signature form supplied package.
      *
-     * @param context Context object to get {@link PackageManager} from.
+     * @param context     Context object to get {@link PackageManager} from.
      * @param packageName Package to retrieve signature for.
      *
      * @return Signature object if package found, null otherwise.
      */
-    @Nullable
-    public static Signature getPackageSignature(@NonNull final Context context,
-                                                @NonNull final String packageName) {
+    @SuppressWarnings("PackageManagerGetSignatures")
+    @NonNull
+    public static Signature[] getPackageSignatures(@NonNull final Context context,
+                                                   @NonNull final String packageName) {
         final PackageManager packageManager = context.getPackageManager();
         try {
-            final PackageInfo info =  packageManager.getPackageInfo(packageName, GET_SIGNATURES);
+            final PackageInfo info = packageManager.getPackageInfo(packageName, GET_SIGNATURES);
             final Signature[] signatures = info.signatures;
-            if (signatures.length > 0) {
-                return signatures[0];
+            if (signatures != null) {
+                return signatures;
             }
         } catch (PackageManager.NameNotFoundException exception) {
             OPFLog.e("", exception);
         }
-        return null;
+        return new Signature[0];
     }
 
     /**
@@ -130,51 +167,9 @@ public final class OPFIabUtils {
     }
 
     /**
-     * Looks for a provider with supplied {@link BillingProviderInfo}.
+     * Constructs empty response corresponding to supplied request.
      *
-     * @param providers Providers to look among.
-     * @param info      Info to look up.
-     *
-     * @return BillingProvider if it was found, null otherwise.
-     */
-    @Nullable
-    public static BillingProvider findWithInfo(@NonNull final Iterable<BillingProvider> providers,
-                                               @NonNull final BillingProviderInfo info) {
-        for (final BillingProvider billingProvider : providers) {
-            if (info.equals(billingProvider.getInfo())) {
-                return billingProvider;
-            }
-        }
-        return null;
-    }
-
-    // where are you stream API...
-
-    /**
-     * Looks for a provider with supplied installer.
-     *
-     * @param providers   Providers to look among.
-     * @param packageName Installer to look for.
-     *
-     * @return BillingProvider if it was found, null otherwise.
-     */
-    @Nullable
-    public static BillingProvider withInstaller(
-            @NonNull final Iterable<BillingProvider> providers,
-            @NonNull final String packageName) {
-        for (final BillingProvider billingProvider : providers) {
-            final BillingProviderInfo info = billingProvider.getInfo();
-            if (packageName.equals(info.getInstaller())) {
-                return billingProvider;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Constructs empty response corresponding to supplied request.`
-     *
-     * @param providerInfo   Info of provider handling request, can be null.
+     * @param providerName   Name of the provider handling request, can be null.
      * @param billingRequest Request to make response for.
      * @param status         Status for newly constructed response.
      *
@@ -182,7 +177,7 @@ public final class OPFIabUtils {
      */
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     @NonNull
-    public static BillingResponse emptyResponse(@Nullable final BillingProviderInfo providerInfo,
+    public static BillingResponse emptyResponse(@Nullable final String providerName,
                                                 @NonNull final BillingRequest billingRequest,
                                                 @NonNull final Status status) {
         final BillingResponse billingResponse;
@@ -190,16 +185,16 @@ public final class OPFIabUtils {
             case CONSUME:
                 final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
                 final Purchase purchase = consumeRequest.getPurchase();
-                billingResponse = new ConsumeResponse(status, providerInfo, purchase);
+                billingResponse = new ConsumeResponse(status, providerName, purchase);
                 break;
             case PURCHASE:
-                billingResponse = new PurchaseResponse(status, providerInfo, null, null);
+                billingResponse = new PurchaseResponse(status, providerName, null, null);
                 break;
             case SKU_DETAILS:
-                billingResponse = new SkuDetailsResponse(status, providerInfo, null);
+                billingResponse = new SkuDetailsResponse(status, providerName, null);
                 break;
             case INVENTORY:
-                billingResponse = new InventoryResponse(status, providerInfo, null, false);
+                billingResponse = new InventoryResponse(status, providerName, null, false);
                 break;
             default:
                 throw new IllegalArgumentException();
@@ -212,7 +207,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(skuDetails.getSku(), sku)) {
             return skuDetails;
         }
-        return skuDetails.substituteSku(sku);
+        return skuDetails.copyWithSku(sku);
     }
 
     public static Purchase substituteSku(@NonNull final Purchase purchase,
@@ -220,7 +215,7 @@ public final class OPFIabUtils {
         if (TextUtils.equals(purchase.getSku(), sku)) {
             return purchase;
         }
-        return purchase.substituteSku(sku);
+        return purchase.copyWithSku(sku);
     }
 
     public static SkuDetails resolve(@NonNull final SkuResolver skuResolver,

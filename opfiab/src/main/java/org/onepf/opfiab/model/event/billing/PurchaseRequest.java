@@ -22,13 +22,8 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.android.OPFIabActivity;
-import org.onepf.opfiab.billing.ActivityBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfutils.OPFLog;
-
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -42,40 +37,19 @@ public class PurchaseRequest extends BillingRequest {
     private static final String NAME_SKU = "sku";
 
 
-    @SuppressFBWarnings({"NFF_NON_FUNCTIONAL_FIELD"})
-    @Nullable
-    private final transient Reference<Activity> activityReference;
     @NonNull
     private final String sku;
-    private final boolean needsFakeActivity;
 
     @SuppressFBWarnings({"SE_NO_SERIALVERSIONID"})
-    public PurchaseRequest(@Nullable final Activity activity,
-                           @NonNull final String sku,
-                           final boolean needsFakeActivity) {
-        super(Type.PURCHASE);
-        this.needsFakeActivity = needsFakeActivity;
-        this.activityReference = activity == null ? null : new WeakReference<>(activity);
-        this.sku = sku;
-    }
-
-    public PurchaseRequest(@NonNull final Activity activity,
-                           @NonNull final String sku) {
-        this(activity, sku, false);
-    }
-
     public PurchaseRequest(@NonNull final String sku) {
-        this(null, sku, true);
+        this(null, false, sku);
     }
 
-    /**
-     * Gets Activity object to be used to start other activities if necessary.
-     *
-     * @return Activity object. Can be null.
-     */
-    @Nullable
-    public Activity getActivity() {
-        return activityReference == null ? null : activityReference.get();
+    public PurchaseRequest(@Nullable final Activity activity,
+                              final boolean activityHandlesResult,
+                              @NonNull final String sku) {
+        super(BillingEventType.PURCHASE, activity, activityHandlesResult);
+        this.sku = sku;
     }
 
     /**
@@ -86,30 +60,6 @@ public class PurchaseRequest extends BillingRequest {
     @NonNull
     public String getSku() {
         return sku;
-    }
-
-    /**
-     * Indicates whether this request require instance of {@link OPFIabActivity}.
-     * <br>
-     * Intended for internal usage only.
-     *
-     * @return True if this request requires {@link OPFIabActivity}, false otherwise.
-     * @see ActivityBillingProvider
-     */
-    public boolean needsFakeActivity() {
-        return needsFakeActivity;
-    }
-
-    /**
-     * Indicates whether this request has instance of {@link OPFIabActivity}.
-     * <br>
-     * Intended for internal usage only.
-     *
-     * @return True if instance of {@link OPFIabActivity} was launched for this request, false
-     * otherwise.
-     */
-    public boolean isActivityFake() {
-        return getActivity() instanceof OPFIabActivity;
     }
 
     @NonNull

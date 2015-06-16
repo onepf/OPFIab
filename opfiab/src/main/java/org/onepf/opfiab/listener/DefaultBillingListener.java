@@ -32,9 +32,9 @@ import java.util.Map;
 
 /**
  * Default implementation of {@link BillingListener} interface.
- * <br>
+ * <p>
  * Intended to be used in {@link Builder#setBillingListener(BillingListener)}.
- * <br>
+ * <p>
  * Implements following features:
  * <ul>
  *  <li>Attempts to consume all verified consumable purchases.

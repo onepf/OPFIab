@@ -23,7 +23,6 @@ import android.text.TextUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
@@ -36,7 +35,6 @@ public class SkuDetails extends BillingModel {
     private static final String NAME_PRICE = "price";
     private static final String NAME_TITLE = "title";
     private static final String NAME_DESCRIPTION = "description";
-    private static final String NAME_ICON_URL = "iconUrl";
 
 
     @Nullable
@@ -45,27 +43,23 @@ public class SkuDetails extends BillingModel {
     private final String title;
     @Nullable
     private final String description;
-    @Nullable
-    private final String iconUrl;
 
     @SuppressWarnings({"checkstyle:parameternumber"})
     protected SkuDetails(@NonNull final String sku,
                          @Nullable final SkuType type,
-                         @Nullable final BillingProviderInfo providerInfo,
+                         @Nullable final String providerName,
                          @Nullable final String originalJson,
                          @Nullable final String price,
                          @Nullable final String title,
-                         @Nullable final String description,
-                         @Nullable final String iconUrl) {
-        super(sku, type, providerInfo, originalJson);
+                         @Nullable final String description) {
+        super(sku, type, providerName, originalJson);
         this.price = price;
         this.title = title;
         this.description = description;
-        this.iconUrl = iconUrl;
     }
 
     public SkuDetails(@NonNull final String sku) {
-        this(sku, null, null, null, null, null, null, null);
+        this(sku, null, null, null, null, null, null);
     }
 
     /**
@@ -99,18 +93,8 @@ public class SkuDetails extends BillingModel {
     }
 
     /**
-     * Gets URL of the image associated with the SKU.
-     *
-     * @return URL for SKU image. Can be null.
-     */
-    @Nullable
-    public String getIconUrl() {
-        return iconUrl;
-    }
-
-    /**
      * Indicates if there's actually any data available in this object.
-     * <br>
+     * <p>
      * Typically this is true when SKU wasn't recognized by {@link BillingProvider}.
      *
      * @return True is there's no data in this object. False otherwise.
@@ -123,7 +107,7 @@ public class SkuDetails extends BillingModel {
 
     @NonNull
     @Override
-    public SkuDetails substituteSku(@NonNull final String sku) {
+    public SkuDetails copyWithSku(@NonNull final String sku) {
         return new Builder(sku).setSkuDetails(this).build();
     }
 
@@ -136,7 +120,6 @@ public class SkuDetails extends BillingModel {
             jsonObject.put(NAME_PRICE, price == null ? NULL : price);
             jsonObject.put(NAME_TITLE, title == null ? NULL : title);
             jsonObject.put(NAME_DESCRIPTION, description == null ? NULL : description);
-            jsonObject.put(NAME_ICON_URL, iconUrl == null ? NULL : iconUrl);
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }
@@ -154,8 +137,6 @@ public class SkuDetails extends BillingModel {
         protected String title;
         @Nullable
         protected String description;
-        @Nullable
-        protected String iconUrl;
 
         public Builder(@NonNull final String sku) {
             super(sku);
@@ -167,9 +148,8 @@ public class SkuDetails extends BillingModel {
         }
 
         @Override
-        public Builder setProviderInfo(
-                @Nullable final BillingProviderInfo providerInfo) {
-            return (Builder) super.setProviderInfo(providerInfo);
+        public Builder setProviderName(@Nullable final String providerName) {
+            return (Builder) super.setProviderName(providerName);
         }
 
         @Override
@@ -216,17 +196,6 @@ public class SkuDetails extends BillingModel {
         }
 
         /**
-         * Sets image URL for a new SkuDetails object.
-         *
-         * @param iconUrl SKU image URL.
-         * @return this object.
-         */
-        public Builder setIconUrl(@Nullable final String iconUrl) {
-            this.iconUrl = iconUrl;
-            return this;
-        }
-
-        /**
          * Sets existing SkuDetails object to use as a base for a new one.
          *
          * @param skuDetails Existing SkuDetails object.
@@ -237,13 +206,11 @@ public class SkuDetails extends BillingModel {
             setPrice(skuDetails.getPrice());
             setTitle(skuDetails.getTitle());
             setDescription(skuDetails.getDescription());
-            setIconUrl(skuDetails.getIconUrl());
             return this;
         }
 
         public SkuDetails build() {
-            return new SkuDetails(sku, type, providerInfo, originalJson, price, title, description,
-                                  iconUrl);
+            return new SkuDetails(sku, type, providerName, originalJson, price, title, description);
         }
     }
 }

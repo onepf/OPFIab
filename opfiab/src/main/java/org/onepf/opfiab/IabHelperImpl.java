@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * The Very basic {@link IabHelper} implementation.
- * <br>
+ * <p>
  * Responsible for {@link BillingRequest}s creation and sending them to {@link BillingBase}.
  */
 class IabHelperImpl implements IabHelper {

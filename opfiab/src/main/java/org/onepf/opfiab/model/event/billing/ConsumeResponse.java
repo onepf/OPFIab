@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfutils.OPFLog;
 
@@ -37,9 +36,9 @@ public class ConsumeResponse extends BillingResponse {
     private final Purchase purchase;
 
     public ConsumeResponse(@NonNull final Status status,
-                           @Nullable final BillingProviderInfo providerInfo,
+                           @Nullable final String providerName,
                            @NonNull final Purchase purchase) {
-        super(Type.CONSUME, status, providerInfo);
+        super(BillingEventType.CONSUME, status, providerName);
         this.purchase = purchase;
     }
 

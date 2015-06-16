@@ -75,15 +75,6 @@
                 tools:text="@string/loreum"
                 tools:visibility="visible"/>
 
-            <TextView
-                android:id="@+id/tv_setup_authorisation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_setup_provider"
-                android:visibility="invisible"
-                tools:text="@string/loreum"
-                tools:visibility="visible"/>
-
             <ProgressBar
                 android:id="@+id/pb_setup"
                 android:layout_width="wrap_content"
@@ -126,15 +117,6 @@
         android:layout_height="@dimen/drawer_row_height"
         android:gravity="center_vertical"
         android:text="@string/btn_auto_recover"
-        android:checkMark="@drawable/tv_check"
-        tools:checked="true"/>
-
-    <CheckedTextView
-        android:id="@+id/ctv_skip_unauthorized"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/drawer_row_height"
-        android:gravity="center_vertical"
-        android:text="@string/btn_skip_unauthorized"
         android:checkMark="@drawable/tv_check"
         tools:checked="true"/>
 </TableLayout>

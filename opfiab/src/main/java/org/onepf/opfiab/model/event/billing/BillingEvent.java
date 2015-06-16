@@ -33,22 +33,11 @@ abstract class BillingEvent implements JsonCompatible, Serializable {
 
     private static final String NAME_TYPE = "type";
 
-    /**
-     * Type of billing event.
-     */
-    public enum Type {
-
-        CONSUME,
-        PURCHASE,
-        SKU_DETAILS,
-        INVENTORY,
-    }
-
 
     @NonNull
-    private final Type type;
+    private final BillingEventType type;
 
-    protected BillingEvent(@NonNull final Type type) {
+    protected BillingEvent(@NonNull final BillingEventType type) {
         this.type = type;
     }
 
@@ -58,7 +47,7 @@ abstract class BillingEvent implements JsonCompatible, Serializable {
      * @return Type of this event.
      */
     @NonNull
-    public Type getType() {
+    public BillingEventType getType() {
         return type;
     }
 

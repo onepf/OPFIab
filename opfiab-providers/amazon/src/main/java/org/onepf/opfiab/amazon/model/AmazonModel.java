@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'idea'
-apply plugin: 'com.android.library'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle'
+package org.onepf.opfiab.amazon.model;
 
-android {
-    defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 22
-        versionCode 1
-        versionName "0.3.0-SNAPSHOT"
+import android.support.annotation.NonNull;
+
+import org.json.JSONException;
+import org.onepf.opfiab.model.JsonModel;
+
+abstract class AmazonModel extends JsonModel {
+
+    private static final String NAME_SKU = "sku";
+
+    @NonNull
+    protected final String sku;
+
+    public AmazonModel(@NonNull final String originalJson) throws JSONException {
+        super(originalJson);
+        this.sku = jsonObject.getString(NAME_SKU);
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-}
-
-dependencies {
-    compile project(':opfiab')
-    provided 'org.onepf:opfutils:0.1.22'
-    provided 'com.amazon:in-app-purchasing:2.0.61'
+    @NonNull
+    public abstract String getSku();
 }

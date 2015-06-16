@@ -3,22 +3,39 @@ package org.onepf.opfiab.samsung.model;
 import android.support.annotation.NonNull;
 
 import org.json.JSONException;
+import org.onepf.opfiab.samsung.SamsungUtils;
+
+import java.util.Date;
 
 abstract class SamsungBillingModel extends SamsungModel {
 
+    private static final String KEY_PURCHASE_ID = "mPurchaseId";
     private static final String KEY_PAYMENT_ID = "mPaymentId";
     private static final String KEY_PURCHASE_DATE = "mPurchaseDate";
 
-
+    @NonNull
+    private final String purchaseId;
     @NonNull
     private final String paymentId;
     @NonNull
-    private final String purchaseDate;
+    private final Date purchaseDate;
 
     public SamsungBillingModel(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
+        this.purchaseId = jsonObject.getString(KEY_PURCHASE_ID);
         this.paymentId = jsonObject.getString(KEY_PAYMENT_ID);
-        this.purchaseDate = jsonObject.getString(KEY_PURCHASE_DATE);
+
+        final String dateString = jsonObject.getString(KEY_PURCHASE_DATE);
+        final Date date = SamsungUtils.parseDate(dateString);
+        if (date == null) {
+            throw new JSONException("Invalid purchase date: " + dateString);
+        }
+        this.purchaseDate = date;
+    }
+
+    @NonNull
+    public String getPurchaseId() {
+        return purchaseId;
     }
 
     @NonNull
@@ -27,7 +44,7 @@ abstract class SamsungBillingModel extends SamsungModel {
     }
 
     @NonNull
-    public String getPurchaseDate() {
+    public Date getPurchaseDate() {
         return purchaseDate;
     }
 }

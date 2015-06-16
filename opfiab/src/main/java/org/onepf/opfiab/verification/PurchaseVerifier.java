@@ -22,9 +22,9 @@ import org.onepf.opfiab.model.billing.Purchase;
 
 /**
  * Interface intended to define purchase verification algorithm.
- * <br>
+ * <p>
  * Verification process is supposed to confirm the fact that user acquired purchase legitimately.
- * <br>
+ * <p>
  * Typically some cryptography checks or external server requests.
  */
 public interface PurchaseVerifier {
@@ -45,7 +45,7 @@ public interface PurchaseVerifier {
 
     /**
      * Attempts to verify that purchase is owned by user.
-     * <br>
+     * <p>
      * Intended to be called from background thread, because it may perform long time operations.
      *
      * @param purchase Purchase object to verify.

@@ -21,7 +21,6 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
@@ -43,12 +42,12 @@ public class Purchase extends BillingModel {
 
     protected Purchase(@NonNull final String sku,
                        @Nullable final SkuType type,
-                       @Nullable final BillingProviderInfo info,
+                       @Nullable final String providerName,
                        @Nullable final String originalJson,
                        @Nullable final String token,
                        final long purchaseTime,
                        final boolean canceled) {
-        super(sku, type, info, originalJson);
+        super(sku, type, providerName, originalJson);
         this.token = token;
         this.purchaseTime = purchaseTime;
         this.canceled = canceled;
@@ -79,7 +78,7 @@ public class Purchase extends BillingModel {
 
     /**
      * Indicates whether this purchase is still valid or not.
-     * <br>
+     * <p>
      * This will return <b>true</b> if this purchase represents a subscription and it's expired.
      *
      * @return True if this purchase is no longer valid, false otherwise.
@@ -90,7 +89,7 @@ public class Purchase extends BillingModel {
 
     @NonNull
     @Override
-    public Purchase substituteSku(@NonNull final String sku) {
+    public Purchase copyWithSku(@NonNull final String sku) {
         return new Builder(sku).setPurchase(this).build();
     }
 
@@ -128,9 +127,9 @@ public class Purchase extends BillingModel {
         }
 
         @Override
-        public Builder setProviderInfo(
-                @Nullable final BillingProviderInfo providerInfo) {
-            return (Builder) super.setProviderInfo(providerInfo);
+        public Builder setProviderName(
+                @Nullable final String providerName) {
+            return (Builder) super.setProviderName(providerName);
         }
 
         @Override
@@ -192,7 +191,7 @@ public class Purchase extends BillingModel {
 
         @Override
         public Purchase build() {
-            return new Purchase(sku, type, providerInfo, originalJson, token, purchaseTime,
+            return new Purchase(sku, type, providerName, originalJson, token, purchaseTime,
                                 canceled);
         }
     }

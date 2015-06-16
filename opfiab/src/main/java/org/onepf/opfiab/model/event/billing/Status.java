@@ -52,7 +52,7 @@ public enum Status {
     NO_BILLING_PROVIDER,
     /**
      * Request can't be handled at a time.
-     * <br>
+     * <p>
      * Most likely - connection went down.
      */
     SERVICE_UNAVAILABLE,
@@ -62,7 +62,7 @@ public enum Status {
     ITEM_UNAVAILABLE,
     /**
      * Item is already owned by user.
-     * <br>
+     * <p>
      * If it's {@link org.onepf.opfiab.model.billing.SkuType#CONSUMABLE} - purchase must be consumed
      * using {@link IabHelper#consume(Purchase)}.
      */

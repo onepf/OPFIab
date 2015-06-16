@@ -21,15 +21,21 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 
-import org.onepf.opfiab.android.OPFIabFragment;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.model.ComponentState;
+import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
+
+import java.util.Set;
 
 /**
- * This {@link IabHelper} implementation works with supplied Activity instance. {@link
- * OPFIabFragment} will be attached to it to monitor lifecycle and automatically call {@link
- * #register()} and {@link #unregister()} when appropriate.
+ * This {@link IabHelper} implementation works with supplied Activity instance.
+ * <p>
+ * {@link org.onepf.opfiab.android.OPFIabFragment} will be attached to it to monitor lifecycle and
+ * automatically call {@link #register()} and {@link #unregister()} when appropriate.
  */
 class ActivityIabHelperImpl extends ComponentIabHelper implements ActivityIabHelper {
 
@@ -42,7 +48,7 @@ class ActivityIabHelperImpl extends ComponentIabHelper implements ActivityIabHel
     ActivityIabHelperImpl(@Nullable final FragmentActivity fragmentActivity,
                           @Nullable final Activity activity) {
         super(fragmentActivity == null ? null : fragmentActivity.getSupportFragmentManager(),
-              activity == null ? null : activity.getFragmentManager());
+                activity == null ? null : activity.getFragmentManager());
         this.activity = activity;
         this.fragmentActivity = fragmentActivity;
     }
@@ -86,5 +92,20 @@ class ActivityIabHelperImpl extends ComponentIabHelper implements ActivityIabHel
     @Override
     public void purchase(@NonNull final String sku) {
         purchase(getActivity(), sku);
+    }
+
+    @Override
+    public void consume(@NonNull final Purchase purchase) {
+        postRequest(new ConsumeRequest(getActivity(), true, purchase));
+    }
+
+    @Override
+    public void inventory(final boolean startOver) {
+        postRequest(new InventoryRequest(getActivity(), true, startOver));
+    }
+
+    @Override
+    public void skuDetails(@NonNull final Set<String> skus) {
+        postRequest(new SkuDetailsRequest(getActivity(), true, skus));
     }
 }

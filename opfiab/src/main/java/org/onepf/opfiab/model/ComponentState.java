@@ -18,7 +18,7 @@ package org.onepf.opfiab.model;
 
 /**
  * Android component state.
- * <br>
+ * <p>
  * Intended for internal use.
  */
 public enum ComponentState {

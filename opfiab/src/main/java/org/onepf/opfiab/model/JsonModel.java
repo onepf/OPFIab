@@ -17,14 +17,34 @@
 package org.onepf.opfiab.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.onepf.opfiab.model.billing.BillingModel;
+import org.onepf.opfutils.OPFLog;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Simple model class that represents java object created from JSON.
  */
 public abstract class JsonModel {
+
+    @Nullable
+    public static <E extends JsonModel> E fromOriginalJson(@NonNull final Class<E> clazz,
+                                                           @NonNull final BillingModel model) {
+        try {
+            final Constructor<E> constructor = clazz.getConstructor(String.class);
+            return constructor.newInstance(model.getOriginalJson());
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException
+                | InstantiationException exception) {
+            OPFLog.e("", exception);
+        }
+        return null;
+    }
+
 
     @NonNull
     protected final JSONObject jsonObject;
@@ -37,14 +57,13 @@ public abstract class JsonModel {
         this.originalJson = originalJson;
     }
 
-    public JsonModel(@NonNull final JSONObject jsonObject)
-            throws JSONException {
+    public JsonModel(@NonNull final JSONObject jsonObject) {
         this.jsonObject = jsonObject;
         this.originalJson = jsonObject.toString();
     }
 
     /**
-     * Gets JSON data associated with this billing model.
+     * Gets JSON data associated with this model.
      *
      * @return JSON string.
      */

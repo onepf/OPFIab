@@ -22,11 +22,11 @@
 
     <string name="name_google">Google Play</string>
     <string name="name_amazon">Amazon Appstore</string>
+    <string name="name_samsung">Samsung Galaxy Store</string>
 
     <string name="btn_forget">forget\nlast\nprovider</string>
     <string name="btn_init">init()</string>
     <string name="btn_setup">setup()</string>
-    <string name="btn_skip_unauthorized">Skip Unauthorized</string>
     <string name="btn_auto_recover">Auto-Recover</string>
 
     <string name="label_helper">Helper Type</string>
@@ -34,8 +34,6 @@
     <string name="label_add_provider">Add Provider</string>
 
     <string name="setup_no_provider">No Billing Provider</string>
-    <string name="setup_authorized">Authorized</string>
-    <string name="setup_unauthorized">Unauthorized</string>
 
     <string name="sku_unknown">No SKU data</string>
 

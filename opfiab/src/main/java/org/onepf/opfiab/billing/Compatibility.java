@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
+package org.onepf.opfiab.billing;
 
-import android.app.Fragment;
+public enum Compatibility {
 
-/**
- * Version of {@link IabHelper} designed to be used from {@link Fragment}.
- * <p>
- * Supports all {@link AdvancedIabHelper} features.
- */
-public interface FragmentIabHelper extends IabHelper, ListenersSupport { }
+    COMPATIBLE,
+    INCOMPATIBLE,
+    PREFERRED,
+}

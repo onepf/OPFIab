@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-apply plugin: 'android-sdk-manager'
-apply plugin: 'com.android.application'
 apply plugin: 'idea'
+apply plugin: 'com.android.application'
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle'
 
 android {
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
-
     defaultConfig {
-        applicationId "org.onepf.opfiab.trivialdrive"
+        applicationId 'org.onepf.opfiab.trivialdrive'
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 28
-        versionName "0.2.2-SNAPSHOT"
-    }
-
-    signingConfigs {
+        versionName "0.3.0-SNAPSHOT"
     }
 
     buildTypes {
@@ -38,11 +32,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     lintOptions {
@@ -55,29 +44,37 @@ android {
     }
 }
 
+check {
+    abortOnError false
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.android.support:recyclerview-v7:22.0.0'
+//    compile 'com.android.support:appcompat-v7:22.2.0'
+//    compile 'com.android.support:recyclerview-v7:22.2.0'
 
     // OPFIab core
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'org.onepf:opfutils:0.1.22'
-    compile('org.onepf:opfiab:0.2.+@aar') {
-        changing = true
-    }
+//    compile('org.onepf:opfiab:0.2.+@aar') {
+//        changing = true
+//    }
     // OPFIab Google
-    compile('org.onepf:opfiab-google:0.2.+@aar') {
-        changing = true
-    }
+//    compile('org.onepf:opfiab-google:0.2.+@aar') {
+//        changing = true
+//    }
     // OPFIab Amazon
-    compile('org.onepf:opfiab-amazon:0.2.+@aar') {
-        changing = true
-    }
+//    compile('org.onepf:opfiab-amazon:0.2.+@aar') {
+//        changing = true
+//    }
+    compile project(':opfiab')
+    compile project(':google')
+    compile project(':samsung')
+    compile project(':amazon')
     compile 'com.amazon:in-app-purchasing:2.0.61'
 
-    compile 'com.makeramen:dragsortadapter:1.1.0'
+    compile 'com.makeramen:dragsortadapter:1.2.0'
 
     // App's dependencies, including test
     compile 'com.android.support:support-annotations:21.0.3'

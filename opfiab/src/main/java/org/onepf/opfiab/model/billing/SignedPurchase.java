@@ -21,7 +21,6 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfutils.OPFLog;
 
 import static org.json.JSONObject.NULL;
@@ -38,14 +37,16 @@ public class SignedPurchase extends Purchase {
     @Nullable
     private final String signature;
 
+    @SuppressWarnings({"checkstyle:parameternumber"})
     public SignedPurchase(@NonNull final String sku,
                           @Nullable final SkuType type,
-                          @Nullable final BillingProviderInfo info,
+                          @Nullable final String providerName,
                           @Nullable final String originalJson,
                           @Nullable final String token,
-                          final long purchaseTime, final boolean canceled,
+                          final long purchaseTime,
+                          final boolean canceled,
                           @Nullable final String signature) {
-        super(sku, type, info, originalJson, token, purchaseTime, canceled);
+        super(sku, type, providerName, originalJson, token, purchaseTime, canceled);
         this.signature = signature;
     }
 
@@ -66,7 +67,7 @@ public class SignedPurchase extends Purchase {
 
     @NonNull
     @Override
-    public Purchase substituteSku(@NonNull final String sku) {
+    public Purchase copyWithSku(@NonNull final String sku) {
         return new Builder(sku).setSignedPurchase(this).build();
     }
 
@@ -107,9 +108,9 @@ public class SignedPurchase extends Purchase {
         }
 
         @Override
-        public Builder setProviderInfo(
-                @Nullable final BillingProviderInfo providerInfo) {
-            return (Builder) super.setProviderInfo(providerInfo);
+        public Builder setProviderName(
+                @Nullable final String providerName) {
+            return (Builder) super.setProviderName(providerName);
         }
 
         @Override
@@ -144,7 +145,7 @@ public class SignedPurchase extends Purchase {
 
         @Override
         public SignedPurchase build() {
-            return new SignedPurchase(sku, type, providerInfo, originalJson, token, purchaseTime,
+            return new SignedPurchase(sku, type, providerName, originalJson, token, purchaseTime,
                                       canceled, signature);
         }
     }

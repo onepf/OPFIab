@@ -20,7 +20,7 @@ public enum BillingMode {
 
     TEST_SUCCESS(1),
     TEST_FAIL(-1),
-    PRODUCTION(0),;
+    PRODUCTION(0);
 
     private final int code;
 

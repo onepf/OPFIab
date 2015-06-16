@@ -23,7 +23,7 @@ import org.onepf.opfiab.model.event.billing.BillingRequest;
 
 /**
  * Class intended to indicate that {@link BillingProvider} finished handling {@link BillingRequest}.
- * <br>
+ * <p>
  * Intended for internal usage.
  *
  * @see BillingProvider#onEventAsync(BillingRequest)

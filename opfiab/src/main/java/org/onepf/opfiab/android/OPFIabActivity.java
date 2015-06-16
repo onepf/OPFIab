@@ -27,6 +27,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.view.WindowManager;
 
+import org.onepf.opfiab.BuildConfig;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.android.ActivityLifecycleEvent;
@@ -36,7 +37,7 @@ import org.onepf.opfutils.OPFLog;
 
 /**
  * Untouchable activity without UI.
- * <p/>
+ * <p>
  * Intended to intercept {@link Activity#onActivityResult(int, int, Intent)} callback,
  * or to be used as Activity {@link Context} when one is not available.
  */
@@ -44,17 +45,19 @@ import org.onepf.opfutils.OPFLog;
 public class OPFIabActivity extends Activity {
 
     /**
-     * If activity is not expecting {@link #onActivityResult(int, int, Intent)} call, it will auto-finish after this timeout.
+     * If activity is not expecting {@link #onActivityResult(int, int, Intent)} call, it will
+     * auto-finish after this timeout.
      */
-    protected static final long FINISH_DELAY = 300L; // 0.3 second
+    protected static final long FINISH_DELAY = 1000L;
 
 
     /**
      * Start new instance of this activity.
      *
-     * @param context Can't be null. Context object witch will be used to start new instance of {@link OPFIabActivity}.
-     *                If passed object is not <code>instanceof</code> {@link Activity},
-     *                new activity will be started with {@link Intent#FLAG_ACTIVITY_NEW_TASK} flag.
+     * @param context Can't be null. Context object witch will be used to start new instance of
+     *                {@link OPFIabActivity}. If passed object is not <code>instanceof</code>
+     *                {@link Activity}, new activity will be started with
+     *                {@link Intent#FLAG_ACTIVITY_NEW_TASK} flag.
      */
     public static void start(@NonNull final Context context) {
         final Intent intent = new Intent(context, OPFIabActivity.class);
@@ -77,6 +80,9 @@ public class OPFIabActivity extends Activity {
         @Override
         public void run() {
             if (!isFinishing()) {
+                if (BuildConfig.DEBUG) {
+                    throw new IllegalStateException();
+                }
                 OPFLog.e("OPFIabActivity wasn't utilised! Finishing: %s", OPFIabActivity.this);
                 finish();
             }
@@ -86,7 +92,7 @@ public class OPFIabActivity extends Activity {
 
     /**
      * Used to schedule {@link #finishTask} call after timeout.
-     * <br>
+     * <p>
      * Resets timeout if task has been already scheduled.
      *
      * @param schedule True if finish should be scheduled, false otherwise.
@@ -128,15 +134,13 @@ public class OPFIabActivity extends Activity {
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
-        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
-        if (data != null || resultCode == RESULT_OK) {
-            // Result was delivered successfully, there's no further need for this activity.
+        if (!OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data))) {
+            // No one received this event, finishing
             finish();
-        } else {
-            // May indicated that this activity is used for something else, for example - to start
-            // another activity.
-            scheduleFinish(true);
         }
+        // Result event subscriber should finish activity when it's done with it.
+        // Schedule finish just in case
+        scheduleFinish(true);
     }
 
     @Override

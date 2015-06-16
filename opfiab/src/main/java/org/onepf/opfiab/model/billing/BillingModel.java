@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.JsonCompatible;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
@@ -38,7 +37,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
 
     private static final String NAME_SKU = "sku";
     private static final String NAME_TYPE = "type";
-    private static final String NAME_PROVIDER_INFO = "provider_info";
+    private static final String NAME_PROVIDER_NAME = "provider_name";
     private static final String NAME_ORIGINAL_JSON = "original_json";
 
 
@@ -47,17 +46,17 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     @NonNull
     private final SkuType type;
     @Nullable
-    private final BillingProviderInfo providerInfo;
+    private final String providerName;
     @Nullable
     private final String originalJson;
 
     protected BillingModel(@NonNull final String sku,
                            @Nullable final SkuType type,
-                           @Nullable final BillingProviderInfo providerInfo,
+                           @Nullable final String providerName,
                            @Nullable final String originalJson) {
         this.sku = sku;
         this.type = type == null ? SkuType.UNKNOWN : type;
-        this.providerInfo = providerInfo;
+        this.providerName = providerName;
         this.originalJson = originalJson;
     }
 
@@ -71,7 +70,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
      * @see #getSku()
      */
     @NonNull
-    public abstract BillingModel substituteSku(@NonNull final String sku);
+    public abstract BillingModel copyWithSku(@NonNull final String sku);
 
     /**
      * Gets Store Keeping Unit (SKU) associated with this billing model.
@@ -93,14 +92,9 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         return type;
     }
 
-    /**
-     * Gets info of {@link BillingProvider} associated with this billing model.
-     *
-     * @return BillingProviderInfo associated with this billing model.
-     */
     @Nullable
-    public BillingProviderInfo getProviderInfo() {
-        return providerInfo;
+    public String getProviderName() {
+        return providerName;
     }
 
     /**
@@ -120,7 +114,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         try {
             jsonObject.put(NAME_SKU, sku);
             jsonObject.put(NAME_TYPE, type);
-            jsonObject.put(NAME_PROVIDER_INFO, providerInfo == null ? NULL : providerInfo.toJson());
+            jsonObject.put(NAME_PROVIDER_NAME, providerName == null ? NULL : providerName);
             jsonObject.put(NAME_ORIGINAL_JSON,
                            originalJson == null ? NULL : new JSONObject(originalJson));
         } catch (JSONException exception) {
@@ -130,7 +124,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     }
 
     //CHECKSTYLE:OFF
-    @SuppressWarnings({"PMD", "RedundantIfStatement"})
+    @SuppressWarnings({"PMD", "RedundantIfStatement", "SimplifiableIfStatement"})
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -138,20 +132,21 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
 
         final BillingModel that = (BillingModel) o;
 
-        if (providerInfo != null ? !providerInfo.equals(
-                that.providerInfo) : that.providerInfo != null)
-            return false;
-        if (!sku.equals(that.sku)) return false;
-        if (type != that.type) return false;
+        if (!getSku().equals(that.getSku())) return false;
+        if (getType() != that.getType()) return false;
+        if (getProviderName() != null ? !getProviderName().equals(
+                that.getProviderName()) : that.getProviderName() != null) return false;
+        return !(getOriginalJson() != null ? !getOriginalJson().equals(
+                that.getOriginalJson()) : that.getOriginalJson() != null);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = sku.hashCode();
-        result = 31 * result + type.hashCode();
-        result = 31 * result + (providerInfo != null ? providerInfo.hashCode() : 0);
+        int result = getSku().hashCode();
+        result = 31 * result + getType().hashCode();
+        result = 31 * result + (getProviderName() != null ? getProviderName().hashCode() : 0);
+        result = 31 * result + (getOriginalJson() != null ? getOriginalJson().hashCode() : 0);
         return result;
     }
 
@@ -171,7 +166,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         @Nullable
         protected SkuType type;
         @Nullable
-        protected BillingProviderInfo providerInfo;
+        protected String providerName;
         @Nullable
         protected String originalJson;
 
@@ -188,7 +183,7 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         protected Builder setBillingModel(@NonNull final BillingModel billingModel) {
             setType(billingModel.getType());
             setOriginalJson(billingModel.getOriginalJson());
-            setProviderInfo(billingModel.getProviderInfo());
+            setProviderName(billingModel.getProviderName());
             return this;
         }
 
@@ -215,13 +210,15 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
         }
 
         /**
-         * Sets billing provider info for a new billing model.
+         * Sets billing provider name for a new billing model.
          *
-         * @param providerInfo BillingProviderInfo object to set.
+         * @param providerName BillingProvider name to set.
          * @return this object.
+         *
+         * @see BillingProvider#getName()
          */
-        protected Builder setProviderInfo(@Nullable final BillingProviderInfo providerInfo) {
-            this.providerInfo = providerInfo;
+        protected Builder setProviderName(@Nullable final String providerName) {
+            this.providerName = providerName;
             return this;
         }
 

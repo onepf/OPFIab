@@ -134,7 +134,6 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
         if (service == null) {
             return null;
         }
-
         try {
             final int code = service.consumePurchase(API, packageName, token);
             final Response response = Response.fromCode(code);

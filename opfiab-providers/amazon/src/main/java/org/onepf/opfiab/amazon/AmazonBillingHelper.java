@@ -16,6 +16,7 @@
 
 package org.onepf.opfiab.amazon;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -28,11 +29,8 @@ import com.amazon.device.iap.model.UserData;
 import com.amazon.device.iap.model.UserDataResponse;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfutils.OPFLog;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This class handles all communications between library and Amazon SDK.
@@ -47,13 +45,22 @@ final class AmazonBillingHelper implements PurchasingListener {
      */
     private static final int USER_DATA_TIMEOUT = 1000;
 
+    private static AmazonBillingHelper instance;
+
+    @SuppressWarnings("PMD.NonThreadSafeSingleton")
+    public static AmazonBillingHelper getInstance(@NonNull final Context context) {
+        if (instance == null) {
+            instance = new AmazonBillingHelper();
+            PurchasingService.registerListener(context, instance);
+        }
+        return instance;
+    }
+
     // User data is requested from library thread, but delivered on main.
     @Nullable
-    private volatile CountDownLatch userDataLatch;
-    @Nullable
-    private volatile UserData userData;
+    private volatile SyncedReference<UserData> syncUserData;
 
-    AmazonBillingHelper() {
+    private AmazonBillingHelper() {
         super();
     }
 
@@ -64,51 +71,31 @@ final class AmazonBillingHelper implements PurchasingListener {
      */
     @Nullable
     UserData getUserData() {
-        // TODO check re-login
-        OPFChecks.checkThread(false);
-        final UserData localUserData = userData;
-        if (localUserData != null) {
-            return localUserData;
-        }
-
-        if (userDataLatch != null) {
-            // Might happen if library handles request in multithreaded pool
-            throw new IllegalStateException("There must be no concurrent requests.");
-        }
-
+        final SyncedReference<UserData> syncUserData = new SyncedReference<>();
         try {
-            userDataLatch = new CountDownLatch(1);
+            this.syncUserData = syncUserData;
             PurchasingService.getUserData();
-            //noinspection ConstantConditions
-            if (!userDataLatch.await(USER_DATA_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                OPFLog.e("User data request timed out.");
-            }
-        } catch (InterruptedException exception) {
-            OPFLog.e("User data request interrupted.", exception);
+            return syncUserData.get(USER_DATA_TIMEOUT);
         } finally {
-            userDataLatch = null;
+            this.syncUserData = null;
         }
-        return userData;
     }
 
     @Override
     public void onUserDataResponse(@NonNull final UserDataResponse userDataResponse) {
         OPFLog.logMethod(userDataResponse);
+        final SyncedReference<UserData> syncUserData = this.syncUserData;
+        if (syncUserData == null) {
+            return;
+        }
         switch (userDataResponse.getRequestStatus()) {
             case SUCCESSFUL:
-                userData = userDataResponse.getUserData();
+                syncUserData.set(userDataResponse.getUserData());
                 break;
             case FAILED:
             case NOT_SUPPORTED:
-                userData = null;
                 OPFLog.e("UserData request failed: %s", userDataResponse);
                 break;
-            default:
-                throw new IllegalStateException();
-        }
-        final CountDownLatch latch = userDataLatch;
-        if (latch != null) {
-            latch.countDown();
         }
     }
 

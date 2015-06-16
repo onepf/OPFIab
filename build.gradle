@@ -27,29 +27,18 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
         classpath 'com.noveogroup.android:check:1.1.2'
+        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:latest.release'
     }
 }
 
 allprojects {
     repositories {
         jcenter()
-        // allow snapshots
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        // simplify maven upload
-        maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
-        // third-party dependencies
-        maven { url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/' }
     }
 
     ext {
         compileSdkVersion = 21
         buildToolsVersion = "22.0.1"
-    }
-
-    configurations.all {
-        // check for updates every build
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 }

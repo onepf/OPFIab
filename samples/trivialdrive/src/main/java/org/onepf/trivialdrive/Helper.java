@@ -19,7 +19,7 @@ package org.onepf.trivialdrive;
 import android.app.Activity;
 import android.support.annotation.StringRes;
 
-import org.onepf.opfiab.trivialdrive.R;
+import org.onepf.trivialdrive.R;
 import org.onepf.trivialdrive.ui.activity.ActivityHelperActivity;
 import org.onepf.trivialdrive.ui.activity.FragmentHelperActivity;
 import org.onepf.trivialdrive.ui.activity.AdvancedHelperActivity;

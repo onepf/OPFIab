@@ -15,8 +15,8 @@
   -->
 
 <manifest
-    package="org.onepf.opfiab.google"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        package="org.onepf.opfiab.google">
 
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-permission android:name="com.android.vending.BILLING"/>

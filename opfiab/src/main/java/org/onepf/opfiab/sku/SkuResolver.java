@@ -27,7 +27,7 @@ public interface SkuResolver {
 
     /**
      * Default implementation of {@link SkuResolver}.
-     * <br>
+     * <p>
      * Maps all SKUs to themselves.
      */
     @NonNull

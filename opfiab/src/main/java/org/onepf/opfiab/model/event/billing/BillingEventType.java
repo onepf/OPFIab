@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.api;
-
-import android.app.Fragment;
+package org.onepf.opfiab.model.event.billing;
 
 /**
- * Version of {@link IabHelper} designed to be used from {@link Fragment}.
- * <p>
- * Supports all {@link AdvancedIabHelper} features.
+ * Type of billing event.
  */
-public interface FragmentIabHelper extends IabHelper, ListenersSupport { }
+public enum BillingEventType {
+
+    CONSUME,
+    PURCHASE,
+    SKU_DETAILS,
+    INVENTORY,
+}

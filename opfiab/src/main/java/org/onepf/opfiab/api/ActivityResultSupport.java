@@ -25,7 +25,7 @@ interface ActivityResultSupport {
 
     /**
      * Notifies library about received activity result.
-     * <p/>
+     * <p>
      * Intended to be called from {@link Activity} used for {@link SimpleIabHelper#purchase(Activity, String)}.
      *
      * @param activity Activity object which received {@link Activity#onActivityResult(int, int, Intent)} call.
