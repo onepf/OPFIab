@@ -65,7 +65,7 @@ public abstract class BillingResponse extends BillingEvent {
      * @return Name of corresponding {@link BillingProvider}.
      */
     @Nullable
-    public String getProviderInfo() {
+    public String getProviderName() {
         return providerName;
     }
 
