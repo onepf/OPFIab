@@ -64,7 +64,7 @@ public class SamsungPurchaseVerifier implements PurchaseVerifier {
             }
             final String body = OPFIabUtils.toString(connection.getInputStream());
             final SamsungVerification verification = new SamsungVerification(body);
-            return verification.idStatus() ? VerificationResult.SUCCESS : VerificationResult.FAILED;
+            return verification.isStatus() ? VerificationResult.SUCCESS : VerificationResult.FAILED;
         } catch (IOException | JSONException exception) {
             OPFLog.e("", exception);
         }
