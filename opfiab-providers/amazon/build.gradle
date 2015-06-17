@@ -25,17 +25,13 @@ android {
         versionCode 1
         versionName "0.3.0-SNAPSHOT"
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 }
 
 dependencies {
-    compile project(':opfiab')
-    provided 'org.onepf:opfutils:0.1.22'
+    compile('org.onepf:opfiab:0.3.+@aar') {
+        changing = true
+    }
+    //noinspection GradleDynamicVersion
+    provided 'org.onepf:opfutils:0.1.+'
     provided 'com.amazon:in-app-purchasing:2.0.61'
 }

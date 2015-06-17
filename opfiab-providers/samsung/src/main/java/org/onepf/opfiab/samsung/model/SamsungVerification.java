@@ -1,6 +1,7 @@
 package org.onepf.opfiab.samsung.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONException;
 import org.onepf.opfiab.model.JsonModel;
@@ -35,41 +36,41 @@ public class SamsungVerification extends JsonModel {
     };
 
 
-    @NonNull
-    private final String itemId;
-    @NonNull
-    private final String name;
-    @NonNull
-    private final String description;
-    @NonNull
-    private final Date purchaseDate;
-    @NonNull
-    private final String paymentId;
-    @NonNull
-    private final String paymentAmount;
-    @NonNull
-    private final BillingMode mode;
     private final boolean status;
+    @Nullable
+    private final String itemId;
+    @Nullable
+    private final String name;
+    @Nullable
+    private final String description;
+    @Nullable
+    private final Date purchaseDate;
+    @Nullable
+    private final String paymentId;
+    @Nullable
+    private final String paymentAmount;
+    @Nullable
+    private final BillingMode mode;
 
+    @SuppressWarnings("PMD.PreserveStackTrace")
     public SamsungVerification(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
-        this.itemId = jsonObject.getString(KEY_ITEM_ID);
-        this.name = jsonObject.getString(KEY_ITEM_NAME);
-        this.description = jsonObject.getString(KEY_ITEM_DESC);
-        this.paymentId = jsonObject.getString(KEY_PAYMENT_ID);
-        this.paymentAmount = jsonObject.getString(KEY_PAYMENT_AMOUNT);
         this.status = jsonObject.getBoolean(KEY_STATUS);
+        this.itemId = jsonObject.optString(KEY_ITEM_ID);
+        this.name = jsonObject.optString(KEY_ITEM_NAME);
+        this.description = jsonObject.optString(KEY_ITEM_DESC);
+        this.paymentId = jsonObject.optString(KEY_PAYMENT_ID);
+        this.paymentAmount = jsonObject.optString(KEY_PAYMENT_AMOUNT);
 
-        final String mode = jsonObject.getString(KEY_MODE);
-        switch (mode) {
-            case MODE_TEST:
-                this.mode = BillingMode.TEST_SUCCESS;
-                break;
-            case MODE_REAL:
-                this.mode = BillingMode.PRODUCTION;
-                break;
-            default:
-                throw new JSONException("Invalid billing mode: " + mode);
+        final String mode = jsonObject.optString(KEY_MODE);
+        if (mode == null) {
+            this.mode = null;
+        } else if (mode.equals(MODE_TEST)) {
+            this.mode = BillingMode.TEST_SUCCESS;
+        } else if (mode.equals(MODE_REAL)) {
+            this.mode = BillingMode.PRODUCTION;
+        } else {
+            throw new JSONException("Invalid billing mode: " + mode);
         }
 
         final String dateString = jsonObject.getString(KEY_PURCHASE_DATE);
@@ -83,42 +84,42 @@ public class SamsungVerification extends JsonModel {
         this.purchaseDate = date;
     }
 
-    @NonNull
+    @Nullable
     public String getItemId() {
         return itemId;
     }
 
-    @NonNull
+    @Nullable
     public String getName() {
         return name;
     }
 
-    @NonNull
+    @Nullable
     public String getDescription() {
         return description;
     }
 
-    @NonNull
+    @Nullable
     public Date getPurchaseDate() {
         return purchaseDate;
     }
 
-    @NonNull
+    @Nullable
     public String getPaymentId() {
         return paymentId;
     }
 
-    @NonNull
+    @Nullable
     public String getPaymentAmount() {
         return paymentAmount;
     }
 
-    @NonNull
+    @Nullable
     public BillingMode getMode() {
         return mode;
     }
 
-    public boolean idStatus() {
+    public boolean isStatus() {
         return status;
     }
 }

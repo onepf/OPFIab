@@ -30,7 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Simple model class that represents java object created from JSON.
  */
-public abstract class JsonModel {
+public abstract class JsonModel implements JsonCompatible {
 
     @Nullable
     public static <E extends JsonModel> E fromOriginalJson(@NonNull final Class<E> clazz,
@@ -60,6 +60,12 @@ public abstract class JsonModel {
     public JsonModel(@NonNull final JSONObject jsonObject) {
         this.jsonObject = jsonObject;
         this.originalJson = jsonObject.toString();
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        return jsonObject;
     }
 
     /**

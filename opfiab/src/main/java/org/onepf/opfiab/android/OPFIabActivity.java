@@ -80,9 +80,6 @@ public class OPFIabActivity extends Activity {
         @Override
         public void run() {
             if (!isFinishing()) {
-                if (BuildConfig.DEBUG) {
-                    throw new IllegalStateException();
-                }
                 OPFLog.e("OPFIabActivity wasn't utilised! Finishing: %s", OPFIabActivity.this);
                 finish();
             }
