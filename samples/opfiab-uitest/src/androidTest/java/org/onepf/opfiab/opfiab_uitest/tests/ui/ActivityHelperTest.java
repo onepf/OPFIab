@@ -33,7 +33,6 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
@@ -49,7 +48,6 @@ import org.onepf.opfiab.opfiab_uitest.util.validators.SetupStartedEventValidator
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_APP_PKG;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_NAME;
-import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_PACKAGE;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_BILLING_PROVIDER;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_LAUNCH_SCREEN;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_PURCHASE;
@@ -68,7 +66,8 @@ public class ActivityHelperTest {
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
     @Rule
-    public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
+    public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
+            EmptyActivity.class);
     private Instrumentation instrumentation;
     private UiDevice uiDevice;
     private EmptyActivity activity;
@@ -83,9 +82,8 @@ public class ActivityHelperTest {
     @Test
     public void testRegisterUnregister() throws InterruptedException {
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(TEST_PROVIDER_NAME, TEST_PROVIDER_PACKAGE))
+                .setName(TEST_PROVIDER_NAME)
                 .setIsAvailable(true)
                 .setSleepTime(WAIT_BILLING_PROVIDER)
                 .build();
@@ -188,6 +186,7 @@ public class ActivityHelperTest {
 
     private void reopenActivity() throws InterruptedException {
         final Context context = instrumentation.getContext();
+        @SuppressWarnings("deprecation")
         final Intent intent = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
                 .getRecentTasks(2, 0).get(1).baseIntent;
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);

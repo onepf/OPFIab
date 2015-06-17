@@ -45,10 +45,10 @@ public class PurchaseResponseValidator extends TypedEventValidator<PurchaseRespo
         if (response.isSuccessful() != isSuccessful) {
             msg = "Not expected success result";
             result = false;
-        } else if (response.getProviderInfo() == null) {
+        } else if (response.getProviderName() == null) {
             msg = "Provider info is set to null";
             result = false;
-        } else if (response.getProviderInfo().getName().equals(name)) {
+        } else if (response.getProviderName().equals(name)) {
             msg = "";
             result = true;
         } else {

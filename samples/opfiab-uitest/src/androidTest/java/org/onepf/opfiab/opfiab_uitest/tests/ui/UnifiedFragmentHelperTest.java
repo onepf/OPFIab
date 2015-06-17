@@ -19,6 +19,7 @@ package org.onepf.opfiab.opfiab_uitest.tests.ui;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
@@ -30,8 +31,10 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.FragmentIabHelper;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.model.Configuration;
+import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
+import org.onepf.opfiab.opfiab_uitest.EmptyFragmentActivity;
 import org.onepf.opfiab.opfiab_uitest.R;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
@@ -44,7 +47,6 @@ import org.onepf.opfiab.opfiab_uitest.util.validators.SetupStartedEventValidator
 
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_NAME_FMT;
-import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_PACKAGE;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_BILLING_PROVIDER;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_INIT;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_LAUNCH_SCREEN;
@@ -58,31 +60,16 @@ import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_TEST_MANAGER;
  */
 public class UnifiedFragmentHelperTest {
 
+    private final static String FRAGMENT_TAG = "FRAGMENT_TAG";
+
     public static void testRegisterUnregisterHomeButton(Instrumentation instrumentation,
                                                         final Activity activity, UiDevice uiDevice)
             throws InterruptedException {
-        final boolean isSupport = activity instanceof FragmentActivity;
-        final Object fragment;
-        if (isSupport) {
-            fragment = SupportTestFragment.getInstance(R.color.blue);
-            ((FragmentActivity) activity).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content, (android.support.v4.app.Fragment) fragment)
-                    .commit();
-
-        } else {
-            fragment = TestFragment.getInstance(R.color.blue);
-            activity.getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content, (Fragment) fragment)
-                    .commit();
-        }
 
         final String providerName = String.format(TEST_PROVIDER_NAME_FMT, "HOME");
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(providerName, TEST_PROVIDER_PACKAGE))
+                .setName(providerName)
                 .setIsAvailable(true)
                 .setSleepTime(WAIT_BILLING_PROVIDER)
                 .build();
@@ -117,22 +104,46 @@ public class UnifiedFragmentHelperTest {
                 .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
                 .build();
 
-        final FragmentIabHelper[] helpers = new FragmentIabHelper[1];
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
                 OPFIab.init(activity.getApplication(), configuration);
-                if (isSupport) {
-                    helpers[0] = OPFIab.getFragmentHelper(
-                            (android.support.v4.app.Fragment) fragment);
-                } else {
-                    helpers[0] = OPFIab.getFragmentHelper((Fragment) fragment);
-                }
-                helpers[0].addPurchaseListener(purchaseListenerAdapter);
             }
         });
         Thread.sleep(WAIT_INIT);
-        final FragmentIabHelper helper = helpers[0];
+        final boolean isSupport = activity instanceof FragmentActivity;
+        Object fragment;
+        if (isSupport) {
+            fragment = SupportTestFragment.getInstance(R.color.blue);
+            final android.support.v4.app.FragmentManager supportFragmentManager = ((FragmentActivity) activity).getSupportFragmentManager();
+            supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content, (android.support.v4.app.Fragment) fragment, FRAGMENT_TAG)
+                    .commit();
+            instrumentation.runOnMainSync(new Runnable() {
+                @Override
+                public void run() {
+                    supportFragmentManager.executePendingTransactions();
+                }
+            });
+        } else {
+            fragment = TestFragment.getInstance(R.color.blue);
+            final FragmentManager fragmentManager = activity.getFragmentManager();
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content, (Fragment) fragment, FRAGMENT_TAG)
+                    .commit();
+            instrumentation.runOnMainSync(new Runnable() {
+                @Override
+                public void run() {
+                    fragmentManager.executePendingTransactions();
+                }
+            });
+        }
+        Thread.sleep(WAIT_INIT);
+
+        FragmentIabHelper helper = getHelper(isSupport, fragment, purchaseListenerAdapter,
+                instrumentation);
 
         purchase(instrumentation, helper, SKU_CONSUMABLE);
 
@@ -141,6 +152,9 @@ public class UnifiedFragmentHelperTest {
         purchase(instrumentation, helper, SKU_CONSUMABLE);
 
         reopenActivity(instrumentation);
+
+        fragment = getFragment(isSupport);
+        helper = getHelper(isSupport, fragment, purchaseListenerAdapter, instrumentation);
 
         pressBackButton(uiDevice);
 
@@ -151,6 +165,25 @@ public class UnifiedFragmentHelperTest {
         for (TestManager manager : managers) {
             Assert.assertTrue(manager.await(WAIT_TEST_MANAGER));
         }
+    }
+
+    private static FragmentIabHelper getHelper(final boolean isSupport, final Object fragment,
+                                               final OnPurchaseListener listener,
+                                               Instrumentation instrumentation)
+            throws InterruptedException {
+        final FragmentIabHelper[] helpers = new FragmentIabHelper[1];
+        instrumentation.runOnMainSync(new Runnable() {
+            @Override
+            public void run() {
+                if (isSupport) {
+                    helpers[0] = ((SupportTestFragment) fragment).getIabHelper(listener);
+                } else {
+                    helpers[0] = ((TestFragment) fragment).getIabHelper(listener);
+                }
+            }
+        });
+        Thread.sleep(WAIT_INIT);
+        return helpers[0];
     }
 
     private static void purchase(Instrumentation instrumentation, IabHelper helper, String sku)
@@ -166,11 +199,23 @@ public class UnifiedFragmentHelperTest {
     private static void reopenActivity(Instrumentation instrumentation)
             throws InterruptedException {
         final Context context = instrumentation.getContext();
+        @SuppressWarnings("deprecation")
         final Intent intent = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
                 .getRecentTasks(2, 0).get(1).baseIntent;
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         instrumentation.getContext().startActivity(intent);
         Thread.sleep(WAIT_REOPEN_ACTIVITY);
+    }
+
+    private static Object getFragment(final boolean isSupport) {
+        if (isSupport) {
+
+            return EmptyFragmentActivity.getLastInstance().getSupportFragmentManager()
+                    .findFragmentByTag(FRAGMENT_TAG);
+        } else {
+            return EmptyActivity.getLastInstance().getFragmentManager()
+                    .findFragmentByTag(FRAGMENT_TAG);
+        }
     }
 
     private static void pressBackButton(UiDevice uiDevice) throws InterruptedException {
@@ -186,14 +231,15 @@ public class UnifiedFragmentHelperTest {
     }
 
     public static void testRegisterUnregisterFragmentReplace(Instrumentation instrumentation,
-                                                             final Activity activity,
+                                                             final Boolean isSupport,
                                                              UiDevice uiDevice)
             throws InterruptedException {
         final String providerName = String.format(TEST_PROVIDER_NAME_FMT, "FRAGMENT_REPLACE");
-        final boolean isSupport = activity instanceof FragmentActivity;
         final Object fragment;
+        final Activity activity;
         if (isSupport) {
             fragment = SupportTestFragment.getInstance(R.color.green);
+            activity = EmptyFragmentActivity.getLastInstance();
             ((FragmentActivity) activity).getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.content, (android.support.v4.app.Fragment) fragment)
@@ -201,6 +247,7 @@ public class UnifiedFragmentHelperTest {
 
         } else {
             fragment = TestFragment.getInstance(R.color.green);
+            activity = EmptyActivity.getLastInstance();
             activity.getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.content, (Fragment) fragment)
@@ -208,9 +255,8 @@ public class UnifiedFragmentHelperTest {
         }
 
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(providerName, TEST_PROVIDER_PACKAGE))
+                .setName(providerName)
                 .setIsAvailable(true)
                 .setSleepTime(WAIT_BILLING_PROVIDER)
                 .build();

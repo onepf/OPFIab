@@ -21,17 +21,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.model.BillingProviderInfo;
-import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
-import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
-import org.onepf.opfiab.model.event.billing.Status;
-import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.verification.VerificationResult;
 
-import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 
 /**
@@ -42,13 +36,10 @@ public class MockOkBillingProvider extends MockBillingProvider {
 
     private static final String NAME = MockOkBillingProvider.class.getSimpleName();
 
-    public static final BillingProviderInfo INFO =
-            new BillingProviderInfo(NAME, null);
-
     @NonNull
     @Override
-    public BillingProviderInfo getInfo() {
-        return INFO;
+    public String getName() {
+        return NAME;
     }
 
     @Override
@@ -63,15 +54,10 @@ public class MockOkBillingProvider extends MockBillingProvider {
     }
 
     @Override
-    public boolean isAuthorised() {
-        return true;
-    }
-
-    @Override
     public void onEventAsync(@NonNull BillingRequest billingRequest) {
         OPFIab.post(new RequestHandledEvent(billingRequest));
         sleep();
-        OPFIab.post(new PurchaseResponse(SUCCESS, getInfo(), null, VerificationResult.SUCCESS));
+        OPFIab.post(new PurchaseResponse(SUCCESS, getName(), null, VerificationResult.SUCCESS));
     }
 
     @Nullable

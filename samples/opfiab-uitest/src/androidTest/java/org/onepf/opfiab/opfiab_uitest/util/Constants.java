@@ -26,12 +26,13 @@ public final class Constants {
     public static final String TEST_PROVIDER_PACKAGE = "org.onepf.opfiab.uitest";
     public static final String TEST_PROVIDER_NAME = "TEST_PROVIDER_NAME";
     public static final String TEST_PROVIDER_NAME_FMT = "TEST_PROVIDER_NAME_%s";
+
     public static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
-    public static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
+    public static final String SKU_ENTITY = "org.onepf.opfiab.entity";
     public static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
     public static final long WAIT_LAUNCH_SCREEN = 5000L;
-    public static final long WAIT_REOPEN_ACTIVITY = 500L;
+    public static final long WAIT_REOPEN_ACTIVITY = 2000L;
     public static final long WAIT_BILLING_PROVIDER = 1000L;
     public static final long WAIT_PURCHASE = 2 * WAIT_BILLING_PROVIDER;
     public static final long WAIT_INIT = 2 * WAIT_BILLING_PROVIDER;

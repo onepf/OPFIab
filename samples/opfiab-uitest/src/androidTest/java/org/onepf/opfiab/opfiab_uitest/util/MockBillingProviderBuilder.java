@@ -20,7 +20,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
@@ -54,19 +54,20 @@ public class MockBillingProviderBuilder {
 
     private long sleepTime = DEFAULT_SLEEP_TIME;
     private boolean willPostSuccess = true;
+    private Compatibility compatibility = Compatibility.COMPATIBLE;
 
     public MockBillingProviderBuilder setWillPostSuccess(boolean willPostSuccess) {
         this.willPostSuccess = willPostSuccess;
         return this;
     }
 
-    public MockBillingProviderBuilder setIsAuthorised(boolean isAuthorised) {
-        when(mock.isAuthorised()).thenReturn(isAuthorised);
+    public MockBillingProviderBuilder setCompatibility(Compatibility compatibility) {
+        this.compatibility = compatibility;
         return this;
     }
 
-    public MockBillingProviderBuilder setInfo(BillingProviderInfo info) {
-        when(mock.getInfo()).thenReturn(info);
+    public MockBillingProviderBuilder setName(String name) {
+        when(mock.getName()).thenReturn(name);
         return this;
     }
 
@@ -81,6 +82,7 @@ public class MockBillingProviderBuilder {
     }
 
     public BillingProvider build() {
+        when(mock.checkCompatibility()).thenReturn(compatibility);
         doAnswer(new BillingAnswer(willPostSuccess, sleepTime)).when(mock).onEventAsync(
                 any(BillingRequest.class));
         return mock;
@@ -118,10 +120,10 @@ public class MockBillingProviderBuilder {
             OPFIab.post(new RequestHandledEvent(request));
             if (willPostSuccess) {
                 OPFIab.post(
-                        new ConsumeResponse(Status.SUCCESS, mock.getInfo(), request.getPurchase()));
+                        new ConsumeResponse(Status.SUCCESS, mock.getName(), request.getPurchase()));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getInfo(), request, BILLING_UNAVAILABLE));
+                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }
@@ -129,12 +131,12 @@ public class MockBillingProviderBuilder {
         public Void answerPurchase(PurchaseRequest request) {
             OPFIab.post(new RequestHandledEvent(request));
             if (willPostSuccess) {
-                OPFIab.post(new PurchaseResponse(SUCCESS, mock.getInfo(),
+                OPFIab.post(new PurchaseResponse(SUCCESS, mock.getName(),
                                                  new Purchase(request.getSku()),
                                                  VerificationResult.SUCCESS));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getInfo(), request, BILLING_UNAVAILABLE));
+                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }
@@ -142,10 +144,10 @@ public class MockBillingProviderBuilder {
         public Void answerSkuDetails(SkuDetailsRequest request) {
             OPFIab.post(new RequestHandledEvent(request));
             if (willPostSuccess) {
-                OPFIab.post(new SkuDetailsResponse(SUCCESS, mock.getInfo(), null));
+                OPFIab.post(new SkuDetailsResponse(SUCCESS, mock.getName(), null));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getInfo(), request, BILLING_UNAVAILABLE));
+                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }
@@ -153,10 +155,10 @@ public class MockBillingProviderBuilder {
         public Void answerInventory(InventoryRequest request) {
             OPFIab.post(new RequestHandledEvent(request));
             if (willPostSuccess) {
-                OPFIab.post(new InventoryResponse(SUCCESS, mock.getInfo(), null, false));
+                OPFIab.post(new InventoryResponse(SUCCESS, mock.getName(), null, false));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getInfo(), request, BILLING_UNAVAILABLE));
+                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }

@@ -22,7 +22,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.api.FragmentIabHelper;
+import org.onepf.opfiab.api.IabHelper;
+import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.opfiab_uitest.R;
+
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 /**
  * @author antonpp
@@ -31,6 +38,10 @@ import org.onepf.opfiab.opfiab_uitest.R;
 public class SupportTestFragment extends Fragment {
 
     private static final String COLOR = "COLOR";
+
+    private volatile FragmentIabHelper iabHelper;
+
+    private Reference<IabHelper> helperReference;
 
     public SupportTestFragment() {
     }
@@ -43,6 +54,22 @@ public class SupportTestFragment extends Fragment {
         return fragment;
     }
 
+    public FragmentIabHelper getIabHelper(final OnPurchaseListener listener) {
+        final IabHelper lastHelper;
+        if (helperReference == null || (lastHelper = helperReference.get()) == null
+                || iabHelper != lastHelper) {
+            iabHelper.addPurchaseListener(listener);
+            helperReference = new WeakReference<IabHelper>(iabHelper);
+        }
+        return iabHelper;
+    }
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.iabHelper = OPFIab.getFragmentHelper(this);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -53,5 +80,12 @@ public class SupportTestFragment extends Fragment {
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         view.setBackgroundColor(getResources().getColor(getArguments().getInt(COLOR)));
+    }
+
+    @SuppressWarnings("AssignmentToNull")
+    @Override
+    public void onDestroy() {
+        this.iabHelper = null;
+        super.onDestroy();
     }
 }

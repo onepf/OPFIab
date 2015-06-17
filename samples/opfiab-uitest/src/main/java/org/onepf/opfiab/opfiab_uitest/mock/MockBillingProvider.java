@@ -16,7 +16,10 @@
 
 package org.onepf.opfiab.opfiab_uitest.mock;
 
+import android.support.annotation.NonNull;
+
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.billing.Compatibility;
 
 import java.util.Random;
 
@@ -35,5 +38,11 @@ public abstract class MockBillingProvider implements BillingProvider {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @NonNull
+    @Override
+    public Compatibility checkCompatibility() {
+        return Compatibility.COMPATIBLE;
     }
 }

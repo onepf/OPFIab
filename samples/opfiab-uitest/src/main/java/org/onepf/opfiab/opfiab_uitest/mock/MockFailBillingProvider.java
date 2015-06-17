@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.model.BillingProviderInfo;
+import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.util.OPFIabUtils;
@@ -36,13 +36,16 @@ public class MockFailBillingProvider extends MockBillingProvider {
 
     protected static final String NAME = MockFailBillingProvider.class.getSimpleName();
 
-    public static final BillingProviderInfo INFO =
-            new BillingProviderInfo(NAME, null);
+    @NonNull
+    @Override
+    public Compatibility checkCompatibility() {
+        return Compatibility.COMPATIBLE;
+    }
 
     @NonNull
     @Override
-    public BillingProviderInfo getInfo() {
-        return INFO;
+    public String getName() {
+        return NAME;
     }
 
     @Override
@@ -50,13 +53,9 @@ public class MockFailBillingProvider extends MockBillingProvider {
         // nothing
     }
 
-    @Override
-    public boolean isAvailable() {
-        return false;
-    }
 
     @Override
-    public boolean isAuthorised() {
+    public boolean isAvailable() {
         return false;
     }
 
@@ -64,7 +63,7 @@ public class MockFailBillingProvider extends MockBillingProvider {
     public void onEventAsync(@NonNull BillingRequest billingRequest) {
         sleep();
         OPFIab.post(new RequestHandledEvent(billingRequest));
-        OPFIab.post(OPFIabUtils.emptyResponse(getInfo(), billingRequest, BILLING_UNAVAILABLE));
+        OPFIab.post(OPFIabUtils.emptyResponse(getName(), billingRequest, BILLING_UNAVAILABLE));
     }
 
     @Nullable

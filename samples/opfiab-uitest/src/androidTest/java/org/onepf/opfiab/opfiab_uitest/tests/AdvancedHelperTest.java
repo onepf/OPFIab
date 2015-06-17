@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,7 +35,6 @@ import org.onepf.opfiab.listener.OnInventoryListener;
 import org.onepf.opfiab.listener.OnPurchaseListener;
 import org.onepf.opfiab.listener.OnSetupListener;
 import org.onepf.opfiab.listener.OnSkuDetailsListener;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
@@ -55,6 +55,9 @@ import java.util.List;
 import java.util.Random;
 
 import static junit.framework.Assert.assertTrue;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_ENTITY;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_SUBSCRIPTION;
 
 /**
  * @author antonpp
@@ -66,21 +69,20 @@ public class AdvancedHelperTest {
 
     private static final int NUM_TESTS = 10;
 
-    private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
-    private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
-    private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
+
 
     private static final String TEST_PROVIDER_NAME = "TEST_PROVIDER_NAME";
     private static final String TEST_PROVIDER_PACKAGE = "org.onepf.opfiab.uitest";
 
     @Rule
-    public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
+    public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
+            EmptyActivity.class);
 
     private EmptyActivity activity;
     private Instrumentation instrumentation;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         activity = testRule.getActivity();
         setupDexmaker();
         instrumentation = InstrumentationRegistry.getInstrumentation();
@@ -97,6 +99,11 @@ public class AdvancedHelperTest {
         // Explicitly set the Dexmaker cache, so tests that use mockito work
         final String dexCache = activity.getCacheDir().getPath();
         System.setProperty("dexmaker.dexcache", dexCache);
+    }
+
+    @After
+    public void tearDown() throws InterruptedException {
+        Thread.sleep(MAX_WAIT_TIME / 2);
     }
 
     @Test
@@ -125,9 +132,8 @@ public class AdvancedHelperTest {
 
     private BillingProvider prepareMockProvider(String TEST_PROVIDER_NAME) {
         return new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setIsAvailable(true)
-                .setInfo(new BillingProviderInfo(TEST_PROVIDER_NAME, null))
+                .setName(TEST_PROVIDER_NAME)
                 .build();
     }
 
@@ -139,7 +145,7 @@ public class AdvancedHelperTest {
                 .expectEvent(new SetupStartedEventValidator())
                 .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
                 .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
-                .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_ENTITY))
                 .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
@@ -166,7 +172,7 @@ public class AdvancedHelperTest {
 
                 for (int i = 0; i < NUM_TESTS; ++i) {
                     iabHelper.purchase(SKU_CONSUMABLE);
-                    iabHelper.purchase(SKU_NONCONSUMABLE);
+                    iabHelper.purchase(SKU_ENTITY);
                     iabHelper.purchase(SKU_SUBSCRIPTION);
                 }
             }
@@ -178,9 +184,8 @@ public class AdvancedHelperTest {
     @Test
     public void testFailPurchase() throws Exception {
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(false)
-                .setInfo(new BillingProviderInfo(TEST_PROVIDER_NAME, TEST_PROVIDER_PACKAGE))
+                .setName(TEST_PROVIDER_NAME)
                 .setIsAvailable(true)
                 .build();
 
@@ -211,9 +216,8 @@ public class AdvancedHelperTest {
     @Test
     public void testSuccessfulPurchase() throws Exception {
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(TEST_PROVIDER_NAME, null))
+                .setName(TEST_PROVIDER_NAME)
                 .setIsAvailable(true)
                 .build();
 
@@ -243,15 +247,14 @@ public class AdvancedHelperTest {
 
     @Test
     public void testMultipleHelpersMultipleRequests() throws Exception {
-        final int n = 5;
+
         final BillingProvider billingProvider = prepareMockProvider(TEST_PROVIDER_NAME);
-        final List<AdvancedIabHelper> helpers = new ArrayList<>(n);
 
         final TestManager testManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
                 .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
                 .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
-                .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_ENTITY))
                 .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
@@ -267,28 +270,7 @@ public class AdvancedHelperTest {
 
         testAdapter.addTestManager(testManager);
 
-        final Random rnd = new Random();
-        final String[] skus = new String[]{SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION};
-
-        instrumentation.runOnMainSync(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < NUM_TESTS; ++i) {
-                    OPFIab.init(activity.getApplication(), configuration);
-
-                    for (int j = 0; j < n; ++j) {
-                        helpers.add(OPFIab.getAdvancedHelper());
-                    }
-
-                    OPFIab.setup();
-
-                    for (int j = 0; j < NUM_TESTS; ++j) {
-                        helpers.get(rnd.nextInt(n)).purchase(skus[j % skus.length]);
-                    }
-
-                }
-            }
-        });
+        instrumentation.runOnMainSync(new TestRunnable(configuration));
 
         assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
     }
@@ -296,9 +278,8 @@ public class AdvancedHelperTest {
     @Test
     public void testRegister() throws Exception {
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(TEST_PROVIDER_NAME, TEST_PROVIDER_PACKAGE))
+                .setName(TEST_PROVIDER_NAME)
                 .setIsAvailable(true)
                 .build();
 
@@ -308,7 +289,7 @@ public class AdvancedHelperTest {
                 .setTag("Setup")
                 .build();
         final OnSetupListener setupListenerAdapter = new BillingManagerAdapter(testSetupManager,
-                                                                               false);
+                false);
 
         final TestManager testPurchaseManager = new TestManager.Builder()
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
@@ -366,20 +347,13 @@ public class AdvancedHelperTest {
                 helper.addInventoryListener(inventoryListenerAdapter);
                 helper.addSkuDetailsListener(skuDetailsListenerAdapter);
                 helper.addConsumeListener(consumeListenerAdapter);
-                helper.addPurchaseListener(new OnPurchaseListener() {
-                    @Override
-                    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-                        if (purchaseResponse.getPurchase() != null) {
-                            helper.consume(purchaseResponse.getPurchase());
-                        }
-                    }
-                });
+                helper.addPurchaseListener(new TestPurchaseListener(helper));
                 helper.register();
 
                 OPFIab.setup();
                 helper.purchase(SKU_CONSUMABLE);
                 helper.purchase(SKU_SUBSCRIPTION);
-                helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
+                helper.skuDetails(SKU_CONSUMABLE, SKU_ENTITY, SKU_SUBSCRIPTION);
                 helper.inventory(true);
             }
         });
@@ -396,9 +370,8 @@ public class AdvancedHelperTest {
     @Test
     public void testUnregister() throws Exception {
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(TEST_PROVIDER_NAME, TEST_PROVIDER_PACKAGE))
+                .setName(TEST_PROVIDER_NAME)
                 .setIsAvailable(true)
                 .build();
 
@@ -450,19 +423,12 @@ public class AdvancedHelperTest {
                 helper.addSkuDetailsListener(subscribeSensitiveAdapter);
                 helper.addConsumeListener(subscribeSensitiveAdapter);
 
-                helper.addPurchaseListener(new OnPurchaseListener() {
-                    @Override
-                    public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
-                        if (purchaseResponse.getPurchase() != null) {
-                            helper.consume(purchaseResponse.getPurchase());
-                        }
-                    }
-                });
+                helper.addPurchaseListener(new TestPurchaseListener(helper));
                 helper.register();
 
                 OPFIab.setup();
                 helper.purchase(SKU_CONSUMABLE);
-                helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
+                helper.skuDetails(SKU_CONSUMABLE, SKU_ENTITY, SKU_SUBSCRIPTION);
                 helper.inventory(true);
             }
         });
@@ -485,12 +451,60 @@ public class AdvancedHelperTest {
 
                 OPFIab.setup();
                 helper.purchase(SKU_CONSUMABLE);
-                helper.skuDetails(SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION);
+                helper.skuDetails(SKU_CONSUMABLE, SKU_ENTITY, SKU_SUBSCRIPTION);
                 helper.inventory(true);
             }
         });
 
         Assert.assertTrue(testAfterUnRegistrationManager.await(MAX_WAIT_TIME * 4));
         Assert.assertTrue(subscribeSensitiveManager.await(MAX_WAIT_TIME));
+    }
+
+    private final class TestRunnable implements Runnable {
+
+        public static final int NUMBER_HELPERS = 5;
+
+        private final Configuration configuration;
+        private final String[] skus = new String[]{SKU_CONSUMABLE, SKU_ENTITY, SKU_SUBSCRIPTION};
+        private final Random rnd = new Random();
+        private final List<AdvancedIabHelper> helpers = new ArrayList<>(NUMBER_HELPERS);
+
+        private TestRunnable(final Configuration configuration) {
+            this.configuration = configuration;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < NUM_TESTS; ++i) {
+                OPFIab.init(activity.getApplication(), configuration);
+
+                for (int j = 0; j < NUMBER_HELPERS; ++j) {
+                    helpers.add(OPFIab.getAdvancedHelper());
+                }
+
+                OPFIab.setup();
+
+                for (int j = 0; j < NUM_TESTS; ++j) {
+                    helpers.get(rnd.nextInt(NUMBER_HELPERS)).purchase(skus[j % skus.length]);
+                }
+
+            }
+        }
+    }
+
+    private final class TestPurchaseListener implements OnPurchaseListener {
+
+        private final AdvancedIabHelper helper;
+
+        private TestPurchaseListener(final AdvancedIabHelper helper) {
+            this.helper = helper;
+        }
+
+        @Override
+        public void onPurchase(@NonNull final PurchaseResponse purchaseResponse) {
+            if (purchaseResponse.getPurchase() != null) {
+                helper.consume(purchaseResponse.getPurchase());
+            }
+        }
     }
 }

@@ -26,7 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
@@ -43,6 +42,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.Assert.assertTrue;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_ENTITY;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_SUBSCRIPTION;
 
 /**
  * @author antonpp
@@ -55,12 +57,9 @@ public class SimpleHelperTest {
 
     private static final int NUM_TESTS = 10;
 
-    private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
-    private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
-    private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
-
     @Rule
-    public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
+    public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
+            EmptyActivity.class);
 
     private EmptyActivity activity;
     private Instrumentation instrumentation;
@@ -68,7 +67,7 @@ public class SimpleHelperTest {
     private CountDownLatch purchaseLatch;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         activity = testRule.getActivity();
         setupDexmaker();
         instrumentation = InstrumentationRegistry.getInstrumentation();
@@ -91,9 +90,8 @@ public class SimpleHelperTest {
     public void testSuccessfulPurchase() throws Exception {
         final String name = "Absolutely random name";
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(name, null))
+                .setName(name)
                 .setIsAvailable(true)
                 .build();
 
@@ -123,9 +121,8 @@ public class SimpleHelperTest {
     public void testFailPurchase() throws Exception {
         final String name = "Absolutely random name";
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(false)
-                .setInfo(new BillingProviderInfo(name, null))
+                .setName(name)
                 .setIsAvailable(true)
                 .build();
 
@@ -157,16 +154,14 @@ public class SimpleHelperTest {
         final String billingProviderName1 = "BP 1";
         final String billingProviderName2 = "BP 2";
         final BillingProvider billingProvider1 = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(false)
-                .setInfo(new BillingProviderInfo(billingProviderName1, null))
+                .setName(billingProviderName1)
                 .setIsAvailable(true)
                 .build();
 
         final BillingProvider billingProvider2 = new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setWillPostSuccess(true)
-                .setInfo(new BillingProviderInfo(billingProviderName2, null))
+                .setName(billingProviderName2)
                 .setIsAvailable(true)
                 .build();
 
@@ -176,10 +171,10 @@ public class SimpleHelperTest {
                 .expectEvent(new SetupStartedEventValidator())
                 .expectEvent(new SetupResponseValidator(billingProviderName2))
                 .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
-                .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_ENTITY))
                 .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
                 .expectEvent(new PurchaseRequestValidator(SKU_CONSUMABLE))
-                .expectEvent(new PurchaseRequestValidator(SKU_NONCONSUMABLE))
+                .expectEvent(new PurchaseRequestValidator(SKU_ENTITY))
                 .expectEvent(new PurchaseRequestValidator(SKU_SUBSCRIPTION))
                 .expectEvent(new PurchaseResponseValidator(billingProviderName1, false))
                 .expectEvent(new PurchaseResponseValidator(billingProviderName1, false))
@@ -202,7 +197,7 @@ public class SimpleHelperTest {
                 .setSubsequentRequestDelay(0)
                 .build();
 
-        final String[] skus = new String[]{SKU_CONSUMABLE, SKU_NONCONSUMABLE, SKU_SUBSCRIPTION};
+        final String[] skus = new String[]{SKU_CONSUMABLE, SKU_ENTITY, SKU_SUBSCRIPTION};
 
 
         for (int i = 0; i < NUM_TESTS; ++i) {

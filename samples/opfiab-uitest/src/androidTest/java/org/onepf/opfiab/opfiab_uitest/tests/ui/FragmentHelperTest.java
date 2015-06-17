@@ -21,10 +21,12 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.uiautomator.UiDevice;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
+import org.onepf.opfiab.opfiab_uitest.util.Constants;
 
 /**
  * @author antonpp
@@ -33,7 +35,8 @@ import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
 public class FragmentHelperTest {
 
     @Rule
-    public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
+    public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
+            EmptyActivity.class);
 
     private Instrumentation instrumentation;
     private UiDevice uiDevice;
@@ -52,10 +55,14 @@ public class FragmentHelperTest {
                                                                    uiDevice);
     }
 
-
     @Test
     public void testRegisterUnregisterFragmentReplace() throws InterruptedException {
-        UnifiedFragmentHelperTest.testRegisterUnregisterFragmentReplace(instrumentation, activity,
+        UnifiedFragmentHelperTest.testRegisterUnregisterFragmentReplace(instrumentation, false,
                                                                         uiDevice);
+    }
+
+    @After
+    public void tearDown() throws InterruptedException {
+        Thread.sleep(Constants.WAIT_TEST_MANAGER);
     }
 }

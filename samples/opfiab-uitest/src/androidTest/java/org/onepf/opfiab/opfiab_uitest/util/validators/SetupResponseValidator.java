@@ -43,7 +43,7 @@ public class SetupResponseValidator extends TypedEventValidator<SetupResponse> {
         if (setupResponse.getBillingProvider() == null) {
             msg = "Billing provider is set to null";
             result =  false;
-        } else if (setupResponse.getBillingProvider().getInfo().getName().equals(name)) {
+        } else if (setupResponse.getBillingProvider().getName().equals(name)) {
             msg = "";
             result = true;
         } else {

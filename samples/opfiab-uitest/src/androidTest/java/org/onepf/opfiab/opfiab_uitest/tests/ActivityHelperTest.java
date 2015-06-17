@@ -29,7 +29,6 @@ import org.junit.runner.RunWith;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
-import org.onepf.opfiab.model.BillingProviderInfo;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.opfiab_uitest.EmptyActivity;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
@@ -52,19 +51,20 @@ public class ActivityHelperTest {
 
     private static final long MAX_WAIT_TIME = 1000L;
     private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
-    private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
+    private static final String SKU_ENTITY = "org.onepf.opfiab.entity";
     private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
     private static final int NUM_TESTS = 10;
 
     @Rule
-    public ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(EmptyActivity.class);
+    public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
+            EmptyActivity.class);
 
     private EmptyActivity activity;
     private Instrumentation instrumentation;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         activity = testRule.getActivity();
         setupDexmaker();
         instrumentation = InstrumentationRegistry.getInstrumentation();
@@ -123,9 +123,8 @@ public class ActivityHelperTest {
 
     private BillingProvider prepareMockProvider(String name) {
         return new MockBillingProviderBuilder()
-                .setIsAuthorised(true)
                 .setIsAvailable(true)
-                .setInfo(new BillingProviderInfo(name, null))
+                .setName(name)
                 .build();
     }
 

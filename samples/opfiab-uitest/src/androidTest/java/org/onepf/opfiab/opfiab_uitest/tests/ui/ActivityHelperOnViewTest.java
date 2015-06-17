@@ -233,9 +233,9 @@ public class ActivityHelperOnViewTest
 
     private Configuration getRandomConfiguration(boolean isOk) {
         return new Configuration.Builder()
-                .addBillingProvider(isOk ? new MockOkBillingProvider() : new MockFailBillingProvider())
+                .addBillingProvider(
+                        isOk ? new MockOkBillingProvider() : new MockFailBillingProvider())
                 .setAutoRecover(RND.nextBoolean())
-                .setSkipUnauthorised(RND.nextBoolean())
                 .setSubsequentRequestDelay(RND.nextLong() % MAX_SUBSEQUENT_DELAY)
                 .build();
     }

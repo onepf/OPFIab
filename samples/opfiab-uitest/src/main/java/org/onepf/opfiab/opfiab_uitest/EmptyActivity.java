@@ -27,12 +27,20 @@ import org.onepf.opfiab.model.event.android.ActivityResultEvent;
  * @author antonpp
  * @since 26.05.15
  */
+@SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
 public class EmptyActivity extends Activity {
+
+    private static EmptyActivity lastInstance;
+
+    public static EmptyActivity getLastInstance() {
+        return lastInstance;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_empty);
+        lastInstance = this;
     }
 
     @Override

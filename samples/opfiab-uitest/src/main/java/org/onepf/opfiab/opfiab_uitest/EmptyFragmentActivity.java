@@ -27,7 +27,14 @@ import org.onepf.opfiab.model.event.android.ActivityResultEvent;
  * @author antonpp
  * @since 26.05.15
  */
+@SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
 public class EmptyFragmentActivity extends FragmentActivity {
+
+    private static EmptyFragmentActivity lastInstance;
+
+    public static EmptyFragmentActivity getLastInstance() {
+        return lastInstance;
+    }
 
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode,
@@ -40,5 +47,6 @@ public class EmptyFragmentActivity extends FragmentActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_empty);
+        lastInstance = this;
     }
 }
