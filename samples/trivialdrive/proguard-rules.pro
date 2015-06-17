@@ -15,3 +15,14 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keepclassmembers class ** {
+    public void onEvent*(**);
+}
+-keepattributes InnerClasses
+-keep class com.android.vending.billing.** {*;}
+-keep class com.sec.android.iap.** {*;}
+-optimizationpasses 1
+-dontwarn com.amazon.**
+-keep class com.amazon.** {*;}
+-keepattributes *Annotation*
