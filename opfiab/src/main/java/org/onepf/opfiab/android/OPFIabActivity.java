@@ -27,7 +27,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.view.WindowManager;
 
-import org.onepf.opfiab.BuildConfig;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.android.ActivityLifecycleEvent;
