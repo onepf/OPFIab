@@ -58,7 +58,7 @@ public class ActivityHelperOnViewTest
         extends ActivityInstrumentationTestCase2<ActivityHelperActivity> {
 
     private static final String TAG = ActivityHelperOnViewTest.class.getSimpleName();
-    private static final long MAX_WAIT_TIME = MockBillingProvider.SLEEP_TIME * 4l;
+    private static final long MAX_WAIT_TIME = MockBillingProvider.SLEEP_TIME * 4L;
     private static final int TESTS_COUNT = 20;
     private static final Random RND = new Random();
     private static final long MAX_SUBSEQUENT_DELAY = 300L;

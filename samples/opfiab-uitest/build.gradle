@@ -14,48 +14,42 @@
  * limitations under the License.
  */
 
+apply plugin: 'idea'
 apply plugin: 'com.android.application'
+apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle'
 
 android {
-    compileSdkVersion project.compileSdkVersion
-    buildToolsVersion project.buildToolsVersion
-
     defaultConfig {
         applicationId "org.onepf.opfiab.opfiab_uitest"
         minSdkVersion 18
         targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "0.3.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 
-    packagingOptions {
-        exclude 'LICENSE.txt'
+    lintOptions {
+        abortOnError false
     }
 }
 
+check {
+    abortOnError false
+}
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.0'
-
-    compile project(':opfiab')
-
-    // OPFIab core
+    // OPFIab
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'org.onepf:opfutils:0.1.21'
-
-    // App's dependencies, including test
-    compile 'com.android.support:support-annotations:22.2.0'
-    androidTestCompile 'com.android.support:support-annotations:22.2.0'
+    //noinspection GradleDynamicVersion
+    compile 'org.onepf:opfutils:0.1.+'
+    compile('org.onepf:opfiab:0.3.+@aar') {
+        changing = true
+    }
 
     // Testing-only dependencies
+    androidTestCompile 'com.android.support:appcompat-v7:22.2.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
     androidTestCompile 'com.android.support.test:runner:0.2'
     androidTestCompile 'com.android.support.test:rules:0.2'
