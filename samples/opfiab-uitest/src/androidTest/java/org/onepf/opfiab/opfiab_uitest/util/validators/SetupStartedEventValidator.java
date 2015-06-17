@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-include ':opfiab',
-        ':opfiab-amazon',
-        ':opfiab-google',
-        ':opfiab-samsung',
-        ':opfiab-uitest',
-        ':trivialdrive'
+package org.onepf.opfiab.opfiab_uitest.util.validators;
 
-project(':opfiab-amazon').projectDir = new File('opfiab-providers/amazon')
-project(':opfiab-google').projectDir = new File('opfiab-providers/google')
-project(':opfiab-samsung').projectDir = new File('opfiab-providers/samsung')
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 
-project(':trivialdrive').projectDir = new File('samples/trivialdrive')
-project(':opfiab-uitest').projectDir = new File('samples/opfiab-uitest')
+/**
+ * @author antonpp
+ * @since 25.05.15
+ */
+public class SetupStartedEventValidator extends TypedEventValidator<SetupStartedEvent> {
+
+    public SetupStartedEventValidator() {
+        super(SetupStartedEvent.class);
+    }
+
+    @Override
+    public boolean validate(Object event, final boolean isLogging, final String logTag) {
+        return super.validate(event, isLogging, logTag);
+    }
+}

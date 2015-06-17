@@ -60,8 +60,8 @@ public class SetupResponse implements JsonCompatible {
         /**
          * Setup resulted in a different {@link BillingProvider} being picked then one that was used
          * for this application previously.
-         * <p>
-         * Some items might be missing form user's inventory.
+         * <br>
+         * Some items might be missing in user's inventory.
          */
         PROVIDER_CHANGED,
         /**
