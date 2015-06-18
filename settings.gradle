@@ -25,5 +25,6 @@ project(':opfiab-amazon').projectDir = new File('opfiab-providers/amazon')
 project(':opfiab-google').projectDir = new File('opfiab-providers/google')
 project(':opfiab-samsung').projectDir = new File('opfiab-providers/samsung')
 
+project(':opfiab-uitest').projectDir = new File('test/opfiab-uitest')
+
 project(':trivialdrive').projectDir = new File('samples/trivialdrive')
-project(':opfiab-uitest').projectDir = new File('samples/opfiab-uitest')
