@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.opfiab_uitest.tests.ui;
+package org.onepf.opfiab.opfiab_uitest.util.fragments;
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,18 +35,20 @@ import java.lang.ref.WeakReference;
  * @author antonpp
  * @since 04.06.15
  */
-public class TestFragment extends Fragment {
+public class SupportTestFragment extends Fragment {
 
     private static final String COLOR = "COLOR";
+
     private volatile FragmentIabHelper iabHelper;
+
     private Reference<IabHelper> helperReference;
 
-    public TestFragment() {
+    public SupportTestFragment() {
         super();
     }
 
-    public static TestFragment getInstance(int color) {
-        final TestFragment fragment = new TestFragment();
+    public static SupportTestFragment getInstance(int color) {
+        final SupportTestFragment fragment = new SupportTestFragment();
         final Bundle args = new Bundle();
         args.putInt(COLOR, color);
         fragment.setArguments(args);

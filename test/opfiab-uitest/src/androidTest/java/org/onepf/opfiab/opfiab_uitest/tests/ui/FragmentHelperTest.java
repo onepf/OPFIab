@@ -34,9 +34,11 @@ import org.onepf.opfiab.opfiab_uitest.util.Constants;
  */
 public class FragmentHelperTest {
 
+    //CHECKSTYLE:OFF
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
             EmptyActivity.class);
+    //CHECKSTYLE:ON
 
     private Instrumentation instrumentation;
     private UiDevice uiDevice;

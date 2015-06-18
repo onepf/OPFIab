@@ -54,9 +54,11 @@ public class ActivityHelperTest {
 
     private static final int NUM_TESTS = 10;
 
+    //CHECKSTYLE:OFF
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
             EmptyActivity.class);
+    //CHECKSTYLE:ON
 
     private EmptyActivity activity;
     private Instrumentation instrumentation;

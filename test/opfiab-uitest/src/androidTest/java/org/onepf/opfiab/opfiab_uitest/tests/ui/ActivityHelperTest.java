@@ -59,15 +59,19 @@ import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_TEST_MANAGER;
 
 public class ActivityHelperTest {
 
+    //CHECKSTYLE:OFF
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
             EmptyActivity.class);
+    //CHECKSTYLE:ON
+
     private Instrumentation instrumentation;
     private UiDevice uiDevice;
     private EmptyActivity activity;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
+        Thread.sleep(WAIT_TEST_MANAGER);
         instrumentation = InstrumentationRegistry.getInstrumentation();
         activity = testRule.getActivity();
         uiDevice = UiDevice.getInstance(instrumentation);

@@ -54,11 +54,11 @@ import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_TEST_MANAGER;
 public class SimpleHelperTest {
 
     private static final int NUM_TESTS = 10;
-
+    //CHECKSTYLE:ON
+    //CHECKSTYLE:OFF
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
             EmptyActivity.class);
-
     private EmptyActivity activity;
     private Instrumentation instrumentation;
     private CountDownLatch setupLatch;

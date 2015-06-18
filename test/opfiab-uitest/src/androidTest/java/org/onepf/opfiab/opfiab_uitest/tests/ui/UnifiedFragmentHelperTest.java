@@ -39,6 +39,8 @@ import org.onepf.opfiab.opfiab_uitest.R;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
+import org.onepf.opfiab.opfiab_uitest.util.fragments.SupportTestFragment;
+import org.onepf.opfiab.opfiab_uitest.util.fragments.TestFragment;
 import org.onepf.opfiab.opfiab_uitest.util.validators.AlwaysFailValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseRequestValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseResponseValidator;
@@ -116,7 +118,7 @@ public final class UnifiedFragmentHelperTest {
         });
         Thread.sleep(WAIT_INIT);
         final boolean isSupport = activity instanceof FragmentActivity;
-        Object fragment = createFragment(isSupport, activity, instrumentation);
+        Object fragment = createFragment(isSupport, activity, instrumentation, R.color.blue);
 
         FragmentIabHelper helper = getHelper(isSupport, fragment, purchaseListenerAdapter,
                 instrumentation);
@@ -144,11 +146,11 @@ public final class UnifiedFragmentHelperTest {
     }
 
     private static Object createFragment(boolean isSupport, Activity activity,
-                                         Instrumentation instrumentation)
+                                         Instrumentation instrumentation, int color)
             throws InterruptedException {
         final Object fragment;
         if (isSupport) {
-            fragment = SupportTestFragment.getInstance(R.color.blue);
+            fragment = SupportTestFragment.getInstance(color);
             final android.support.v4.app.FragmentManager supportFragmentManager = ((FragmentActivity) activity).getSupportFragmentManager();
             supportFragmentManager
                     .beginTransaction()
@@ -161,7 +163,7 @@ public final class UnifiedFragmentHelperTest {
                 }
             });
         } else {
-            fragment = TestFragment.getInstance(R.color.blue);
+            fragment = TestFragment.getInstance(color);
             final FragmentManager fragmentManager = activity.getFragmentManager();
             fragmentManager
                     .beginTransaction()
@@ -248,23 +250,11 @@ public final class UnifiedFragmentHelperTest {
                                                          UiDevice uiDevice)
             throws InterruptedException {
         final String providerName = String.format(TEST_PROVIDER_NAME_FMT, "FRAGMENT_REPLACE");
-        final Object fragment;
         final Activity activity;
         if (isSupport) {
-            fragment = SupportTestFragment.getInstance(R.color.green);
             activity = EmptyFragmentActivity.getLastInstance();
-            ((FragmentActivity) activity).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content, (android.support.v4.app.Fragment) fragment)
-                    .commit();
-
         } else {
-            fragment = TestFragment.getInstance(R.color.green);
             activity = EmptyActivity.getLastInstance();
-            activity.getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content, (Fragment) fragment)
-                    .commit();
         }
 
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
@@ -308,17 +298,12 @@ public final class UnifiedFragmentHelperTest {
             @Override
             public void run() {
                 OPFIab.init(activity.getApplication(), configuration);
-                if (isSupport) {
-                    helpers[0] = OPFIab.getFragmentHelper(
-                            (android.support.v4.app.Fragment) fragment);
-                } else {
-                    helpers[0] = OPFIab.getFragmentHelper((Fragment) fragment);
-                }
-                helpers[0].addPurchaseListener(purchaseListenerAdapter);
             }
         });
         Thread.sleep(WAIT_INIT);
-        final FragmentIabHelper helper = helpers[0];
+        final Object fragment = createFragment(isSupport, activity, instrumentation, R.color.green);
+        final FragmentIabHelper helper = getHelper(isSupport, fragment, purchaseListenerAdapter,
+                instrumentation);
 
         purchase(instrumentation, helper, SKU_CONSUMABLE);
         Thread.sleep(WAIT_PURCHASE);
