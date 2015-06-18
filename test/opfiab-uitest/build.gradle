@@ -28,6 +28,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     lintOptions {
         abortOnError false
     }
@@ -41,19 +42,11 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.0'
     // OPFIab
     compile 'de.greenrobot:eventbus:2.4.0'
-<<<<<<< HEAD:samples/opfiab-uitest/build.gradle
-    compile 'org.onepf:opfutils:0.1.22'
-
-    // App's dependencies, including test
-    compile 'com.android.support:support-annotations:22.2.0'
-    androidTestCompile 'com.android.support:support-annotations:22.2.0'
-=======
     //noinspection GradleDynamicVersion
     compile 'org.onepf:opfutils:0.1.+'
     compile('org.onepf:opfiab:0.3.+@aar') {
         changing = true
     }
->>>>>>> befb5483e7f43eefcd969f780cddf49dd1a36d88:test/opfiab-uitest/build.gradle
 
     // Testing-only dependencies
     androidTestCompile 'com.android.support:appcompat-v7:22.2.0'
