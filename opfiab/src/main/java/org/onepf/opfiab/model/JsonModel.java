@@ -32,6 +32,20 @@ import java.lang.reflect.InvocationTargetException;
  */
 public abstract class JsonModel implements JsonCompatible {
 
+    @Nullable
+    public static <E extends JsonModel> E fromOriginalJson(@NonNull final Class<E> clazz,
+                                                           @NonNull final BillingModel model) {
+        try {
+            final Constructor<E> constructor = clazz.getConstructor(String.class);
+            return constructor.newInstance(model.getOriginalJson());
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException
+                | InstantiationException exception) {
+            OPFLog.e("", exception);
+        }
+        return null;
+    }
+
+
     @NonNull
     protected final JSONObject jsonObject;
     @NonNull
@@ -46,19 +60,6 @@ public abstract class JsonModel implements JsonCompatible {
     public JsonModel(@NonNull final JSONObject jsonObject) {
         this.jsonObject = jsonObject;
         this.originalJson = jsonObject.toString();
-    }
-
-    @Nullable
-    public static <E extends JsonModel> E fromOriginalJson(@NonNull final Class<E> clazz,
-                                                           @NonNull final BillingModel model) {
-        try {
-            final Constructor<E> constructor = clazz.getConstructor(String.class);
-            return constructor.newInstance(model.getOriginalJson());
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException
-                | InstantiationException exception) {
-            OPFLog.e("", exception);
-        }
-        return null;
     }
 
     @NonNull

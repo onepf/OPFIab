@@ -48,19 +48,7 @@ public class OPFIabActivity extends Activity {
      * auto-finish after this timeout.
      */
     protected static final long FINISH_DELAY = 1000L;
-    protected final Handler handler = new Handler(Looper.getMainLooper());
-    /**
-     * Used to finish activity if for some reason it wasn't used by library.
-     */
-    protected final Runnable finishTask = new Runnable() {
-        @Override
-        public void run() {
-            if (!isFinishing()) {
-                OPFLog.e("OPFIabActivity wasn't utilised! Finishing: %s", OPFIabActivity.this);
-                finish();
-            }
-        }
-    };
+
 
     /**
      * Start new instance of this activity.
@@ -82,15 +70,21 @@ public class OPFIabActivity extends Activity {
         context.startActivity(intent);
     }
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        OPFLog.d("onCreate: %s, task: %d", this, getTaskId());
-        // Don't handle any touch events
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        OPFIab.post(new ActivityLifecycleEvent(ComponentState.CREATE, this));
-        onNewIntent(getIntent());
-    }
+
+    protected final Handler handler = new Handler(Looper.getMainLooper());
+    /**
+     * Used to finish activity if for some reason it wasn't used by library.
+     */
+    protected final Runnable finishTask = new Runnable() {
+        @Override
+        public void run() {
+            if (!isFinishing()) {
+                OPFLog.e("OPFIabActivity wasn't utilised! Finishing: %s", OPFIabActivity.this);
+                finish();
+            }
+        }
+    };
+
 
     /**
      * Used to schedule {@link #finishTask} call after timeout.
@@ -104,6 +98,16 @@ public class OPFIabActivity extends Activity {
         if (schedule) {
             handler.postDelayed(finishTask, FINISH_DELAY);
         }
+    }
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OPFLog.d("onCreate: %s, task: %d", this, getTaskId());
+        // Don't handle any touch events
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        OPFIab.post(new ActivityLifecycleEvent(ComponentState.CREATE, this));
+        onNewIntent(getIntent());
     }
 
     @Override
@@ -121,8 +125,25 @@ public class OPFIabActivity extends Activity {
     }
 
     @Override
-    public void onBackPressed() {
-        // ignore
+    protected void onActivityResult(final int requestCode,
+                                    final int resultCode,
+                                    final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
+        if (!OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data))) {
+            // No one received this event, finishing
+            finish();
+        }
+        // Result event subscriber should finish activity when it's done with it.
+        // Schedule finish just in case
+        scheduleFinish(true);
+    }
+
+    @Override
+    public void finish() {
+        OPFLog.d("finish: %s, task: %d", this, getTaskId());
+        scheduleFinish(false);
+        super.finish();
     }
 
     @Override
@@ -148,7 +169,7 @@ public class OPFIabActivity extends Activity {
             throws IntentSender.SendIntentException {
         scheduleFinish(false);
         super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
-                extraFlags);
+                                         extraFlags);
     }
 
     @Override
@@ -163,24 +184,7 @@ public class OPFIabActivity extends Activity {
     }
 
     @Override
-    public void finish() {
-        OPFLog.d("finish: %s, task: %d", this, getTaskId());
-        scheduleFinish(false);
-        super.finish();
-    }
-
-    @Override
-    protected void onActivityResult(final int requestCode,
-                                    final int resultCode,
-                                    final Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
-        if (!OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data))) {
-            // No one received this event, finishing
-            finish();
-        }
-        // Result event subscriber should finish activity when it's done with it.
-        // Schedule finish just in case
-        scheduleFinish(true);
+    public void onBackPressed() {
+        // ignore
     }
 }
