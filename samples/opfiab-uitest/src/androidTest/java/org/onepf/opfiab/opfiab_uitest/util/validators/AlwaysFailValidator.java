@@ -31,7 +31,7 @@ public class AlwaysFailValidator implements EventValidator {
 
     @Override
     public boolean validate(final Object event, final boolean isLogging, final String logTag) {
-        final boolean result = event == STOP_OBJECT;
+        final boolean result = event.equals(STOP_OBJECT);
         if (isLogging && !result) {
             OPFLog.e(String.format("[%s]: Received %s when STOP_OBJECT was expected", logTag,
                                    event.getClass().getSimpleName()));
@@ -40,6 +40,8 @@ public class AlwaysFailValidator implements EventValidator {
     }
 
     private static final class StopObject {
-        private StopObject() {}
+        public StopObject() {
+            super();
+        }
     }
 }

@@ -40,7 +40,9 @@ public class TestFragment extends Fragment {
     private static final String COLOR = "COLOR";
     private volatile FragmentIabHelper iabHelper;
     private Reference<IabHelper> helperReference;
+
     public TestFragment() {
+        super();
     }
 
     public static TestFragment getInstance(int color) {
@@ -54,7 +56,7 @@ public class TestFragment extends Fragment {
     public FragmentIabHelper getIabHelper(final OnPurchaseListener listener) {
         final IabHelper lastHelper;
         if (helperReference == null || (lastHelper = helperReference.get()) == null
-                || iabHelper != lastHelper) {
+                || !iabHelper.equals(lastHelper)) {
             iabHelper.addPurchaseListener(listener);
             helperReference = new WeakReference<IabHelper>(iabHelper);
         }

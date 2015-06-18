@@ -35,7 +35,10 @@ import java.util.concurrent.TimeUnit;
  * @author antonpp
  * @since 15.05.15
  */
-public class TestManager {
+@SuppressWarnings({"PMD.MissingStaticMethodInNonInstantiatableClass", "PMD.AccessorClassGeneration"})
+public final class TestManager {
+
+    private static final int LETTERS_TO_DELETE = 3;
 
     private final String tag;
     private final Queue<EventValidator> eventValidators;
@@ -44,9 +47,7 @@ public class TestManager {
     private final boolean failOnReceive;
     private final Strategy strategy;
     private final CountDownLatch testLatch = new CountDownLatch(1);
-    private int currentEvent;
-    private String errorMsg;
-    private volatile boolean testResult = false;
+    private volatile boolean testResult;
 
     private TestManager(Collection<EventValidator> eventValidators, final String tag,
                         boolean skipWrongEvents,
@@ -65,39 +66,41 @@ public class TestManager {
         final boolean isTimeOver = !testLatch.await(timeout, TimeUnit.MILLISECONDS);
         if (isTimeOver && !failOnReceive) {
             OPFLog.e(String.format("[%s]: Did not receive all events (%d not received). %s", tag,
-                                   eventValidators.size(), getStringEvents()));
+                    eventValidators.size(), getStringEvents()));
             finishTest(false);
         } else if (isTimeOver) {
             validateEvent(AlwaysFailValidator.getStopObject());
             if (!eventValidators.isEmpty()) {
                 OPFLog.e(String.format("[%s]: Did not receive all events (%d not received). %s",
-                                       tag, eventValidators.size(), getStringEvents()));
+                        tag, eventValidators.size(), getStringEvents()));
             }
             finishTest(eventValidators.isEmpty());
         }
         return testResult;
     }
 
-    public synchronized String getStringEvents() {
+    public String getStringEvents() {
         final StringBuilder sb = new StringBuilder("Received Events: [");
-        for (Pair<Object, Boolean> event : receivedEvents) {
-            sb.append(event.first.getClass().getSimpleName())
-                    .append(String.format(" (%s)", event.second ? "+" : "-"))
-                    .append(", \n");
-        }
-        if (!receivedEvents.isEmpty()) {
-            sb.delete(sb.length() - 3, sb.length());
+        synchronized (receivedEvents) {
+            for (Pair<Object, Boolean> event : receivedEvents) {
+                sb.append(event.first.getClass().getSimpleName())
+                        .append(String.format(" (%s)", event.second ? "+" : "-"))
+                        .append(", \n");
+            }
+            if (!receivedEvents.isEmpty()) {
+                sb.delete(sb.length() - LETTERS_TO_DELETE, sb.length());
+            }
         }
         sb.append(']');
         return sb.toString();
     }
 
-    private synchronized void finishTest(boolean result) {
+    private void finishTest(boolean result) {
         testResult = result;
         testLatch.countDown();
     }
 
-    synchronized void validateEvent(Object event) {
+    void validateEvent(Object event) {
         if (testLatch.getCount() == 0) {
             return;
         }
@@ -112,11 +115,13 @@ public class TestManager {
             default:
                 throw new IllegalArgumentException();
         }
-        receivedEvents.add(new Pair<>(event, validationResult));
+        synchronized (receivedEvents) {
+            receivedEvents.add(new Pair<>(event, validationResult));
+        }
         if (!validationResult) {
             if (skipWrongEvents) {
                 OPFLog.e(String.format("[%s]: %s", tag,
-                                       "skipping event " + event.getClass().getSimpleName()));
+                        "skipping event " + event.getClass().getSimpleName()));
             } else {
                 finishTest(false);
             }
@@ -143,7 +148,7 @@ public class TestManager {
                 break;
             }
         }
-        final boolean validationResult = (matchedValidator != null);
+        final boolean validationResult = matchedValidator != null;
         if (validationResult) {
             eventValidators.remove(matchedValidator);
         }
@@ -158,13 +163,13 @@ public class TestManager {
         ORDERED_EVENTS, UNORDERED_EVENTS
     }
 
-    public final static class Builder {
+    public static final class Builder {
 
         private final Collection<EventValidator> eventValidators = new ArrayList<>();
         private boolean skipWrongEvents = true;
-        private boolean failOnReceive = false;
+        private boolean failOnReceive;
         private Strategy strategy = Strategy.ORDERED_EVENTS;
-        private TestManagerAdapter adapter = null;
+        private TestManagerAdapter adapter;
         private String tag = "TestManager";
 
         public Builder setStrategy(Strategy strategy) {
@@ -211,7 +216,7 @@ public class TestManager {
                 eventValidators.add(new AlwaysFailValidator());
             }
             final TestManager testManager = new TestManager(eventValidators, tag, skipWrongEvents,
-                                                            strategy, failOnReceive);
+                    strategy, failOnReceive);
             if (adapter != null) {
                 adapter.addTestManager(testManager);
             }

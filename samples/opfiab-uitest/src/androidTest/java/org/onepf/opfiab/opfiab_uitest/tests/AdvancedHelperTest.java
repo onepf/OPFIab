@@ -22,7 +22,6 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,6 +57,8 @@ import static junit.framework.Assert.assertTrue;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_ENTITY;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_SUBSCRIPTION;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_NAME;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_TEST_MANAGER;
 
 /**
  * @author antonpp
@@ -65,14 +66,7 @@ import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_SUBSCRIPTION;
  */
 public class AdvancedHelperTest {
 
-    private static final long MAX_WAIT_TIME = 2000L;
-
     private static final int NUM_TESTS = 10;
-
-
-
-    private static final String TEST_PROVIDER_NAME = "TEST_PROVIDER_NAME";
-    private static final String TEST_PROVIDER_PACKAGE = "org.onepf.opfiab.uitest";
 
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
@@ -103,7 +97,7 @@ public class AdvancedHelperTest {
 
     @After
     public void tearDown() throws InterruptedException {
-        Thread.sleep(MAX_WAIT_TIME / 2);
+        Thread.sleep(WAIT_TEST_MANAGER / 2);
     }
 
     @Test
@@ -117,7 +111,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testManager, false))
+                .setBillingListener(new BillingManagerAdapter(testManager))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -127,13 +121,13 @@ public class AdvancedHelperTest {
                 OPFIab.setup();
             }
         });
-        assertTrue(testManager.await(MAX_WAIT_TIME));
+        assertTrue(testManager.await(WAIT_TEST_MANAGER));
     }
 
-    private BillingProvider prepareMockProvider(String TEST_PROVIDER_NAME) {
+    private BillingProvider prepareMockProvider(String name) {
         return new MockBillingProviderBuilder()
                 .setIsAvailable(true)
-                .setName(TEST_PROVIDER_NAME)
+                .setName(name)
                 .build();
     }
 
@@ -178,7 +172,7 @@ public class AdvancedHelperTest {
             }
         });
 
-        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
+        assertTrue(testManager.await(WAIT_TEST_MANAGER * NUM_TESTS));
     }
 
     @Test
@@ -199,7 +193,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testManager, false))
+                .setBillingListener(new BillingManagerAdapter(testManager))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -210,7 +204,7 @@ public class AdvancedHelperTest {
             }
         });
 
-        assertTrue(testManager.await(MAX_WAIT_TIME));
+        assertTrue(testManager.await(WAIT_TEST_MANAGER));
     }
 
     @Test
@@ -231,7 +225,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testManager, false))
+                .setBillingListener(new BillingManagerAdapter(testManager))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -242,7 +236,7 @@ public class AdvancedHelperTest {
             }
         });
 
-        assertTrue(testManager.await(MAX_WAIT_TIME));
+        assertTrue(testManager.await(WAIT_TEST_MANAGER));
     }
 
     @Test
@@ -272,7 +266,7 @@ public class AdvancedHelperTest {
 
         instrumentation.runOnMainSync(new TestRunnable(configuration));
 
-        assertTrue(testManager.await(MAX_WAIT_TIME * NUM_TESTS));
+        assertTrue(testManager.await(WAIT_TEST_MANAGER * NUM_TESTS));
     }
 
     @Test
@@ -288,36 +282,36 @@ public class AdvancedHelperTest {
                 .expectEvent(new SetupResponseValidator(TEST_PROVIDER_NAME))
                 .setTag("Setup")
                 .build();
-        final OnSetupListener setupListenerAdapter = new BillingManagerAdapter(testSetupManager,
-                false);
+        final OnSetupListener setupListenerAdapter = new BillingManagerAdapter(testSetupManager
+        );
 
         final TestManager testPurchaseManager = new TestManager.Builder()
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
                 .setTag("Purchase")
                 .build();
         final OnPurchaseListener purchaseListenerAdapter = new BillingManagerAdapter(
-                testPurchaseManager, false);
+                testPurchaseManager);
 
         final TestManager testInventoryManager = new TestManager.Builder()
                 .expectEvent(new InventoryResponseValidator(TEST_PROVIDER_NAME, true, null))
                 .setTag("Inventory")
                 .build();
         final OnInventoryListener inventoryListenerAdapter = new BillingManagerAdapter(
-                testInventoryManager, false);
+                testInventoryManager);
 
         final TestManager testSkuDetailsManager = new TestManager.Builder()
                 .expectEvent(new SkuDetailsResponseValidator(TEST_PROVIDER_NAME, true))
                 .setTag("SkuDetails")
                 .build();
         final OnSkuDetailsListener skuDetailsListenerAdapter = new BillingManagerAdapter(
-                testSkuDetailsManager, false);
+                testSkuDetailsManager);
 
         final TestManager testConsumeManager = new TestManager.Builder()
                 .expectEvent(new ConsumeResponseValidator(TEST_PROVIDER_NAME, true))
                 .setTag("Consume")
                 .build();
         final OnConsumeListener consumeListenerAdapter = new BillingManagerAdapter(
-                testConsumeManager, false);
+                testConsumeManager);
 
         final TestManager testGlobalListenerManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
@@ -333,7 +327,7 @@ public class AdvancedHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
+                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -363,7 +357,7 @@ public class AdvancedHelperTest {
 
 
         for (TestManager manager : managers) {
-            Assert.assertTrue(manager.await(MAX_WAIT_TIME * 4));
+            assertTrue(manager.await(WAIT_TEST_MANAGER * managers.length));
         }
     }
 
@@ -390,7 +384,7 @@ public class AdvancedHelperTest {
                 .setTag("BeforeUnreg")
                 .build();
         final BillingManagerAdapter testAdapter = new BillingManagerAdapter(
-                testBeforeUnregistrationManager, false);
+                testBeforeUnregistrationManager);
 
         final TestManager subscribeSensitiveManager = new TestManager.Builder()
                 .expectEvents(eventValidators)
@@ -401,7 +395,7 @@ public class AdvancedHelperTest {
                 .setTag("RegisterSensitive")
                 .build();
         final BillingManagerAdapter subscribeSensitiveAdapter = new BillingManagerAdapter(
-                subscribeSensitiveManager, false);
+                subscribeSensitiveManager);
 
         final AdvancedIabHelper[] helpers = new AdvancedIabHelper[1];
 
@@ -433,7 +427,7 @@ public class AdvancedHelperTest {
             }
         });
 
-        Assert.assertTrue(testBeforeUnregistrationManager.await(MAX_WAIT_TIME * 4));
+        assertTrue(testBeforeUnregistrationManager.await(WAIT_TEST_MANAGER));
 
         final TestManager testAfterUnRegistrationManager = new TestManager.Builder()
                 .expectEvents(eventValidators)
@@ -456,8 +450,8 @@ public class AdvancedHelperTest {
             }
         });
 
-        Assert.assertTrue(testAfterUnRegistrationManager.await(MAX_WAIT_TIME * 4));
-        Assert.assertTrue(subscribeSensitiveManager.await(MAX_WAIT_TIME));
+        assertTrue(testAfterUnRegistrationManager.await(WAIT_TEST_MANAGER));
+        assertTrue(subscribeSensitiveManager.await(WAIT_TEST_MANAGER));
     }
 
     private final class TestRunnable implements Runnable {
@@ -469,7 +463,7 @@ public class AdvancedHelperTest {
         private final Random rnd = new Random();
         private final List<AdvancedIabHelper> helpers = new ArrayList<>(NUMBER_HELPERS);
 
-        private TestRunnable(final Configuration configuration) {
+        public TestRunnable(final Configuration configuration) {
             this.configuration = configuration;
         }
 
@@ -496,7 +490,7 @@ public class AdvancedHelperTest {
 
         private final AdvancedIabHelper helper;
 
-        private TestPurchaseListener(final AdvancedIabHelper helper) {
+        public TestPurchaseListener(final AdvancedIabHelper helper) {
             this.helper = helper;
         }
 

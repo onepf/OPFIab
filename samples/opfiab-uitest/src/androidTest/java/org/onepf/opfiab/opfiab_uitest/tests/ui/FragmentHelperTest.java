@@ -51,14 +51,14 @@ public class FragmentHelperTest {
 
     @Test
     public void testRegisterUnregisterHomeButton() throws InterruptedException {
-        UnifiedFragmentHelperTest.testRegisterUnregisterHomeButton(instrumentation, activity,
-                                                                   uiDevice);
+        UnifiedFragmentHelperTest.registerUnregisterHomeButton(instrumentation, activity,
+                uiDevice);
     }
 
     @Test
     public void testRegisterUnregisterFragmentReplace() throws InterruptedException {
-        UnifiedFragmentHelperTest.testRegisterUnregisterFragmentReplace(instrumentation, false,
-                                                                        uiDevice);
+        UnifiedFragmentHelperTest.registerUnregisterFragmentReplace(instrumentation, false,
+                uiDevice);
     }
 
     @After

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class AbortableCountDownLatch extends CountDownLatch {
 
-    protected boolean aborted = false;
+    protected boolean aborted;
     protected String abortMessage;
 
     /**
@@ -61,7 +61,15 @@ public class AbortableCountDownLatch extends CountDownLatch {
         }
     }
 
+    @Override
+    public void await() throws InterruptedException {
+        super.await();
+        if (aborted) {
+            throw new AbortedException(abortMessage);
+        }
+    }
 
+    @SuppressWarnings("PMD.PrematureDeclaration")
     @Override
     public boolean await(long timeout, @NonNull TimeUnit unit) throws InterruptedException {
         final boolean result = super.await(timeout, unit);
@@ -71,17 +79,9 @@ public class AbortableCountDownLatch extends CountDownLatch {
         return result;
     }
 
-    @Override
-    public void await() throws InterruptedException {
-        super.await();
-        if (aborted) {
-            throw new AbortedException(abortMessage);
-        }
-    }
-
-
     public static class AbortedException extends InterruptedException {
         public AbortedException() {
+            super();
         }
 
         public AbortedException(String detailMessage) {

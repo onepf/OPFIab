@@ -18,7 +18,6 @@ package org.onepf.opfiab.opfiab_uitest.tests.ui;
 
 import android.app.ActivityManager;
 import android.app.Instrumentation;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
@@ -46,7 +45,6 @@ import org.onepf.opfiab.opfiab_uitest.util.validators.SetupResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.SetupStartedEventValidator;
 
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
-import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_APP_PKG;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.TEST_PROVIDER_NAME;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_BILLING_PROVIDER;
 import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_LAUNCH_SCREEN;
@@ -60,10 +58,6 @@ import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_TEST_MANAGER;
  */
 
 public class ActivityHelperTest {
-
-    private static final Intent START_EMPTY_ACTIVITY = new Intent(Intent.ACTION_MAIN)
-            .setComponent(new ComponentName(TEST_APP_PKG, TEST_APP_PKG + ".EmptyActivity"))
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
@@ -97,8 +91,8 @@ public class ActivityHelperTest {
                 .setTag("Setup")
                 .build();
         final BillingManagerAdapter setupListenerAdapter = new BillingManagerAdapter(
-                testSetupManager,
-                false);
+                testSetupManager
+        );
 
         final TestManager testPurchaseManager = new TestManager.Builder()
                 .expectEvent(new PurchaseResponseValidator(TEST_PROVIDER_NAME, true))
@@ -107,7 +101,7 @@ public class ActivityHelperTest {
                 .setTag("Purchase")
                 .build();
         final BillingManagerAdapter purchaseListenerAdapter = new BillingManagerAdapter(
-                testPurchaseManager, false);
+                testPurchaseManager);
 
         final EventValidator[] validators = {
                 new SetupStartedEventValidator(),
@@ -127,7 +121,7 @@ public class ActivityHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
+                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager))
                 .build();
 
         final ActivityIabHelper[] helperArray = new ActivityIabHelper[1];
@@ -162,6 +156,7 @@ public class ActivityHelperTest {
         }
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private void purchase(final IabHelper helper, final String skuConsumable)
             throws InterruptedException {
         purchase(helper, skuConsumable, WAIT_PURCHASE);
@@ -172,13 +167,13 @@ public class ActivityHelperTest {
         Thread.sleep(WAIT_REOPEN_ACTIVITY);
     }
 
-    private void purchase(final IabHelper helper, final String skuConsumable, long timeout)
+    private void purchase(final IabHelper helper, final String sku, long timeout)
             throws InterruptedException {
         instrumentation.runOnMainSync(new Runnable() {
             @Override
             public void run() {
                 OPFIab.setup();
-                helper.purchase(SKU_CONSUMABLE);
+                helper.purchase(sku);
             }
         });
         Thread.sleep(timeout);

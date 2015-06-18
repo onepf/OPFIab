@@ -34,8 +34,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
  */
 public class BillingManagerAdapter extends TestManagerAdapter implements BillingListener {
 
-    public BillingManagerAdapter(final TestManager testManager,
-                                 final boolean isHandledInOnResponse) {
+    public BillingManagerAdapter(final TestManager testManager) {
         super(testManager);
     }
 
