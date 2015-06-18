@@ -180,7 +180,7 @@ public class OPFIabActivity extends Activity {
             throws IntentSender.SendIntentException {
         scheduleFinish(false);
         super.startIntentSenderForResult(intent, requestCode, fillInIntent, flagsMask, flagsValues,
-                extraFlags, options);
+                                         extraFlags, options);
     }
 
     @Override
