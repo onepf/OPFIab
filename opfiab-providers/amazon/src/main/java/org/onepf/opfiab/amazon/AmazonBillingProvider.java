@@ -65,8 +65,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
 
     public static final String NAME = "Amazon";
     protected static final String INSTALLER = "com.amazon.venezia";
-    protected static final Pattern PACKAGE_PATTERN = Pattern.compile(
+    protected static final Pattern PATTERN_STORE_PACKAGE = Pattern.compile(
             "(com\\.amazon\\.venezia)|([a-z]{2,3}\\.amazon\\.mShop\\.android(\\.apk)?)");
+    protected static final String TESTER_PACKAGE = "com.amazon.sdktestclient";
 
     /**
      * Helper object handles all Amazon SDK related calls.
@@ -199,8 +200,10 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     public boolean isAvailable() {
         final PackageManager packageManager = context.getPackageManager();
         for (final PackageInfo info : packageManager.getInstalledPackages(0)) {
-            if (PACKAGE_PATTERN.matcher(info.packageName).matches()) {
-                return true;
+            if (PATTERN_STORE_PACKAGE.matcher(info.packageName).matches()) {
+                // Check sdk tester package if app is in sandbox mode.
+                return !PurchasingService.IS_SANDBOX_MODE
+                        || OPFUtils.isInstalled(context, TESTER_PACKAGE);
             }
         }
         return false;
