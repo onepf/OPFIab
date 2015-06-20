@@ -4,6 +4,9 @@ import android.support.annotation.NonNull;
 
 import org.json.JSONException;
 
+/**
+ * Model representing purchased item returned in user inventory.
+ */
 public class SamsungPurchase extends SamsungBillingModel {
 
     private static final String KEY_VERIFY_URL = "mVerifyUrl";
