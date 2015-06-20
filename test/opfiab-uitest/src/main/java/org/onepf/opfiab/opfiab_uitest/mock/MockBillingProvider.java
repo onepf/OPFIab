@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.Compatibility;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Random;
 
@@ -36,7 +37,7 @@ public abstract class MockBillingProvider implements BillingProvider {
         try {
             Thread.sleep((SLEEP_TIME + RND.nextLong() % SLEEP_TIME) / 2);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            OPFLog.e(e.getMessage());
         }
     }
 

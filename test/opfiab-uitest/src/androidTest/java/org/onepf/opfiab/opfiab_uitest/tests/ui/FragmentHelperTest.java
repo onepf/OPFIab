@@ -34,9 +34,11 @@ import org.onepf.opfiab.opfiab_uitest.util.Constants;
  */
 public class FragmentHelperTest {
 
+    //CHECKSTYLE:OFF
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
             EmptyActivity.class);
+    //CHECKSTYLE:ON
 
     private Instrumentation instrumentation;
     private UiDevice uiDevice;
@@ -51,14 +53,14 @@ public class FragmentHelperTest {
 
     @Test
     public void testRegisterUnregisterHomeButton() throws InterruptedException {
-        UnifiedFragmentHelperTest.testRegisterUnregisterHomeButton(instrumentation, activity,
-                                                                   uiDevice);
+        UnifiedFragmentHelperTest.registerUnregisterHomeButton(instrumentation, activity,
+                uiDevice);
     }
 
     @Test
     public void testRegisterUnregisterFragmentReplace() throws InterruptedException {
-        UnifiedFragmentHelperTest.testRegisterUnregisterFragmentReplace(instrumentation, false,
-                                                                        uiDevice);
+        UnifiedFragmentHelperTest.registerUnregisterFragmentReplace(instrumentation, false,
+                uiDevice);
     }
 
     @After

@@ -40,6 +40,7 @@ import org.onepf.opfiab.opfiab_uitest.util.validators.SetupResponseValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.SetupStartedEventValidator;
 
 import static junit.framework.Assert.assertTrue;
+import static org.onepf.opfiab.opfiab_uitest.util.Constants.SKU_CONSUMABLE;
 
 /**
  * @author antonpp
@@ -50,15 +51,14 @@ import static junit.framework.Assert.assertTrue;
 public class ActivityHelperTest {
 
     private static final long MAX_WAIT_TIME = 1000L;
-    private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
-    private static final String SKU_ENTITY = "org.onepf.opfiab.entity";
-    private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
     private static final int NUM_TESTS = 10;
 
+    //CHECKSTYLE:OFF
     @Rule
     public final ActivityTestRule<EmptyActivity> testRule = new ActivityTestRule<>(
             EmptyActivity.class);
+    //CHECKSTYLE:ON
 
     private EmptyActivity activity;
     private Instrumentation instrumentation;

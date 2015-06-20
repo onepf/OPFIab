@@ -27,10 +27,12 @@ public abstract class TestManagerAdapter {
 
     private final Collection<TestManager> testManagers = new HashSet<>();
 
-    public TestManagerAdapter() {}
-
     public TestManagerAdapter(TestManager testManager) {
         testManagers.add(testManager);
+    }
+
+    public TestManagerAdapter() {
+        // TestManager should be added later
     }
 
     public void validateEvent(Object event) {

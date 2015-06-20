@@ -32,7 +32,6 @@ import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfiab.verification.VerificationResult;
 
@@ -100,7 +99,7 @@ public class MockBillingProviderBuilder {
 
         @Override
         public Void answer(final InvocationOnMock invocationOnMock) throws Throwable {
-            final BillingRequest billingRequest = (BillingRequest)invocationOnMock.getArguments()[0];
+            final BillingRequest billingRequest = (BillingRequest) invocationOnMock.getArguments()[0];
             Thread.sleep(sleepTime);
             switch (billingRequest.getType()) {
                 case CONSUME:
@@ -120,7 +119,7 @@ public class MockBillingProviderBuilder {
             OPFIab.post(new RequestHandledEvent(request));
             if (willPostSuccess) {
                 OPFIab.post(
-                        new ConsumeResponse(Status.SUCCESS, mock.getName(), request.getPurchase()));
+                        new ConsumeResponse(SUCCESS, mock.getName(), request.getPurchase()));
             } else {
                 OPFIab.post(
                         OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
@@ -132,8 +131,8 @@ public class MockBillingProviderBuilder {
             OPFIab.post(new RequestHandledEvent(request));
             if (willPostSuccess) {
                 OPFIab.post(new PurchaseResponse(SUCCESS, mock.getName(),
-                                                 new Purchase(request.getSku()),
-                                                 VerificationResult.SUCCESS));
+                        new Purchase(request.getSku()),
+                        VerificationResult.SUCCESS));
             } else {
                 OPFIab.post(
                         OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
