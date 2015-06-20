@@ -39,6 +39,8 @@ import org.onepf.opfiab.opfiab_uitest.R;
 import org.onepf.opfiab.opfiab_uitest.manager.BillingManagerAdapter;
 import org.onepf.opfiab.opfiab_uitest.manager.TestManager;
 import org.onepf.opfiab.opfiab_uitest.util.MockBillingProviderBuilder;
+import org.onepf.opfiab.opfiab_uitest.util.fragments.SupportTestFragment;
+import org.onepf.opfiab.opfiab_uitest.util.fragments.TestFragment;
 import org.onepf.opfiab.opfiab_uitest.util.validators.AlwaysFailValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseRequestValidator;
 import org.onepf.opfiab.opfiab_uitest.util.validators.PurchaseResponseValidator;
@@ -58,12 +60,16 @@ import static org.onepf.opfiab.opfiab_uitest.util.Constants.WAIT_TEST_MANAGER;
  * @author antonpp
  * @since 04.06.15
  */
-public class UnifiedFragmentHelperTest {
+public final class UnifiedFragmentHelperTest {
 
-    private final static String FRAGMENT_TAG = "FRAGMENT_TAG";
+    private static final String FRAGMENT_TAG = "FRAGMENT_TAG";
 
-    public static void testRegisterUnregisterHomeButton(Instrumentation instrumentation,
-                                                        final Activity activity, UiDevice uiDevice)
+    private UnifiedFragmentHelperTest() {
+        throw new UnsupportedOperationException();
+    }
+
+    public static void registerUnregisterHomeButton(Instrumentation instrumentation,
+                                                    final Activity activity, UiDevice uiDevice)
             throws InterruptedException {
 
         final String providerName = String.format(TEST_PROVIDER_NAME_FMT, "HOME");
@@ -82,7 +88,7 @@ public class UnifiedFragmentHelperTest {
                 .setSkipWrongEvents(false)
                 .build();
         final BillingManagerAdapter purchaseListenerAdapter = new BillingManagerAdapter(
-                testPurchaseManager, false);
+                testPurchaseManager);
 
         final TestManager testGlobalListenerManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
@@ -101,7 +107,7 @@ public class UnifiedFragmentHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
+                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager))
                 .build();
 
         instrumentation.runOnMainSync(new Runnable() {
@@ -112,35 +118,7 @@ public class UnifiedFragmentHelperTest {
         });
         Thread.sleep(WAIT_INIT);
         final boolean isSupport = activity instanceof FragmentActivity;
-        Object fragment;
-        if (isSupport) {
-            fragment = SupportTestFragment.getInstance(R.color.blue);
-            final android.support.v4.app.FragmentManager supportFragmentManager = ((FragmentActivity) activity).getSupportFragmentManager();
-            supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.content, (android.support.v4.app.Fragment) fragment, FRAGMENT_TAG)
-                    .commit();
-            instrumentation.runOnMainSync(new Runnable() {
-                @Override
-                public void run() {
-                    supportFragmentManager.executePendingTransactions();
-                }
-            });
-        } else {
-            fragment = TestFragment.getInstance(R.color.blue);
-            final FragmentManager fragmentManager = activity.getFragmentManager();
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.content, (Fragment) fragment, FRAGMENT_TAG)
-                    .commit();
-            instrumentation.runOnMainSync(new Runnable() {
-                @Override
-                public void run() {
-                    fragmentManager.executePendingTransactions();
-                }
-            });
-        }
-        Thread.sleep(WAIT_INIT);
+        Object fragment = createFragment(isSupport, activity, instrumentation, R.color.blue);
 
         FragmentIabHelper helper = getHelper(isSupport, fragment, purchaseListenerAdapter,
                 instrumentation);
@@ -167,6 +145,42 @@ public class UnifiedFragmentHelperTest {
         }
     }
 
+    private static Object createFragment(boolean isSupport, Activity activity,
+                                         Instrumentation instrumentation, int color)
+            throws InterruptedException {
+        final Object fragment;
+        if (isSupport) {
+            fragment = SupportTestFragment.getInstance(color);
+            final android.support.v4.app.FragmentManager supportFragmentManager = ((FragmentActivity) activity).getSupportFragmentManager();
+            supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content, (android.support.v4.app.Fragment) fragment, FRAGMENT_TAG)
+                    .commit();
+            instrumentation.runOnMainSync(new Runnable() {
+                @Override
+                public void run() {
+                    supportFragmentManager.executePendingTransactions();
+                }
+            });
+        } else {
+            fragment = TestFragment.getInstance(color);
+            final FragmentManager fragmentManager = activity.getFragmentManager();
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content, (Fragment) fragment, FRAGMENT_TAG)
+                    .commit();
+            instrumentation.runOnMainSync(new Runnable() {
+                @Override
+                public void run() {
+                    fragmentManager.executePendingTransactions();
+                }
+            });
+        }
+        Thread.sleep(WAIT_INIT);
+        return fragment;
+    }
+
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static FragmentIabHelper getHelper(final boolean isSupport, final Object fragment,
                                                final OnPurchaseListener listener,
                                                Instrumentation instrumentation)
@@ -186,6 +200,7 @@ public class UnifiedFragmentHelperTest {
         return helpers[0];
     }
 
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static void purchase(Instrumentation instrumentation, IabHelper helper, String sku)
             throws InterruptedException {
         purchase(instrumentation, helper, sku, WAIT_PURCHASE);
@@ -230,28 +245,16 @@ public class UnifiedFragmentHelperTest {
         Thread.sleep(timeout);
     }
 
-    public static void testRegisterUnregisterFragmentReplace(Instrumentation instrumentation,
-                                                             final Boolean isSupport,
-                                                             UiDevice uiDevice)
+    public static void registerUnregisterFragmentReplace(Instrumentation instrumentation,
+                                                         final Boolean isSupport,
+                                                         UiDevice uiDevice)
             throws InterruptedException {
         final String providerName = String.format(TEST_PROVIDER_NAME_FMT, "FRAGMENT_REPLACE");
-        final Object fragment;
         final Activity activity;
         if (isSupport) {
-            fragment = SupportTestFragment.getInstance(R.color.green);
             activity = EmptyFragmentActivity.getLastInstance();
-            ((FragmentActivity) activity).getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content, (android.support.v4.app.Fragment) fragment)
-                    .commit();
-
         } else {
-            fragment = TestFragment.getInstance(R.color.green);
             activity = EmptyActivity.getLastInstance();
-            activity.getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content, (Fragment) fragment)
-                    .commit();
         }
 
         final BillingProvider billingProvider = new MockBillingProviderBuilder()
@@ -268,7 +271,7 @@ public class UnifiedFragmentHelperTest {
                 .setTag("Purchase")
                 .build();
         final BillingManagerAdapter purchaseListenerAdapter = new BillingManagerAdapter(
-                testPurchaseManager, false);
+                testPurchaseManager);
 
         final TestManager testGlobalListenerManager = new TestManager.Builder()
                 .expectEvent(new SetupStartedEventValidator())
@@ -285,7 +288,7 @@ public class UnifiedFragmentHelperTest {
 
         final Configuration configuration = new Configuration.Builder()
                 .addBillingProvider(billingProvider)
-                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager, false))
+                .setBillingListener(new BillingManagerAdapter(testGlobalListenerManager))
                 .build();
 
         final TestManager[] managers = {testGlobalListenerManager, testPurchaseManager};
@@ -295,17 +298,12 @@ public class UnifiedFragmentHelperTest {
             @Override
             public void run() {
                 OPFIab.init(activity.getApplication(), configuration);
-                if (isSupport) {
-                    helpers[0] = OPFIab.getFragmentHelper(
-                            (android.support.v4.app.Fragment) fragment);
-                } else {
-                    helpers[0] = OPFIab.getFragmentHelper((Fragment) fragment);
-                }
-                helpers[0].addPurchaseListener(purchaseListenerAdapter);
             }
         });
         Thread.sleep(WAIT_INIT);
-        final FragmentIabHelper helper = helpers[0];
+        final Object fragment = createFragment(isSupport, activity, instrumentation, R.color.green);
+        final FragmentIabHelper helper = getHelper(isSupport, fragment, purchaseListenerAdapter,
+                instrumentation);
 
         purchase(instrumentation, helper, SKU_CONSUMABLE);
         Thread.sleep(WAIT_PURCHASE);
@@ -359,7 +357,7 @@ public class UnifiedFragmentHelperTest {
         private final IabHelper helper;
         private final String sku;
 
-        private PurchaseRunnable(final IabHelper helper, final String sku) {
+        public PurchaseRunnable(final IabHelper helper, final String sku) {
             this.helper = helper;
             this.sku = sku;
         }

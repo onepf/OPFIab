@@ -18,56 +18,62 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
+              android:orientation="vertical"
     tools:context=".MainActivity">
 
     <LinearLayout
+        style="?android:attr/buttonBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/button_init_ok"
-            android:text="@string/str_init_ok"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="@string/str_init_ok"
+            android:textColor="@color/green"/>
 
         <Button
             android:id="@+id/button_init_fail"
-            android:text="@string/str_init_fail"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="@string/str_init_fail"
+            android:textColor="@color/red"/>
     </LinearLayout>
 
     <Button
         android:id="@+id/button_init"
-        android:text="@string/str_init_custom"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/str_init_custom"
+        android:textColor="@color/blue"/>
 
     <Button
         android:id="@+id/button_setup"
-        android:text="@string/str_setup"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/str_setup"/>
 
     <Button
         android:id="@+id/button_buy_consumable"
-        android:text="@string/str_buy_consumable"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/str_buy_consumable"/>
 
     <Button
         android:id="@+id/button_buy_nonconsumable"
-        android:text="@string/str_buy_nonconsumable"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/str_buy_nonconsumable"/>
 
     <Button
         android:id="@+id/button_buy_subscription"
-        android:text="@string/str_buy_subscription"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="@string/str_buy_subscription"/>
 
 </LinearLayout>

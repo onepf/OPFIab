@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.api.ActivityIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
@@ -32,10 +33,8 @@ import org.onepf.opfutils.OPFLog;
 
 public class ActivityHelperActivity extends Activity implements View.OnClickListener {
 
-    private static final String TAG = ActivityHelperActivity.class.getSimpleName();
-
     private static final String SKU_CONSUMABLE = "org.onepf.opfiab.consumable";
-    private static final String SKU_NONCONSUMABLE = "org.onepf.opfiab.nonconsumable";
+    private static final String SKU_ENTITY = "org.onepf.opfiab.entity";
     private static final String SKU_SUBSCRIPTION = "org.onepf.opfiab.subscription";
 
     private ActivityIabHelper iabHelper;
@@ -71,6 +70,22 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
         iabHelper = OPFIab.getActivityHelper(this);
     }
 
+    private void initHelper(boolean needOkBillingProvider) {
+        final BillingProvider billingProvider;
+        if (needOkBillingProvider) {
+            billingProvider = new MockOkBillingProvider();
+        } else {
+            billingProvider = new MockFailBillingProvider();
+        }
+
+        OPFIab.init(getApplication(),
+                new Configuration.Builder()
+                        .addBillingProvider(billingProvider)
+                        .setBillingListener(new DefaultBillingListener())
+                        .build()
+        );
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -98,36 +113,12 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
         }
     }
 
-    public void setCustomConfiguration(Configuration customConfiguration) {
-        this.customConfiguration = customConfiguration;
-    }
-
-    private void initHelper(boolean needOkBillingProvider) {
-        final BillingProvider billingProvider;
-        if (needOkBillingProvider) {
-            billingProvider = new MockOkBillingProvider();
-        } else {
-            billingProvider = new MockFailBillingProvider();
-        }
-
-        OPFIab.init(getApplication(),
-                new Configuration.Builder()
-                        .addBillingProvider(billingProvider)
-                        .setBillingListener(new DefaultBillingListener())
-                        .build()
-        );
-    }
-
     private void initHelper() {
         if (customConfiguration == null) {
             initHelper(false);
         } else {
             OPFIab.init(getApplication(), customConfiguration);
         }
-    }
-
-    public void setBillingListener(BillingListener listener) {
-        iabHelper.addBillingListener(listener);
     }
 
     private void setupHelper() {
@@ -139,11 +130,19 @@ public class ActivityHelperActivity extends Activity implements View.OnClickList
     }
 
     private void buyNonconsumable() {
-        iabHelper.purchase(SKU_NONCONSUMABLE);
+        iabHelper.purchase(SKU_ENTITY);
     }
 
     private void buySubscription() {
         iabHelper.purchase(SKU_SUBSCRIPTION);
+    }
+
+    public void setCustomConfiguration(Configuration customConfiguration) {
+        this.customConfiguration = customConfiguration;
+    }
+
+    public void setBillingListener(BillingListener listener) {
+        iabHelper.addBillingListener(listener);
     }
 
     public ActivityIabHelper getIabHelper() {

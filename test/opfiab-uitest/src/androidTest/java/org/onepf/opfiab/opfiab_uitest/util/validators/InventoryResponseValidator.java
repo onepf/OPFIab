@@ -54,20 +54,20 @@ public class InventoryResponseValidator extends TypedEventValidator<InventoryRes
         }
     }
 
+    @SuppressWarnings("PMD.")
     @Override
     public boolean validate(final Object event, final boolean isLogging, final String logTag) {
         if (!super.validate(event, isLogging, logTag)) {
             return false;
         }
         final InventoryResponse response = (InventoryResponse) event;
+
+        if (expectedInventory != null && validateInventory(response, isLogging, logTag)) {
+            return false;
+        }
+
         final boolean result;
         final String msg;
-
-        if (expectedInventory != null) {
-            if (validateInventory(response, isLogging, logTag)) {
-                return false;
-            }
-        }
 
         if (response.isSuccessful() != isSuccessful) {
             msg = "Not expected success result";

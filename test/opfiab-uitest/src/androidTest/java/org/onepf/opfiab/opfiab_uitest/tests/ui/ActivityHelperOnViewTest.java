@@ -38,6 +38,7 @@ import org.onepf.opfiab.opfiab_uitest.R;
 import org.onepf.opfiab.opfiab_uitest.mock.MockBillingProvider;
 import org.onepf.opfiab.opfiab_uitest.mock.MockFailBillingProvider;
 import org.onepf.opfiab.opfiab_uitest.mock.MockOkBillingProvider;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +58,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class ActivityHelperOnViewTest
         extends ActivityInstrumentationTestCase2<ActivityHelperActivity> {
 
-    private static final String TAG = ActivityHelperOnViewTest.class.getSimpleName();
     private static final long MAX_WAIT_TIME = MockBillingProvider.SLEEP_TIME * 4L;
     private static final int TESTS_COUNT = 20;
     private static final Random RND = new Random();
@@ -132,7 +132,7 @@ public class ActivityHelperOnViewTest
         try {
             latch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            OPFLog.e(e.getMessage());
         }
     }
 
@@ -140,7 +140,7 @@ public class ActivityHelperOnViewTest
         try {
             latch.await(ms, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            OPFLog.e(e.getMessage());
         }
     }
 
@@ -246,6 +246,7 @@ public class ActivityHelperOnViewTest
         private final CountDownLatch failLatch;
 
         public TestBillingListener(CountDownLatch successLatch, CountDownLatch failLatch) {
+            super();
             this.successLatch = successLatch;
             this.failLatch = failLatch;
         }

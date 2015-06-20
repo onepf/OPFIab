@@ -35,7 +35,7 @@ android {
 }
 
 check {
-    abortOnError false
+    abortOnError true
 }
 
 dependencies {
