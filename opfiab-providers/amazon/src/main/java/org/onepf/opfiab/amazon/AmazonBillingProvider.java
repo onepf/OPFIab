@@ -260,27 +260,18 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         return NAME;
     }
 
-    public static class Builder extends BaseBillingProvider.Builder<SkuResolver, PurchaseVerifier> {
+    public static class Builder extends BaseBillingProvider.Builder<Builder, SkuResolver,
+            PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
-            super(context, SkuResolver.DEFAULT, PurchaseVerifier.DEFAULT);
+            super(context);
         }
 
         @Override
-        public BaseBillingProvider build() {
+        public AmazonBillingProvider build() {
             return new AmazonBillingProvider(context,
                     skuResolver == null ? SkuResolver.DEFAULT : skuResolver,
                     purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
-        }
-
-        @Override
-        public Builder setSkuResolver(@NonNull final SkuResolver skuResolver) {
-            return (Builder) super.setSkuResolver(skuResolver);
-        }
-
-        @Override
-        public Builder setPurchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
-            return (Builder) super.setPurchaseVerifier(purchaseVerifier);
         }
     }
 }

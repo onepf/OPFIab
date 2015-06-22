@@ -377,11 +377,11 @@ public class GoogleBillingProvider
     }
 
 
-    public static class Builder
-            extends BaseBillingProvider.Builder<GoogleSkuResolver, PurchaseVerifier> {
+    public static class Builder extends BaseBillingProvider.Builder<Builder, GoogleSkuResolver,
+            PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
-            super(context, null, PurchaseVerifier.DEFAULT);
+            super(context);
         }
 
         @Override
@@ -389,19 +389,8 @@ public class GoogleBillingProvider
             if (skuResolver == null) {
                 throw new IllegalStateException("GoogleSkuResolver must be set.");
             }
-            return new GoogleBillingProvider(context, skuResolver, purchaseVerifier == null
-                                                     ? PurchaseVerifier.DEFAULT
-                                                     : purchaseVerifier);
-        }
-
-        @Override
-        public Builder setSkuResolver(@NonNull final GoogleSkuResolver skuResolver) {
-            return (Builder) super.setSkuResolver(skuResolver);
-        }
-
-        @Override
-        public Builder setPurchaseVerifier(@NonNull final PurchaseVerifier purchaseVerifier) {
-            return (Builder) super.setPurchaseVerifier(purchaseVerifier);
+            return new GoogleBillingProvider(context, skuResolver,
+                    purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
         }
     }
 }

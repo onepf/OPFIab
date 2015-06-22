@@ -283,14 +283,14 @@ public class SamsungBillingProvider
         releaseActivity(activity);
     }
 
-    public static class Builder
-            extends BaseBillingProvider.Builder<SamsungSkuResolver, PurchaseVerifier> {
+    public static class Builder extends BaseBillingProvider.Builder<Builder, SamsungSkuResolver,
+            PurchaseVerifier> {
 
         @NonNull
         private BillingMode billingMode = BillingMode.PRODUCTION;
 
         public Builder(@NonNull final Context context) {
-            super(context, null, DEFAULT);
+            super(context);
         }
 
         @NonNull
@@ -307,18 +307,6 @@ public class SamsungBillingProvider
             return new SamsungBillingProvider(context, skuResolver,
                     purchaseVerifier == null ? DEFAULT : purchaseVerifier,
                     billingMode);
-        }
-
-        @Override
-        public Builder setSkuResolver(
-                @NonNull final SamsungSkuResolver skuResolver) {
-            return (Builder) super.setSkuResolver(skuResolver);
-        }
-
-        @Override
-        public Builder setPurchaseVerifier(
-                @NonNull final PurchaseVerifier purchaseVerifier) {
-            return (Builder) super.setPurchaseVerifier(purchaseVerifier);
         }
     }
 }

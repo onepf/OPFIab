@@ -348,7 +348,9 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      * @param <R> {@link SkuResolver} subclass to use with this BillingProvider.
      * @param <V> {@link PurchaseVerifier} subclass to use with this BillingProvider.
      */
-    protected abstract static class Builder<R extends SkuResolver, V extends PurchaseVerifier> {
+    @SuppressWarnings("unchecked")
+    protected abstract static class Builder<B extends Builder, R extends SkuResolver,
+            V extends PurchaseVerifier> {
 
         @NonNull
         protected final Context context;
@@ -357,12 +359,8 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         @Nullable
         protected V purchaseVerifier;
 
-        protected Builder(@NonNull final Context context,
-                          @Nullable final R skuResolver,
-                          @Nullable final V purchaseVerifier) {
+        protected Builder(@NonNull final Context context) {
             this.context = context;
-            this.skuResolver = skuResolver;
-            this.purchaseVerifier = purchaseVerifier;
         }
 
         /**
@@ -371,9 +369,9 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
          * @param skuResolver SkuResolver to use with this BillingProvider.
          * @return this object.
          */
-        protected Builder setSkuResolver(@NonNull final R skuResolver) {
+        public B setSkuResolver(@NonNull final R skuResolver) {
             this.skuResolver = skuResolver;
-            return this;
+            return (B)this;
         }
 
         /**
@@ -382,9 +380,9 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
          * @param purchaseVerifier PurchaseVerifier to use with this BillingProvider.
          * @return this object.
          */
-        protected Builder setPurchaseVerifier(@NonNull final V purchaseVerifier) {
+        public B setPurchaseVerifier(@NonNull final V purchaseVerifier) {
             this.purchaseVerifier = purchaseVerifier;
-            return this;
+            return (B)this;
         }
 
         /**

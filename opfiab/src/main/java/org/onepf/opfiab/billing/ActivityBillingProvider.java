@@ -46,7 +46,7 @@ import java.util.Set;
  * <p>
  * New instance of {@link OPFIabActivity} will be launched if necessary.
  */
-public abstract class ActivityBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
+public abstract class  ActivityBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         extends BaseBillingProvider<R, V> {
 
     /**

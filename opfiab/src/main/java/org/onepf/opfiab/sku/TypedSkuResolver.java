@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-apply plugin: 'idea'
-apply plugin: 'com.android.library'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle'
+package org.onepf.opfiab.sku;
 
-android {
-    defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 22
-        versionCode 1
-        versionName "0.3.0-SNAPSHOT"
-    }
-}
+import android.support.annotation.NonNull;
 
-dependencies {
-//    compile('org.onepf:opfiab:0.3.+@aar') {
-//        changing = true
-//    }
-    compile project(':opfiab')
-    //noinspection GradleDynamicVersion
-    provided 'org.onepf:opfutils:0.1.+'
-    provided 'com.amazon:in-app-purchasing:2.0.61'
+import org.onepf.opfiab.model.billing.SkuType;
+
+/**
+ * Resolves {@link SkuType} for supplied SKU.
+ */
+public interface TypedSkuResolver extends SkuResolver {
+
+    /**
+     * Resolves type of supplied SKU. SKU should not yet be resolved.
+     *
+     * @param sku SKU to resolve type for.
+     *
+     * @return SKU type, can't be null.
+     * @see #resolve(String)
+     */
+    @NonNull
+    SkuType resolveType(@NonNull final String sku);
 }

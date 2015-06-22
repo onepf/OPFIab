@@ -14,25 +14,11 @@
  * limitations under the License.
  */
 
-apply plugin: 'idea'
-apply plugin: 'com.android.library'
-apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle'
+package org.onepf.opfiab.util;
 
-android {
-    defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 22
-        versionCode 1
-        versionName "0.3.0-SNAPSHOT"
+public final class BillingProviderUtils {
+
+    private BillingProviderUtils() {
+        throw new UnsupportedOperationException();
     }
-}
-
-dependencies {
-//    compile('org.onepf:opfiab:0.3.+@aar') {
-//        changing = true
-//    }
-    compile project(':opfiab')
-    //noinspection GradleDynamicVersion
-    provided 'org.onepf:opfutils:0.1.+'
-    provided 'com.amazon:in-app-purchasing:2.0.61'
 }
