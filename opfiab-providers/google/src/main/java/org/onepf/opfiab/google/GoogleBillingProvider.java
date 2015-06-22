@@ -28,8 +28,8 @@ import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.onepf.opfiab.billing.ActivityBillingProvider;
-import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
@@ -40,6 +40,7 @@ import org.onepf.opfiab.model.billing.SignedPurchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.Status;
+import org.onepf.opfiab.sku.TypedSkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
@@ -60,8 +61,8 @@ import static android.Manifest.permission.GET_ACCOUNTS;
  * <a href="https://play.google.com/store">Google Play</a> App Store.
  */
 @SuppressWarnings("PMD.GodClass")
-public class GoogleBillingProvider
-        extends ActivityBillingProvider<GoogleSkuResolver, PurchaseVerifier> {
+public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResolver,
+        PurchaseVerifier> {
 
     public static final String NAME = "Google";
     protected static final String PACKAGE = "com.android.vending";
@@ -76,7 +77,7 @@ public class GoogleBillingProvider
 
     protected GoogleBillingProvider(
             @NonNull final Context context,
-            @NonNull final GoogleSkuResolver skuResolver,
+            @NonNull final TypedSkuResolver skuResolver,
             @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
         helper = new GoogleBillingHelper(context);
@@ -377,8 +378,8 @@ public class GoogleBillingProvider
     }
 
 
-    public static class Builder extends BaseBillingProvider.Builder<Builder, GoogleSkuResolver,
-            PurchaseVerifier> {
+    public static class Builder extends BaseBillingProviderBuilder<Builder, TypedSkuResolver,
+                    PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
             super(context);

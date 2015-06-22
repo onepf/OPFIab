@@ -38,7 +38,7 @@ public class SignedPurchase extends Purchase {
     private final String signature;
 
     @SuppressWarnings({"checkstyle:parameternumber"})
-    public SignedPurchase(@NonNull final String sku,
+    protected SignedPurchase(@NonNull final String sku,
                           @Nullable final SkuType type,
                           @Nullable final String providerName,
                           @Nullable final String originalJson,
@@ -68,7 +68,7 @@ public class SignedPurchase extends Purchase {
     @NonNull
     @Override
     public Purchase copyWithSku(@NonNull final String sku) {
-        return new Builder(sku).setSignedPurchase(this).build();
+        return new Builder(sku).setBase(this).build();
     }
 
     @NonNull
@@ -83,70 +83,39 @@ public class SignedPurchase extends Purchase {
         return jsonObject;
     }
 
-    public static class Builder extends Purchase.Builder {
 
-        private String signature;
+    @SuppressWarnings("unchecked")
+    protected static abstract class SignedPurchaseBuilder<B extends SignedPurchaseBuilder,
+            M extends SignedPurchase> extends Purchase.PurchaseBuilder<B, M> {
+
+        protected String signature;
+
+        public SignedPurchaseBuilder(@NonNull final String sku) {
+            super(sku);
+        }
+
+        public B setSignature(@Nullable final String signature) {
+            this.signature = signature;
+            return (B) this;
+        }
+
+        @Override
+        public B setBase(@NonNull final M billingModel) {
+            setSignature(billingModel.getSignature());
+            return super.setBase(billingModel);
+        }
+    }
+
+    public static class Builder extends SignedPurchaseBuilder<Builder, SignedPurchase> {
 
         public Builder(@NonNull final String sku) {
             super(sku);
         }
 
-        public Builder setSignedPurchase(@NonNull final SignedPurchase signedPurchase) {
-            super.setPurchase(signedPurchase);
-            setSignature(signedPurchase.getSignature());
-            return this;
-        }
-
-        public Builder setSignature(@Nullable final String signature) {
-            this.signature = signature;
-            return this;
-        }
-
-        @Override
-        public Builder setType(@Nullable final SkuType type) {
-            return (Builder) super.setType(type);
-        }
-
-        @Override
-        public Builder setProviderName(
-                @Nullable final String providerName) {
-            return (Builder) super.setProviderName(providerName);
-        }
-
-        @Override
-        public Builder setOriginalJson(@Nullable final String originalJson) {
-            return (Builder) super.setOriginalJson(originalJson);
-        }
-
-        @Override
-        public Builder setBillingModel(@NonNull final BillingModel billingModel) {
-            return (Builder) super.setBillingModel(billingModel);
-        }
-
-        @Override
-        public Builder setToken(@Nullable final String token) {
-            return (Builder) super.setToken(token);
-        }
-
-        @Override
-        public Builder setCanceled(final boolean canceled) {
-            return (Builder) super.setCanceled(canceled);
-        }
-
-        @Override
-        public Builder setPurchaseTime(final long purchaseTime) {
-            return (Builder) super.setPurchaseTime(purchaseTime);
-        }
-
-        @Override
-        public Builder setPurchase(@NonNull final Purchase purchase) {
-            return (Builder) super.setPurchase(purchase);
-        }
-
         @Override
         public SignedPurchase build() {
             return new SignedPurchase(sku, type, providerName, originalJson, token, purchaseTime,
-                                      canceled, signature);
+                    canceled, signature);
         }
     }
 }

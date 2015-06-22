@@ -32,6 +32,7 @@ import com.amazon.device.iap.model.PurchaseUpdatesResponse;
 
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
@@ -260,8 +261,8 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
         return NAME;
     }
 
-    public static class Builder extends BaseBillingProvider.Builder<Builder, SkuResolver,
-            PurchaseVerifier> {
+    public static class Builder extends BaseBillingProviderBuilder<Builder, SkuResolver,
+                    PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
             super(context);

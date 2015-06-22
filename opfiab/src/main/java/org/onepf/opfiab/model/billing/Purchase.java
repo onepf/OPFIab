@@ -90,7 +90,7 @@ public class Purchase extends BillingModel {
     @NonNull
     @Override
     public Purchase copyWithSku(@NonNull final String sku) {
-        return new Builder(sku).setPurchase(this).build();
+        return new Builder(sku).setBase(this).build();
     }
 
     @NonNull
@@ -110,36 +110,17 @@ public class Purchase extends BillingModel {
     /**
      * Builder class for {@link Purchase} object.
      */
-    public static class Builder extends BillingModel.Builder {
+    @SuppressWarnings("unchecked")
+    protected static abstract class PurchaseBuilder<B extends PurchaseBuilder, M extends Purchase>
+            extends BillingModel.Builder<B, M> {
 
         @Nullable
         protected String token;
         protected boolean canceled;
         protected long purchaseTime = -1L;
 
-        public Builder(@NonNull final String sku) {
+        public PurchaseBuilder(@NonNull final String sku) {
             super(sku);
-        }
-
-        @Override
-        public Builder setType(@Nullable final SkuType type) {
-            return (Builder) super.setType(type);
-        }
-
-        @Override
-        public Builder setProviderName(
-                @Nullable final String providerName) {
-            return (Builder) super.setProviderName(providerName);
-        }
-
-        @Override
-        public Builder setOriginalJson(@Nullable final String originalJson) {
-            return (Builder) super.setOriginalJson(originalJson);
-        }
-
-        @Override
-        public Builder setBillingModel(@NonNull final BillingModel billingModel) {
-            return (Builder) super.setBillingModel(billingModel);
         }
 
         /**
@@ -148,9 +129,9 @@ public class Purchase extends BillingModel {
          * @param token Token to use.
          * @return this object.
          */
-        public Builder setToken(@Nullable final String token) {
+        public B setToken(@Nullable final String token) {
             this.token = token;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -159,9 +140,9 @@ public class Purchase extends BillingModel {
          * @param canceled Canceled status to set.
          * @return this object.
          */
-        public Builder setCanceled(final boolean canceled) {
+        public B setCanceled(final boolean canceled) {
             this.canceled = canceled;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -170,23 +151,24 @@ public class Purchase extends BillingModel {
          * @param purchaseTime Time in millisecond when purchase was made.
          * @return this object.
          */
-        public Builder setPurchaseTime(final long purchaseTime) {
+        public B setPurchaseTime(final long purchaseTime) {
             this.purchaseTime = purchaseTime;
-            return this;
+            return (B) this;
         }
 
-        /**
-         * Sets existing Purchase object to use as a base for a new one.
-         *
-         * @param purchase Existing purchase object.
-         * @return this object.
-         */
-        public Builder setPurchase(@NonNull final Purchase purchase) {
-            setBillingModel(purchase);
-            setToken(purchase.getToken());
-            setPurchaseTime(purchase.getPurchaseTime());
-            setCanceled(purchase.isCanceled());
-            return this;
+        @Override
+        public B setBase(@NonNull final M billingModel) {
+            setToken(billingModel.getToken());
+            setPurchaseTime(billingModel.getPurchaseTime());
+            setCanceled(billingModel.isCanceled());
+            return super.setBase(billingModel);
+        }
+    }
+
+    public static class Builder extends PurchaseBuilder<Builder, Purchase> {
+
+        public Builder(@NonNull final String sku) {
+            super(sku);
         }
 
         @Override

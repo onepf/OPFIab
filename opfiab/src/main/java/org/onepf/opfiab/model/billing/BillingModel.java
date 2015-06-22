@@ -159,7 +159,8 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
     /**
      * Parent class for all billing models builders.
      */
-    abstract static class Builder {
+    @SuppressWarnings("unchecked")
+    abstract static class Builder<B extends Builder, M extends BillingModel> {
 
         @NonNull
         protected final String sku;
@@ -180,11 +181,11 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
          * @param billingModel BillingModel object to copy data from.
          * @return this object.
          */
-        protected Builder setBillingModel(@NonNull final BillingModel billingModel) {
+        public B setBase(@NonNull final M billingModel) {
             setType(billingModel.getType());
             setOriginalJson(billingModel.getOriginalJson());
             setProviderName(billingModel.getProviderName());
-            return this;
+            return (B) this;
         }
 
         /**
@@ -193,9 +194,9 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
          * @param type Type to set.
          * @return this object.
          */
-        protected Builder setType(@Nullable final SkuType type) {
+        public B setType(@Nullable final SkuType type) {
             this.type = type;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -204,9 +205,9 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
          * @param originalJson JSON data to set.
          * @return this object.
          */
-        protected Builder setOriginalJson(@Nullable final String originalJson) {
+        public B setOriginalJson(@Nullable final String originalJson) {
             this.originalJson = originalJson;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -217,9 +218,9 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
          *
          * @see BillingProvider#getName()
          */
-        protected Builder setProviderName(@Nullable final String providerName) {
+        public B setProviderName(@Nullable final String providerName) {
             this.providerName = providerName;
-            return this;
+            return (B) this;
         }
 
         /**
@@ -227,6 +228,6 @@ public abstract class BillingModel implements JsonCompatible, Serializable {
          *
          * @return new BillingModer from supplied data.
          */
-        public abstract BillingModel build();
+        public abstract M build();
     }
 }

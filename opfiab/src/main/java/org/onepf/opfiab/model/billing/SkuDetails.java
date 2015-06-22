@@ -94,7 +94,7 @@ public class SkuDetails extends BillingModel {
 
     /**
      * Indicates if there's actually any data available in this object.
-     * <p>
+     * <p/>
      * Typically this is true when SKU wasn't recognized by {@link BillingProvider}.
      *
      * @return True is there's no data in this object. False otherwise.
@@ -108,7 +108,7 @@ public class SkuDetails extends BillingModel {
     @NonNull
     @Override
     public SkuDetails copyWithSku(@NonNull final String sku) {
-        return new Builder(sku).setSkuDetails(this).build();
+        return new Builder(sku).setBase(this).build();
     }
 
     @SuppressWarnings("PMD.NPathComplexity")
@@ -129,7 +129,9 @@ public class SkuDetails extends BillingModel {
     /**
      * Builder class for {@link SkuDetails} object.
      */
-    public static class Builder extends BillingModel.Builder {
+    @SuppressWarnings("unchecked")
+    protected static abstract class SkuDetailsBuilder<B extends Builder, M extends SkuDetails>
+            extends BillingModel.Builder<B, M> {
 
         @Nullable
         protected String price;
@@ -138,75 +140,59 @@ public class SkuDetails extends BillingModel {
         @Nullable
         protected String description;
 
-        public Builder(@NonNull final String sku) {
+        public SkuDetailsBuilder(@NonNull final String sku) {
             super(sku);
-        }
-
-        @Override
-        public Builder setType(@Nullable final SkuType type) {
-            return (Builder) super.setType(type);
-        }
-
-        @Override
-        public Builder setProviderName(@Nullable final String providerName) {
-            return (Builder) super.setProviderName(providerName);
-        }
-
-        @Override
-        public Builder setOriginalJson(@Nullable final String originalJson) {
-            return (Builder) super.setOriginalJson(originalJson);
-        }
-
-        @Override
-        public Builder setBillingModel(@NonNull final BillingModel billingModel) {
-            return (Builder) super.setBillingModel(billingModel);
         }
 
         /**
          * Sets price for a new SkuDetails object.
          *
          * @param price Formatted, localized price.
+         *
          * @return this object.
          */
-        public Builder setPrice(@Nullable final String price) {
+        public B setPrice(@Nullable final String price) {
             this.price = price;
-            return this;
+            return (B) this;
         }
 
         /**
          * Sets title for a new SkuDetails object.
          *
          * @param title SKU title.
+         *
          * @return this object.
          */
-        public Builder setTitle(@Nullable final String title) {
+        public B setTitle(@Nullable final String title) {
             this.title = title;
-            return this;
+            return (B) this;
         }
 
         /**
          * Sets localized description for a new SkuDetails object.
          *
          * @param description SKU description.
+         *
          * @return this object.
          */
-        public Builder setDescription(@Nullable final String description) {
+        public B setDescription(@Nullable final String description) {
             this.description = description;
-            return this;
+            return (B) this;
         }
 
-        /**
-         * Sets existing SkuDetails object to use as a base for a new one.
-         *
-         * @param skuDetails Existing SkuDetails object.
-         * @return this object.
-         */
-        public Builder setSkuDetails(@NonNull final SkuDetails skuDetails) {
-            setBillingModel(skuDetails);
-            setPrice(skuDetails.getPrice());
-            setTitle(skuDetails.getTitle());
-            setDescription(skuDetails.getDescription());
-            return this;
+        @Override
+        public B setBase(@NonNull final M billingModel) {
+            setPrice(billingModel.getPrice());
+            setTitle(billingModel.getTitle());
+            setDescription(billingModel.getDescription());
+            return super.setBase(billingModel);
+        }
+    }
+
+    public static class Builder extends SkuDetailsBuilder<Builder, SkuDetails> {
+
+        public Builder(@NonNull final String sku) {
+            super(sku);
         }
 
         public SkuDetails build() {

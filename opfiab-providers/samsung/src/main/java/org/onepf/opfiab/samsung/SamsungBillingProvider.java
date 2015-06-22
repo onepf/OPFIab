@@ -25,7 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.billing.ActivityBillingProvider;
-import org.onepf.opfiab.billing.BaseBillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -283,8 +283,8 @@ public class SamsungBillingProvider
         releaseActivity(activity);
     }
 
-    public static class Builder extends BaseBillingProvider.Builder<Builder, SamsungSkuResolver,
-            PurchaseVerifier> {
+    public static class Builder extends BaseBillingProviderBuilder<Builder, SamsungSkuResolver,
+                    PurchaseVerifier> {
 
         @NonNull
         private BillingMode billingMode = BillingMode.PRODUCTION;
