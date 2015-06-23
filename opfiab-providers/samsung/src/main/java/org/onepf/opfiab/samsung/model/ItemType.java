@@ -19,6 +19,8 @@ package org.onepf.opfiab.samsung.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.model.billing.SkuType;
+
 public enum ItemType {
 
     CONSUMABLE("00"),
@@ -36,6 +38,20 @@ public enum ItemType {
         return null;
     }
 
+    @NonNull
+    public static ItemType fromSkuType(@NonNull final SkuType type) {
+        switch (type) {
+            case CONSUMABLE:
+                return CONSUMABLE;
+            case ENTITLEMENT:
+                return NON_CONSUMABLE;
+            case SUBSCRIPTION:
+                return SUBSCRIPTION;
+            default:
+                throw new IllegalArgumentException("Can't convert SkyType: " + type);
+        }
+
+    }
 
     @NonNull
     private final String code;

@@ -26,10 +26,12 @@ import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.Configuration.Builder;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
-import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
+
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import static org.onepf.opfiab.model.event.SetupResponse.Status.FAILED;
 import static org.onepf.opfiab.model.event.SetupResponse.Status.PROVIDER_CHANGED;
@@ -38,7 +40,7 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 /**
  * This class tries to pick one {@link BillingProvider} from those available from
  * {@link Configuration#getProviders()}.
- * <p>
+ * <p/>
  * Providers are picked according to this priority rules:
  * <ul>
  * <li> Only available providers will be considered, according to {@link BillingProvider#isAvailable()}.
@@ -73,7 +75,7 @@ final class SetupManager {
     private boolean setupInProgress;
     /**
      * Configuration object from last received setup request.
-     * <p>
+     * <p/>
      * Used to determine whether {@link SetupResponse} is relevant when it's ready.
      */
     @Nullable
@@ -84,6 +86,25 @@ final class SetupManager {
         preferences = new OPFPreferences(context);
     }
 
+    /**
+     * Filters out unavailable {@link BillingProvider}s.
+     *
+     * @param providers Providers to filter.
+     *
+     * @return Collection of available providers.
+     */
+    @NonNull
+    public Iterable<BillingProvider> getAvailable(
+            @NonNull final Iterable<BillingProvider> providers) {
+        final Collection<BillingProvider> availableProviders = new LinkedHashSet<>();
+        for (final BillingProvider provider : providers) {
+            if (provider.isAvailable()) {
+                availableProviders.add(provider);
+            }
+        }
+        return availableProviders;
+    }
+
     @SuppressWarnings({"PMD.NPathComplexity", "PMD.AvoidDeeplyNestedIfStmts"})
     @NonNull
     private SetupResponse newResponse(@NonNull final SetupStartedEvent setupStartedEvent) {
@@ -91,7 +112,7 @@ final class SetupManager {
 
         final Configuration configuration = setupStartedEvent.getConfiguration();
         final Iterable<BillingProvider> providers = configuration.getProviders();
-        final Iterable<BillingProvider> availableProviders = OPFIabUtils.getAvailable(providers);
+        final Iterable<BillingProvider> availableProviders = getAvailable(providers);
 
         final boolean hadProvider = preferences.contains(KEY_LAST_PROVIDER);
         if (hadProvider) {
@@ -135,7 +156,7 @@ final class SetupManager {
 
     /**
      * Tries to start setup process for the supplied configuration.
-     * <p>
+     * <p/>
      * If setup is already in progress, new configuration object is stored and used after
      * current setup is finished.
      *

@@ -2,9 +2,9 @@ package org.onepf.opfiab.samsung;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.sku.MapSkuResolver;
+import org.onepf.opfiab.sku.TypedMapSkuResolver;
 
-public class SamsungMapSkuResolver extends MapSkuResolver implements SamsungSkuResolver {
+public class SamsungMapSkuResolver extends TypedMapSkuResolver implements SamsungSkuResolver {
 
     @NonNull
     private final String groupId;

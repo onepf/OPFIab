@@ -308,26 +308,6 @@ public final class SamsungUtils {
     }
 
     @Nullable
-    public static ItemType getItemType(@Nullable final Bundle bundle,
-                                       @NonNull final String sku) {
-        final Collection<String> items = getItems(bundle);
-        if (items == null) {
-            return null;
-        }
-        for (final String item : items) {
-            try {
-                final SamsungSkuDetails skuDetails = new SamsungSkuDetails(item);
-                if (sku.equals(skuDetails.getItemId())) {
-                    return skuDetails.getItemType();
-                }
-            } catch (JSONException exception) {
-                OPFLog.e("Filed to decode Samsung sku details.", exception);
-            }
-        }
-        return null;
-    }
-
-    @Nullable
     public static SamsungPurchase getPurchase(@Nullable final Bundle bundle) {
         final String item;
         if (bundle == null || (item = bundle.getString(KEY_RESULT_OBJECT)) == null) {

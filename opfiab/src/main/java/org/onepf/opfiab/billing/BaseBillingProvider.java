@@ -16,45 +16,30 @@
 
 package org.onepf.opfiab.billing;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.ActivityMonitor;
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
-import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryRequest;
-import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
-import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
-import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
-import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.util.BillingUtils;
 import org.onepf.opfiab.verification.PurchaseVerifier;
-import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFLog;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 
 /**
  * Base implementation of {@link BillingProvider}.
@@ -86,48 +71,28 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      * Loads details for specified SKUs.
      * <p/>
      * At this point all SKUs should be resolved with provided {@link SkuResolver}.
-     *
-     * @param skus skus to load details for.
-     *
-     * @see SkuDetails
-     * @see #postSkuDetailsResponse(Status, Collection)
      */
-    protected abstract void skuDetails(@NonNull final Set<String> skus);
+    protected abstract void skuDetails(@NonNull final SkuDetailsRequest request);
 
     /**
      * Loads user's inventory.
-     *
-     * @param startOver Flag indicating whether inventory should be loaded from the start or
-     *                  continue from the last request.
-     *
-     * @see Purchase
-     * @see #postInventoryResponse(Status, Iterable, boolean)
      */
-    protected abstract void inventory(final boolean startOver);
+    protected abstract void inventory(@NonNull final InventoryRequest request);
 
     /**
      * Purchase specified SKU.
      * <p/>
      * At this point sku should be already resolved with supplied {@link SkuResolver}.
-     *
-     * @param sku SKU to purchase.
-     *
-     * @see Purchase
-     * @see #postResponse(BillingResponse)
      */
-    protected abstract void purchase(@NonNull final String sku);
+    protected abstract void purchase(@NonNull final PurchaseRequest request);
 
     /**
      * Consumes specified Purchase.
      * <p/>
      * SKU available from {@link Purchase#getSku()} should be already resolved with supplied
      * {@link SkuResolver}.
-     *
-     * @param purchase Purchase object to consume
-     *
-     * @see #postConsumeResponse(Status, Purchase)
      */
-    protected abstract void consume(@NonNull final Purchase purchase);
+    protected abstract void consume(@NonNull final ConsumeRequest request);
 
     /**
      * Entry point for all incoming billing requests.
@@ -139,165 +104,36 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
         OPFLog.logMethod(billingRequest);
-        final Activity activity = billingRequest.getActivity();
-        // Filter not relevant requests
-        if (activity != null && !OPFIabUtils.isActivityFake(activity) && !ActivityMonitor.isStarted(
-                activity)) {
-            postEmptyResponse(billingRequest, USER_CANCELED);
-            return;
-        }
-        final String resolvedSku;
-        switch (billingRequest.getType()) {
+        final BillingRequest resolvedRequest = BillingUtils.resolve(skuResolver, billingRequest);
+        switch (resolvedRequest.getType()) {
             case CONSUME:
-                final ConsumeRequest consumeRequest = (ConsumeRequest) billingRequest;
+                final ConsumeRequest consumeRequest = (ConsumeRequest) resolvedRequest;
                 final Purchase purchase = consumeRequest.getPurchase();
                 final String purchaseProviderName = purchase.getProviderName();
                 final String providerName = getName();
                 if (!providerName.equals(purchaseProviderName)) {
                     OPFLog.e("Attempt to consume purchase from wrong provider: %s.\n"
                             + "Current provider: %s", purchaseProviderName, providerName);
-                    postEmptyResponse(billingRequest, ITEM_UNAVAILABLE);
+                    postEmptyResponse(resolvedRequest, ITEM_UNAVAILABLE);
                     break;
                 }
-                resolvedSku = skuResolver.resolve(purchase.getSku());
-                consume(OPFIabUtils.substituteSku(purchase, resolvedSku));
+                consume(consumeRequest);
                 break;
             case PURCHASE:
-                final PurchaseRequest purchaseRequest = (PurchaseRequest) billingRequest;
-                resolvedSku = skuResolver.resolve(purchaseRequest.getSku());
-                purchase(resolvedSku);
+                final PurchaseRequest purchaseRequest = (PurchaseRequest) resolvedRequest;
+                purchase(purchaseRequest);
                 break;
             case SKU_DETAILS:
-                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) billingRequest;
-                final Set<String> skus = skuDetailsRequest.getSkus();
-                final Set<String> resolvedSkus = OPFIabUtils.resolveSkus(skuResolver, skus);
-                skuDetails(resolvedSkus);
+                final SkuDetailsRequest skuDetailsRequest = (SkuDetailsRequest) resolvedRequest;
+                skuDetails(skuDetailsRequest);
                 break;
             case INVENTORY:
-                final InventoryRequest inventoryRequest = (InventoryRequest) billingRequest;
-                final boolean startOver = inventoryRequest.startOver();
-                inventory(startOver);
+                final InventoryRequest inventoryRequest = (InventoryRequest) resolvedRequest;
+                inventory(inventoryRequest);
                 break;
             default:
                 throw new IllegalStateException();
         }
-    }
-
-    /**
-     * Notifies library about billing response from this billing provider.
-     *
-     * @param billingResponse BillingResponse object to send to library.
-     */
-    protected void postResponse(@NonNull final BillingResponse billingResponse) {
-        OPFIab.post(billingResponse);
-    }
-
-    /**
-     * Constructs and sends empty {@link BillingResponse}.
-     *
-     * @param billingRequest BillingRequest object to construct corresponding response to.
-     * @param status         Status object to use in BillingResponse.
-     *
-     * @see #postResponse(BillingResponse)
-     */
-    protected void postEmptyResponse(@NonNull final BillingRequest billingRequest,
-                                     @NonNull final Status status) {
-        postResponse(OPFIabUtils.emptyResponse(getName(), billingRequest, status));
-    }
-
-    /**
-     * Constructs and sends {@link SkuDetailsResponse}.
-     * <p/>
-     * SKUs available from {@link SkuDetails#getSku()} will be reverted with supplied
-     * {@link SkuResolver}.
-     *
-     * @param status      Status object to use in response.
-     * @param skusDetails Can be null. Collection of SkuDetails objects to add in response.
-     *
-     * @see SkuDetailsResponse
-     */
-    protected void postSkuDetailsResponse(@NonNull final Status status,
-                                          @Nullable final Collection<SkuDetails> skusDetails) {
-        final SkuDetailsResponse response;
-        if (skusDetails == null) {
-            response = new SkuDetailsResponse(status, getName(), null);
-        } else {
-            final Collection<SkuDetails> revertedSkusDetails = new ArrayList<>(skusDetails.size());
-            for (final SkuDetails skuDetails : skusDetails) {
-                revertedSkusDetails.add(OPFIabUtils.revert(skuResolver, skuDetails));
-            }
-            response = new SkuDetailsResponse(status, getName(), revertedSkusDetails);
-        }
-        postResponse(response);
-    }
-
-    /**
-     * Constructs and sends {@link InventoryResponse}.
-     * <p/>
-     * SKUs available from {@link Purchase#getSku()} will be reverted with supplied
-     * {@link SkuResolver}.
-     *
-     * @param status    Status object to use in response.
-     * @param inventory Can be null. Collection of Purchase objects to add in response.
-     * @param hasMore   Flag indicating whether more items are available in user inventory.
-     *
-     * @see InventoryResponse
-     */
-    protected void postInventoryResponse(@NonNull final Status status,
-                                         @Nullable final Iterable<Purchase> inventory,
-                                         final boolean hasMore) {
-        final InventoryResponse response;
-        if (inventory == null) {
-            response = new InventoryResponse(status, getName(), null, hasMore);
-        } else {
-            final Map<Purchase, VerificationResult> verifiedRevertedInventory = new HashMap<>();
-            for (final Purchase purchase : inventory) {
-                final VerificationResult result = purchaseVerifier.verify(purchase);
-                final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
-                verifiedRevertedInventory.put(revertedPurchase, result);
-            }
-            response = new InventoryResponse(status, getName(), verifiedRevertedInventory, hasMore);
-        }
-        postResponse(response);
-    }
-
-    /**
-     * Constructs and sends {@link PurchaseResponse}.
-     * <p/>
-     * SKU available from {@link Purchase#getSku()} will be reverted with supplied
-     * {@link SkuResolver}.
-     *
-     * @param status   Status object to use in response.
-     * @param purchase Can be null. Purchase object to add in response.
-     *
-     * @see PurchaseResponse
-     */
-    protected void postPurchaseResponse(@NonNull final Status status,
-                                        @Nullable final Purchase purchase) {
-        final PurchaseResponse response;
-        if (purchase == null) {
-            response = new PurchaseResponse(status, getName(), null, null);
-        } else {
-            final VerificationResult result = purchaseVerifier.verify(purchase);
-            final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
-            response = new PurchaseResponse(status, getName(), revertedPurchase, result);
-        }
-        postResponse(response);
-    }
-
-    /**
-     * Constructs and sends {@link ConsumeResponse}.
-     * <p/>
-     * SKU available from {@link Purchase#getSku()} will be reverted with supplied
-     * {@link SkuResolver}.
-     *
-     * @param status   Status object to use in response.
-     * @param purchase Can't be null. Purchase object to add in response.
-     */
-    protected void postConsumeResponse(@NonNull final Status status,
-                                       @NonNull final Purchase purchase) {
-        final Purchase revertedPurchase = OPFIabUtils.revert(skuResolver, purchase);
-        postResponse(new ConsumeResponse(status, getName(), revertedPurchase));
     }
 
     @Override
@@ -308,6 +144,37 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
             handleRequest(billingRequest);
         }
         OPFIab.post(new RequestHandledEvent(billingRequest));
+    }
+
+
+    protected BillingResponse verify(@NonNull final BillingResponse response) {
+        return BillingUtils.verify(purchaseVerifier, response);
+    }
+
+    protected BillingResponse revertSku(@NonNull final BillingResponse response) {
+        return BillingUtils.revert(skuResolver, response);
+    }
+
+    /**
+     * Notifies library about billing response from this billing provider.
+     *
+     * @param billingResponse BillingResponse object to send to library.
+     */
+    protected void postResponse(@NonNull final BillingResponse billingResponse) {
+        final BillingResponse verifiedResponse = verify(billingResponse);
+        final BillingResponse revertedResponse = revertSku(verifiedResponse);
+        OPFIab.post(revertedResponse);
+    }
+
+    /**
+     * Constructs and sends empty {@link BillingResponse}.
+     *
+     * @param billingRequest BillingRequest object to construct corresponding response to.
+     * @param status         Status object to use in BillingResponse.
+     */
+    protected void postEmptyResponse(@NonNull final BillingRequest billingRequest,
+                                     @NonNull final Status status) {
+        postResponse(BillingUtils.emptyResponse(getName(), billingRequest, status));
     }
 
     @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")
@@ -349,6 +216,4 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
         return getName();
     }
     //CHECKSTYLE:ON
-
-
 }

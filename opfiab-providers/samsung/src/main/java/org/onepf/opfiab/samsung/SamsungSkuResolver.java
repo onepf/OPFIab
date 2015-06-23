@@ -18,9 +18,9 @@ package org.onepf.opfiab.samsung;
 
 import android.support.annotation.NonNull;
 
-import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfiab.sku.TypedSkuResolver;
 
-public interface SamsungSkuResolver extends SkuResolver {
+public interface SamsungSkuResolver extends TypedSkuResolver {
 
     @NonNull
     String getGroupId();

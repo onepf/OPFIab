@@ -16,13 +16,10 @@
 
 package org.onepf.opfiab;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.api.IabHelper;
-import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
@@ -30,9 +27,10 @@ import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * This class is responsible for pending {@link BillingRequest}s execution. It monitors {@link
@@ -54,46 +52,14 @@ final class BillingRequestScheduler {
     }
 
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
     /**
      * Collection of helpers potentially having pending requests.
      */
-    private final Map<IabHelperImpl, Collection<BillingRequest>> helpers = new HashMap<>();
-    @SuppressWarnings("OverlyComplexAnonymousInnerClass")
-    private final Runnable handleNextRequest = new Runnable() {
-        @Override
-        public void run() {
-            // Iterate through registered helpers looking for pending request
-            for (final Map.Entry<IabHelperImpl, Collection<BillingRequest>> entry : helpers.entrySet()) {
-                final IabHelperImpl helper = entry.getKey();
-                if (helper.billingBase.isBusy()) {
-                    // Library is busy, pending requests will have to wait some more.
-                    return;
-                }
-                final BillingRequest request = OPFIabUtils.poll(entry.getValue());
-                if (request != null) {
-                    // Send request for execution
-                    entry.getKey().postRequest(request);
-                    return;
-                }
-            }
-        }
-    };
-
+    private final Map<IabHelperImpl, Collection<BillingRequest>> helpers = Collections
+            .synchronizedMap(new HashMap<IabHelperImpl, Collection<BillingRequest>>());
 
     private BillingRequestScheduler() {
         super();
-    }
-
-    /**
-     * Registers callback which will attempt to execute enqueued request after certain delay.
-     *
-     * @see Configuration#getSubsequentRequestDelay()
-     */
-    private void schedule() {
-        handler.removeCallbacks(handleNextRequest);
-        final long delay = OPFIab.getConfiguration().getSubsequentRequestDelay();
-        handler.postDelayed(handleNextRequest, delay);
     }
 
     /**
@@ -113,12 +79,11 @@ final class BillingRequestScheduler {
 
         final Collection<BillingRequest> queue;
         if (!helpers.containsKey(helper)) {
-            helpers.put(helper, queue = new LinkedHashSet<>());
+            helpers.put(helper, queue = new ConcurrentLinkedQueue<>());
         } else {
             queue = helpers.get(helper);
         }
         queue.add(request);
-        schedule();
     }
 
     /**
@@ -134,17 +99,33 @@ final class BillingRequestScheduler {
      * Dismisses all pending requests for all known helpers.
      */
     void dropQueue() {
-        handler.removeCallbacks(handleNextRequest);
         helpers.clear();
+    }
+
+    void handleNext() {
+        // Iterate through registered helpers looking for pending request
+        for (final Map.Entry<IabHelperImpl, Collection<BillingRequest>> entry : helpers.entrySet()) {
+            final IabHelperImpl helper = entry.getKey();
+            if (helper.billingBase.isBusy()) {
+                // Library is busy, pending requests will have to wait some more.
+                return;
+            }
+            final BillingRequest request = OPFIabUtils.poll(entry.getValue());
+            if (request != null) {
+                // Send request for execution
+                entry.getKey().postRequest(request);
+                return;
+            }
+        }
     }
 
     @SuppressWarnings("UnusedParameters")
     public void onEventMainThread(@NonNull final RequestHandledEvent event) {
-        schedule();
+        handleNext();
     }
 
     @SuppressWarnings("UnusedParameters")
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
-        handleNextRequest.run();
+        handleNext();
     }
 }

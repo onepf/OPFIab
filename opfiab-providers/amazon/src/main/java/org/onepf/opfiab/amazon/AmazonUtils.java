@@ -150,7 +150,10 @@ public final class AmazonUtils {
         final Collection<SkuDetails> skusDetails = new ArrayList<>();
         final Collection<Product> products = response.getProductData().values();
         for (final Product product : products) {
-            skusDetails.add(convertSkuDetails(product));
+            final SkuDetails skuDetails = convertSkuDetails(product);
+            if (skuDetails != null) {
+                skusDetails.add(skuDetails);
+            }
         }
         for (final String sku : response.getUnavailableSkus()) {
             skusDetails.add(new SkuDetails(sku));
@@ -166,7 +169,10 @@ public final class AmazonUtils {
         final List<Receipt> receipts = response.getReceipts();
         final Collection<Purchase> purchases = new ArrayList<>(receipts.size());
         for (final Receipt receipt : receipts) {
-            purchases.add(convertPurchase(receipt));
+            final Purchase purchase = convertPurchase(receipt);
+            if (purchase != null) {
+                purchases.add(purchase);
+            }
         }
 
         return purchases;

@@ -25,7 +25,6 @@ import org.json.JSONObject;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
-import org.onepf.opfiab.google.GoogleMapSkuResolver;
 import org.onepf.opfiab.google.SimpleGooglePurchaseVerifier;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.Purchase;
@@ -39,6 +38,7 @@ import org.onepf.opfiab.samsung.SamsungBillingProvider;
 import org.onepf.opfiab.samsung.SamsungMapSkuResolver;
 import org.onepf.opfiab.samsung.SamsungPurchaseVerifier;
 import org.onepf.opfiab.sku.MapSkuResolver;
+import org.onepf.opfiab.sku.TypedMapSkuResolver;
 import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.ArrayList;
@@ -106,8 +106,9 @@ public final class TrivialBilling {
         }
     }
 
+
     private static BillingProvider newGoogleProvider() {
-        final GoogleMapSkuResolver skuResolver = new GoogleMapSkuResolver();
+        final TypedMapSkuResolver skuResolver = new TypedMapSkuResolver();
         skuResolver.add(SKU_GAS, GOOGLE_SKU_GAS, SkuType.CONSUMABLE);
         skuResolver.add(SKU_PREMIUM, GOOGLE_SKU_PREMIUM, SkuType.ENTITLEMENT);
         skuResolver.add(SKU_SUBSCRIPTION, GOOGLE_SKU_SUBSCRIPTION, SkuType.SUBSCRIPTION);
@@ -131,13 +132,13 @@ public final class TrivialBilling {
 
     private static BillingProvider newSamsungProvider() {
         final SamsungMapSkuResolver skuResolver = new SamsungMapSkuResolver(SAMSUNG_GROUP_ID);
-        skuResolver.add(SKU_GAS, SAMSUNG_SKU_GAS);
-        skuResolver.add(SKU_PREMIUM, SAMSUNG_SKU_PREMIUM);
-        skuResolver.add(SKU_SUBSCRIPTION, SAMSUNG_SKU_SUBSCRIPTION);
+        skuResolver.add(SKU_GAS, SAMSUNG_SKU_GAS, SkuType.CONSUMABLE);
+        skuResolver.add(SKU_PREMIUM, SAMSUNG_SKU_PREMIUM, SkuType.ENTITLEMENT);
+        skuResolver.add(SKU_SUBSCRIPTION, SAMSUNG_SKU_SUBSCRIPTION, SkuType.SUBSCRIPTION);
 
         return new SamsungBillingProvider.Builder(context)
                 .setBillingMode(BillingMode.TEST_SUCCESS)
-                .setPurchaseVerifier(new SamsungPurchaseVerifier(context))
+                .setPurchaseVerifier(new SamsungPurchaseVerifier(context, BillingMode.TEST_SUCCESS))
                 .setSkuResolver(skuResolver)
                 .build();
     }
@@ -238,7 +239,7 @@ public final class TrivialBilling {
 
     public static void updateInventory(final InventoryResponse inventoryResponse) {
         final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
-        if (!inventoryResponse.isSuccessful() || inventory == null) {
+        if (!inventoryResponse.isSuccessful()) {
             // Leave current values intact if request failed
             return;
         }
@@ -264,7 +265,7 @@ public final class TrivialBilling {
 
     public static void updateSkuDetails(final SkuDetailsResponse skuDetailsResponse) {
         final Collection<SkuDetails> skusDetails = skuDetailsResponse.getSkusDetails();
-        if (!skuDetailsResponse.isSuccessful() || skusDetails == null) {
+        if (!skuDetailsResponse.isSuccessful()) {
             // Leave current values intact if request failed
             return;
         }

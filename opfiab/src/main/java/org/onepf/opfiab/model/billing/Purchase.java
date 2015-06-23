@@ -111,7 +111,7 @@ public class Purchase extends BillingModel {
      * Builder class for {@link Purchase} object.
      */
     @SuppressWarnings("unchecked")
-    protected static abstract class PurchaseBuilder<B extends PurchaseBuilder, M extends Purchase>
+    protected abstract static class PurchaseBuilder<B extends PurchaseBuilder, M extends Purchase>
             extends BillingModel.Builder<B, M> {
 
         @Nullable

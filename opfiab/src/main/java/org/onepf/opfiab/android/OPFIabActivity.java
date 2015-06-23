@@ -135,8 +135,6 @@ public class OPFIabActivity extends Activity {
             finish();
         }
         // Result event subscriber should finish activity when it's done with it.
-        // Schedule finish just in case
-        scheduleFinish(true);
     }
 
     @Override

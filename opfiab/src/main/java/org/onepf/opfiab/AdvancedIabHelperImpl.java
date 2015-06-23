@@ -61,8 +61,8 @@ class AdvancedIabHelperImpl extends SimpleIabHelperImpl implements AdvancedIabHe
     protected void postRequest(@NonNull final BillingRequest billingRequest) {
         if (billingBase.getSetupResponse() == null) {
             // Lazy setup
-            OPFIab.setup();
             scheduler.schedule(this, billingRequest);
+            OPFIab.setup();
         } else if (!billingBase.isBusy()) {
             // No need to schedule anything
             super.postRequest(billingRequest);

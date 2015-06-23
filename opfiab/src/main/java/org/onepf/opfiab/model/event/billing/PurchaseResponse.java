@@ -52,10 +52,22 @@ public class PurchaseResponse extends BillingResponse {
         this.verificationResult = verificationResult;
     }
 
+    public PurchaseResponse(@NonNull final Status status,
+                            @Nullable final String providerName,
+                            @Nullable final Purchase purchase) {
+        this(status, providerName, purchase, null);
+    }
+
+    public PurchaseResponse(@NonNull final Status status,
+                            @Nullable final String providerName) {
+        this(status, providerName, null);
+    }
+
     /**
      * Gets purchase acquired by user with corresponding {@link BillingRequest}.
      *
      * @return Purchase object. Can be null.
+     *
      * @see #isSuccessful()
      */
     @Nullable
@@ -67,6 +79,7 @@ public class PurchaseResponse extends BillingResponse {
      * Gets verification result for corresponding purchase.
      *
      * @return VerificationResult. Can be null.
+     *
      * @see #isSuccessful()
      * @see PurchaseVerifier
      */
@@ -91,7 +104,7 @@ public class PurchaseResponse extends BillingResponse {
         try {
             jsonObject.put(NAME_PURCHASE, purchase == null ? NULL : purchase.toJson());
             jsonObject.put(NAME_VERIFICATION_RESULT,
-                           verificationResult == null ? NULL : verificationResult);
+                    verificationResult == null ? NULL : verificationResult);
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }

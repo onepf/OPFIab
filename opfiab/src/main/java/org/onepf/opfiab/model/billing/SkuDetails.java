@@ -130,7 +130,7 @@ public class SkuDetails extends BillingModel {
      * Builder class for {@link SkuDetails} object.
      */
     @SuppressWarnings("unchecked")
-    protected static abstract class SkuDetailsBuilder<B extends Builder, M extends SkuDetails>
+    protected abstract static class SkuDetailsBuilder<B extends Builder, M extends SkuDetails>
             extends BillingModel.Builder<B, M> {
 
         @Nullable

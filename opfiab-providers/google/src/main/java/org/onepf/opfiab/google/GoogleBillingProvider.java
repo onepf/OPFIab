@@ -28,8 +28,8 @@ import android.text.TextUtils;
 
 import org.json.JSONException;
 import org.onepf.opfiab.billing.ActivityBillingProvider;
-import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
+import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
@@ -39,6 +39,15 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SignedPurchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
+import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.billing.ConsumeRequest;
+import org.onepf.opfiab.model.event.billing.ConsumeResponse;
+import org.onepf.opfiab.model.event.billing.InventoryRequest;
+import org.onepf.opfiab.model.event.billing.InventoryResponse;
+import org.onepf.opfiab.model.event.billing.PurchaseRequest;
+import org.onepf.opfiab.model.event.billing.PurchaseResponse;
+import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
+import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.TypedSkuResolver;
 import org.onepf.opfiab.verification.PurchaseVerifier;
@@ -49,7 +58,6 @@ import org.onepf.opfutils.OPFUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -214,38 +222,41 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
     }
 
     @Override
-    public void consume(final Activity activity, @NonNull final Purchase purchase) {
+    protected void consume(@NonNull final ConsumeRequest request) {
+        final Purchase purchase = request.getPurchase();
         final String token = purchase.getToken();
         if (TextUtils.isEmpty(token)) {
             OPFLog.e("Purchase toke in empty.");
-            postConsumeResponse(Status.ITEM_UNAVAILABLE, purchase);
+            postEmptyResponse(request, Status.ITEM_UNAVAILABLE);
             return;
         }
 
         final Response response = helper.consumePurchase(token);
         if (response != Response.OK) {
             OPFLog.e("Consume failed.");
-            postConsumeResponse(getStatus(response), purchase);
+            postEmptyResponse(request, getStatus(response));
             return;
         }
 
-        postConsumeResponse(Status.SUCCESS, purchase);
+        postResponse(new ConsumeResponse(Status.SUCCESS, getName(), purchase));
     }
 
     @Override
-    public void skuDetails(final Activity activity, @NonNull final Set<String> skus) {
+    protected void skuDetails(@NonNull final SkuDetailsRequest request) {
+        final Set<String> skus = request.getSkus();
         final Bundle result = helper.getSkuDetails(skus);
         final Response response = GoogleUtils.getResponse(result);
         //noinspection ConstantConditions
         if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve sku details.");
-            postSkuDetailsResponse(getStatus(response), null);
+            postEmptyResponse(request, getStatus(response));
             return;
         }
 
         final Collection<String> jsonSkuDetails = GoogleUtils.getSkuDetails(result);
         if (jsonSkuDetails == null) {
-            postSkuDetailsResponse(Status.SUCCESS, Collections.<SkuDetails>emptyList());
+            OPFLog.d("No sku details data: %s", result);
+            postEmptyResponse(request, Status.SUCCESS);
             return;
         }
 
@@ -265,17 +276,18 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
         for (final String sku : unresolvedSkus) {
             skusDetails.add(new SkuDetails(sku));
         }
-        postSkuDetailsResponse(Status.SUCCESS, skusDetails);
+        postResponse(new SkuDetailsResponse(Status.SUCCESS, getName(), skusDetails));
     }
 
     @Override
-    public void inventory(final Activity activity, final boolean startOver) {
+    protected void inventory(@NonNull final InventoryRequest request) {
+        final boolean startOver = request.startOver();
         final Bundle result = helper.getPurchases(startOver);
         final Response response = GoogleUtils.getResponse(result);
         // noinspection ConstantConditions
         if (response != Response.OK || result == null) {
             OPFLog.e("Failed to retrieve purchase data.");
-            postInventoryResponse(getStatus(response), null, false);
+            postEmptyResponse(request, getStatus(response));
             return;
         }
 
@@ -283,14 +295,15 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
         final List<String> dataList = GoogleUtils.getDataList(result);
         final List<String> signatureList = GoogleUtils.getSignatureList(result);
         if (itemList == null || dataList == null || signatureList == null) {
-            postInventoryResponse(Status.SUCCESS, Collections.<Purchase>emptyList(), false);
+            OPFLog.d("No purchases data: %s", response);
+            postEmptyResponse(request, Status.SUCCESS);
             return;
         }
 
         final int size = dataList.size();
         if (itemList.size() < size || signatureList.size() < size) {
             OPFLog.e("Failed to parse purchase data response.");
-            postInventoryResponse(Status.UNKNOWN_ERROR, Collections.<Purchase>emptyList(), false);
+            postEmptyResponse(request, Status.UNKNOWN_ERROR);
             return;
         }
 
@@ -308,24 +321,18 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
         }
         final String token = GoogleUtils.getContinuationToken(result);
         final boolean hasMore = !TextUtils.isEmpty(token);
-        postInventoryResponse(Status.SUCCESS, inventory, hasMore);
-    }
-
-    protected void postPurchaseResponse(@NonNull final Status status,
-                                        @Nullable final Purchase purchase,
-                                        @NonNull final Activity activity) {
-        releaseActivity(activity);
-        postPurchaseResponse(status, purchase);
+        postResponse(new InventoryResponse(Status.SUCCESS, getName(), inventory, hasMore));
     }
 
     @Override
-    public void purchase(@NonNull final Activity activity, @NonNull final String sku) {
+    protected void purchase(@NonNull final PurchaseRequest request) {
+        final String sku = request.getSku();
         final SkuType skuType = skuResolver.resolveType(sku);
         final ItemType itemType = ItemType.fromSkuType(skuType);
         // Google can't process purchase with unknown type
         if (itemType == null) {
             OPFLog.e("Unknown sku type: %s", sku);
-            postPurchaseResponse(Status.ITEM_UNAVAILABLE, null, activity);
+            postEmptyResponse(request, Status.ITEM_UNAVAILABLE);
             return;
         }
 
@@ -334,33 +341,34 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
         final PendingIntent intent = GoogleUtils.getBuyIntent(result);
         if (response != Response.OK || intent == null) {
             OPFLog.e("Failed to retrieve buy intent.");
-            postPurchaseResponse(getStatus(response), null, activity);
+            postEmptyResponse(request, getStatus(response));
             return;
         }
 
-        final IntentSender sender = intent.getIntentSender();
-        try {
-            activity.startIntentSenderForResult(sender, REQUEST_CODE, new Intent(), 0, 0, 0);
-        } catch (IntentSender.SendIntentException exception) {
-            OPFLog.e("Failed to send buy intent.", exception);
-            postPurchaseResponse(Status.UNKNOWN_ERROR, null, activity);
+        final ActivityResultEvent activityResult = requestActivityResult(request,
+                new ActivityResultHelper(DEFAULT_REQUEST_CODE) {
+                    @Override
+                    public void onStartForResult(@NonNull final Activity activity)
+                            throws IntentSender.SendIntentException {
+                        final IntentSender sender = intent.getIntentSender();
+                        activity.startIntentSenderForResult(
+                                sender, DEFAULT_REQUEST_CODE, new Intent(), 0, 0, 0);
+                    }
+                });
+        if (activityResult == null) {
+            postEmptyResponse(request, Status.UNKNOWN_ERROR);
+            return;
         }
-    }
-
-    @Override
-    public void onActivityResult(@NonNull final Activity activity,
-                                 final int requestCode,
-                                 final int resultCode,
-                                 @Nullable final Intent data) {
-        //TODO release activity
-        // Handle purchase result
-        final Response response = GoogleUtils.getResponse(data);
+        final Intent data = activityResult.getData();
+        final int resultCode = activityResult.getResultCode();
+        final Response purchaseResponse = GoogleUtils.getResponse(data);
         final String purchaseData = GoogleUtils.getPurchaseData(data);
         final String signature = GoogleUtils.getSignature(data);
-        if (resultCode != Activity.RESULT_OK || response != Response.OK || purchaseData == null || signature == null) {
+        if (resultCode != Activity.RESULT_OK || purchaseResponse != Response.OK
+                || purchaseData == null || signature == null) {
             OPFLog.e("Failed to handle activity result. Code:%s, Data:%s",
-                     resultCode, OPFUtils.toString(data));
-            postPurchaseResponse(getStatus(response), null, activity);
+                    resultCode, OPFUtils.toString(data));
+            postEmptyResponse(request, getStatus(purchaseResponse));
             return;
         }
 
@@ -369,17 +377,16 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
             googlePurchase = new GooglePurchase(purchaseData);
         } catch (JSONException exception) {
             OPFLog.e("Failed to parse purchase data: " + purchaseData, exception);
-            postPurchaseResponse(Status.UNKNOWN_ERROR, null, activity);
+            postEmptyResponse(request, Status.UNKNOWN_ERROR);
             return;
         }
 
         final Purchase purchase = newPurchase(googlePurchase, signature);
-        postPurchaseResponse(Status.SUCCESS, purchase, activity);
+        postResponse(new PurchaseResponse(Status.SUCCESS, getName(), purchase));
     }
 
-
     public static class Builder extends BaseBillingProviderBuilder<Builder, TypedSkuResolver,
-                    PurchaseVerifier> {
+            PurchaseVerifier> {
 
         public Builder(@NonNull final Context context) {
             super(context);

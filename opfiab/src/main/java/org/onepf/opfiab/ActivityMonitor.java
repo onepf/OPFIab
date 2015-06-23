@@ -107,6 +107,9 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
         return Arrays.asList(RESUME, PAUSE, START).contains(getState(activity));
     }
 
+    public static boolean isDestroyed(@NonNull final Activity activity) {
+        return getState(activity) == DESTROY;
+    }
 
     private ActivityMonitor() {
         super();

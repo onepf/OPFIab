@@ -85,7 +85,7 @@ public class SignedPurchase extends Purchase {
 
 
     @SuppressWarnings("unchecked")
-    protected static abstract class SignedPurchaseBuilder<B extends SignedPurchaseBuilder,
+    protected abstract static class SignedPurchaseBuilder<B extends SignedPurchaseBuilder,
             M extends SignedPurchase> extends Purchase.PurchaseBuilder<B, M> {
 
         protected String signature;

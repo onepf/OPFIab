@@ -25,6 +25,7 @@ import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfutils.OPFLog;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -38,30 +39,35 @@ public class SkuDetailsResponse extends BillingResponse {
     private static final String NAME_SKUS_DETAILS = "skus_details";
 
 
-    @Nullable
-    private final Collection<SkuDetails> skusDetails;
+    private final Collection<SkuDetails> skusDetails = new ArrayList<>();
 
     public SkuDetailsResponse(@NonNull final Status status,
                               @Nullable final String providerName,
                               @Nullable final Collection<SkuDetails> skusDetails) {
         super(BillingEventType.SKU_DETAILS, status, providerName);
-        this.skusDetails = skusDetails == null
-                ? null
-                : Collections.unmodifiableCollection(skusDetails);
+        if (skusDetails != null) {
+            this.skusDetails.addAll(skusDetails);
+        }
+    }
+
+    public SkuDetailsResponse(@NonNull final Status status,
+                              @Nullable final String providerName) {
+        this(status, providerName, null);
     }
 
     /**
      * Gets details for corresponding SKUs.
-     * <p>
+     * <p/>
      * Some SKUs might not have been recognized by {@link BillingProvider} and are left empty.
      *
      * @return Collection of SkuDetails objects. Can be null.
+     *
      * @see #isSuccessful()
      * @see SkuDetails#isEmpty()
      */
-    @Nullable
+    @NonNull
     public Collection<SkuDetails> getSkusDetails() {
-        return skusDetails;
+        return Collections.unmodifiableCollection(skusDetails);
     }
 
     @NonNull

@@ -27,8 +27,10 @@ import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.Status;
+import org.onepf.opfiab.util.BillingUtils;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.BUSY;
@@ -95,12 +97,12 @@ final class BillingBase {
 
     private void postEmptyResponse(@NonNull final BillingRequest billingRequest,
                                    @NonNull final Status status) {
-        OPFIab.post(OPFIabUtils.emptyResponse(null, billingRequest, status));
+        OPFIab.post(BillingUtils.emptyResponse(null, billingRequest, status));
     }
 
     /**
      * Sets configuration currently used by library.
-     * <p>
+     * <p/>
      * This method resets library setup state.
      *
      * @param configuration Current configuration object
@@ -145,11 +147,12 @@ final class BillingBase {
 
     /**
      * Attempts to execute supplied billing request using current billing provider.
-     * <p>
+     * <p/>
      * If current provider is unavailable or busy, supplied request will not be executed and
      * instead corresponding response will be send immediately.
      *
      * @param billingRequest BillingRequest to execute.
+     *
      * @see #isBusy()
      */
     void postRequest(@NonNull final BillingRequest billingRequest) {
@@ -161,6 +164,10 @@ final class BillingBase {
         } else if ((setupResponse = getSetupResponse()) == null || !setupResponse.isSuccessful()) {
             // Setup was not started, is in progress or failed
             postEmptyResponse(billingRequest, NO_BILLING_PROVIDER);
+        } else if (configuration.skipStaleRequests() && OPFIabUtils.isStale(billingRequest)) {
+            // Request is no longer relevant, try next one
+            OPFLog.d("Skipping stale request: " + billingRequest);
+            BillingRequestScheduler.getInstance().handleNext();
         } else {
             pendingRequest = billingRequest;
             // Send request to be handled by BillingProvider

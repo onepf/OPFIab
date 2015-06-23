@@ -27,6 +27,7 @@ import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,8 +41,7 @@ public class InventoryResponse extends BillingResponse {
     private static final String NAME_HAS_MORE = "has_more";
 
 
-    @Nullable
-    private final Map<Purchase, VerificationResult> inventory;
+    private final Map<Purchase, VerificationResult> inventory = new HashMap<>();
     private final boolean hasMore;
 
     public InventoryResponse(@NonNull final Status status,
@@ -49,25 +49,48 @@ public class InventoryResponse extends BillingResponse {
                              @Nullable final Map<Purchase, VerificationResult> inventory,
                              final boolean hasMore) {
         super(BillingEventType.INVENTORY, status, providerName);
-        this.inventory = inventory == null ? null : Collections.unmodifiableMap(inventory);
+        if (inventory != null) {
+            this.inventory.putAll(inventory);
+        }
         this.hasMore = hasMore;
+    }
+
+    public InventoryResponse(@NonNull final Status status,
+                             @Nullable final String providerName,
+                             @Nullable final Iterable<Purchase> inventory,
+                             final boolean hasMore) {
+        this(status, providerName,
+                inventory == null ? null : new HashMap<Purchase, VerificationResult>() {
+                    {
+                        for (final Purchase purchase : inventory) {
+                            put(purchase, null);
+                        }
+                    }
+                }, hasMore);
+    }
+
+    public InventoryResponse(@NonNull final Status status,
+                             @Nullable final String providerName) {
+        this(status, providerName, (Map<Purchase, VerificationResult>) null, false);
     }
 
     /**
      * Gets items owned by user along with {@link VerificationResult} of those items.
      *
      * @return Purchases made by user mapped to their verification status. Can be null.
+     *
      * @see #isSuccessful()
      */
-    @Nullable
+    @NonNull
     public Map<Purchase, VerificationResult> getInventory() {
-        return inventory;
+        return Collections.unmodifiableMap(inventory);
     }
 
     /**
      * Indicates whether there are more items to be loaded with subsequent {@link InventoryRequest}s.
      *
      * @return True if there are more user owned purchases to be loaded, false otherwise.
+     *
      * @see InventoryRequest#startOver()
      */
     public boolean hasMore() {

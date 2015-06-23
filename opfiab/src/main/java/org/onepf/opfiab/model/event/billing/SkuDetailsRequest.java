@@ -28,6 +28,7 @@ import org.onepf.opfutils.OPFLog;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -42,7 +43,7 @@ public class SkuDetailsRequest extends BillingRequest {
     // Must use serializable Set
     @SuppressWarnings("PMD.LooseCoupling")
     @NonNull
-    private final HashSet<String> skus = new HashSet<>();
+    private final HashSet<String> skus = new LinkedHashSet<>();
 
     public SkuDetailsRequest(@NonNull final Set<String> skus) {
         this(null, false, skus);

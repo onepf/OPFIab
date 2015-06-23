@@ -17,6 +17,8 @@
 package org.onepf.opfiab.sku;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.onepf.opfiab.model.billing.SkuType;
 
@@ -33,6 +35,33 @@ public class TypedMapSkuResolver implements TypedSkuResolver {
 
     public TypedMapSkuResolver() {
         super();
+    }
+
+    /**
+     * Adds SKU mapping with corresponding SKU type.
+     *
+     * @param sku         Original SKU.
+     * @param resolvedSku Provider specific SKU. Can be null if there's no need in mapping.
+     * @param skuType     Type of the mapped SKU.
+     */
+    public void add(@NonNull final String sku,
+                    @Nullable final String resolvedSku,
+                    @NonNull final SkuType skuType) {
+        types.put(sku, skuType);
+        if (!TextUtils.isEmpty(resolvedSku)) {
+            types.put(resolvedSku, skuType);
+            mapSkuResolver.add(sku, resolvedSku);
+        }
+    }
+
+    /**
+     * Same as {@code add(sku, null, skuType)}.
+     *
+     * @see #add(String, String, SkuType)
+     */
+    public void add(@NonNull final String sku,
+                    @NonNull final SkuType skuType) {
+        add(sku, null, skuType);
     }
 
     @NonNull

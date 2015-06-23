@@ -52,14 +52,9 @@ public abstract class BillingRequest extends BillingEvent {
         this.activityHandlesResult = activityHandlesResult;
     }
 
-    /**
-     * Gets Activity object to be used to start other activities if necessary.
-     *
-     * @return Activity object. Can be null.
-     */
     @Nullable
-    public Activity getActivity() {
-        return activityReference == null ? null : activityReference.get();
+    public Reference<Activity> getActivity() {
+        return activityReference;
     }
 
     /**

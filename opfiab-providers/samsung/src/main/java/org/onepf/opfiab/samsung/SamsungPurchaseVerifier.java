@@ -41,9 +41,13 @@ public class SamsungPurchaseVerifier implements PurchaseVerifier {
 
     @NonNull
     protected final Context context;
+    @NonNull
+    protected final BillingMode billingMode;
 
-    public SamsungPurchaseVerifier(@NonNull final Context context) {
+    public SamsungPurchaseVerifier(@NonNull final Context context,
+                                   @NonNull final BillingMode billingMode) {
         this.context = context;
+        this.billingMode = billingMode;
     }
 
     @NonNull
@@ -64,7 +68,8 @@ public class SamsungPurchaseVerifier implements PurchaseVerifier {
             }
             final String body = OPFIabUtils.toString(connection.getInputStream());
             final SamsungVerification verification = new SamsungVerification(body);
-            return verification.isStatus() ? VerificationResult.SUCCESS : VerificationResult.FAILED;
+            return verification.isStatus()  && verification.getMode() == this.billingMode
+                    ? VerificationResult.SUCCESS : VerificationResult.FAILED;
         } catch (IOException | JSONException exception) {
             OPFLog.e("", exception);
         }

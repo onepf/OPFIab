@@ -20,7 +20,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.api.AdvancedIabHelper;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.DefaultBillingListener;
@@ -37,21 +36,18 @@ import java.util.Set;
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass")
 public final class Configuration {
 
-    private static final long DEFAULT_REQUEST_DELAY = 50L;
-
-
     @NonNull
     private final Set<BillingProvider> providers;
     @Nullable
     private final BillingListener billingListener;
-    private final long subsequentRequestDelay;
+    private final boolean skipStaleRequests;
     private final boolean autoRecover;
 
     Configuration(@NonNull final Set<BillingProvider> providers,
                   @Nullable final BillingListener billingListener,
-                  final long subsequentRequestDelay,
+                  final boolean skipStaleRequests,
                   final boolean autoRecover) {
-        this.subsequentRequestDelay = subsequentRequestDelay;
+        this.skipStaleRequests = skipStaleRequests;
         this.autoRecover = autoRecover;
         this.providers = Collections.unmodifiableSet(providers);
         this.billingListener = billingListener;
@@ -78,13 +74,8 @@ public final class Configuration {
         return billingListener;
     }
 
-    /**
-     * Gets minimal time gap between pending requests.
-     *
-     * @return Time gap in milliseconds.
-     */
-    public long getSubsequentRequestDelay() {
-        return subsequentRequestDelay;
+    public boolean skipStaleRequests() {
+        return skipStaleRequests;
     }
 
     /**
@@ -106,12 +97,12 @@ public final class Configuration {
         private final Set<BillingProvider> providers = new LinkedHashSet<>();
         @Nullable
         private BillingListener billingListener;
-        private long subsequentRequestDelay = DEFAULT_REQUEST_DELAY;
+        private boolean skipStaleRequests = true;
         private boolean autoRecover;
 
         /**
          * Adds supported billing provider.
-         * <p>
+         * <p/>
          * During setup process billing providers will be considered in the order they were added.
          *
          * @param provider BillingProvider object to add.
@@ -125,7 +116,7 @@ public final class Configuration {
 
         /**
          * Sets global listener to handle all billing events.
-         * <p>
+         * <p/>
          * This listener will be stored in a static reference.
          *
          * @param billingListener BillingListener object to use.
@@ -139,18 +130,8 @@ public final class Configuration {
             return this;
         }
 
-        /**
-         * Sets time gap between attempts to execute enqueued requests.
-         * <p>
-         * Default value is 50ms.
-         *
-         * @param subsequentRequestDelay Time gap in milliseconds.
-         *
-         * @see #getSubsequentRequestDelay()
-         * @see AdvancedIabHelper
-         */
-        public Builder setSubsequentRequestDelay(final long subsequentRequestDelay) {
-            this.subsequentRequestDelay = subsequentRequestDelay;
+        public Builder setSkipStaleRequests(final boolean skipStaleRequests) {
+            this.skipStaleRequests = skipStaleRequests;
             return this;
         }
 
@@ -175,8 +156,7 @@ public final class Configuration {
          * @return Newly constructed Configuration instance.
          */
         public Configuration build() {
-            return new Configuration(providers, billingListener, subsequentRequestDelay,
-                                     autoRecover);
+            return new Configuration(providers, billingListener, skipStaleRequests, autoRecover);
         }
     }
 }
