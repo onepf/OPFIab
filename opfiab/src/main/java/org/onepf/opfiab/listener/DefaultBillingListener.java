@@ -87,15 +87,12 @@ public class DefaultBillingListener extends SimpleBillingListener {
         if (inventoryResponse.isSuccessful()) {
             // Inventory request was successful
             final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
-            if (inventory != null) {
-                // Inventory is not empty
-                for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
-                    final VerificationResult verificationResult = entry.getValue();
-                    final Purchase purchase;
-                    if (verificationResult == VerificationResult.SUCCESS
-                            && canConsume(purchase = entry.getKey())) {
-                        getHelper().consume(purchase);
-                    }
+            for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
+                final VerificationResult verificationResult = entry.getValue();
+                final Purchase purchase;
+                if (verificationResult == VerificationResult.SUCCESS
+                        && canConsume(purchase = entry.getKey())) {
+                    getHelper().consume(purchase);
                 }
             }
             // Load next batch if there's more
