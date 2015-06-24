@@ -32,7 +32,7 @@ import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
-import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.util.BillingUtils;
 import org.onepf.opfiab.verification.VerificationResult;
 
 import static org.mockito.Matchers.any;
@@ -122,7 +122,7 @@ public class MockBillingProviderBuilder {
                         new ConsumeResponse(SUCCESS, mock.getName(), request.getPurchase()));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
+                        BillingUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }
@@ -135,7 +135,7 @@ public class MockBillingProviderBuilder {
                         VerificationResult.SUCCESS));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
+                        BillingUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }
@@ -146,7 +146,7 @@ public class MockBillingProviderBuilder {
                 OPFIab.post(new SkuDetailsResponse(SUCCESS, mock.getName(), null));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
+                        BillingUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }
@@ -154,10 +154,10 @@ public class MockBillingProviderBuilder {
         public Void answerInventory(InventoryRequest request) {
             OPFIab.post(new RequestHandledEvent(request));
             if (willPostSuccess) {
-                OPFIab.post(new InventoryResponse(SUCCESS, mock.getName(), null, false));
+                OPFIab.post(new InventoryResponse(SUCCESS, mock.getName()));
             } else {
                 OPFIab.post(
-                        OPFIabUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
+                        BillingUtils.emptyResponse(mock.getName(), request, BILLING_UNAVAILABLE));
             }
             return null;
         }

@@ -186,13 +186,11 @@ public class SimpleHelperTest {
         final Configuration config1 = new Configuration.Builder()
                 .addBillingProvider(billingProvider1)
                 .setBillingListener(new MyAdapter(testManager))
-                .setSubsequentRequestDelay(0)
                 .build();
 
         final Configuration config2 = new Configuration.Builder()
                 .addBillingProvider(billingProvider2)
                 .setBillingListener(new MyAdapter(testManager))
-                .setSubsequentRequestDelay(0)
                 .build();
 
         final String[] skus = new String[]{SKU_CONSUMABLE, SKU_ENTITY, SKU_SUBSCRIPTION};

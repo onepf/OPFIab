@@ -61,7 +61,6 @@ public class ActivityHelperOnViewTest
     private static final long MAX_WAIT_TIME = MockBillingProvider.SLEEP_TIME * 4L;
     private static final int TESTS_COUNT = 20;
     private static final Random RND = new Random();
-    private static final long MAX_SUBSEQUENT_DELAY = 300L;
 
     @Nullable
     private ActivityHelperActivity activity;
@@ -236,7 +235,6 @@ public class ActivityHelperOnViewTest
                 .addBillingProvider(
                         isOk ? new MockOkBillingProvider() : new MockFailBillingProvider())
                 .setAutoRecover(RND.nextBoolean())
-                .setSubsequentRequestDelay(RND.nextLong() % MAX_SUBSEQUENT_DELAY)
                 .build();
     }
 

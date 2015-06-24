@@ -24,7 +24,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
-import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfiab.util.BillingUtils;
 
 import static org.onepf.opfiab.model.event.billing.Status.BILLING_UNAVAILABLE;
 
@@ -63,7 +63,7 @@ public class MockFailBillingProvider extends MockBillingProvider {
     public void onEventAsync(@NonNull BillingRequest billingRequest) {
         sleep();
         OPFIab.post(new RequestHandledEvent(billingRequest));
-        OPFIab.post(OPFIabUtils.emptyResponse(getName(), billingRequest, BILLING_UNAVAILABLE));
+        OPFIab.post(BillingUtils.emptyResponse(getName(), billingRequest, BILLING_UNAVAILABLE));
     }
 
     @Nullable

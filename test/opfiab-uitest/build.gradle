@@ -44,9 +44,10 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     //noinspection GradleDynamicVersion
     compile 'org.onepf:opfutils:0.1.+'
-    compile('org.onepf:opfiab:0.3.+@aar') {
-        changing = true
-    }
+    compile project(':opfiab')
+//    compile('org.onepf:opfiab:0.3.+@aar') {
+//        changing = true
+//    }
 
     // Testing-only dependencies
     androidTestCompile 'com.android.support:appcompat-v7:22.2.0'
