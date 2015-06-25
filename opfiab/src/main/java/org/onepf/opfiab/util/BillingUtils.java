@@ -106,9 +106,11 @@ public final class BillingUtils {
         } else if (type == BillingEventType.INVENTORY) {
             final InventoryResponse inventoryResponse = (InventoryResponse) response;
             final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
-            final Iterable<Purchase> purchases = inventory.keySet();
-            final boolean hasMore = inventoryResponse.hasMore();
-            return new InventoryResponse(status, name, verify(verifier, purchases), hasMore);
+            final Collection<Purchase> purchases = inventory.keySet();
+            if (!purchases.isEmpty()) {
+                final boolean hasMore = inventoryResponse.hasMore();
+                return new InventoryResponse(status, name, verify(verifier, purchases), hasMore);
+            }
         }
         return response;
     }

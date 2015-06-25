@@ -67,6 +67,7 @@ public class OPFIabActivity extends Activity {
         } else {
             intent.setFlags(flags | Intent.FLAG_ACTIVITY_NEW_TASK);
         }
+        OPFLog.d("Starting OPFIabActivity with " + context + " as context");
         context.startActivity(intent);
     }
 

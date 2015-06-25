@@ -27,15 +27,19 @@ import java.util.concurrent.TimeUnit;
 public class SyncedReference<E> {
 
     private final CountDownLatch latch = new CountDownLatch(1);
+    private boolean isSet;
+
     @Nullable
     private volatile E model;
 
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public void set(@Nullable final E model) {
-        if (latch.getCount() == 0L) {
+        if (isSet) {
             OPFLog.logMethod(model);
             OPFLog.e("Attempt to re-set SyncedReference value.");
             return;
         }
+        this.isSet = true;
         this.model = model;
         latch.countDown();
     }
@@ -44,17 +48,27 @@ public class SyncedReference<E> {
     public E get(final long timeout) {
         OPFChecks.checkThread(false);
         try {
-            if (latch.await(timeout, TimeUnit.MILLISECONDS)) {
-                return model;
-            }
+            latch.await(timeout, TimeUnit.MILLISECONDS);
         } catch (InterruptedException exception) {
             OPFLog.e("", exception);
         }
-        return null;
+        return model;
     }
 
     @Nullable
     public E get() {
+        OPFChecks.checkThread(false);
+        try {
+            latch.await();
+        } catch (InterruptedException exception) {
+            OPFLog.e("", exception);
+        }
         return model;
     }
+
+    @Nullable
+    public E getNow() {
+        return model;
+    }
+
 }

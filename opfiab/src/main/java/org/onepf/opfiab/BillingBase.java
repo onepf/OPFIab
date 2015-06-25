@@ -24,6 +24,7 @@ import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
+import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.Status;
@@ -84,22 +85,6 @@ final class BillingBase {
         super();
     }
 
-    private void setCurrentProvider(@Nullable final BillingProvider provider) {
-        if (currentProvider != null) {
-            // Unregister provider from receiving any billing requests
-            OPFIab.unregister(currentProvider);
-        }
-        currentProvider = provider;
-        if (currentProvider != null) {
-            OPFIab.register(currentProvider);
-        }
-    }
-
-    private void postEmptyResponse(@NonNull final BillingRequest billingRequest,
-                                   @NonNull final Status status) {
-        OPFIab.post(BillingUtils.emptyResponse(null, billingRequest, status));
-    }
-
     /**
      * Sets configuration currently used by library.
      * <p/>
@@ -108,9 +93,13 @@ final class BillingBase {
      * @param configuration Current configuration object
      */
     void setConfiguration(@NonNull final Configuration configuration) {
-        this.configuration = configuration;
-        setCurrentProvider(null);
         setupResponse = null;
+        currentProvider = null;
+    }
+
+    private void postEmptyResponse(@NonNull final BillingRequest billingRequest,
+                                   @NonNull final Status status) {
+        OPFIab.post(BillingUtils.emptyResponse(null, billingRequest, status));
     }
 
     /**
@@ -175,18 +164,31 @@ final class BillingBase {
         }
     }
 
+    public void onEvent(@NonNull final SetupStartedEvent event) {
+        OPFChecks.checkThread(true);
+        this.currentProvider = null;
+        this.setupResponse = null;
+    }
+
     public void onEventMainThread(@NonNull final SetupResponse setupResponse) {
         // Called before any other SetupResponse handler
         this.setupResponse = setupResponse;
         if (setupResponse.isSuccessful()) {
             // Suitable provider was found
-            setCurrentProvider(setupResponse.getBillingProvider());
+            currentProvider = setupResponse.getBillingProvider();
         }
+    }
+
+    public void onEventAsync(@NonNull final BillingRequest billingRequest) {
+        final BillingProvider billingProvider = this.currentProvider;
+        if (billingProvider != null) {
+            billingProvider.onBillingRequest(billingRequest);
+        }
+        OPFIab.post(new RequestHandledEvent(billingRequest));
     }
 
     public void onEventMainThread(@NonNull final RequestHandledEvent event) {
         if (!event.getBillingRequest().equals(pendingRequest)) {
-            // For some reason billing provider didn't report correct request
             throw new IllegalStateException();
         }
         pendingRequest = null;
@@ -200,8 +202,6 @@ final class BillingBase {
                 // Auto-recovery is set
                 && configuration.autoRecover()) {
             // Attempt to pick new billing provider
-            setCurrentProvider(null);
-            setupResponse = null;
             OPFIab.setup();
         }
     }

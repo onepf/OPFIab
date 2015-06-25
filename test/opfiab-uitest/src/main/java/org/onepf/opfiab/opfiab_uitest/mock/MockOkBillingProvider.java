@@ -54,7 +54,7 @@ public class MockOkBillingProvider extends MockBillingProvider {
     }
 
     @Override
-    public void onEventAsync(@NonNull BillingRequest billingRequest) {
+    public void onBillingRequest(@NonNull BillingRequest billingRequest) {
         OPFIab.post(new RequestHandledEvent(billingRequest));
         sleep();
         OPFIab.post(new PurchaseResponse(SUCCESS, getName(), null, VerificationResult.SUCCESS));

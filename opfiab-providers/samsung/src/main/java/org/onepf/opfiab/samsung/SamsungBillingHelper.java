@@ -44,7 +44,7 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
     private final String packageName;
 
     public SamsungBillingHelper(@NonNull final Context context,
-            @NonNull final BillingMode billingMode) {
+                                @NonNull final BillingMode billingMode) {
         super(context, IAPConnector.class);
         this.billingMode = billingMode.getCode();
         this.packageName = context.getPackageName();
@@ -69,12 +69,8 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
     }
 
     @Nullable
-    public Bundle init() {
+    protected Bundle init(@NonNull final IAPConnector iapConnector) {
         OPFLog.logMethod();
-        final IAPConnector iapConnector = getService();
-        if (iapConnector == null) {
-            return null;
-        }
         try {
             final Bundle bundle = iapConnector.init(billingMode);
             return SamsungUtils.checkSignature(context) ? bundle : null;
@@ -91,6 +87,10 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
         if (iapConnector == null) {
             return null;
         }
+        final Bundle init = init(iapConnector);
+        if (SamsungUtils.getResponse(init) != Response.ERROR_NONE) {
+            return init;
+        }
         try {
             return iapConnector.getItemsInbox(packageName, groupId, 1, Integer.MAX_VALUE,
                     START_DATE, SamsungUtils.getNowDate());
@@ -106,6 +106,10 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
         final IAPConnector iapConnector = getService();
         if (iapConnector == null) {
             return null;
+        }
+        final Bundle init = init(iapConnector);
+        if (SamsungUtils.getResponse(init) != Response.ERROR_NONE) {
+            return init;
         }
         try {
             return iapConnector.getItemList(billingMode, packageName, groupId, 1, Integer.MAX_VALUE,

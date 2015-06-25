@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.model.billing.BillingModel;
+import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
 
 import java.lang.reflect.Constructor;
@@ -62,12 +63,6 @@ public abstract class JsonModel implements JsonCompatible {
         this.originalJson = jsonObject.toString();
     }
 
-    @NonNull
-    @Override
-    public JSONObject toJson() {
-        return jsonObject;
-    }
-
     /**
      * Gets JSON data associated with this model.
      *
@@ -76,5 +71,16 @@ public abstract class JsonModel implements JsonCompatible {
     @NonNull
     public String getOriginalJson() {
         return originalJson;
+    }
+
+    @NonNull
+    @Override
+    public JSONObject toJson() {
+        return jsonObject;
+    }
+
+    @Override
+    public String toString() {
+        return OPFIabUtils.toString(this);
     }
 }

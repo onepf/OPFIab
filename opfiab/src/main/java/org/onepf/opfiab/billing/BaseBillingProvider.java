@@ -23,7 +23,6 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.billing.Purchase;
-import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
@@ -137,13 +136,12 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     }
 
     @Override
-    public void onEventAsync(@NonNull final BillingRequest billingRequest) {
+    public void onBillingRequest(@NonNull final BillingRequest billingRequest) {
         if (!isAvailable()) {
             postEmptyResponse(billingRequest, BILLING_UNAVAILABLE);
         } else {
             handleRequest(billingRequest);
         }
-        OPFIab.post(new RequestHandledEvent(billingRequest));
     }
 
 

@@ -19,6 +19,7 @@ package org.onepf.opfiab.samsung;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -52,6 +53,7 @@ import java.util.Set;
 
 import static android.Manifest.permission.GET_ACCOUNTS;
 import static android.Manifest.permission.INTERNET;
+import static org.onepf.opfiab.model.event.billing.Status.SERVICE_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
@@ -102,8 +104,7 @@ public class SamsungBillingProvider
     @NonNull
     @Override
     public Compatibility checkCompatibility() {
-        final Bundle bundle = helper.init();
-        if (SamsungUtils.getResponse(bundle) != Response.ERROR_NONE) {
+        if (!OPFUtils.isInstalled(context, PACKAGE)) {
             return Compatibility.INCOMPATIBLE;
         }
         if (INSTALLER.equals(OPFUtils.getPackageInstaller(context))) {
@@ -112,29 +113,27 @@ public class SamsungBillingProvider
         return Compatibility.COMPATIBLE;
     }
 
-    protected boolean checkAuthorisation(@NonNull final BillingRequest billingRequest) {
+    protected Status checkAuthorisation(@NonNull final BillingRequest billingRequest) {
         if (!SamsungUtils.hasSamsungAccount(context)) {
-            return false;
+            return UNAUTHORISED;
         }
         final ActivityResultEvent result = requestActivityResult(billingRequest,
-                new ActivityResultHelper(DEFAULT_REQUEST_CODE) {
+                new ActivityForResultLauncher() {
                     @Override
-                    public void onStartForResult(@NonNull final Activity activity) {
+                    public void onStartForResult(@NonNull final Activity activity)
+                            throws IntentSender.SendIntentException {
                         final Intent intent = SamsungUtils.getAccountIntent();
                         activity.startActivityForResult(intent, DEFAULT_REQUEST_CODE);
                     }
-                });
-        return result != null && result.getResultCode() == Activity.RESULT_OK;
+                }, DEFAULT_REQUEST_CODE);
+        if (result != null && result.getResultCode() == Activity.RESULT_OK) {
+            return null;
+        }
+        return OPFUtils.isConnected(context) ? UNAUTHORISED : SERVICE_UNAVAILABLE;
     }
 
     @Override
     protected void skuDetails(@NonNull final SkuDetailsRequest request) {
-        final Status initError = SamsungUtils.handleError(context, helper.init());
-        if (initError != null) {
-            postEmptyResponse(request, initError);
-            return;
-        }
-
         final Bundle bundle = helper.getItemList(skuResolver.getGroupId());
         final Status error = SamsungUtils.handleError(context, bundle);
         if (error != null) {
@@ -150,15 +149,9 @@ public class SamsungBillingProvider
 
     @Override
     protected void inventory(@NonNull final InventoryRequest request) {
-        final Status initError = SamsungUtils.handleError(context, helper.init());
-        if (initError != null) {
-            postEmptyResponse(request, initError);
-            return;
-        }
-
-        final boolean authorized = checkAuthorisation(request);
-        if (!authorized) {
-            postEmptyResponse(request, UNAUTHORISED);
+        final Status authStatus = checkAuthorisation(request);
+        if (authStatus != null) {
+            postEmptyResponse(request, authStatus);
             return;
         }
 
@@ -177,27 +170,30 @@ public class SamsungBillingProvider
 
     @Override
     protected void purchase(@NonNull final PurchaseRequest request) {
-        final Status initError = SamsungUtils.handleError(context, helper.init());
-        if (initError != null) {
-            postEmptyResponse(request, initError);
-            return;
-        }
+        //TODO make sure init is not required
+        //        final Status initError = SamsungUtils.handleError(context, helper.init());
+        //        if (initError != null) {
+        //            postEmptyResponse(request, initError);
+        //            return;
+        //        }
 
-        if (!checkAuthorisation(request)) {
-            postEmptyResponse(request, UNAUTHORISED);
+        final Status authStatus = checkAuthorisation(request);
+        if (authStatus != null) {
+            postEmptyResponse(request, authStatus);
             return;
         }
 
         final String sku = request.getSku();
         final ActivityResultEvent result = requestActivityResult(request,
-                new ActivityResultHelper(DEFAULT_REQUEST_CODE) {
+                new ActivityForResultLauncher() {
                     @Override
-                    public void onStartForResult(@NonNull final Activity activity) {
+                    public void onStartForResult(@NonNull final Activity activity)
+                            throws IntentSender.SendIntentException {
                         final String groupId = skuResolver.getGroupId();
                         final Intent intent = SamsungUtils.getPurchaseIntent(context, groupId, sku);
                         activity.startActivityForResult(intent, DEFAULT_REQUEST_CODE);
                     }
-                });
+                }, DEFAULT_REQUEST_CODE);
         if (result == null) {
             postEmptyResponse(request, UNKNOWN_ERROR);
         } else if (result.getResultCode() != Activity.RESULT_OK) {

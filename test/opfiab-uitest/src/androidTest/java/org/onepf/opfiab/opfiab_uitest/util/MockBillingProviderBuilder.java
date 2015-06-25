@@ -82,7 +82,7 @@ public class MockBillingProviderBuilder {
 
     public BillingProvider build() {
         when(mock.checkCompatibility()).thenReturn(compatibility);
-        doAnswer(new BillingAnswer(willPostSuccess, sleepTime)).when(mock).onEventAsync(
+        doAnswer(new BillingAnswer(willPostSuccess, sleepTime)).when(mock).onBillingRequest(
                 any(BillingRequest.class));
         return mock;
     }

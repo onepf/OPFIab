@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.Looper;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -51,7 +52,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     /**
      * Timeout to wait before giving up on connecting to service.
      */
-    private static final long CONNECTION_TIMEOUT = 3000L; // 3 seconds
+    private static final long CONNECTION_TIMEOUT = 5000L; // 3 seconds
     /**
      * Automatically disconnect from service after this delay since last usage.
      */
@@ -105,7 +106,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
      */
     private void scheduleDisconnect() {
         HANDLER.removeCallbacks(disconnect);
-        HANDLER.postDelayed(disconnect, DISCONNECT_DELAY);
+        HANDLER.postDelayed(disconnect, getDisconnectDelay());
     }
 
     /**
@@ -116,13 +117,17 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     @NonNull
     protected abstract Intent getServiceIntent();
 
+    protected long getDisconnectDelay() {
+        return DISCONNECT_DELAY;
+    }
+
     /**
      * Blocking call to retrieve {@link IInterface} instance to interact with {@link Service}.
      *
      * @return {@link IInterface} instance if {@link Service} connection was successful, null otherwise.
      */
     @Nullable
-    public AIDL getService() {
+    public AIDL getService(final long timeout) {
         final AIDL service = this.service;
         if (service != null) {
             scheduleDisconnect();
@@ -132,22 +137,29 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         final Intent serviceIntent = getServiceIntent();
         final PackageManager packageManager = context.getPackageManager();
         final Collection<ResolveInfo> infos = packageManager.queryIntentServices(serviceIntent, 0);
+        serviceSemaphore.drainPermits();
         if (infos == null || infos.isEmpty()
                 || !context.bindService(getServiceIntent(), this, Context.BIND_AUTO_CREATE)) {
             OPFLog.d("Can't bind to service: %s", asInterface.getDeclaringClass());
             return null;
         }
-        serviceSemaphore.drainPermits();
         try {
-            if (!serviceSemaphore.tryAcquire(CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)) {
-                OPFLog.e("AIDL service connection timeout: %s", OPFUtils.toString(serviceIntent));
+            if (serviceSemaphore.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+                return this.service;
             }
+            OPFLog.e("AIDL service connection timeout: %s", OPFUtils.toString(serviceIntent));
         } catch (InterruptedException exception) {
             OPFLog.d("", exception);
         }
-        return this.service;
+        return null;
     }
 
+    @Nullable
+    public AIDL getService() {
+        return getService(CONNECTION_TIMEOUT);
+    }
+
+    @CallSuper
     @Override
     public void onServiceConnected(final ComponentName name, final IBinder service) {
         //https://code.google.com/p/android/issues/detail?id=153406
@@ -164,6 +176,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         serviceSemaphore.release();
     }
 
+    @CallSuper
     @Override
     public void onServiceDisconnected(final ComponentName name) {
         service = null;

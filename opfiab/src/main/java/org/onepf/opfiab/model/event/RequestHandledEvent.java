@@ -26,7 +26,7 @@ import org.onepf.opfiab.model.event.billing.BillingRequest;
  * <p>
  * Intended for internal usage.
  *
- * @see BillingProvider#onEventAsync(BillingRequest)
+ * @see BillingProvider#onBillingRequest(BillingRequest)
  */
 public class RequestHandledEvent {
 

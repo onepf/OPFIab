@@ -24,7 +24,6 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.ActivityMonitor;
 import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
 import org.onepf.opfiab.model.event.android.ActivityResultEvent;
@@ -38,17 +37,14 @@ import org.onepf.opfutils.OPFLog;
 public abstract class ActivityBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         extends BaseBillingProvider<R, V> {
 
-    /**
-     * Timeout to give up on waiting for a new activity instance.
-     */
-    protected static final long ACTIVITY_TIMEOUT = 1000L; // 1 second
     protected static final int DEFAULT_REQUEST_CODE = 4232;
 
 
     @Nullable
-    private SyncedReference<Activity> syncActivity;
+    private volatile SyncedReference<Activity> syncActivity;
     @Nullable
-    private ActivityResultHelper resultHelper;
+    private volatile SyncedReference<ActivityResultEvent> syncResult;
+    private volatile int pendingRequestCode;
 
     protected ActivityBillingProvider(@NonNull final Context context,
                                       @NonNull final R skuResolver,
@@ -61,7 +57,7 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
         super.handleRequest(billingRequest);
         final SyncedReference<Activity> syncActivity = this.syncActivity;
-        final Activity activity = syncActivity == null ? null : syncActivity.get();
+        final Activity activity = syncActivity == null ? null : syncActivity.getNow();
         if (activity instanceof OPFIabActivity) {
             activity.finish();
         }
@@ -76,23 +72,36 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
             return activity;
         }
         final SyncedReference<Activity> syncActivity = this.syncActivity;
-        final Activity opfActivity = syncActivity == null ? null : syncActivity.get();
+        final Activity opfActivity = syncActivity == null ? null : syncActivity.getNow();
         if (opfActivity != null) {
             return opfActivity;
         }
         final SyncedReference<Activity> newSyncActivity = new SyncedReference<>();
         this.syncActivity = newSyncActivity;
         OPFIabActivity.start(activity != null ? activity : context);
-        return newSyncActivity.get(ACTIVITY_TIMEOUT);
+        return newSyncActivity.get();
     }
 
     @Nullable
     protected ActivityResultEvent requestActivityResult(
             @NonNull final BillingRequest billingRequest,
-            @NonNull final ActivityResultHelper helper) {
-        this.resultHelper = helper;
-        helper.init(getResultHandlingActivity(billingRequest));
-        return helper.getResult();
+            @NonNull final ActivityForResultLauncher launcher,
+            final int requestCode) {
+        final Activity activity = getResultHandlingActivity(billingRequest);
+        if (activity == null) {
+            return null;
+        }
+        try {
+            final SyncedReference<ActivityResultEvent> syncResult = new SyncedReference<>();
+            this.syncResult = syncResult;
+            this.pendingRequestCode = requestCode;
+            launcher.onStartForResult(activity);
+            return syncResult.get();
+        } catch (ActivityNotFoundException | IntentSender.SendIntentException exception) {
+            OPFLog.e("", exception);
+            this.syncResult = null;
+        }
+        return null;
     }
 
     public final void onEventMainThread(@NonNull final ActivityNewIntentEvent intentEvent) {
@@ -103,57 +112,18 @@ public abstract class ActivityBillingProvider<R extends SkuResolver, V extends P
         }
     }
 
-    public final void onEventMainThread(@NonNull final ActivityResultEvent event) {
-        final ActivityResultHelper resultHelper = this.resultHelper;
-        if (resultHelper != null && resultHelper.requestCode == event.getRequestCode()) {
-            this.resultHelper = null;
-            resultHelper.setResult(event);
+    @CallSuper
+    public void onEventMainThread(@NonNull final ActivityResultEvent event) {
+        final SyncedReference<ActivityResultEvent> syncResult = this.syncResult;
+        if (syncResult != null && event.getRequestCode() == pendingRequestCode) {
+            this.syncResult = null;
+            syncResult.set(event);
         }
     }
 
+    protected interface ActivityForResultLauncher {
 
-    protected abstract static class ActivityResultHelper {
-
-        private final SyncedReference<ActivityResultEvent> syncResult = new SyncedReference<>();
-        private final int requestCode;
-        private Activity activity;
-
-        protected ActivityResultHelper(final int requestCode) {
-            this.requestCode = requestCode;
-        }
-
-        public abstract void onStartForResult(@NonNull final Activity activity)
+        void onStartForResult(@NonNull final Activity activity)
                 throws IntentSender.SendIntentException;
-
-        private void init(@Nullable final Activity activity) {
-            if (activity != null) {
-                try {
-                    onStartForResult(activity);
-                    this.activity = activity;
-                } catch (ActivityNotFoundException | IntentSender.SendIntentException exception) {
-                    OPFLog.e("", exception);
-                }
-            }
-        }
-
-        private void setResult(@NonNull final ActivityResultEvent activityResult) {
-            OPFLog.logMethod(activityResult);
-            syncResult.set(activityResult);
-        }
-
-        @Nullable
-        private ActivityResultEvent getResult() {
-            if (activity == null) {
-                OPFLog.e("No activity, returning null as activity result.");
-                return null;
-            }
-            while (syncResult.get(ACTIVITY_TIMEOUT) == null) {
-                if (ActivityMonitor.isDestroyed(activity)) {
-                    OPFLog.e("Couldn't get result, activity died.");
-                    return null;
-                }
-            }
-            return syncResult.get();
-        }
     }
 }

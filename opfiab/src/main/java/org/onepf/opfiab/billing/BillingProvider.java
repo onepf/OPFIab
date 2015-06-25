@@ -71,7 +71,7 @@ public interface BillingProvider {
      *
      * @param billingRequest Billing request to handle with this billing provider.
      */
-    void onEventAsync(@NonNull final BillingRequest billingRequest);
+    void onBillingRequest(@NonNull final BillingRequest billingRequest);
 
     /**
      * Acquires {@link Intent} to open representation of this App within this BillingProvider.

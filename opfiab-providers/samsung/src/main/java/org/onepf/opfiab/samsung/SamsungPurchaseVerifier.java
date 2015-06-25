@@ -34,6 +34,7 @@ import java.net.URL;
 
 public class SamsungPurchaseVerifier implements PurchaseVerifier {
 
+    protected static final int TIMEOUT = 3000;
     protected static final String VERIFY_URL
             = "https://iap.samsungapps.com/iap/appsItemVerifyIAPReceipt.as?protocolVersion=2.0"
             + "&purchaseID=";
@@ -60,6 +61,8 @@ public class SamsungPurchaseVerifier implements PurchaseVerifier {
         try {
             final HttpURLConnection connection = (HttpURLConnection)
                     new URL(VERIFY_URL + purchase.getToken()).openConnection();
+            connection.setConnectTimeout(TIMEOUT);
+            connection.setReadTimeout(TIMEOUT);
             connection.connect();
             final int responseCode = connection.getResponseCode();
             OPFLog.d("Verify response code: " + responseCode);
@@ -68,6 +71,7 @@ public class SamsungPurchaseVerifier implements PurchaseVerifier {
             }
             final String body = OPFIabUtils.toString(connection.getInputStream());
             final SamsungVerification verification = new SamsungVerification(body);
+            OPFLog.d("Samsung verification: " + verification);
             return verification.isStatus()  && verification.getMode() == this.billingMode
                     ? VerificationResult.SUCCESS : VerificationResult.FAILED;
         } catch (IOException | JSONException exception) {

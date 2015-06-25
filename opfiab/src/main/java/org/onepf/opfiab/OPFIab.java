@@ -61,6 +61,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @see #getActivityHelper(android.support.v4.app.FragmentActivity)
  * @see #getActivityHelper(Activity)
  */
+@SuppressWarnings("TypeMayBeWeakened")
 public final class OPFIab {
 
     private static final EventBus EVENT_BUS = EventBus.builder()
@@ -227,13 +228,7 @@ public final class OPFIab {
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
         OPFChecks.checkThread(true);
-        context = application.getApplicationContext();
-
-        // Check if manifest satisfies all billing providers.
-        final Collection<BillingProvider> providers = configuration.getProviders();
-        for (final BillingProvider provider : providers) {
-            provider.checkManifest();
-        }
+        OPFIab.context = application.getApplicationContext();
 
         final BillingBase billingBase = BillingBase.getInstance();
         final BillingRequestScheduler scheduler = BillingRequestScheduler.getInstance();
@@ -245,11 +240,21 @@ public final class OPFIab {
             register(BillingEventDispatcher.getInstance());
 
             application.registerActivityLifecycleCallbacks(ActivityMonitor.getInstance());
+        } else {
+            for (final BillingProvider provider : OPFIab.configuration.getProviders()) {
+                unregister(provider);
+            }
+        }
+        OPFIab.configuration = configuration;
+
+        final Collection<BillingProvider> providers = configuration.getProviders();
+        for (final BillingProvider provider : providers) {
+            provider.checkManifest();
+            register(provider);
         }
 
         scheduler.dropQueue();
         billingBase.setConfiguration(configuration);
-        OPFIab.configuration = configuration;
     }
 
     /**

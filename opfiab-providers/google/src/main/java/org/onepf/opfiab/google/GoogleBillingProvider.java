@@ -346,15 +346,15 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
         }
 
         final ActivityResultEvent activityResult = requestActivityResult(request,
-                new ActivityResultHelper(DEFAULT_REQUEST_CODE) {
+                new ActivityForResultLauncher() {
                     @Override
                     public void onStartForResult(@NonNull final Activity activity)
                             throws IntentSender.SendIntentException {
                         final IntentSender sender = intent.getIntentSender();
-                        activity.startIntentSenderForResult(
-                                sender, DEFAULT_REQUEST_CODE, new Intent(), 0, 0, 0);
+                        activity.startIntentSenderForResult(sender, DEFAULT_REQUEST_CODE,
+                                new Intent(), 0, 0, 0);
                     }
-                });
+                }, DEFAULT_REQUEST_CODE);
         if (activityResult == null) {
             postEmptyResponse(request, Status.UNKNOWN_ERROR);
             return;
