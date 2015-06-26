@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
 import org.onepf.opfiab.OPFIab;
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.android.ActivityResult;
 
 /**
  * @author antonpp
@@ -40,7 +40,7 @@ public class EmptyFragmentActivity extends FragmentActivity {
     protected void onActivityResult(final int requestCode, final int resultCode,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data));
+        OPFIab.post(new ActivityResult(this, requestCode, resultCode, data));
     }
 
     @Override

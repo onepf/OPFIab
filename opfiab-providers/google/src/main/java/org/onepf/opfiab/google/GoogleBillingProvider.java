@@ -27,7 +27,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONException;
-import org.onepf.opfiab.billing.ActivityBillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.Compatibility;
@@ -39,7 +39,7 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SignedPurchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.android.ActivityResult;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryRequest;
@@ -50,6 +50,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.TypedSkuResolver;
+import org.onepf.opfiab.util.ActivityForResultLauncher;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
@@ -69,7 +70,7 @@ import static android.Manifest.permission.GET_ACCOUNTS;
  * <a href="https://play.google.com/store">Google Play</a> App Store.
  */
 @SuppressWarnings("PMD.GodClass")
-public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResolver,
+public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
         PurchaseVerifier> {
 
     public static final String NAME = "Google";
@@ -345,8 +346,8 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
             return;
         }
 
-        final ActivityResultEvent activityResult = requestActivityResult(request,
-                new ActivityForResultLauncher() {
+        final ActivityResult activityResult = requestActivityResult(request,
+                new ActivityForResultLauncher(DEFAULT_REQUEST_CODE) {
                     @Override
                     public void onStartForResult(@NonNull final Activity activity)
                             throws IntentSender.SendIntentException {
@@ -354,7 +355,7 @@ public class GoogleBillingProvider extends ActivityBillingProvider<TypedSkuResol
                         activity.startIntentSenderForResult(sender, DEFAULT_REQUEST_CODE,
                                 new Intent(), 0, 0, 0);
                     }
-                }, DEFAULT_REQUEST_CODE);
+                });
         if (activityResult == null) {
             postEmptyResponse(request, Status.UNKNOWN_ERROR);
             return;

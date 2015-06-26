@@ -18,12 +18,24 @@ package org.onepf.opfiab;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.model.ComponentState;
+import org.onepf.opfiab.model.event.ActivityResultRequest;
+import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
+import org.onepf.opfiab.model.event.android.ActivityResult;
+import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.util.ActivityForResultLauncher;
+import org.onepf.opfiab.util.BillingUtils;
+import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,14 +53,14 @@ import static org.onepf.opfiab.model.ComponentState.STOP;
 
 /**
  * This class is designed to monitor the existing {@link Activity}s lifecycle.
- * <p>
+ * <p/>
  * Intended for internal use.
  */
 public final class ActivityMonitor implements Application.ActivityLifecycleCallbacks {
 
     /**
      * Map of the existing activities lifecycle states.
-     * <p>
+     * <p/>
      * Backed up by {@link WeakHashMap} to avoid memory leaks.
      */
     @SuppressWarnings("Convert2Diamond")
@@ -60,10 +72,10 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
 
 
     @SuppressWarnings({"PMD.NonThreadSafeSingleton"})
-    public static Application.ActivityLifecycleCallbacks getInstance() {
+    public static ActivityMonitor getInstance(@NonNull final Context context) {
         OPFChecks.checkThread(true);
         if (instance == null) {
-            instance = new ActivityMonitor();
+            instance = new ActivityMonitor(context);
         }
         return instance;
     }
@@ -111,9 +123,79 @@ public final class ActivityMonitor implements Application.ActivityLifecycleCallb
         return getState(activity) == DESTROY;
     }
 
-    private ActivityMonitor() {
+
+    private final Context context;
+    @Nullable
+    private volatile SyncedReference<Activity> syncActivity;
+    @Nullable
+    private volatile SyncedReference<ActivityResult> syncResult;
+    private volatile int pendingRequestCode;
+
+
+    private ActivityMonitor(final Context context) {
         super();
+        this.context = context;
     }
+
+    @Nullable
+    private Activity getResultHandlingActivity(
+            @NonNull final BillingRequest billingRequest) {
+        final Activity activity = BillingUtils.getActivity(billingRequest);
+        if (activity != null && billingRequest.isActivityHandlesResult()) {
+            return activity;
+        }
+        final SyncedReference<Activity> newSyncActivity = new SyncedReference<>();
+        this.syncActivity = newSyncActivity;
+        OPFIabActivity.start(activity != null ? activity : context);
+        OPFLog.d("Waiting for activity...");
+        return newSyncActivity.get();
+    }
+
+    public void onEvent(@NonNull final ActivityResultRequest resultRequest) {
+        OPFChecks.checkThread(false);
+        final SyncedReference<ActivityResult> syncResult = resultRequest.getSyncActivityResult();
+        if (this.syncActivity != null || this.syncResult != null) {
+            OPFLog.e("Another ActivityResultRequest is being handled.");
+            syncResult.set(null);
+        }
+        final BillingRequest billingRequest = resultRequest.getRequest();
+        final Activity activity = getResultHandlingActivity(billingRequest);
+        if (activity == null) {
+            return;
+        }
+        final ActivityForResultLauncher launcher = resultRequest.getLauncher();
+        this.pendingRequestCode = launcher.getRequestCode();
+        this.syncResult = syncResult;
+        try {
+            launcher.onStartForResult(activity);
+        } catch (ActivityNotFoundException | IntentSender.SendIntentException exception) {
+            OPFLog.e("", exception);
+            this.syncResult = null;
+            syncResult.set(null);
+        }
+    }
+
+    public void onEventMainThread(@NonNull final ActivityNewIntentEvent intentEvent) {
+        final SyncedReference<Activity> syncActivity = this.syncActivity;
+        final Activity activity = intentEvent.getActivity();
+        if (activity.getClass() == OPFIabActivity.class && syncActivity != null) {
+            this.syncActivity = null;
+            syncActivity.set(activity);
+        }
+    }
+
+    public void onEventMainThread(@NonNull final ActivityResult event) {
+        final SyncedReference<ActivityResult> syncResult = this.syncResult;
+        if (syncResult != null && event.getRequestCode() == pendingRequestCode) {
+            this.syncResult = null;
+            syncResult.set(event);
+            final Activity activity = event.getActivity();
+            if (activity.getClass() == OPFIabActivity.class) {
+                activity.finish();
+            }
+        }
+    }
+
 
     @Override
     public void onActivityCreated(final Activity activity, final Bundle savedInstanceState) {

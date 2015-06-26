@@ -36,10 +36,11 @@ import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.exception.InitException;
 
-import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 import de.greenrobot.event.EventBus;
+import de.greenrobot.event.EventBusException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
@@ -84,7 +85,11 @@ public final class OPFIab {
 
     static void register(@NonNull final Object subscriber) {
         if (!EVENT_BUS.isRegistered(subscriber)) {
-            EVENT_BUS.register(subscriber);
+            try {
+                EVENT_BUS.register(subscriber);
+            } catch (EventBusException exception) {
+                OPFLog.d("", exception);
+            }
         }
     }
 
@@ -227,19 +232,23 @@ public final class OPFIab {
     @SuppressFBWarnings({"LI_LAZY_INIT_UPDATE_STATIC", "LI_LAZY_INIT_STATIC"})
     public static void init(@NonNull final Application application,
                             @NonNull final Configuration configuration) {
+        OPFLog.logMethod(configuration);
         OPFChecks.checkThread(true);
         OPFIab.context = application.getApplicationContext();
 
         final BillingBase billingBase = BillingBase.getInstance();
         final BillingRequestScheduler scheduler = BillingRequestScheduler.getInstance();
+        final Set<BillingProvider> providers = configuration.getProviders();
         if (OPFIab.configuration == null) {
             // first init
+            final ActivityMonitor activityMonitor = ActivityMonitor.getInstance(context);
+            application.registerActivityLifecycleCallbacks(activityMonitor);
             register(billingBase, Integer.MAX_VALUE);
-            register(scheduler);
             register(SetupManager.getInstance(application));
+            register(scheduler);
+            register(activityMonitor);
             register(BillingEventDispatcher.getInstance());
 
-            application.registerActivityLifecycleCallbacks(ActivityMonitor.getInstance());
         } else {
             for (final BillingProvider provider : OPFIab.configuration.getProviders()) {
                 unregister(provider);
@@ -247,7 +256,6 @@ public final class OPFIab {
         }
         OPFIab.configuration = configuration;
 
-        final Collection<BillingProvider> providers = configuration.getProviders();
         for (final BillingProvider provider : providers) {
             provider.checkManifest();
             register(provider);

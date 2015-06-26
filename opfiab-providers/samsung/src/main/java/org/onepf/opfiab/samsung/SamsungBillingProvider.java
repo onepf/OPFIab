@@ -24,13 +24,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.billing.ActivityBillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.android.ActivityResult;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
@@ -43,6 +43,7 @@ import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.samsung.model.ItemType;
 import org.onepf.opfiab.samsung.model.SamsungPurchase;
+import org.onepf.opfiab.util.ActivityForResultLauncher;
 import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFChecks;
@@ -60,8 +61,8 @@ import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 import static org.onepf.opfiab.verification.PurchaseVerifier.DEFAULT;
 
-public class SamsungBillingProvider
-        extends ActivityBillingProvider<SamsungSkuResolver, PurchaseVerifier> {
+public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolver,
+        PurchaseVerifier> {
 
     public static final String NAME = "Samsung";
     protected static final String PACKAGE = "com.sec.android.app.samsungapps";
@@ -117,15 +118,15 @@ public class SamsungBillingProvider
         if (!SamsungUtils.hasSamsungAccount(context)) {
             return UNAUTHORISED;
         }
-        final ActivityResultEvent result = requestActivityResult(billingRequest,
-                new ActivityForResultLauncher() {
+        final ActivityResult result = requestActivityResult(billingRequest,
+                new ActivityForResultLauncher(DEFAULT_REQUEST_CODE) {
                     @Override
                     public void onStartForResult(@NonNull final Activity activity)
                             throws IntentSender.SendIntentException {
                         final Intent intent = SamsungUtils.getAccountIntent();
                         activity.startActivityForResult(intent, DEFAULT_REQUEST_CODE);
                     }
-                }, DEFAULT_REQUEST_CODE);
+                });
         if (result != null && result.getResultCode() == Activity.RESULT_OK) {
             return null;
         }
@@ -184,8 +185,8 @@ public class SamsungBillingProvider
         }
 
         final String sku = request.getSku();
-        final ActivityResultEvent result = requestActivityResult(request,
-                new ActivityForResultLauncher() {
+        final ActivityResult result = requestActivityResult(request,
+                new ActivityForResultLauncher(DEFAULT_REQUEST_CODE) {
                     @Override
                     public void onStartForResult(@NonNull final Activity activity)
                             throws IntentSender.SendIntentException {
@@ -193,7 +194,7 @@ public class SamsungBillingProvider
                         final Intent intent = SamsungUtils.getPurchaseIntent(context, groupId, sku);
                         activity.startActivityForResult(intent, DEFAULT_REQUEST_CODE);
                     }
-                }, DEFAULT_REQUEST_CODE);
+                });
         if (result == null) {
             postEmptyResponse(request, UNKNOWN_ERROR);
         } else if (result.getResultCode() != Activity.RESULT_OK) {

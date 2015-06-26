@@ -31,7 +31,7 @@ import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.ComponentState;
 import org.onepf.opfiab.model.event.android.ActivityLifecycleEvent;
 import org.onepf.opfiab.model.event.android.ActivityNewIntentEvent;
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.android.ActivityResult;
 import org.onepf.opfutils.OPFLog;
 
 /**
@@ -131,11 +131,8 @@ public class OPFIabActivity extends Activity {
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         OPFLog.d("onActivityResult: %s, task: %d", this, getTaskId());
-        if (!OPFIab.post(new ActivityResultEvent(this, requestCode, resultCode, data))) {
-            // No one received this event, finishing
-            finish();
-        }
         // Result event subscriber should finish activity when it's done with it.
+        OPFIab.post(new ActivityResult(this, requestCode, resultCode, data));
     }
 
     @Override

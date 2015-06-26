@@ -26,17 +26,17 @@ import org.onepf.opfutils.OPFUtils;
 /**
  * Event indicating {@link Activity#onActivityResult(int, int, Intent)} call.
  */
-public class ActivityResultEvent extends ActivityEvent {
+public class ActivityResult extends ActivityEvent {
 
     private final int requestCode;
     private final int resultCode;
     @Nullable
     private final Intent data;
 
-    public ActivityResultEvent(@NonNull final Activity activity,
-                               final int requestCode,
-                               final int resultCode,
-                               @Nullable final Intent data) {
+    public ActivityResult(@NonNull final Activity activity,
+                          final int requestCode,
+                          final int resultCode,
+                          @Nullable final Intent data) {
         super(activity);
         this.requestCode = requestCode;
         this.resultCode = resultCode;
@@ -74,7 +74,7 @@ public class ActivityResultEvent extends ActivityEvent {
     //CHECKSTYLE:OFF
     @Override
     public String toString() {
-        return "ActivityResultEvent{" +
+        return "ActivityResult{" +
                 "requestCode=" + requestCode +
                 ", resultCode=" + resultCode +
                 ", data=" + OPFUtils.toString(data) +

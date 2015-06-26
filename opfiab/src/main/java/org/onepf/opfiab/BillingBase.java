@@ -27,7 +27,6 @@ import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
-import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.util.BillingUtils;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
@@ -93,13 +92,9 @@ final class BillingBase {
      * @param configuration Current configuration object
      */
     void setConfiguration(@NonNull final Configuration configuration) {
-        setupResponse = null;
-        currentProvider = null;
-    }
-
-    private void postEmptyResponse(@NonNull final BillingRequest billingRequest,
-                                   @NonNull final Status status) {
-        OPFIab.post(BillingUtils.emptyResponse(null, billingRequest, status));
+        this.configuration = configuration;
+        this.setupResponse = null;
+        this.currentProvider = null;
     }
 
     /**
@@ -149,10 +144,10 @@ final class BillingBase {
         final SetupResponse setupResponse;
         if (isBusy()) {
             // Library is busy with another request
-            postEmptyResponse(billingRequest, BUSY);
+            OPFIab.post(BillingUtils.emptyResponse(null, billingRequest, BUSY));
         } else if ((setupResponse = getSetupResponse()) == null || !setupResponse.isSuccessful()) {
             // Setup was not started, is in progress or failed
-            postEmptyResponse(billingRequest, NO_BILLING_PROVIDER);
+            OPFIab.post(BillingUtils.emptyResponse(null, billingRequest, NO_BILLING_PROVIDER));
         } else if (configuration.skipStaleRequests() && OPFIabUtils.isStale(billingRequest)) {
             // Request is no longer relevant, try next one
             OPFLog.d("Skipping stale request: " + billingRequest);

@@ -23,6 +23,8 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.event.ActivityResultRequest;
+import org.onepf.opfiab.model.event.android.ActivityResult;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
@@ -31,7 +33,9 @@ import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfiab.sku.SkuResolver;
+import org.onepf.opfiab.util.ActivityForResultLauncher;
 import org.onepf.opfiab.util.BillingUtils;
+import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFLog;
 
@@ -50,6 +54,9 @@ import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
  */
 public abstract class BaseBillingProvider<R extends SkuResolver, V extends PurchaseVerifier>
         implements BillingProvider {
+
+    protected static final int DEFAULT_REQUEST_CODE = 4232;
+
 
     @NonNull
     protected final Context context;
@@ -93,6 +100,16 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      */
     protected abstract void consume(@NonNull final ConsumeRequest request);
 
+    @Nullable
+    protected ActivityResult requestActivityResult(
+            @NonNull final BillingRequest billingRequest,
+            @NonNull final ActivityForResultLauncher launcher) {
+        final SyncedReference<ActivityResult> syncResult = new SyncedReference<>();
+        OPFIab.post(new ActivityResultRequest(billingRequest, launcher, syncResult));
+        OPFLog.d("Waiting for ActivityResult");
+        return syncResult.get();
+    }
+
     /**
      * Entry point for all incoming billing requests.
      * <p/>
@@ -102,7 +119,6 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
      */
     @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
     protected void handleRequest(@NonNull final BillingRequest billingRequest) {
-        OPFLog.logMethod(billingRequest);
         final BillingRequest resolvedRequest = BillingUtils.resolve(skuResolver, billingRequest);
         switch (resolvedRequest.getType()) {
             case CONSUME:

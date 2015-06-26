@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 import org.onepf.opfiab.android.OPFIabActivity;
 import org.onepf.opfiab.api.IabHelper;
 import org.onepf.opfiab.api.SimpleIabHelper;
-import org.onepf.opfiab.model.event.android.ActivityResultEvent;
+import org.onepf.opfiab.model.event.android.ActivityResult;
 import org.onepf.opfiab.model.event.billing.PurchaseRequest;
 
 /**
@@ -46,6 +46,6 @@ class SimpleIabHelperImpl extends IabHelperImpl implements SimpleIabHelper {
     @Override
     public void onActivityResult(@NonNull final Activity activity, final int requestCode,
                                  final int resultCode, @Nullable final Intent data) {
-        OPFIab.post(new ActivityResultEvent(activity, requestCode, resultCode, data));
+        OPFIab.post(new ActivityResult(activity, requestCode, resultCode, data));
     }
 }
