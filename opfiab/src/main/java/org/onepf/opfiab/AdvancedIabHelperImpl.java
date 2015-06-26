@@ -124,7 +124,12 @@ class AdvancedIabHelperImpl extends SimpleIabHelperImpl implements AdvancedIabHe
 
     @Override
     public void unregister() {
+        dropQueue();
         dispatcher.unregister(listenerCompositor);
+    }
+
+    @Override
+    public void dropQueue() {
         scheduler.dropQueue(this);
     }
 }

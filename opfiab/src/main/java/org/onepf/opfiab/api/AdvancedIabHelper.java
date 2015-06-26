@@ -75,4 +75,6 @@ public interface AdvancedIabHelper extends SimpleIabHelper, ListenersSupport {
      * @see #register()
      */
     void unregister();
+
+    void dropQueue();
 }

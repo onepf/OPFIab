@@ -20,6 +20,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.model.billing.Purchase;
+
+import java.util.Set;
+
 /**
  * Version of {@link IabHelper} featuring {@link #purchase(String)} with activity.
  *
@@ -28,11 +32,39 @@ import android.support.annotation.NonNull;
 public interface SimpleIabHelper extends IabHelper, ActivityResultSupport {
 
     /**
-     * Same as {@link #purchase(String)} except passed activity <b>must</b> override {@link Activity#onActivityResult(int, int, Intent)}.
+     * Same as {@link #purchase(String)} except passed activity <b>must</b> override
+     * {@link Activity#onActivityResult(int, int, Intent)}.
      *
-     * @param activity Activity object used to start other activities if necessary.
-     * @param sku      Stock Keeping Unit - unique product ID to purchase.
      * @see #onActivityResult(Activity, int, int, Intent)
      */
     void purchase(@NonNull final Activity activity, @NonNull final String sku);
+
+    /**
+     * Same as {@link #consume(Purchase)} except passed activity <b>must</b> override
+     * {@link Activity#onActivityResult(int, int, Intent)}.
+     *
+     * @see #onActivityResult(Activity, int, int, Intent)
+     */
+    void consume(@NonNull final Activity activity, @NonNull final Purchase purchase);
+
+    /**
+     * Same as {@link #inventory(boolean)} except passed activity <b>must</b> override
+     * {@link Activity#onActivityResult(int, int, Intent)}.
+     *
+     * @see #onActivityResult(Activity, int, int, Intent)
+     */
+    void inventory(@NonNull final Activity activity, final boolean startOver);
+
+    /**
+     * Same as {@link #skuDetails(Set)} except passed activity <b>must</b> override
+     * {@link Activity#onActivityResult(int, int, Intent)}.
+     *
+     * @see #onActivityResult(Activity, int, int, Intent)
+     */
+    void skuDetails(@NonNull final Activity activity, @NonNull final Set<String> skus);
+
+    /**
+     * Same as {@link #skuDetails(Activity, Set)}.
+     */
+    void skuDetails(@NonNull final Activity activity, @NonNull final String... skus);
 }
