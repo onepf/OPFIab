@@ -88,7 +88,8 @@ public final class SamsungUtils {
     }
 
     public static boolean checkSignature(@NonNull final Context context) {
-        final Signature[] signatures = OPFIabUtils.getPackageSignatures(context, BILLING_PACKAGE_NAME);
+        final Signature[] signatures = OPFIabUtils
+                .getPackageSignatures(context, BILLING_PACKAGE_NAME);
         for (final Signature signature : signatures) {
             if (signature.hashCode() == BILLING_SIGNATURE_HASHCODE) {
                 return true;
@@ -242,7 +243,7 @@ public final class SamsungUtils {
     }
 
     @Nullable
-    private static Collection<String> getItems(@Nullable final Bundle bundle) {
+    public static Collection<String> getItems(@Nullable final Bundle bundle) {
         final List<String> items;
         if (bundle == null || (items = bundle.getStringArrayList(KEY_RESULT_LIST)) == null) {
             return null;

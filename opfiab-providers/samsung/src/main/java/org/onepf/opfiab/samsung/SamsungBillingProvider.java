@@ -47,6 +47,7 @@ import org.onepf.opfiab.util.ActivityForResultLauncher;
 import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfiab.verification.PurchaseVerifier;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.Collection;
@@ -61,6 +62,7 @@ import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
 import static org.onepf.opfiab.verification.PurchaseVerifier.DEFAULT;
 
+@SuppressWarnings("PMD.NPathComplexity")
 public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolver,
         PurchaseVerifier> {
 
@@ -70,7 +72,11 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
     protected static final String SAMSUNG_BILLING = "com.sec.android.iap.permission.BILLING";
 
     protected static final long ACCOUNT_TIMEOUT = 5000;
+    private static final int BATCH_SIZE = 15;
+    private static final String KEY_LAST_ITEM = "last_item";
 
+
+    private final OPFPreferences preferences = new OPFPreferences(context);
     @NonNull
     protected final SamsungBillingHelper helper;
     @Nullable
@@ -156,17 +162,26 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
             return;
         }
 
-        final Bundle bundle = helper.getItemsInbox(skuResolver.getGroupId());
+        final boolean startOver = request.startOver();
+        final int start = startOver ? 1 : preferences.getInt(KEY_LAST_ITEM, 1);
+        final int end = start + BATCH_SIZE;
+        final Bundle bundle = helper.getItemsInbox(skuResolver.getGroupId(), start, end);
         final Status error = SamsungUtils.handleError(context, bundle);
         if (error != null) {
             postEmptyResponse(request, error);
             return;
         }
 
+        final Collection loadedItems = SamsungUtils.getItems(bundle);
+        final int loadedCount = loadedItems == null ? 0 : loadedItems.size();
+        if (loadedCount > 0) {
+            preferences.put(KEY_LAST_ITEM, start + loadedCount);
+        }
+
         //TODO check if consumables should be loaded
         final Collection<Purchase> purchases = SamsungUtils.getPurchasedItems(bundle, false);
         final Status status = purchases == null ? UNKNOWN_ERROR : SUCCESS;
-        postResponse(new InventoryResponse(status, getName(), purchases, false));
+        postResponse(new InventoryResponse(status, getName(), purchases, loadedCount == BATCH_SIZE));
     }
 
     @Override
@@ -195,27 +210,22 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
                         activity.startActivityForResult(intent, DEFAULT_REQUEST_CODE);
                     }
                 });
-        if (result == null) {
-            postEmptyResponse(request, UNKNOWN_ERROR);
-        } else if (result.getResultCode() != Activity.RESULT_OK) {
-            postEmptyResponse(request, USER_CANCELED);
-        } else {
-            final Intent data = result.getData();
-            final SamsungPurchase samsungPurchase;
-            final Bundle bundle = data == null ? null : data.getExtras();
-            final Status error = SamsungUtils.handleError(context, bundle);
-            if (error != null) {
-                postEmptyResponse(request, error);
-            } else if (data == null
-                    || (samsungPurchase = SamsungUtils.getPurchase(bundle)) == null) {
-                postEmptyResponse(request, UNKNOWN_ERROR);
-            } else {
-                final SkuType skuType = skuResolver.resolveType(sku);
-                final ItemType itemType = ItemType.fromSkuType(skuType);
-                final Purchase purchase = SamsungUtils.convertPurchase(samsungPurchase, itemType);
-                postResponse(new PurchaseResponse(SUCCESS, getName(), purchase));
-            }
+        if (result == null || result.getResultCode() != Activity.RESULT_OK) {
+            postEmptyResponse(request, result == null ? UNKNOWN_ERROR : USER_CANCELED);
+            return;
         }
+        final Intent data = result.getData();
+        final Bundle bundle = data == null ? null : data.getExtras();
+        final Status error = SamsungUtils.handleError(context, bundle);
+        final SamsungPurchase samsungPurchase = SamsungUtils.getPurchase(bundle);
+        if (error != null || samsungPurchase == null) {
+            postEmptyResponse(request, error != null ? error : UNKNOWN_ERROR);
+            return;
+        }
+        final SkuType skuType = skuResolver.resolveType(sku);
+        final ItemType itemType = ItemType.fromSkuType(skuType);
+        final Purchase purchase = SamsungUtils.convertPurchase(samsungPurchase, itemType);
+        postResponse(new PurchaseResponse(SUCCESS, getName(), purchase));
     }
 
     @Override
