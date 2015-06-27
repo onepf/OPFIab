@@ -81,7 +81,7 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
     }
 
     @Nullable
-    public Bundle getItemsInbox(@NonNull final String groupId) {
+    public Bundle getItemsInbox(@NonNull final String groupId, final int start, final int end) {
         OPFLog.logMethod();
         final IAPConnector iapConnector = getService();
         if (iapConnector == null) {
@@ -91,9 +91,9 @@ final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
         if (SamsungUtils.getResponse(init) != Response.ERROR_NONE) {
             return init;
         }
+        final String now = SamsungUtils.getNowDate();
         try {
-            return iapConnector.getItemsInbox(packageName, groupId, 1, Integer.MAX_VALUE,
-                    START_DATE, SamsungUtils.getNowDate());
+            return iapConnector.getItemsInbox(packageName, groupId, start, end, START_DATE, now);
         } catch (RemoteException exception) {
             OPFLog.e("getItemsInbox failed.", exception);
         }
