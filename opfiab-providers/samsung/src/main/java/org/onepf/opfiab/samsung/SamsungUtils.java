@@ -65,6 +65,7 @@ public final class SamsungUtils {
     private static final String ACCOUNT_TYPE_SAMSUNG = "com.osp.app.signin";
 
     private static final String KEY_TYPE = "mType";
+    private static final String KEY_HAS_MORE = "hasMore";
 
     private static final String KEY_THIRD_PARTY = "THIRD_PARTY_NAME";
     private static final String KEY_STATUS_CODE = "STATUS_CODE";
@@ -320,6 +321,23 @@ public final class SamsungUtils {
             OPFLog.e("Failed to decode Samsung purchase.", exception);
         }
         return null;
+    }
+
+    @Nullable
+    public static Boolean getHasMore(@Nullable final Bundle bundle) {
+        if (bundle == null || !bundle.containsKey(KEY_HAS_MORE)) {
+            return null;
+        }
+        return bundle.getBoolean(KEY_HAS_MORE);
+    }
+
+    @Nullable
+    public static Bundle putHasMore(@Nullable final Bundle bundle, final boolean hasMore) {
+        if (bundle == null) {
+            return null;
+        }
+        bundle.putBoolean(KEY_HAS_MORE, hasMore);
+        return bundle;
     }
 
     @NonNull
