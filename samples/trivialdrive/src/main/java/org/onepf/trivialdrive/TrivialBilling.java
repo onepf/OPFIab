@@ -243,9 +243,13 @@ public final class TrivialBilling {
             // Leave current values intact if request failed
             return;
         }
-        premium = getPurchase(inventory, SKU_PREMIUM) != null;
+        if (getPurchase(inventory, SKU_PREMIUM) != null) {
+            premium = true;
+        }
         final Purchase purchase = getPurchase(inventory, SKU_SUBSCRIPTION);
-        subscription = purchase != null && !purchase.isCanceled();
+        if (purchase != null && !purchase.isCanceled()) {
+            subscription = true;
+        }
     }
 
     public static void updatePurchase(final PurchaseResponse purchaseResponse) {

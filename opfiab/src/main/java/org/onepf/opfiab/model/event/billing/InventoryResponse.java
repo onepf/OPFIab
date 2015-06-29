@@ -104,6 +104,7 @@ public class InventoryResponse extends BillingResponse {
     public JSONObject toJson() {
         final JSONObject jsonObject = super.toJson();
         try {
+            jsonObject.put(NAME_HAS_MORE, hasMore);
             final JSONArray jsonArray = new JSONArray();
             for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
                 final JSONObject item = new JSONObject();
@@ -112,7 +113,6 @@ public class InventoryResponse extends BillingResponse {
                 jsonArray.put(item);
             }
             jsonObject.put(NAME_INVENTORY, jsonArray);
-            jsonObject.put(NAME_HAS_MORE, hasMore);
         } catch (JSONException e) {
             OPFLog.e("", e);
         }
