@@ -19,6 +19,7 @@ package org.onepf.opfiab.model.event.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
@@ -29,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.json.JSONObject.NULL;
-
 /**
  * Response from {@link BillingProvider} for corresponding {@link SkuDetailsRequest}.
  */
@@ -39,6 +38,7 @@ public class SkuDetailsResponse extends BillingResponse {
     private static final String NAME_SKUS_DETAILS = "skus_details";
 
 
+    @NonNull
     private final Collection<SkuDetails> skusDetails = new ArrayList<>();
 
     public SkuDetailsResponse(@NonNull final Status status,
@@ -75,13 +75,11 @@ public class SkuDetailsResponse extends BillingResponse {
     public JSONObject toJson() {
         final JSONObject jsonObject = super.toJson();
         try {
-            if (skusDetails == null) {
-                jsonObject.put(NAME_SKUS_DETAILS, NULL);
-            } else {
-                for (final SkuDetails skuDetails : skusDetails) {
-                    jsonObject.accumulate(NAME_SKUS_DETAILS, skuDetails.toJson());
-                }
+            final JSONArray jsonArray = new JSONArray();
+            for (final SkuDetails skuDetails : skusDetails) {
+                jsonArray.put(skuDetails.toJson());
             }
+            jsonObject.put(NAME_SKUS_DETAILS, jsonArray);
         } catch (JSONException exception) {
             OPFLog.e("", exception);
         }

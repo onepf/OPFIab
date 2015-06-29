@@ -37,7 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.onepf.opfiab.google.GoogleBillingProvider.PACKAGE;
+import static org.onepf.opfiab.google.GoogleBillingProvider.NAME;
 
 /**
  * This class handles all Google specific billing operations.
@@ -46,21 +46,19 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
     private static final String INTENT_ACTION = "com.android.vending.billing.InAppBillingService.BIND";
     private static final String INTENT_PACKAGE = "com.android.vending";
-    private static final String KEY_CONTINUATION_TOKEN = PACKAGE + ".continuation_token.";
+    private static final String KEY_CONTINUATION_TOKEN = NAME + ".continuation_token.";
 
     private static final int API = 3;
     private static final int BATCH_SIZE = 20;
 
 
     @NonNull
-    private final String packageName;
+    private final String packageName = context.getPackageName();
     @NonNull
-    private final OPFPreferences preferences;
+    private final OPFPreferences preferences = new OPFPreferences(context);
 
     GoogleBillingHelper(@NonNull final Context context) {
         super(context, IInAppBillingService.class);
-        this.packageName = context.getPackageName();
-        this.preferences = new OPFPreferences(context, GoogleBillingProvider.NAME);
     }
 
     /**
@@ -174,7 +172,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
                     final Bundle details = service.getSkuDetails(API, packageName, type, bundle);
                     final Response response = GoogleUtils.getResponse(details);
                     OPFLog.d("From %d to %d. Type: %s. Response: %s. Details: %s.",
-                             first, last, itemType, response, OPFUtils.toString(details));
+                            first, last, itemType, response, OPFUtils.toString(details));
                     if (response != Response.OK) {
                         // Return received bundle if error is encountered
                         return details;
@@ -217,7 +215,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
                 final Bundle purchases = service.getPurchases(API, packageName, type, token);
                 final Response response = GoogleUtils.getResponse(purchases);
                 OPFLog.d("Type: %s. Response: %s. Purchases: %s.",
-                         itemType, response, OPFUtils.toString(purchases));
+                        itemType, response, OPFUtils.toString(purchases));
                 if (response != Response.OK) {
                     return purchases;
                 } else {

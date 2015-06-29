@@ -19,6 +19,7 @@ package org.onepf.opfiab.model.event.billing;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onepf.opfiab.billing.BillingProvider;
@@ -41,6 +42,7 @@ public class InventoryResponse extends BillingResponse {
     private static final String NAME_HAS_MORE = "has_more";
 
 
+    @NonNull
     private final Map<Purchase, VerificationResult> inventory = new HashMap<>();
     private final boolean hasMore;
 
@@ -102,16 +104,14 @@ public class InventoryResponse extends BillingResponse {
     public JSONObject toJson() {
         final JSONObject jsonObject = super.toJson();
         try {
-            if (inventory == null) {
-                jsonObject.put(NAME_INVENTORY, JSONObject.NULL);
-            } else {
-                for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
-                    final JSONObject item = new JSONObject();
-                    item.put(NAME_PURCHASE, entry.getKey().toJson());
-                    item.put(NAME_VERIFICATION_RESULT, entry.getValue());
-                    jsonObject.accumulate(NAME_INVENTORY, item);
-                }
+            final JSONArray jsonArray = new JSONArray();
+            for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
+                final JSONObject item = new JSONObject();
+                item.put(NAME_PURCHASE, entry.getKey().toJson());
+                item.put(NAME_VERIFICATION_RESULT, entry.getValue());
+                jsonArray.put(item);
             }
+            jsonObject.put(NAME_INVENTORY, jsonArray);
             jsonObject.put(NAME_HAS_MORE, hasMore);
         } catch (JSONException e) {
             OPFLog.e("", e);

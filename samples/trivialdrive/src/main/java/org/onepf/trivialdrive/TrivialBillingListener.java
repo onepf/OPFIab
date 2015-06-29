@@ -32,7 +32,6 @@ import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
-import org.onepf.trivialdrive.R;
 import org.onepf.trivialdrive.ui.view.TrivialView;
 
 public class TrivialBillingListener extends DefaultBillingListener {

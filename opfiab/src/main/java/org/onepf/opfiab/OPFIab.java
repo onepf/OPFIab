@@ -248,7 +248,6 @@ public final class OPFIab {
             register(scheduler);
             register(activityMonitor);
             register(BillingEventDispatcher.getInstance());
-
         } else {
             for (final BillingProvider provider : OPFIab.configuration.getProviders()) {
                 unregister(provider);
