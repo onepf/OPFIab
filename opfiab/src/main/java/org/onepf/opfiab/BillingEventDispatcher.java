@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.listener.BillingListener;
 import org.onepf.opfiab.listener.BillingListenerCompositor;
+import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.SetupResponse;
 import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
@@ -31,6 +32,9 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
+
+import java.util.Deque;
+import java.util.LinkedList;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -54,6 +58,13 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
         return instance;
     }
 
+
+    /**
+     * Used to cache responses that are delivered while library is busy.
+     *
+     * @see RequestHandledEvent
+     */
+    private final Deque<BillingResponse> responseQueue = new LinkedList<>();
 
     private BillingEventDispatcher() {
         super();
@@ -94,8 +105,27 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
         onSetupResponse(setupResponse);
     }
 
-    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
+    public void onEventMainThread(@NonNull final BillingRequest billingRequest) {
+        onRequest(billingRequest);
+    }
+
     public void onEventMainThread(@NonNull final BillingResponse billingResponse) {
+        // Store response in a queue to handle it later
+        if (BillingBase.getInstance().isBusy()) {
+            responseQueue.addLast(billingResponse);
+        } else {
+            handleBillingResponse(billingResponse);
+        }
+    }
+
+    public void onEventMainThread(@NonNull final RequestHandledEvent event) {
+        while (!responseQueue.isEmpty()) {
+            handleBillingResponse(responseQueue.pollFirst());
+        }
+    }
+
+    @SuppressFBWarnings({"BC_UNCONFIRMED_CAST"})
+    private void handleBillingResponse(@NonNull final BillingResponse billingResponse) {
         onResponse(billingResponse);
         switch (billingResponse.getType()) {
             case PURCHASE:
@@ -113,10 +143,6 @@ final class BillingEventDispatcher extends BillingListenerCompositor {
             default:
                 throw new IllegalStateException();
         }
-    }
-
-    public void onEventMainThread(@NonNull final BillingRequest billingRequest) {
-        onRequest(billingRequest);
     }
 
     @Override
