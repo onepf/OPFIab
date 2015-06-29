@@ -72,8 +72,8 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
     protected static final String SAMSUNG_BILLING = "com.sec.android.iap.permission.BILLING";
 
     protected static final long ACCOUNT_TIMEOUT = 5000;
-    private static final int BATCH_SIZE = 15;
-    private static final String KEY_LAST_ITEM = "last_item";
+    protected static final int BATCH_SIZE = 15;
+    protected static final String KEY_LAST_ITEM = NAME + ".last_item";
 
 
     private final OPFPreferences preferences = new OPFPreferences(context);
@@ -164,7 +164,7 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
 
         final boolean startOver = request.startOver();
         final int start = startOver ? 1 : preferences.getInt(KEY_LAST_ITEM, 1);
-        final int end = start + BATCH_SIZE;
+        final int end = start + BATCH_SIZE - 1;
         final Bundle bundle = helper.getItemsInbox(skuResolver.getGroupId(), start, end);
         final Status error = SamsungUtils.handleError(context, bundle);
         if (error != null) {
