@@ -60,7 +60,7 @@ public final class TrivialBilling {
     private static final String AMAZON_SKU_GAS = "org.onepf.opfiab.trivialdrive.sku_gas";
     private static final String AMAZON_SKU_PREMIUM = "org.onepf.opfiab.trivialdrive.sku_premium";
     private static final String AMAZON_SKU_SUBSCRIPTION
-            = "org.onepf.opfiab.trivialdrive.sku_infinite_gas.month";
+            = "org.onepf.opfiab.trivialdrive.sku_infinite_gas";
 
     private static final String GOOGLE_SKU_GAS = "sku_gas";
     @SuppressWarnings("SpellCheckingInspection")
@@ -74,11 +74,10 @@ public final class TrivialBilling {
             "acThoMk9ErEOFBqb4dGBNswH5JRm68r/u7a2XzEoo40dXQQH2/5tMy3AQCzVakHnfcIQcZO0BkQOh4o52ahh" +
             "y3vcCUhauN61YA492k+DmKT5GgSH+KxwgK5dcorjbh94E9e03dZwIDAQAB";
 
-    public static final String SAMSUNG_SKU_GAS = "org.onepf.trivialdrivegame.sku_gas";
-    public static final String SAMSUNG_SKU_PREMIUM = "org.onepf.trivialdrivegame.sku_premium";
-    public static final String SAMSUNG_SKU_SUBSCRIPTION =
-            "org.onepf.trivialdrivegame.sku_infinite_gas";
-    public static final String SAMSUNG_GROUP_ID = "100000104947";
+    public static final String SAMSUNG_SKU_GAS = "gas";
+    public static final String SAMSUNG_SKU_PREMIUM = "premium";
+    public static final String SAMSUNG_SKU_SUBSCRIPTION = "subscription";
+    public static final String SAMSUNG_GROUP_ID = "100000105548";
 
     public static final String SKU_GAS = "sku_gas";
     public static final String SKU_PREMIUM = "sku_premium";

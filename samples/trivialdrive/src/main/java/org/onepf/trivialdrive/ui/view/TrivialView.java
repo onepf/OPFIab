@@ -38,13 +38,15 @@ import java.util.Set;
 
 import static android.view.Gravity.CENTER_HORIZONTAL;
 import static android.view.Gravity.CENTER_VERTICAL;
+import static org.onepf.trivialdrive.TrivialBilling.SKU_GAS;
+import static org.onepf.trivialdrive.TrivialBilling.SKU_PREMIUM;
+import static org.onepf.trivialdrive.TrivialBilling.SKU_SUBSCRIPTION;
 
 public class TrivialView extends LinearLayout
         implements View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public static final Set<String> SKUS = new HashSet<>(Arrays.asList(TrivialBilling.SKU_GAS,
-                                                                       TrivialBilling.SKU_PREMIUM,
-                                                                       TrivialBilling.SKU_SUBSCRIPTION));
+    public static final Set<String> SKUS = new HashSet<>(
+            Arrays.asList(SKU_GAS, SKU_PREMIUM, SKU_SUBSCRIPTION));
 
 
     private View btnDrive;
@@ -133,12 +135,14 @@ public class TrivialView extends LinearLayout
     }
 
     private void updateGas() {
-        if (TrivialBilling.hasValidSubscription()) {
+        final boolean hasValidSubscription = TrivialBilling.hasValidSubscription();
+        if (hasValidSubscription) {
             ivGas.setImageResource(R.drawable.img_gas_inf);
         } else {
             ivGas.setImageResource(R.drawable.img_gas_level);
             ivGas.getDrawable().setLevel(TrivialData.getGas());
         }
+        btnBuyGas.setEnabled(!TrivialBilling.hasValidSubscription() && TrivialData.canAddGas());
     }
 
     public void setIabHelper(final IabHelper iabHelper) {
@@ -147,8 +151,8 @@ public class TrivialView extends LinearLayout
 
     public void updatePremium() {
         ivCar.setImageResource(TrivialBilling.hasPremium()
-                                       ? R.drawable.img_car_premium
-                                       : R.drawable.img_car);
+                ? R.drawable.img_car_premium
+                : R.drawable.img_car);
     }
 
     public void updateSubscription() {
@@ -156,9 +160,9 @@ public class TrivialView extends LinearLayout
     }
 
     public void updateSkuDetails() {
-        sdvGas.setSkuDetails(TrivialBilling.getDetails(TrivialBilling.SKU_GAS));
-        sdvPremium.setSkuDetails(TrivialBilling.getDetails(TrivialBilling.SKU_PREMIUM));
-        sdvSubscription.setSkuDetails(TrivialBilling.getDetails(TrivialBilling.SKU_SUBSCRIPTION));
+        sdvGas.setSkuDetails(TrivialBilling.getDetails(SKU_GAS));
+        sdvPremium.setSkuDetails(TrivialBilling.getDetails(SKU_PREMIUM));
+        sdvSubscription.setSkuDetails(TrivialBilling.getDetails(SKU_SUBSCRIPTION));
     }
 
     public void update() {
@@ -172,11 +176,11 @@ public class TrivialView extends LinearLayout
         if (v == btnDrive) {
             drive();
         } else if (v == btnBuyGas && !TrivialBilling.hasValidSubscription() && TrivialData.canAddGas()) {
-            iabHelper.purchase(TrivialBilling.SKU_GAS);
+            iabHelper.purchase(SKU_GAS);
         } else if (v == btnBuyPremium) {
-            iabHelper.purchase(TrivialBilling.SKU_PREMIUM);
+            iabHelper.purchase(SKU_PREMIUM);
         } else if (v == btnBuySubscription) {
-            iabHelper.purchase(TrivialBilling.SKU_SUBSCRIPTION);
+            iabHelper.purchase(SKU_SUBSCRIPTION);
         }
     }
 
