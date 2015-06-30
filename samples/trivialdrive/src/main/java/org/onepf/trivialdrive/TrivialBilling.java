@@ -77,7 +77,7 @@ public final class TrivialBilling {
     public static final String SAMSUNG_SKU_GAS = "gas";
     public static final String SAMSUNG_SKU_PREMIUM = "premium";
     public static final String SAMSUNG_SKU_SUBSCRIPTION = "subscription";
-    public static final String SAMSUNG_GROUP_ID = "100000105548";
+    public static final String SAMSUNG_GROUP_ID = "100000105550";
 
     public static final String SKU_GAS = "sku_gas";
     public static final String SKU_PREMIUM = "sku_premium";
@@ -137,7 +137,7 @@ public final class TrivialBilling {
 
         return new SamsungBillingProvider.Builder(context)
                 .setBillingMode(BillingMode.TEST_SUCCESS)
-                .setPurchaseVerifier(new SamsungPurchaseVerifier(context, BillingMode.TEST_SUCCESS))
+                .setPurchaseVerifier(new SamsungPurchaseVerifier(context, BillingMode.PRODUCTION))
                 .setSkuResolver(skuResolver)
                 .build();
     }

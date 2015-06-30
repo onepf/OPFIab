@@ -20,11 +20,11 @@ apply from: 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons
 
 android {
     defaultConfig {
-        applicationId 'org.onepf.sample.trivialdrive'
+        applicationId 'org.onepf.opfiab.trivialdrive'
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 28
-        versionName "0.3.0-SNAPSHOT"
+        versionCode 30
+        versionName "0.3.0"
     }
 
     buildTypes {
