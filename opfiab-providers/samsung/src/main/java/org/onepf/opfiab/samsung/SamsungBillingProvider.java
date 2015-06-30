@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.json.JSONException;
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.billing.Compatibility;
@@ -31,7 +32,9 @@ import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.android.ActivityResult;
+import org.onepf.opfiab.model.event.billing.BillingEventType;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
+import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.model.event.billing.ConsumeRequest;
 import org.onepf.opfiab.model.event.billing.ConsumeResponse;
 import org.onepf.opfiab.model.event.billing.InventoryRequest;
@@ -46,11 +49,14 @@ import org.onepf.opfiab.samsung.model.SamsungPurchase;
 import org.onepf.opfiab.util.ActivityForResultLauncher;
 import org.onepf.opfiab.util.SyncedReference;
 import org.onepf.opfiab.verification.PurchaseVerifier;
+import org.onepf.opfiab.verification.VerificationResult;
 import org.onepf.opfutils.OPFChecks;
+import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFPreferences;
 import org.onepf.opfutils.OPFUtils;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import static android.Manifest.permission.GET_ACCOUNTS;
@@ -60,7 +66,9 @@ import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
+import static org.onepf.opfiab.samsung.model.ItemType.CONSUMABLE;
 import static org.onepf.opfiab.verification.PurchaseVerifier.DEFAULT;
+import static org.onepf.opfiab.verification.VerificationResult.ERROR;
 
 @SuppressWarnings("PMD.NPathComplexity")
 public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolver,
@@ -76,7 +84,8 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
     protected static final String KEY_LAST_ITEM = NAME + ".last_item";
 
 
-    private final OPFPreferences preferences = new OPFPreferences(context);
+    protected final OPFPreferences preferences = new OPFPreferences(context);
+    protected final OPFPreferences consumablePurchases = new OPFPreferences(context, NAME);
     @NonNull
     protected final SamsungBillingHelper helper;
     @Nullable
@@ -118,6 +127,43 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
             return Compatibility.PREFERRED;
         }
         return Compatibility.COMPATIBLE;
+    }
+
+    @Override
+    protected BillingResponse verify(@NonNull final BillingResponse response) {
+        final BillingResponse verifiedResponse = super.verify(response);
+        if (verifiedResponse.getStatus() != SUCCESS) {
+            return verifiedResponse;
+        }
+        // Due to API limitations this BillingProvider doesn't return consumables in inventory
+        // requests. However this there's a possibility of error during purchase verification
+        // process user might not get a verified consumable purchase in onPurchase() callback.
+        // To work around this issue we'll this kind of purchases in SharedPreferences.
+        final BillingEventType type = verifiedResponse.getType();
+        if (type == BillingEventType.PURCHASE) {
+            final PurchaseResponse purchaseResponse = (PurchaseResponse) verifiedResponse;
+            final Purchase purchase = purchaseResponse.getPurchase();
+            if (purchaseResponse.getVerificationResult() == ERROR && purchase != null
+                    && purchase.getType() == SkuType.CONSUMABLE) {
+                final String token = purchase.getToken();
+                final String originalJson = purchase.getOriginalJson();
+                if (token != null && originalJson != null) {
+                    consumablePurchases.put(token, originalJson);
+                }
+            }
+        } else if (type == BillingEventType.INVENTORY) {
+            final InventoryResponse inventoryResponse = (InventoryResponse) verifiedResponse;
+            final Map<Purchase, VerificationResult> inventory = inventoryResponse.getInventory();
+            for (final Map.Entry<Purchase, VerificationResult> entry : inventory.entrySet()) {
+                final VerificationResult result = entry.getValue();
+                final Purchase purchase = entry.getKey();
+                final String token = purchase.getToken();
+                if (token != null && result != ERROR && consumablePurchases.contains(token)) {
+                    consumablePurchases.remove(token);
+                }
+            }
+        }
+        return verifiedResponse;
     }
 
     protected Status checkAuthorisation(@NonNull final BillingRequest billingRequest) {
@@ -180,8 +226,25 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
 
         //TODO check if consumables should be loaded
         final Collection<Purchase> purchases = SamsungUtils.getPurchasedItems(bundle, false);
+        if (purchases != null) {
+            // Add all consumables that might be stored in SharedPreferences.
+            final Map<String, ?> all = consumablePurchases.getPreferences().getAll();
+            for (final Map.Entry<String, ?> entry : all.entrySet()) {
+                final String value = (String) entry.getValue();
+                try {
+                    final SamsungPurchase samsungPurchase = new SamsungPurchase(value);
+                    final Purchase purchase = SamsungUtils
+                            .convertPurchase(samsungPurchase, CONSUMABLE);
+                    purchases.add(purchase);
+                } catch (JSONException exception) {
+                    OPFLog.e("", exception);
+                    consumablePurchases.remove(entry.getKey());
+                }
+            }
+        }
         final Status status = purchases == null ? UNKNOWN_ERROR : SUCCESS;
-        postResponse(new InventoryResponse(status, getName(), purchases, loadedCount == BATCH_SIZE));
+        final boolean hasMore = loadedCount == BATCH_SIZE;
+        postResponse(new InventoryResponse(status, getName(), purchases, hasMore));
     }
 
     @Override

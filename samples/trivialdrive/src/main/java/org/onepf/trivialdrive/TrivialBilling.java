@@ -137,7 +137,7 @@ public final class TrivialBilling {
 
         return new SamsungBillingProvider.Builder(context)
                 .setBillingMode(BillingMode.TEST_SUCCESS)
-                .setPurchaseVerifier(new SamsungPurchaseVerifier(context, BillingMode.PRODUCTION))
+                .setPurchaseVerifier(new SamsungPurchaseVerifier(context, BillingMode.TEST_SUCCESS))
                 .setSkuResolver(skuResolver)
                 .build();
     }
