@@ -70,7 +70,7 @@ import static org.onepf.opfiab.samsung.model.ItemType.CONSUMABLE;
 import static org.onepf.opfiab.verification.PurchaseVerifier.DEFAULT;
 import static org.onepf.opfiab.verification.VerificationResult.ERROR;
 
-@SuppressWarnings("PMD.NPathComplexity")
+@SuppressWarnings({"PMD.NPathComplexity", "PMD.ModifiedCyclomaticComplexity", "PMD.GodClass", "PMD.StdCyclomaticComplexity"})
 public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolver,
         PurchaseVerifier> {
 
