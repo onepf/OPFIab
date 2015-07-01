@@ -10,8 +10,8 @@ Add core dependency:
 ```groovy
   dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'org.onepf:opfutils:0.1.22'
-    compile 'org.onepf:opfiab:0.2.1@aar'
+    compile 'org.onepf:opfutils:x.x.x'
+    compile 'org.onepf:opfiab:x.x.x@aar'
   }
 ```
 Or grab our latest [release](https://github.com/onepf/OPFIab/releases).
