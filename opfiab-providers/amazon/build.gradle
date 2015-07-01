@@ -28,10 +28,7 @@ android {
 }
 
 dependencies {
-//    compile('org.onepf:opfiab:0.3.+@aar') {
-//        changing = true
-//    }
-    compile project(':opfiab')
+    compile 'org.onepf:opfiab:0.3.0@aar'
     //noinspection GradleDynamicVersion
     provided 'org.onepf:opfutils:0.1.+'
     provided 'com.amazon:in-app-purchasing:2.0.61'

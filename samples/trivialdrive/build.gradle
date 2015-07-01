@@ -54,26 +54,14 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     //noinspection GradleDynamicVersion
     compile 'org.onepf:opfutils:0.1.+'
-    compile project(':opfiab')
-//    compile('org.onepf:opfiab:0.3.+@aar') {
-//        changing = true
-//    }
+    compile 'org.onepf:opfiab:0.3.0@aar'
     // OPFIab Google
-    compile project(':opfiab-google')
-//    compile('org.onepf:opfiab-google:0.3.+@aar') {
-//        changing = true
-//    }
+    compile 'org.onepf:opfiab-google:0.3.0@aar'
     // OPFIab Amazon
-    compile project(':opfiab-amazon')
-//    compile('org.onepf:opfiab-amazon:0.3.+@aar') {
-//        changing = true
-//    }
+    compile 'org.onepf:opfiab-amazon:0.3.+@aar'
     compile 'com.amazon:in-app-purchasing:2.0.61'
     // OPFIab Samsung
-    compile project(':opfiab-samsung')
-//    compile('org.onepf:opfiab-samsung:0.3.+@aar') {
-//        changing = true
-//    }
+    compile 'org.onepf:opfiab-samsung:0.3.+@aar'
     // UI
     compile 'com.makeramen:dragsortadapter:1.3.0'
     // Leak Canary
