@@ -16,14 +16,14 @@
 
 apply plugin: 'idea'
 apply plugin: 'com.android.library'
-apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle')
+apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/opf-commons.gradle')
 
 android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 1
-        versionName "0.3.0-SNAPSHOT"
+        versionCode 2
+        versionName "0.3.0"
     }
 }
 
