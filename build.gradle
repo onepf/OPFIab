@@ -27,10 +27,13 @@ buildscript {
         classpath 'com.android.tools.build:gradle:1.2.3'
         classpath 'com.noveogroup.android:check:1.1.2'
         classpath 'net.ltgt.gradle:gradle-errorprone-plugin:latest.release'
+        classpath "com.kageiit:url-cache-plugin:1.0.0"
     }
 }
 
 allprojects {
+    apply plugin: 'com.kageiit.url-cache'
+
     repositories {
         jcenter()
     }
