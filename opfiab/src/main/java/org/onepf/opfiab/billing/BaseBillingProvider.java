@@ -228,7 +228,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     @Override
     public int hashCode() {
-        return getName().hashCode();
+        return toString().hashCode();
     }
 
     @Override

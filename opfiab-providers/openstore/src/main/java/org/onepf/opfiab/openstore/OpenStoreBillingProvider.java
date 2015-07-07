@@ -24,6 +24,7 @@ import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.Compatibility;
@@ -70,9 +71,9 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
     protected final OpenStoreBillingHelper helper = getHelper();
     private String name;
 
-    public OpenStoreBillingProvider(@NonNull final Context context,
-                                    @NonNull final TypedSkuResolver skuResolver,
-                                    @NonNull final PurchaseVerifier purchaseVerifier) {
+    protected OpenStoreBillingProvider(@NonNull final Context context,
+                                       @NonNull final TypedSkuResolver skuResolver,
+                                       @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
     }
 
@@ -124,15 +125,24 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
     }
 
     @Override
-    public void checkManifest() {
-        // Nothing to check
+    public String toString() {
+        return getClass().getSimpleName();
     }
 
     @SuppressWarnings("NullableProblems")
     @Nullable
     @Override
     public String getName() {
-        return name == null ? name = helper.getAppstoreName() : name;
+        if (name == null) {
+            OPFChecks.checkThread(false);
+            name = helper.getAppstoreName();
+        }
+        return name;
+    }
+
+    @Override
+    public void checkManifest() {
+        // Nothing to check
     }
 
     @Override
@@ -251,7 +261,7 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
 
             final String continuationToken = OpenStoreUtils.getContinuationToken(result);
             final String tokenKey = getTokenKey(entry.getKey());
-            if (continuationToken == null) {
+            if (TextUtils.isEmpty(continuationToken)) {
                 preferences.remove(tokenKey);
             } else {
                 preferences.put(tokenKey, continuationToken);

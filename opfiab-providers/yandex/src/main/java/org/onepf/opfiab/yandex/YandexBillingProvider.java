@@ -19,6 +19,8 @@ package org.onepf.opfiab.yandex;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import org.onepf.opfiab.billing.BaseBillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.openstore.OpenStoreBillingHelper;
 import org.onepf.opfiab.openstore.OpenStoreBillingProvider;
 import org.onepf.opfiab.sku.TypedSkuResolver;
@@ -26,15 +28,37 @@ import org.onepf.opfiab.verification.PurchaseVerifier;
 
 public class YandexBillingProvider extends OpenStoreBillingProvider {
 
-    public YandexBillingProvider(@NonNull final Context context,
-                                 @NonNull final TypedSkuResolver skuResolver,
-                                 @NonNull final PurchaseVerifier purchaseVerifier) {
+    protected YandexBillingProvider(@NonNull final Context context,
+                                    @NonNull final TypedSkuResolver skuResolver,
+                                    @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
+    }
+
+    @Override
+    public String toString() {
+        return "Yandex";
     }
 
     @NonNull
     @Override
     protected OpenStoreBillingHelper getHelper() {
         return new YandexBillingHelper(context);
+    }
+
+    public static class Builder extends BaseBillingProviderBuilder<Builder, TypedSkuResolver,
+            PurchaseVerifier> {
+
+        public Builder(@NonNull final Context context) {
+            super(context);
+        }
+
+        @Override
+        public BaseBillingProvider build() {
+            if (skuResolver == null) {
+                throw new IllegalStateException("SkuResolver must be set.");
+            }
+            return new YandexBillingProvider(context, skuResolver,
+                    purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
+        }
     }
 }

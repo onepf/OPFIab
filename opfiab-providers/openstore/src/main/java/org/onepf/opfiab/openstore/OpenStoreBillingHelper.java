@@ -152,8 +152,8 @@ public abstract class OpenStoreBillingHelper {
         if (openInApp == null) {
             return null;
         }
-        final Bundle result = new Bundle();
         try {
+            Bundle result = null;
             for (final List<String> skuBatch : OPFIabUtils.partition(skus, BATCH_SIZE)) {
                 for (final ItemType itemType : ItemType.values()) {
                     final String type = itemType.toString();
@@ -162,7 +162,11 @@ public abstract class OpenStoreBillingHelper {
                     if (OpenStoreUtils.getResponse(batch) != Response.OK) {
                         return batch;
                     }
-                    OpenStoreUtils.addSkuDetails(result, batch);
+                    if (result == null) {
+                        result = batch;
+                    } else {
+                        OpenStoreUtils.addSkuDetails(result, batch);
+                    }
                 }
             }
             return result;
