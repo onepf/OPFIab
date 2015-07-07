@@ -14,32 +14,28 @@
  * limitations under the License.
  */
 
-task wrapper(type: Wrapper) {
-    gradleVersion '2.2.1'
-}
+package org.onepf.opfiab.yandex;
 
-buildscript {
-    repositories {
-        jcenter()
+import android.content.Context;
+import android.content.Intent;
+import android.support.annotation.NonNull;
+
+import org.onepf.opfiab.openstore.OpenStoreBillingHelper;
+
+public class YandexBillingHelper extends OpenStoreBillingHelper {
+
+    protected static final String PACKAGE = "com.yandex.store";
+
+
+    public YandexBillingHelper(final Context context) {
+        super(context);
     }
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'com.noveogroup.android:check:1.1.2'
-        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:latest.release'
-        classpath 'com.kageiit:url-cache-plugin:1.0.0'
-    }
-}
-
-allprojects {
-    apply plugin: 'com.kageiit.url-cache'
-
-    repositories {
-        jcenter()
-    }
-
-    ext {
-        compileSdkVersion = 22
-        buildToolsVersion = "22.0.1"
+    @NonNull
+    @Override
+    protected Intent getOpenAppstoreServiceIntent() {
+        final Intent intent = new Intent(ACTION_BIND_OPENSTORE);
+        intent.setPackage(PACKAGE);
+        return intent;
     }
 }

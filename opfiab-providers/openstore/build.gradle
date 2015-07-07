@@ -14,32 +14,24 @@
  * limitations under the License.
  */
 
-task wrapper(type: Wrapper) {
-    gradleVersion '2.2.1'
-}
+apply plugin: 'idea'
+apply plugin: 'com.android.library'
+apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle')
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'com.noveogroup.android:check:1.1.2'
-        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:latest.release'
-        classpath 'com.kageiit:url-cache-plugin:1.0.0'
+android {
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion 22
+        versionCode 1
+        versionName "0.3.0-SNAPSHOT"
     }
 }
 
-allprojects {
-    apply plugin: 'com.kageiit.url-cache'
-
-    repositories {
-        jcenter()
-    }
-
-    ext {
-        compileSdkVersion = 22
-        buildToolsVersion = "22.0.1"
-    }
+dependencies {
+//    compile('org.onepf:opfiab:0.3.+@aar') {
+//        changing = true
+//    }
+    compile project(':opfiab')
+    //noinspection GradleDynamicVersion
+    provided 'org.onepf:opfutils:0.1.+'
 }

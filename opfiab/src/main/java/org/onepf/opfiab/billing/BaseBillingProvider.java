@@ -23,6 +23,7 @@ import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
 import org.onepf.opfiab.model.billing.Purchase;
+import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.ActivityResultRequest;
 import org.onepf.opfiab.model.event.android.ActivityResult;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
@@ -189,6 +190,11 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     protected void postEmptyResponse(@NonNull final BillingRequest billingRequest,
                                      @NonNull final Status status) {
         postResponse(BillingUtils.emptyResponse(getName(), billingRequest, status));
+    }
+
+    @Override
+    public boolean skuTypeSupported(@NonNull final SkuType skuType) {
+        return true;
     }
 
     @SuppressWarnings("PMD.EmptyMethodInAbstractClassShouldBeAbstract")

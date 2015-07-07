@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -35,8 +36,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.Reference;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import static android.content.pm.PackageManager.GET_SIGNATURES;
 
@@ -104,6 +107,61 @@ public final class OPFIabUtils {
         final E e = iterator.next();
         iterator.remove();
         return e;
+    }
+
+    @NonNull
+    public static <T> List<List<T>> partition(@NonNull final Collection<T> collection,
+                                              final int batch) {
+        final int size = collection.size();
+        final int batches = size / batch + size % batch == 0 ? 0 : 1;
+        final List<List<T>> partitioned = new ArrayList<>(batches);
+        final List<T> list = new ArrayList<>(collection);
+        for (int i = 0; i < batches; i++) {
+            final int start = batch * i;
+            final int end = size > start + batch ? start + batch : size;
+            partitioned.add(list.subList(start, end));
+        }
+        return partitioned;
+    }
+
+    @SuppressWarnings("PMD.LooseCoupling")
+    @Nullable
+    public static ArrayList<String> getList(@Nullable final Bundle bundle,
+                                            @NonNull final String key) {
+        if (bundle != null && bundle.containsKey(key)) {
+            return bundle.getStringArrayList(key);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("PMD.LooseCoupling")
+    @NonNull
+    public static Bundle putList(@NonNull final Bundle bundle,
+                                 @Nullable final ArrayList<String> list,
+                                 @NonNull final String key) {
+        if (list != null) {
+            bundle.putStringArrayList(key, list);
+        }
+        return bundle;
+    }
+
+    @SuppressWarnings("PMD.LooseCoupling")
+    @NonNull
+    public static Bundle addList(@NonNull final Bundle bundle,
+                                 @Nullable final ArrayList<String> list,
+                                 @NonNull final String key) {
+        if (list != null) {
+            final ArrayList<String> oldList = getList(bundle, key);
+            final ArrayList<String> newList;
+            if (oldList == null) {
+                newList = list;
+            } else {
+                newList = new ArrayList<>(oldList);
+                newList.addAll(list);
+            }
+            bundle.putStringArrayList(key, newList);
+        }
+        return bundle;
     }
 
     /**
