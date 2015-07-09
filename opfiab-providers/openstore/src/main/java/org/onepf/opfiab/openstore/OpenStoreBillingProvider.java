@@ -27,6 +27,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.billing.BaseBillingProvider;
+import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
 import org.onepf.opfiab.billing.Compatibility;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -63,35 +64,30 @@ import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 @SuppressWarnings({"PMD.GodClass", "PMD.EmptyMethodInAbstractClassShouldBeAbstract", "PMD.NPathComplexity"})
-public abstract class OpenStoreBillingProvider extends BaseBillingProvider<TypedSkuResolver,
+public class OpenStoreBillingProvider extends BaseBillingProvider<TypedSkuResolver,
         PurchaseVerifier> {
 
     protected static final String KEY_TOKEN = "continuation_token";
 
-    protected final OpenStoreBillingHelper helper = getHelper();
+    @Nullable
+    protected final OpenStoreIntentMaker intentMaker;
+    protected final OpenStoreBillingHelper helper;
+    @Nullable
     private String name;
 
     protected OpenStoreBillingProvider(@NonNull final Context context,
                                        @NonNull final TypedSkuResolver skuResolver,
-                                       @NonNull final PurchaseVerifier purchaseVerifier) {
+                                       @NonNull final PurchaseVerifier purchaseVerifier,
+                                       @Nullable final OpenStoreIntentMaker intentMaker) {
         super(context, skuResolver, purchaseVerifier);
-    }
-
-    @NonNull
-    protected abstract OpenStoreBillingHelper getHelper();
-
-    protected final String getName(final boolean forceNonNull) {
-        final String name = getName();
-        if (forceNonNull && name == null) {
-            throw new IllegalStateException();
-        }
-        return name;
+        this.intentMaker = intentMaker;
+        this.helper = new OpenStoreBillingHelper(context, intentMaker);
     }
 
     @NonNull
     protected final OPFPreferences getPreferences() {
         // Store name can't be null. If store is unavailable this method shouldn't be used.
-        return new OPFPreferences(context, getName(true));
+        return new OPFPreferences(context, getName());
     }
 
     /**
@@ -126,16 +122,14 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
 
     @Override
     public String toString() {
-        return getClass().getSimpleName();
+        return intentMaker != null ? intentMaker.getProviderName() : getClass().getSimpleName();
     }
 
-    @SuppressWarnings("NullableProblems")
-    @Nullable
+    @NonNull
     @Override
     public String getName() {
         if (name == null) {
-            OPFChecks.checkThread(false);
-            name = helper.getAppstoreName();
+            throw new IllegalStateException();
         }
         return name;
     }
@@ -147,15 +141,18 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
 
     @Override
     public boolean isAvailable() {
-        return getName() != null;
+        OPFChecks.checkThread(false);
+        final String appstoreName = helper.getAppstoreName();
+        if (appstoreName == null) {
+            return false;
+        }
+        this.name = appstoreName;
+        return helper.isBillingAvailable();
     }
 
     @NonNull
     @Override
     public Compatibility checkCompatibility() {
-        if (!helper.isBillingAvailable()) {
-            return Compatibility.INCOMPATIBLE;
-        }
         if (helper.isPackageInstaller()) {
             return Compatibility.PREFERRED;
         }
@@ -185,8 +182,25 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
 
     @Override
     protected void skuDetails(@NonNull final SkuDetailsRequest request) {
+        final Map<ItemType, Collection<String>> typeSkuMap = new HashMap<>();
         final Set<String> skus = request.getSkus();
-        final Bundle result = helper.getSkuDetails(skus);
+        for (final String sku : skus) {
+            final SkuType skuType = skuResolver.resolveType(sku);
+            final ItemType itemType = ItemType.fromSkuType(skuType);
+            if (itemType == null) {
+                OPFLog.e("Unknown SKU type: " + sku);
+                continue;
+            }
+            final Collection<String> typeSkus;
+            if (!typeSkuMap.containsKey(itemType)) {
+                typeSkus = new ArrayList<>();
+                typeSkuMap.put(itemType, typeSkus);
+            } else {
+                typeSkus = typeSkuMap.get(itemType);
+            }
+            typeSkus.add(sku);
+        }
+        final Bundle result = helper.getSkuDetails(typeSkuMap);
         final Response response = OpenStoreUtils.getResponse(result);
         if (response != Response.OK) {
             postEmptyResponse(request, getStatus(response));
@@ -199,17 +213,16 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
         }
         final Collection<SkuDetails> skusDetails = new ArrayList<>();
         final Collection<String> unresolvedSkus = new HashSet<>(skus);
-        final String name = getName(true);
         for (final OpenSkuDetails openSkuDetails : openSkusDetails) {
             final String sku = openSkuDetails.getProductId();
             final SkuType skuType = skuResolver.resolveType(sku);
-            skusDetails.add(OpenStoreUtils.convertSkuDetails(openSkuDetails, name, skuType));
+            skusDetails.add(OpenStoreUtils.convertSkuDetails(openSkuDetails, getName(), skuType));
             unresolvedSkus.remove(sku);
         }
         for (final String unresolvedSku : unresolvedSkus) {
             skusDetails.add(new SkuDetails(unresolvedSku));
         }
-        postResponse(new SkuDetailsResponse(Status.SUCCESS, name, skusDetails));
+        postResponse(new SkuDetailsResponse(Status.SUCCESS, getName(), skusDetails));
     }
 
     private String getTokenKey(@NonNull final ItemType itemType) {
@@ -238,7 +251,6 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
         }
 
         final Collection<Purchase> inventory = new ArrayList<>();
-        final String name = getName(true);
         boolean hasMore = false;
         for (final Map.Entry<ItemType, Bundle> entry : resultMap.entrySet()) {
             final Bundle result = entry.getValue();
@@ -256,7 +268,8 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
                 final OpenPurchase purchase = purchaseIterator.next();
                 final String signature = signatureIterator.next();
                 final SkuType skuType = skuResolver.resolveType(purchase.getProductId());
-                inventory.add(OpenStoreUtils.convertPurchase(purchase, name, skuType, signature));
+                inventory.add(
+                        OpenStoreUtils.convertPurchase(purchase, getName(), skuType, signature));
             }
 
             final String continuationToken = OpenStoreUtils.getContinuationToken(result);
@@ -268,7 +281,7 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
                 hasMore = true;
             }
         }
-        postResponse(new InventoryResponse(Status.SUCCESS, name, inventory, hasMore));
+        postResponse(new InventoryResponse(Status.SUCCESS, getName(), inventory, hasMore));
     }
 
     @Override
@@ -282,17 +295,22 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
             return;
         }
 
-        postResponse(new ConsumeResponse(Status.SUCCESS, getName(true), purchase));
+        postResponse(new ConsumeResponse(Status.SUCCESS, getName(), purchase));
     }
 
     @SuppressWarnings("PMD.PrematureDeclaration")
     @Override
     protected void purchase(@NonNull final PurchaseRequest request) {
-        final String name = getName(true);
         final String sku = request.getSku();
         final SkuType skuType = skuResolver.resolveType(sku);
         //noinspection ConstantConditions
-        final Bundle intentBundle = helper.getBuyIntent(sku, ItemType.fromSkuType(skuType));
+        final ItemType itemType = ItemType.fromSkuType(skuType);
+        if (itemType == null) {
+            OPFLog.e("Unknown SKU type: " + sku);
+            postEmptyResponse(request, Status.ITEM_UNAVAILABLE);
+            return;
+        }
+        final Bundle intentBundle = helper.getBuyIntent(sku, itemType);
         final Response intentResponse = OpenStoreUtils.getResponse(intentBundle);
         if (intentResponse != Response.OK) {
             postEmptyResponse(request, getStatus(intentResponse));
@@ -342,7 +360,42 @@ public abstract class OpenStoreBillingProvider extends BaseBillingProvider<Typed
         }
         final String signature = OpenStoreUtils.getSignature(result);
         final Purchase purchase = OpenStoreUtils
-                .convertPurchase(openPurchase, name, skuType, signature);
-        postResponse(new PurchaseResponse(Status.SUCCESS, name, purchase));
+                .convertPurchase(openPurchase, getName(), skuType, signature);
+        postResponse(new PurchaseResponse(Status.SUCCESS, getName(), purchase));
+    }
+
+
+    protected abstract static class OpenStoreBuilder<B extends OpenStoreBuilder>
+            extends BaseBillingProviderBuilder<B, TypedSkuResolver, PurchaseVerifier> {
+
+        @Nullable
+        protected OpenStoreIntentMaker intentMaker;
+
+        public OpenStoreBuilder(@NonNull final Context context) {
+            super(context);
+        }
+
+        protected OpenStoreBuilder setIntentMaker(
+                @NonNull final OpenStoreIntentMaker intentMaker) {
+            this.intentMaker = intentMaker;
+            return this;
+        }
+    }
+
+    public static class Builder extends OpenStoreBuilder<Builder> {
+
+        public Builder(@NonNull final Context context) {
+            super(context);
+        }
+
+        @Override
+        public OpenStoreBillingProvider build() {
+            if (skuResolver == null) {
+                throw new IllegalStateException();
+            }
+            return new OpenStoreBillingProvider(context, skuResolver,
+                    purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier,
+                    intentMaker);
+        }
     }
 }

@@ -81,7 +81,6 @@ public class TypedMapSkuResolver implements TypedSkuResolver {
     @Override
     public SkuType resolveType(@NonNull final String sku) {
         if (!types.containsKey(sku)) {
-            OPFLog.e("No type for SKU: " + sku);
             return SkuType.UNKNOWN;
         }
         return types.get(sku);

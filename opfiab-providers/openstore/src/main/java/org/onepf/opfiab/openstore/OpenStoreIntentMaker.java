@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package org.onepf.opfiab.yandex;
+package org.onepf.opfiab.openstore;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import org.onepf.opfiab.openstore.OpenStoreBillingHelper;
+import org.onepf.oms.IOpenAppstore;
 
-public class YandexBillingHelper extends OpenStoreBillingHelper {
+public interface OpenStoreIntentMaker {
 
-    protected static final String PACKAGE = "com.yandex.store";
+    @Nullable
+    Intent makeIntent(@NonNull final Context context);
 
-
-    public YandexBillingHelper(final Context context) {
-        super(context);
-    }
-
+    /**
+     * Returns string that should uniquely identify OpenStore.
+     * <p>
+     * Please note that it can differ from name returned by {@link IOpenAppstore#getAppstoreName()}.
+     *
+     * @return OpenStore name. Can't be null.
+     */
     @NonNull
-    @Override
-    protected Intent getOpenAppstoreServiceIntent() {
-        final Intent intent = new Intent(ACTION_BIND_OPENSTORE);
-        intent.setPackage(PACKAGE);
-        return intent;
-    }
+    String getProviderName();
 }

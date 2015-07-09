@@ -215,13 +215,12 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
     @SuppressWarnings({"PMD", "TypeMayBeWeakened", "RedundantIfStatement"})
     @Override
     public boolean equals(final Object o) {
-        final String name = getName();
         if (this == o) return true;
         if (!(o instanceof BaseBillingProvider)) return false;
 
         final BaseBillingProvider that = (BaseBillingProvider) o;
 
-        if (!name.equals(that.getName())) return false;
+        if (!toString().equals(that.toString())) return false;
 
         return true;
     }

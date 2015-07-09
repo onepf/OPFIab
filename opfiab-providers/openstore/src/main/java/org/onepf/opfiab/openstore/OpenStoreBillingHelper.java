@@ -19,6 +19,9 @@ package org.onepf.opfiab.openstore;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -33,14 +36,17 @@ import org.onepf.opfutils.OPFLog;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
-public abstract class OpenStoreBillingHelper {
+public class OpenStoreBillingHelper {
 
-    protected static final String ACTION_BIND_OPENSTORE = "org.onepf.oms.openappstore.BIND";
+    public static final String ACTION_BIND_OPENSTORE = "org.onepf.oms.openappstore.BIND";
     protected static final int API = 3;
     protected static final int BATCH_SIZE = 20;
 
 
+    @Nullable
+    protected final OpenStoreIntentMaker intentMaker;
     @NonNull
     private final OpenAppstoreHelper openAppstoreHelper;
     @NonNull
@@ -48,7 +54,9 @@ public abstract class OpenStoreBillingHelper {
     @NonNull
     private final String packageName;
 
-    public OpenStoreBillingHelper(@NonNull final Context context) {
+    public OpenStoreBillingHelper(@NonNull final Context context,
+                                  @Nullable final OpenStoreIntentMaker intentMaker) {
+        this.intentMaker = intentMaker;
         this.openAppstoreHelper = new OpenAppstoreHelper(context, IOpenAppstore.class);
         this.openInAppHelper = new OpenInAppHelper(context, IOpenInAppBillingService.class);
         this.packageName = context.getPackageName();
@@ -147,16 +155,17 @@ public abstract class OpenStoreBillingHelper {
     }
 
     @Nullable
-    public Bundle getSkuDetails(@NonNull final Collection<String> skus) {
+    public Bundle getSkuDetails(@NonNull final Map<ItemType, Collection<String>> typeSkuMap) {
         final IOpenInAppBillingService openInApp = openInAppHelper.getService();
         if (openInApp == null) {
             return null;
         }
         try {
             Bundle result = null;
-            for (final List<String> skuBatch : OPFIabUtils.partition(skus, BATCH_SIZE)) {
-                for (final ItemType itemType : ItemType.values()) {
-                    final String type = itemType.toString();
+            for (final Map.Entry<ItemType, Collection<String>> entry : typeSkuMap.entrySet()) {
+                final String type = entry.getKey().toString();
+                final Collection<String> skus = entry.getValue();
+                for (final List<String> skuBatch : OPFIabUtils.partition(skus, BATCH_SIZE)) {
                     final Bundle skuBundle = OpenStoreUtils.putSkus(new Bundle(), skuBatch);
                     final Bundle batch = openInApp.getSkuDetails(API, packageName, type, skuBundle);
                     if (OpenStoreUtils.getResponse(batch) != Response.OK) {
@@ -200,9 +209,6 @@ public abstract class OpenStoreBillingHelper {
         return null;
     }
 
-    @Nullable
-    protected abstract Intent getOpenAppstoreServiceIntent();
-
     protected class OpenAppstoreHelper extends AidlBillingHelper<IOpenAppstore> {
 
         public OpenAppstoreHelper(final Context context, final Class<IOpenAppstore> clazz) {
@@ -212,7 +218,20 @@ public abstract class OpenStoreBillingHelper {
         @Nullable
         @Override
         protected Intent getServiceIntent() {
-            return getOpenAppstoreServiceIntent();
+            if (intentMaker != null) {
+                return intentMaker.makeIntent(context);
+            }
+            final Intent intent = new Intent(ACTION_BIND_OPENSTORE);
+            final PackageManager packageManager = context.getPackageManager();
+            final List<ResolveInfo> resolveInfos = packageManager.queryIntentServices(intent, 0);
+            if (resolveInfos == null || resolveInfos.isEmpty()) {
+                return null;
+            }
+            final ResolveInfo resolveInfo = resolveInfos.get(0);
+            final ServiceInfo serviceInfo = resolveInfo.serviceInfo;
+            final Intent explicitIntent = new Intent(ACTION_BIND_OPENSTORE);
+            explicitIntent.setClassName(serviceInfo.packageName, serviceInfo.name);
+            return explicitIntent;
         }
     }
 

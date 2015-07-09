@@ -381,10 +381,10 @@ public final class SamsungUtils {
 
     @NonNull
     public static Purchase convertPurchase(@NonNull final SamsungPurchase purchase,
-                                           @NonNull final ItemType itemType) {
+                                           @NonNull final SkuType skuType) {
         return new Purchase.Builder(purchase.getItemId())
                 .setOriginalJson(purchase.getOriginalJson())
-                .setType(convertType(itemType))
+                .setType(skuType)
                 .setToken(purchase.getPurchaseId())
                 .setPurchaseTime(purchase.getPurchaseDate().getTime())
                 .setProviderName(NAME)
