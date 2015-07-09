@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.model.billing.SkuType;
+import org.onepf.opfutils.OPFLog;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,7 +81,8 @@ public class TypedMapSkuResolver implements TypedSkuResolver {
     @Override
     public SkuType resolveType(@NonNull final String sku) {
         if (!types.containsKey(sku)) {
-            throw new IllegalArgumentException("No type for SKU: " + sku);
+            OPFLog.e("No type for SKU: " + sku);
+            return SkuType.UNKNOWN;
         }
         return types.get(sku);
     }
