@@ -53,14 +53,14 @@ import static org.onepf.opfiab.model.ComponentState.STOP;
 
 /**
  * This class is designed to monitor the existing {@link Activity}s lifecycle.
- * <p/>
+ * <p>
  * Intended for internal use.
  */
 public final class ActivityMonitor implements Application.ActivityLifecycleCallbacks {
 
     /**
      * Map of the existing activities lifecycle states.
-     * <p/>
+     * <p>
      * Backed up by {@link WeakHashMap} to avoid memory leaks.
      */
     @SuppressWarnings("Convert2Diamond")

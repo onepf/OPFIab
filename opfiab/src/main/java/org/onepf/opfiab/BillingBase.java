@@ -86,7 +86,7 @@ final class BillingBase {
 
     /**
      * Sets configuration currently used by library.
-     * <p/>
+     * <p>
      * This method resets library setup state.
      *
      * @param configuration Current configuration object
@@ -131,7 +131,7 @@ final class BillingBase {
 
     /**
      * Attempts to execute supplied billing request using current billing provider.
-     * <p/>
+     * <p>
      * If current provider is unavailable or busy, supplied request will not be executed and
      * instead corresponding response will be send immediately.
      *

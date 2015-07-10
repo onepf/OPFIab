@@ -94,7 +94,7 @@ public class SkuDetails extends BillingModel {
 
     /**
      * Indicates if there's actually any data available in this object.
-     * <p/>
+     * <p>
      * Typically this is true when SKU wasn't recognized by {@link BillingProvider}.
      *
      * @return True is there's no data in this object. False otherwise.

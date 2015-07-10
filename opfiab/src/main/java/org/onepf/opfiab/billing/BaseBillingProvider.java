@@ -47,7 +47,7 @@ import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
 
 /**
  * Base implementation of {@link BillingProvider}.
- * <p/>
+ * <p>
  * Most implementations should extend this one unless implementation from scratch is absolutely necessary.
  *
  * @param <R> {@link SkuResolver} subclass to use with this BillingProvider.
@@ -76,7 +76,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Loads details for specified SKUs.
-     * <p/>
+     * <p>
      * At this point all SKUs should be resolved with provided {@link SkuResolver}.
      */
     protected abstract void skuDetails(@NonNull final SkuDetailsRequest request);
@@ -88,14 +88,14 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Purchase specified SKU.
-     * <p/>
+     * <p>
      * At this point sku should be already resolved with supplied {@link SkuResolver}.
      */
     protected abstract void purchase(@NonNull final PurchaseRequest request);
 
     /**
      * Consumes specified Purchase.
-     * <p/>
+     * <p>
      * SKU available from {@link Purchase#getSku()} should be already resolved with supplied
      * {@link SkuResolver}.
      */
@@ -113,7 +113,7 @@ public abstract class BaseBillingProvider<R extends SkuResolver, V extends Purch
 
     /**
      * Entry point for all incoming billing requests.
-     * <p/>
+     * <p>
      * Might be a good place for intercepting request.
      *
      * @param billingRequest incoming BillingRequest object.
