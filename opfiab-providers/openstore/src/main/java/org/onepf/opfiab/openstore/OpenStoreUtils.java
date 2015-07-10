@@ -1,6 +1,11 @@
 package org.onepf.opfiab.openstore;
 
 import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,11 +20,15 @@ import org.onepf.opfiab.openstore.model.OpenSkuDetails;
 import org.onepf.opfiab.openstore.model.PurchaseState;
 import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public final class OpenStoreUtils {
+
+    public static final String ACTION_BIND_OPENSTORE = "org.onepf.oms.openappstore.BIND";
 
     private static final String RESPONSE_CODE = "RESPONSE_CODE";
     private static final String SKU_DETAILS_LIST = "DETAILS_LIST";
@@ -27,11 +36,51 @@ public final class OpenStoreUtils {
     private static final String BUY_INTENT = "BUY_INTENT";
     private static final String PURCHASE_DATA = "INAPP_PURCHASE_DATA";
     private static final String SIGNATURE = "INAPP_DATA_SIGNATURE";
-//    private static final String ITEM_LIST = "INAPP_PURCHASE_ITEM_LIST";
+    //    private static final String ITEM_LIST = "INAPP_PURCHASE_ITEM_LIST";
     private static final String PURCHASE_DATA_LIST = "INAPP_PURCHASE_DATA_LIST";
     private static final String SIGNATURE_LIST = "INAPP_DATA_SIGNATURE_LIST";
     private static final String CONTINUATION_TOKEN = "INAPP_CONTINUATION_TOKEN";
 
+
+    @Nullable
+    public static Intent getOpenStoreIntent(@NonNull final Context context) {
+        final Intent intent = new Intent(ACTION_BIND_OPENSTORE);
+        final PackageManager packageManager = context.getPackageManager();
+        final List<ResolveInfo> resolveInfos = packageManager.queryIntentServices(intent, 0);
+        if (resolveInfos != null && !resolveInfos.isEmpty()) {
+            final Intent explicitIntent = new Intent(intent);
+            final ServiceInfo serviceInfo = resolveInfos.get(0).serviceInfo;
+            explicitIntent.setClassName(serviceInfo.packageName, serviceInfo.name);
+            return explicitIntent;
+        }
+        return null;
+    }
+
+    @NonNull
+    public static OpenStoreIntentMaker getIntentMaker(@NonNull final String name,
+                                                      @NonNull final String... packages) {
+        //noinspection OverlyComplexAnonymousInnerClass
+        return new OpenStoreIntentMaker() {
+            @Nullable
+            @Override
+            public Intent makeIntent(@NonNull final Context context) {
+                for (final String packageName : packages) {
+                    if (OPFUtils.isInstalled(context, packageName)) {
+                        final Intent intent = new Intent(ACTION_BIND_OPENSTORE);
+                        intent.setPackage(packageName);
+                        return intent;
+                    }
+                }
+                return null;
+            }
+
+            @NonNull
+            @Override
+            public String getProviderName() {
+                return name;
+            }
+        };
+    }
 
     @NonNull
     public static Bundle putSkus(@NonNull final Bundle bundle,

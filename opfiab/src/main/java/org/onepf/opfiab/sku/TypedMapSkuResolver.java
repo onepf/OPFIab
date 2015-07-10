@@ -21,7 +21,6 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.onepf.opfiab.model.billing.SkuType;
-import org.onepf.opfutils.OPFLog;
 
 import java.util.HashMap;
 import java.util.Map;

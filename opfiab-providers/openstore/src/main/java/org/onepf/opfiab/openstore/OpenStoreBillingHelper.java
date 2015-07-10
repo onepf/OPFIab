@@ -19,9 +19,6 @@ package org.onepf.opfiab.openstore;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -40,7 +37,6 @@ import java.util.Map;
 
 public class OpenStoreBillingHelper {
 
-    public static final String ACTION_BIND_OPENSTORE = "org.onepf.oms.openappstore.BIND";
     protected static final int API = 3;
     protected static final int BATCH_SIZE = 20;
 
@@ -221,17 +217,7 @@ public class OpenStoreBillingHelper {
             if (intentMaker != null) {
                 return intentMaker.makeIntent(context);
             }
-            final Intent intent = new Intent(ACTION_BIND_OPENSTORE);
-            final PackageManager packageManager = context.getPackageManager();
-            final List<ResolveInfo> resolveInfos = packageManager.queryIntentServices(intent, 0);
-            if (resolveInfos == null || resolveInfos.isEmpty()) {
-                return null;
-            }
-            final ResolveInfo resolveInfo = resolveInfos.get(0);
-            final ServiceInfo serviceInfo = resolveInfo.serviceInfo;
-            final Intent explicitIntent = new Intent(ACTION_BIND_OPENSTORE);
-            explicitIntent.setClassName(serviceInfo.packageName, serviceInfo.name);
-            return explicitIntent;
+            return OpenStoreUtils.getOpenStoreIntent(context);
         }
     }
 

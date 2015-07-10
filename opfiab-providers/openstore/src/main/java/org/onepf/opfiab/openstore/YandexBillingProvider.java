@@ -17,7 +17,6 @@
 package org.onepf.opfiab.openstore;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -27,23 +26,7 @@ import org.onepf.opfiab.verification.PurchaseVerifier;
 public class YandexBillingProvider extends OpenStoreBillingProvider {
 
     public static final String NAME = "Yandex";
-    protected static final String PACKAGE = "com.yandex.store";
-
-    protected static final OpenStoreIntentMaker INTENT_MAKER = new OpenStoreIntentMaker() {
-        @Nullable
-        @Override
-        public Intent makeIntent(@NonNull final Context context) {
-            final Intent intent = new Intent(OpenStoreBillingHelper.ACTION_BIND_OPENSTORE);
-            intent.setPackage(PACKAGE);
-            return intent;
-        }
-
-        @NonNull
-        @Override
-        public String getProviderName() {
-            return NAME;
-        }
-    };
+    protected static final String[] PACKAGES = new String[]{"com.yandex.store"};
 
 
     public YandexBillingProvider(@NonNull final Context context,
@@ -58,7 +41,7 @@ public class YandexBillingProvider extends OpenStoreBillingProvider {
 
         public Builder(@NonNull final Context context) {
             super(context);
-            setIntentMaker(INTENT_MAKER);
+            setIntentMaker(OpenStoreUtils.getIntentMaker(NAME, PACKAGES));
         }
 
         @Override
