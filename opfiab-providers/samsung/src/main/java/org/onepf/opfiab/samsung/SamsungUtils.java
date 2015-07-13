@@ -39,6 +39,7 @@ import org.onepf.opfiab.samsung.model.SamsungPurchase;
 import org.onepf.opfiab.samsung.model.SamsungPurchasedItem;
 import org.onepf.opfiab.samsung.model.SamsungSkuDetails;
 import org.onepf.opfiab.util.OPFIabUtils;
+import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
 import java.text.DateFormat;
@@ -51,6 +52,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static android.Manifest.permission.GET_ACCOUNTS;
 import static org.onepf.opfiab.samsung.SamsungBillingProvider.NAME;
 
 
@@ -101,6 +103,9 @@ public final class SamsungUtils {
     }
 
     public static boolean hasSamsungAccount(@NonNull final Context context) {
+        if (!OPFChecks.hasPermission(context, GET_ACCOUNTS)) {
+            return true;
+        }
         final Object service = context.getSystemService(Context.ACCOUNT_SERVICE);
         final AccountManager accountManager = (AccountManager) service;
         return accountManager.getAccountsByType(ACCOUNT_TYPE_SAMSUNG).length > 0;

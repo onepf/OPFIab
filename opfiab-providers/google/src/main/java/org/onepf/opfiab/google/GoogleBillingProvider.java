@@ -63,8 +63,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
-
 /**
  * This {@link BillingProvider} implementation adds support for
  * <a href="https://play.google.com/store">Google Play</a> App Store.
@@ -191,7 +189,6 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
 
     @Override
     public void checkManifest() {
-        OPFChecks.checkPermission(context, GET_ACCOUNTS);
         OPFChecks.checkPermission(context, PERMISSION_BILLING);
     }
 

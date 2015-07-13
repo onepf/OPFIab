@@ -33,5 +33,7 @@ dependencies {
 //    }
     compile project(':opfiab')
     //noinspection GradleDynamicVersion
-    provided 'org.onepf:opfutils:0.1.+'
+    provided('org.onepf:opfutils:0.1.+') {
+        changing = true
+    }
 }

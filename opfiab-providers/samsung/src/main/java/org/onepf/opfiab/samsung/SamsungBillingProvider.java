@@ -58,7 +58,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
 import static android.Manifest.permission.INTERNET;
 import static org.onepf.opfiab.model.event.billing.Status.SERVICE_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
@@ -99,7 +98,6 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
 
     @Override
     public void checkManifest() {
-        OPFChecks.checkPermission(context, GET_ACCOUNTS);
         OPFChecks.checkPermission(context, INTERNET);
         OPFChecks.checkPermission(context, SAMSUNG_BILLING);
     }
