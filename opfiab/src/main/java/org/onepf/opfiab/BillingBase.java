@@ -28,7 +28,6 @@ import org.onepf.opfiab.model.event.SetupStartedEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
 import org.onepf.opfiab.util.BillingUtils;
-import org.onepf.opfiab.util.OPFIabUtils;
 import org.onepf.opfutils.OPFChecks;
 import org.onepf.opfutils.OPFLog;
 
@@ -148,7 +147,7 @@ final class BillingBase {
         } else if ((setupResponse = getSetupResponse()) == null || !setupResponse.isSuccessful()) {
             // Setup was not started, is in progress or failed
             OPFIab.post(BillingUtils.emptyResponse(null, billingRequest, NO_BILLING_PROVIDER));
-        } else if (configuration.skipStaleRequests() && OPFIabUtils.isStale(billingRequest)) {
+        } else if (configuration.skipStaleRequests() && BillingUtils.isStale(billingRequest)) {
             // Request is no longer relevant, try next one
             OPFLog.d("Skipping stale request: " + billingRequest);
             BillingRequestScheduler.getInstance().handleNext();

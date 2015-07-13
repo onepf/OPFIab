@@ -16,7 +16,6 @@
 
 package org.onepf.opfiab.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -26,16 +25,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.json.JSONException;
-import org.onepf.opfiab.ActivityMonitor;
 import org.onepf.opfiab.model.JsonCompatible;
-import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfutils.OPFLog;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -188,11 +184,4 @@ public final class OPFIabUtils {
         }
         return new Signature[0];
     }
-
-    public static boolean isStale(@NonNull final BillingRequest request) {
-        final Reference<Activity> reference = request.getActivity();
-        final Activity activity = reference == null ? null : reference.get();
-        return reference != null && (activity == null || !ActivityMonitor.isStarted(activity));
-    }
-
 }
