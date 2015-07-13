@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.billing.Compatibility;
+import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfutils.OPFLog;
 
 import java.util.Random;
@@ -45,5 +46,10 @@ public abstract class MockBillingProvider implements BillingProvider {
     @Override
     public Compatibility checkCompatibility() {
         return Compatibility.COMPATIBLE;
+    }
+
+    @Override
+    public boolean skuTypeSupported(@NonNull final SkuType skuType) {
+        return true;
     }
 }

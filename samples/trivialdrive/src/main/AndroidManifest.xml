@@ -18,8 +18,13 @@
 
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.onepf.trivialdrive"
     android:installLocation="auto">
+
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        tools:node="remove"/>
 
     <application
         android:name="org.onepf.trivialdrive.TrivialApplication"

@@ -44,7 +44,6 @@ import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsRequest;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
 import org.onepf.opfiab.model.event.billing.Status;
-import org.onepf.opfiab.samsung.model.ItemType;
 import org.onepf.opfiab.samsung.model.SamsungPurchase;
 import org.onepf.opfiab.util.ActivityForResultLauncher;
 import org.onepf.opfiab.util.SyncedReference;
@@ -59,14 +58,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
 import static android.Manifest.permission.INTERNET;
 import static org.onepf.opfiab.model.event.billing.Status.SERVICE_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 import static org.onepf.opfiab.model.event.billing.Status.USER_CANCELED;
-import static org.onepf.opfiab.samsung.model.ItemType.CONSUMABLE;
 import static org.onepf.opfiab.verification.PurchaseVerifier.DEFAULT;
 import static org.onepf.opfiab.verification.VerificationResult.ERROR;
 
@@ -101,7 +98,6 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
 
     @Override
     public void checkManifest() {
-        OPFChecks.checkPermission(context, GET_ACCOUNTS);
         OPFChecks.checkPermission(context, INTERNET);
         OPFChecks.checkPermission(context, SAMSUNG_BILLING);
     }
@@ -234,7 +230,7 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
                 try {
                     final SamsungPurchase samsungPurchase = new SamsungPurchase(value);
                     final Purchase purchase = SamsungUtils
-                            .convertPurchase(samsungPurchase, CONSUMABLE);
+                            .convertPurchase(samsungPurchase, SkuType.CONSUMABLE);
                     purchases.add(purchase);
                 } catch (JSONException exception) {
                     OPFLog.e("", exception);
@@ -286,8 +282,7 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
             return;
         }
         final SkuType skuType = skuResolver.resolveType(sku);
-        final ItemType itemType = ItemType.fromSkuType(skuType);
-        final Purchase purchase = SamsungUtils.convertPurchase(samsungPurchase, itemType);
+        final Purchase purchase = SamsungUtils.convertPurchase(samsungPurchase, skuType);
         postResponse(new PurchaseResponse(SUCCESS, getName(), purchase));
     }
 

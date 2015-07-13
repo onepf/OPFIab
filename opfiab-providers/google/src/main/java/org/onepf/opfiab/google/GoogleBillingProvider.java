@@ -63,8 +63,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static android.Manifest.permission.GET_ACCOUNTS;
-
 /**
  * This {@link BillingProvider} implementation adds support for
  * <a href="https://play.google.com/store">Google Play</a> App Store.
@@ -191,7 +189,6 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
 
     @Override
     public void checkManifest() {
-        OPFChecks.checkPermission(context, GET_ACCOUNTS);
         OPFChecks.checkPermission(context, PERMISSION_BILLING);
     }
 
@@ -218,8 +215,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             return Compatibility.INCOMPATIBLE;
         }
         return INSTALLER.equals(OPFUtils.getPackageInstaller(context))
-                ? Compatibility.PREFERRED
-                : Compatibility.COMPATIBLE;
+                ? Compatibility.PREFERRED : Compatibility.COMPATIBLE;
     }
 
     @Override
@@ -275,6 +271,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             }
         }
         for (final String sku : unresolvedSkus) {
+            OPFLog.e("No details for SKU: " + sku);
             skusDetails.add(new SkuDetails(sku));
         }
         postResponse(new SkuDetailsResponse(Status.SUCCESS, getName(), skusDetails));

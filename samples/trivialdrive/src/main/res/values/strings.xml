@@ -23,6 +23,11 @@
     <string name="name_google">Google Play</string>
     <string name="name_amazon">Amazon Appstore</string>
     <string name="name_samsung">Samsung Galaxy Store</string>
+    <string name="name_yandex">Yandex Store</string>
+    <string name="name_appland">Appland</string>
+    <string name="name_aptoide">Aptoide</string>
+    <string name="name_slideme">SlideME</string>
+    <string name="name_openstore">Open Store</string>
 
     <string name="btn_forget">forget\nlast\nprovider</string>
     <string name="btn_init">init()</string>

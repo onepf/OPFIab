@@ -33,8 +33,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 2
-        versionName "0.3.0"
+        versionCode 1
+        versionName "0.4.0"
     }
 }
 
@@ -42,7 +42,7 @@ dependencies {
     compile 'com.android.support:support-annotations:22.2.0'
     provided 'de.greenrobot:eventbus:2.4.0'
     //noinspection GradleDynamicVersion
-    provided 'org.onepf:opfutils:0.1.+'
+    provided 'org.onepf:opfutils:0.1.23'
     //noinspection GradleDependency,GradleCompatible
     provided 'com.android.support:support-v4:13.0.0'
 }

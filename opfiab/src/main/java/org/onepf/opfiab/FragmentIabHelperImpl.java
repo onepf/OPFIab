@@ -35,7 +35,7 @@ import java.util.Set;
 
 /**
  * This {@link IabHelper} implementation works with supplied fragment instance.
- * <p/>
+ * <p>
  * {@link org.onepf.opfiab.android.OPFIabFragment} is attached to it to monitor lifecycle and
  * automatically call {@link #register()} and {@link #unregister()} when appropriate.
  */

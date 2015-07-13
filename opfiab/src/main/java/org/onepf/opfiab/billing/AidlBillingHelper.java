@@ -52,7 +52,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     /**
      * Timeout to wait before giving up on connecting to service.
      */
-    private static final long CONNECTION_TIMEOUT = 5000L; // 3 seconds
+    private static final long CONNECTION_TIMEOUT = 30000L;
     /**
      * Automatically disconnect from service after this delay since last usage.
      */
@@ -114,7 +114,7 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
      *
      * @return new Intent suitable for {@link Context#startService(Intent)}.
      */
-    @NonNull
+    @Nullable
     protected abstract Intent getServiceIntent();
 
     protected long getDisconnectDelay() {
@@ -135,11 +135,14 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         }
 
         final Intent serviceIntent = getServiceIntent();
+        if (serviceIntent == null) {
+            return null;
+        }
         final PackageManager packageManager = context.getPackageManager();
         final Collection<ResolveInfo> infos = packageManager.queryIntentServices(serviceIntent, 0);
         serviceSemaphore.drainPermits();
         if (infos == null || infos.isEmpty()
-                || !context.bindService(getServiceIntent(), this, Context.BIND_AUTO_CREATE)) {
+                || !context.bindService(serviceIntent, this, Context.BIND_AUTO_CREATE)) {
             OPFLog.d("Can't bind to service: %s", asInterface.getDeclaringClass());
             return null;
         }
@@ -154,6 +157,11 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
         return null;
     }
 
+    /**
+     * Same as {@link #getService(long)} but with default timeout.
+     *
+     * @see #CONNECTION_TIMEOUT
+     */
     @Nullable
     public AIDL getService() {
         return getService(CONNECTION_TIMEOUT);

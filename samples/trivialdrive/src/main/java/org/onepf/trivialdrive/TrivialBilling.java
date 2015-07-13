@@ -33,12 +33,17 @@ import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.billing.InventoryResponse;
 import org.onepf.opfiab.model.event.billing.PurchaseResponse;
 import org.onepf.opfiab.model.event.billing.SkuDetailsResponse;
+import org.onepf.opfiab.openstore.ApplandBillingProvider;
+import org.onepf.opfiab.openstore.AptoideBillingProvider;
+import org.onepf.opfiab.openstore.OpenStoreBillingProvider;
+import org.onepf.opfiab.openstore.SlideMEBillingProvider;
 import org.onepf.opfiab.samsung.BillingMode;
 import org.onepf.opfiab.samsung.SamsungBillingProvider;
 import org.onepf.opfiab.samsung.SamsungMapSkuResolver;
 import org.onepf.opfiab.samsung.SamsungPurchaseVerifier;
 import org.onepf.opfiab.sku.MapSkuResolver;
 import org.onepf.opfiab.sku.TypedMapSkuResolver;
+import org.onepf.opfiab.verification.SimplePublicKeyPurchaseVerifier;
 import org.onepf.opfiab.verification.VerificationResult;
 
 import java.util.ArrayList;
@@ -79,6 +84,24 @@ public final class TrivialBilling {
     public static final String SAMSUNG_SKU_SUBSCRIPTION = "subscription";
     public static final String SAMSUNG_GROUP_ID = "100000105550";
 
+    public static final String YANDEX_SKU_GAS = "org.onepf.sample.trivialdrive.sku_gas";
+    public static final String YANDEX_SKU_PREMIUM = "org.onepf.sample.trivialdrive.sku_premium";
+    public static final String YANDEX_SKU_SUBSCRIPTION = "org.onepf.sample.trivialdrive.sku_infinite_gas";
+    public static final String YANDEX_PUBLIC_KEY
+            = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs4SI/obW+q3dhsY3g5B6UggPcL5olWK8WY3tnT" +
+            "a2k3i2U40jQuHRNNs8SqzdJeuoBLsKjaEsdTT0SJtEucOMZrprXMch97QtuLB4Mgu3Gs7USL6dM7NCUSoYrg" +
+            "Ogw1Koi+ab+ZvFJkVMb9a2EjYzR3aP0k4xjKyG2gW1rIEMMepxHm22VFjEg6YxBy+ecwRrjqDJOAPJyH6uSl" +
+            "8vUT8AKuG+hcCuYbNvlMdEZJo6MXJ9vPNf/qPHwMy5G+faEprL6zR+HaPfxEqN/d8rbrW0qnr8LpXJ+nPB3/" +
+            "irBiMSZSqA222GC7m12sNNmNnNNlI397F3fRQSTzVSRZt14YdPzwIDAQAB";
+
+    public static final String APPLAND_GAS = "appland.sku_gas";
+    public static final String APPLAND_PREMIUM = "appland.sku_premium";
+    public static final String APPLAND_SUBSCRIPTION = "appland.sku_infinite_gas";
+
+    public static final String SLIDEME_GAS = "slideme.sku_gas";
+    public static final String SLIDEME_PREMIUM = "slideme.sku_premium";
+    public static final String SLIDEME_SUBSCRIPTION = "slideme.sku_infinite_gas";
+
     public static final String SKU_GAS = "sku_gas";
     public static final String SKU_PREMIUM = "sku_premium";
     public static final String SKU_SUBSCRIPTION = "sku_subscription";
@@ -100,6 +123,16 @@ public final class TrivialBilling {
                 return newGoogleProvider();
             case SAMSUNG:
                 return newSamsungProvider();
+            case YANDEX:
+                return newYandexProvider();
+            case APPLAND:
+                return newApplandProvider();
+            case APTOIDE:
+                return newAptoideProvider();
+            case SLIDEME:
+                return newSlideMEProvider();
+            case OPENSTORE:
+                return newOpenStoreProvider();
             default:
                 throw new IllegalStateException();
         }
@@ -142,6 +175,60 @@ public final class TrivialBilling {
                 .build();
     }
 
+    private static BillingProvider newYandexProvider() {
+        final TypedMapSkuResolver skuResolver = new TypedMapSkuResolver();
+        skuResolver.add(SKU_GAS, YANDEX_SKU_GAS, SkuType.CONSUMABLE);
+        skuResolver.add(SKU_PREMIUM, YANDEX_SKU_PREMIUM, SkuType.ENTITLEMENT);
+        skuResolver.add(SKU_SUBSCRIPTION, YANDEX_SKU_SUBSCRIPTION, SkuType.SUBSCRIPTION);
+
+        return new OpenStoreBillingProvider.Builder(context)
+                .setPurchaseVerifier(new SimplePublicKeyPurchaseVerifier(YANDEX_PUBLIC_KEY))
+                .setSkuResolver(skuResolver)
+                .build();
+    }
+
+    private static BillingProvider newAptoideProvider() {
+        final TypedMapSkuResolver skuResolver = new TypedMapSkuResolver();
+        //        skuResolver.add(SKU_GAS, YANDEX_SKU_GAS, SkuType.CONSUMABLE);
+        //        skuResolver.add(SKU_PREMIUM, YANDEX_SKU_PREMIUM, SkuType.ENTITLEMENT);
+        //        skuResolver.add(SKU_SUBSCRIPTION, YANDEX_SKU_SUBSCRIPTION, SkuType.SUBSCRIPTION);
+        return new AptoideBillingProvider.Builder(context)
+                .setSkuResolver(skuResolver)
+                .build();
+    }
+
+    private static BillingProvider newApplandProvider() {
+        final TypedMapSkuResolver skuResolver = new TypedMapSkuResolver();
+        skuResolver.add(SKU_GAS, APPLAND_GAS, SkuType.CONSUMABLE);
+        skuResolver.add(SKU_PREMIUM, APPLAND_PREMIUM, SkuType.ENTITLEMENT);
+        skuResolver.add(SKU_SUBSCRIPTION, APPLAND_SUBSCRIPTION, SkuType.SUBSCRIPTION);
+
+        return new ApplandBillingProvider.Builder(context)
+                .setSkuResolver(skuResolver)
+                .build();
+    }
+
+    private static BillingProvider newSlideMEProvider() {
+        final TypedMapSkuResolver skuResolver = new TypedMapSkuResolver();
+        skuResolver.add(SKU_GAS, SLIDEME_GAS, SkuType.CONSUMABLE);
+        skuResolver.add(SKU_PREMIUM, SLIDEME_PREMIUM, SkuType.ENTITLEMENT);
+        skuResolver.add(SKU_SUBSCRIPTION, SLIDEME_SUBSCRIPTION, SkuType.SUBSCRIPTION);
+
+        return new SlideMEBillingProvider.Builder(context)
+                .setSkuResolver(skuResolver)
+                .build();
+    }
+
+    private static BillingProvider newOpenStoreProvider() {
+        final TypedMapSkuResolver skuResolver = new TypedMapSkuResolver();
+        //        skuResolver.add(SKU_GAS, YANDEX_SKU_GAS, SkuType.CONSUMABLE);
+        //        skuResolver.add(SKU_PREMIUM, YANDEX_SKU_PREMIUM, SkuType.ENTITLEMENT);
+        //        skuResolver.add(SKU_SUBSCRIPTION, YANDEX_SKU_SUBSCRIPTION, SkuType.SUBSCRIPTION);
+
+        return new OpenStoreBillingProvider.Builder(context)
+                .setSkuResolver(skuResolver)
+                .build();
+    }
 
     private TrivialBilling() {
         throw new UnsupportedOperationException();

@@ -24,7 +24,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import org.onepf.opfutils.OPFChecks;
+
 import java.util.ArrayList;
+
+import static android.Manifest.permission.GET_ACCOUNTS;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -47,6 +51,9 @@ public final class GoogleUtils {
 
 
     public static boolean hasGoogleAccount(@NonNull final Context context) {
+        if (!OPFChecks.hasPermission(context, GET_ACCOUNTS)) {
+            return true;
+        }
         final Object service = context.getSystemService(Context.ACCOUNT_SERVICE);
         final AccountManager accountManager = (AccountManager) service;
         // At least one Google account is present on device

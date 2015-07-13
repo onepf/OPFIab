@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import org.onepf.opfiab.ActivityMonitor;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.event.billing.BillingEventType;
@@ -49,6 +50,12 @@ import java.util.Set;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 public final class BillingUtils {
+
+    public static boolean isStale(@NonNull final BillingRequest request) {
+        final Reference<Activity> reference = request.getActivity();
+        final Activity activity = reference == null ? null : reference.get();
+        return reference != null && (activity == null || !ActivityMonitor.isStarted(activity));
+    }
 
     /**
      * Constructs empty response corresponding to supplied request.
@@ -250,6 +257,7 @@ public final class BillingUtils {
         return newSkusDetails;
     }
 
+
     @NonNull
     public static Map<Purchase, VerificationResult> revert(
             @NonNull final SkuResolver resolver,
@@ -263,7 +271,6 @@ public final class BillingUtils {
         }
         return newInventory;
     }
-
 
     private BillingUtils() {
         throw new UnsupportedOperationException();

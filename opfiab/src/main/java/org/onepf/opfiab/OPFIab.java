@@ -45,14 +45,14 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This class is OPFIab library entry point.
- * <p/>
+ * <p>
  * Before anything else, {@link #init(Application, Configuration)} must be called.
  * Multiple init() calls are supported.
- * <p/>
+ * <p>
  * Before utilizing library billing capabilities {@link BillingProvider} must be picked.
  * This might either be done with direct {@link #setup()} call or through the use of
  * {@link IabHelper} variant featuring lazy setup.
- * <p/>
+ * <p>
  * To execute billing operations one must interact with {@link IabHelper}.
  *
  * @see #getSimpleHelper()
@@ -160,9 +160,9 @@ public final class OPFIab {
 
     /**
      * Instantiates {@link IabHelper} associated with supplied activity.
-     * <p/>
+     * <p>
      * This call will attach invisible fragment which monitors activity lifecycle.
-     * <p/>
+     * <p>
      * Supplied activity <b>must</b> delegate {@link Activity#onActivityResult(int, int, Intent)}
      * to {@link ActivityIabHelper#onActivityResult(Activity, int, int, Intent)}.
      *
@@ -190,13 +190,13 @@ public final class OPFIab {
 
     /**
      * Instantiates {@link IabHelper} associated with supplied fragment.
-     * <p/>
+     * <p>
      * This call will attach invisible child fragment which monitors parent lifecycle.
-     * <p/>
+     * <p>
      * If parent activity delegates {@link Activity#onActivityResult(int, int, Intent)}
      * to {@link ActivityIabHelper#onActivityResult(Activity, int, int, Intent)}, consider using
      * {@link SimpleIabHelper}.
-     * <p/>
+     * <p>
      * Nested fragments were introduced in Android API 17, use
      * {@link #getFragmentHelper(android.support.v4.app.Fragment)} for earlier versions.
      *
@@ -220,9 +220,9 @@ public final class OPFIab {
 
     /**
      * Initialize OPFIab library with supplied configuration.
-     * <p/>
+     * <p>
      * It's strongly recommended to call this method from {@link Application#onCreate()}.
-     * <p/>
+     * <p>
      * Subsequent calls are supported but will reset any previous setup state.
      *
      * @param application   Application object to add {@link Application.ActivityLifecycleCallbacks}
@@ -266,9 +266,9 @@ public final class OPFIab {
 
     /**
      * Tries to pick one of the {@link BillingProvider}s supplied in {@link Configuration}.
-     * <p/>
+     * <p>
      * {@link #init(Application, Configuration)} must be called prior to this method.
-     * <p/>
+     * <p>
      * Subsequent calls are supported.
      */
     public static void setup() {

@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * This implementation of {@link IabHelper} allows passing existing {@link Activity} object thus
  * avoiding usage of {@link OPFIabActivity}.
- * <p/>
+ * <p>
  * Supplied Activity <b>must</b> delegate {@link Activity#onActivityResult(int, int, Intent)}
  * callback to this helper.
  *

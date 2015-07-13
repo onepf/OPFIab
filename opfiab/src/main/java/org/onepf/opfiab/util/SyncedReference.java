@@ -33,7 +33,7 @@ public class SyncedReference<E> {
     private volatile E model;
 
     @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
-    public void set(@Nullable final E model) {
+    public synchronized void set(@Nullable final E model) {
         if (isSet) {
             OPFLog.logMethod(model);
             OPFLog.e("Attempt to re-set SyncedReference value.");

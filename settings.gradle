@@ -18,12 +18,14 @@ include ':opfiab',
         ':opfiab-amazon',
         ':opfiab-google',
         ':opfiab-samsung',
+        ':opfiab-openstore',
         ':opfiab-uitest',
         ':trivialdrive'
 
 project(':opfiab-amazon').projectDir = new File('opfiab-providers/amazon')
 project(':opfiab-google').projectDir = new File('opfiab-providers/google')
 project(':opfiab-samsung').projectDir = new File('opfiab-providers/samsung')
+project(':opfiab-openstore').projectDir = new File('opfiab-providers/openstore')
 
 project(':opfiab-uitest').projectDir = new File('test/opfiab-uitest')
 

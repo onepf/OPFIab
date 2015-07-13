@@ -40,7 +40,7 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 /**
  * This class tries to pick one {@link BillingProvider} from those available from
  * {@link Configuration#getProviders()}.
- * <p/>
+ * <p>
  * Providers are picked according to this priority rules:
  * <ul>
  * <li> Only available providers will be considered, according to {@link BillingProvider#isAvailable()}.
@@ -75,7 +75,7 @@ final class SetupManager {
     private boolean setupInProgress;
     /**
      * Configuration object from last received setup request.
-     * <p/>
+     * <p>
      * Used to determine whether {@link SetupResponse} is relevant when it's ready.
      */
     @Nullable
@@ -156,7 +156,7 @@ final class SetupManager {
 
     /**
      * Tries to start setup process for the supplied configuration.
-     * <p/>
+     * <p>
      * If setup is already in progress, new configuration object is stored and used after
      * current setup is finished.
      *

@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import org.onepf.opfiab.OPFIab;
+import org.onepf.opfiab.model.billing.SkuType;
 import org.onepf.opfiab.model.event.RequestHandledEvent;
 import org.onepf.opfiab.model.event.billing.BillingRequest;
 import org.onepf.opfiab.model.event.billing.BillingResponse;
@@ -72,6 +73,17 @@ public interface BillingProvider {
      * @param billingRequest Billing request to handle with this billing provider.
      */
     void onBillingRequest(@NonNull final BillingRequest billingRequest);
+
+    /**
+     * Indicates whether supplied SkyType is supported by this billing provider.
+     * <p>
+     * Might be useful to update UI or adjust app logic.
+     *
+     * @param skuType SkuType to check.
+     *
+     * @return True is supplied SkuType is supported by this billing provider, false otherwise.
+     */
+    boolean skuTypeSupported(@NonNull final SkuType skuType);
 
     /**
      * Acquires {@link Intent} to open representation of this App within this BillingProvider.
