@@ -20,13 +20,21 @@ import android.support.annotation.StringRes;
 
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
+import org.onepf.opfiab.openstore.ApplandBillingProvider;
+import org.onepf.opfiab.openstore.AptoideBillingProvider;
+import org.onepf.opfiab.openstore.SlideMEBillingProvider;
+import org.onepf.opfiab.openstore.YandexBillingProvider;
 import org.onepf.opfiab.samsung.SamsungBillingProvider;
-import org.onepf.trivialdrive.R;
 
 public enum Provider {
     AMAZON(R.string.name_amazon, AmazonBillingProvider.NAME),
     GOOGLE(R.string.name_google, GoogleBillingProvider.NAME),
-    SAMSUNG(R.string.name_samsung, SamsungBillingProvider.NAME),;
+    SAMSUNG(R.string.name_samsung, SamsungBillingProvider.NAME),
+    YANDEX(R.string.name_yandex, YandexBillingProvider.NAME),
+    APPLAND(R.string.name_appland, ApplandBillingProvider.NAME),
+    APTOIDE(R.string.name_aptoide, AptoideBillingProvider.NAME),
+    SLIDEME(R.string.name_slideme, SlideMEBillingProvider.NAME),
+    OPENSTORE(R.string.name_openstore, "Open Store");
 
 
     public static Provider getByName(final String name) {
