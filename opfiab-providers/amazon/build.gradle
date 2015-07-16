@@ -28,8 +28,7 @@ android {
 }
 
 dependencies {
-    compile 'org.onepf:opfiab:0.3.0@aar'
-    //noinspection GradleDynamicVersion
+    compile 'org.onepf:opfiab:0.4.0@aar'
     provided 'org.onepf:opfutils:0.1.23'
     provided 'com.amazon:in-app-purchasing:2.0.61'
 }

@@ -24,7 +24,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 31
-        versionName '0.4.0'
+        versionName "0.4.0"
     }
 
     buildTypes {
@@ -52,17 +52,17 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:22.2.0'
     // OPFIab
     compile 'de.greenrobot:eventbus:2.4.0'
-    //noinspection GradleDynamicVersion
     compile 'org.onepf:opfutils:0.1.23'
-    compile 'org.onepf:opfiab:0.3.0@aar'
+    compile 'org.onepf:opfiab:0.4.0@aar'
     // OPFIab Google
-    compile 'org.onepf:opfiab-google:0.3.0@aar'
+    compile 'org.onepf:opfiab-google:0.4.0@aar'
     // OPFIab Amazon
-    compile 'org.onepf:opfiab-amazon:0.3.0@aar'
+    compile 'org.onepf:opfiab-amazon:0.4.0@aar'
     compile 'com.amazon:in-app-purchasing:2.0.61'
     // OPFIab Samsung
-    compile 'org.onepf:opfiab-samsung:0.3.0@aar'
-    compile project(':opfiab-openstore')
+    compile 'org.onepf:opfiab-samsung:0.4.0@aar'
+    // Openstores
+    compile 'org.onepf:opfiab-openstore:0.4.0@aar'
     // UI
     compile 'com.makeramen:dragsortadapter:1.3.0'
     // Leak Canary

@@ -23,17 +23,11 @@ android {
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
-        versionName "0.3.0-SNAPSHOT"
+        versionName "0.4.0"
     }
 }
 
 dependencies {
-//    compile('org.onepf:opfiab:0.3.+@aar') {
-//        changing = true
-//    }
-    compile project(':opfiab')
-    //noinspection GradleDynamicVersion
-    provided('org.onepf:opfutils:0.1.+') {
-        changing = true
-    }
+    compile 'org.onepf:opfiab:0.4.0@aar'
+    provided 'org.onepf:opfutils:0.1.23'
 }
