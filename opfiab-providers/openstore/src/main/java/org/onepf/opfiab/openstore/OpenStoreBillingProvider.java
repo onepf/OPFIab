@@ -67,6 +67,7 @@ import static android.app.Activity.RESULT_OK;
 public class OpenStoreBillingProvider extends BaseBillingProvider<TypedSkuResolver,
         PurchaseVerifier> {
 
+    protected static final String DEFAULT_NAME = "OpenStore";
     protected static final String KEY_TOKEN = "continuation_token";
 
     @Nullable
@@ -122,7 +123,7 @@ public class OpenStoreBillingProvider extends BaseBillingProvider<TypedSkuResolv
 
     @Override
     public String toString() {
-        return intentMaker != null ? intentMaker.getProviderName() : getClass().getSimpleName();
+        return intentMaker != null ? intentMaker.getProviderName() : DEFAULT_NAME;
     }
 
     @NonNull

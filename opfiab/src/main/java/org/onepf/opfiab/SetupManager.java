@@ -54,7 +54,7 @@ import static org.onepf.opfiab.model.event.SetupResponse.Status.SUCCESS;
 @SuppressWarnings({"PMD.ModifiedCyclomaticComplexity", "PMD.StdCyclomaticComplexity"})
 final class SetupManager {
 
-    private static final String KEY_LAST_PROVIDER = SetupManager.class.getName() + ".last_provider";
+    private static final String KEY_LAST_PROVIDER = "last_provider";
 
     private static SetupManager instance;
 
