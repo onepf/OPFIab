@@ -38,12 +38,12 @@ import org.onepf.opfutils.OPFLog;
  * Intended to exist as singleton, which is registered for Amazon callbacks as soon as it's
  * created.
  */
-final class AmazonBillingHelper implements PurchasingListener {
+public class AmazonBillingHelper implements PurchasingListener {
 
     /**
      * Timeout to give up on waiting for user data.
      */
-    private static final long USER_DATA_TIMEOUT = Long.parseLong("5000");
+    protected static final long USER_DATA_TIMEOUT = Long.parseLong("5000");
 
     private static AmazonBillingHelper instance;
 
@@ -60,7 +60,7 @@ final class AmazonBillingHelper implements PurchasingListener {
     @Nullable
     private volatile SyncedReference<UserData> syncUserData;
 
-    private AmazonBillingHelper() {
+    protected AmazonBillingHelper() {
         super();
     }
 
@@ -70,7 +70,7 @@ final class AmazonBillingHelper implements PurchasingListener {
      * @return User data if received withing {@link #USER_DATA_TIMEOUT}, null otherwise.
      */
     @Nullable
-    UserData getUserData() {
+    public UserData getUserData() {
         final SyncedReference<UserData> syncUserData = new SyncedReference<>();
         try {
             this.syncUserData = syncUserData;

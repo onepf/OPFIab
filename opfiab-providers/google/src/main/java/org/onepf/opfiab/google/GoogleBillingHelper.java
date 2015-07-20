@@ -42,22 +42,22 @@ import static org.onepf.opfiab.google.GoogleBillingProvider.NAME;
 /**
  * This class handles all Google specific billing operations.
  */
-class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
+public class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
 
-    private static final String INTENT_ACTION = "com.android.vending.billing.InAppBillingService.BIND";
-    private static final String INTENT_PACKAGE = "com.android.vending";
-    private static final String KEY_CONTINUATION_TOKEN = NAME + ".continuation_token.";
+    protected static final String INTENT_ACTION = "com.android.vending.billing.InAppBillingService.BIND";
+    protected static final String INTENT_PACKAGE = "com.android.vending";
+    protected static final String KEY_CONTINUATION_TOKEN = NAME + ".continuation_token.";
 
-    private static final int API = 3;
-    private static final int BATCH_SIZE = 20;
+    protected static final int API = 3;
+    protected static final int BATCH_SIZE = 20;
 
 
     @NonNull
-    private final String packageName = context.getPackageName();
+    protected final String packageName = context.getPackageName();
     @NonNull
-    private final OPFPreferences preferences = new OPFPreferences(context);
+    protected final OPFPreferences preferences = new OPFPreferences(context);
 
-    GoogleBillingHelper(@NonNull final Context context) {
+    protected GoogleBillingHelper(@NonNull final Context context) {
         super(context, IInAppBillingService.class);
     }
 
@@ -68,7 +68,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      * if it's not. Returns null if error has occurred.
      */
     @Nullable
-    Response isBillingSupported() {
+    public Response isBillingSupported() {
         OPFLog.logMethod();
         final IInAppBillingService service = getService();
         if (service == null) {
@@ -100,7 +100,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      * @return Bundle containing purchase intent. Can be null.
      */
     @Nullable
-    Bundle getBuyIntent(@NonNull final String sku, @NonNull final ItemType itemType) {
+    public Bundle getBuyIntent(@NonNull final String sku, @NonNull final ItemType itemType) {
         OPFLog.logMethod(sku, itemType);
         final IInAppBillingService service = getService();
         if (service == null) {
@@ -126,7 +126,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      * @return Result of the operation. Can be null.
      */
     @Nullable
-    Response consumePurchase(@NonNull final String token) {
+    public Response consumePurchase(@NonNull final String token) {
         OPFLog.logMethod(token);
         final IInAppBillingService service = getService();
         if (service == null) {
@@ -151,7 +151,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      * @return Bundle containing requested SKUs details. Can be null.
      */
     @Nullable
-    Bundle getSkuDetails(@NonNull final Collection<String> skus) {
+    public Bundle getSkuDetails(@NonNull final Collection<String> skus) {
         OPFLog.logMethod(Arrays.toString(skus.toArray()));
         final IInAppBillingService service = getService();
         if (service == null) {
@@ -199,7 +199,7 @@ class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService> {
      * @return Bundle containing user inventory. Can be null.
      */
     @Nullable
-    Bundle getPurchases(final boolean startOver) {
+    public Bundle getPurchases(final boolean startOver) {
         OPFLog.logMethod(startOver);
         final IInAppBillingService service = getService();
         if (service == null) {

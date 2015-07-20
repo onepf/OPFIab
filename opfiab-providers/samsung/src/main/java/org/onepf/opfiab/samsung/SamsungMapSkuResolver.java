@@ -7,7 +7,7 @@ import org.onepf.opfiab.sku.TypedMapSkuResolver;
 public class SamsungMapSkuResolver extends TypedMapSkuResolver implements SamsungSkuResolver {
 
     @NonNull
-    private final String groupId;
+    protected final String groupId;
 
     public SamsungMapSkuResolver(@NonNull final String groupId) {
         super();

@@ -21,9 +21,9 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 import org.onepf.opfiab.model.JsonModel;
 
-abstract class AmazonModel extends JsonModel {
+public abstract class AmazonModel extends JsonModel {
 
-    private static final String NAME_SKU = "sku";
+    protected static final String NAME_SKU = "sku";
 
     @NonNull
     protected final String sku;

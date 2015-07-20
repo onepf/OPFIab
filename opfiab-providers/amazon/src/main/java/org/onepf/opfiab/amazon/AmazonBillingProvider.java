@@ -60,7 +60,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static org.onepf.opfiab.model.event.billing.Status.ITEM_ALREADY_OWNED;
 import static org.onepf.opfiab.model.event.billing.Status.ITEM_UNAVAILABLE;
-import static org.onepf.opfiab.model.event.billing.Status.SERVICE_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.SUCCESS;
 import static org.onepf.opfiab.model.event.billing.Status.UNAUTHORISED;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
@@ -81,7 +80,8 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
     /**
      * Helper object handles all Amazon SDK related calls.
      */
-    protected final AmazonBillingHelper billingHelper;
+    @NonNull
+    protected final AmazonBillingHelper billingHelper = getHelper();
 
 
     @SuppressWarnings("AssignmentToStaticFieldFromInstanceMethod")
@@ -90,22 +90,13 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             @NonNull final SkuResolver skuResolver,
             @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
-        this.billingHelper = AmazonBillingHelper.getInstance(context);
     }
 
-    /**
-     * Tries to guess appropriate error code.
-     *
-     * @return Most suitable status.
-     */
-    protected Status handleFailure() {
-        // Unfortunately Amazon doesn't report a reason for error
-        if (!PurchasingService.IS_SANDBOX_MODE && !OPFUtils.isConnected(context)) {
-            return SERVICE_UNAVAILABLE;
-        }
-
-        return UNKNOWN_ERROR;
+    @NonNull
+    protected AmazonBillingHelper getHelper() {
+        return AmazonBillingHelper.getInstance(context);
     }
+
 
     /**
      * Handles sku details response from Amazon.
@@ -122,7 +113,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             case FAILED:
             case NOT_SUPPORTED:
                 OPFLog.e("Product data request failed: %s", response);
-                postResponse(new SkuDetailsResponse(handleFailure(), getName()));
+                postResponse(new SkuDetailsResponse(AmazonUtils.handleFailure(context), getName()));
                 break;
             default:
                 OPFLog.e("Unknown status: " + status);
@@ -147,7 +138,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             case FAILED:
             case NOT_SUPPORTED:
                 OPFLog.e("Purchase updates request failed: %s", response);
-                postResponse(new InventoryResponse(handleFailure(), getName()));
+                postResponse(new InventoryResponse(AmazonUtils.handleFailure(context), getName()));
                 break;
             default:
                 OPFLog.e("Unknown status: " + status);
@@ -179,7 +170,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
             case FAILED:
             case NOT_SUPPORTED:
                 OPFLog.e("Purchase request failed: %s", response);
-                postResponse(new PurchaseResponse(handleFailure(), getName()));
+                postResponse(new PurchaseResponse(AmazonUtils.handleFailure(context), getName()));
                 break;
             default:
                 OPFLog.e("Unknown status: " + status);

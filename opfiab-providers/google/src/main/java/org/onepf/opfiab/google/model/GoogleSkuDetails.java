@@ -25,24 +25,24 @@ import org.json.JSONException;
  */
 public class GoogleSkuDetails extends GoogleModel {
 
-    private static final String NAME_TYPE = "type";
-    private static final String NAME_PRICE = "price";
-    private static final String NAME_CURRENCY = "price_currency_code";
-    private static final String NAME_TITLE = "title";
-    private static final String NAME_DESCRIPTION = "description";
-    private static final String NAME_MICROS = "price_amount_micros";
+    protected static final String NAME_TYPE = "type";
+    protected static final String NAME_PRICE = "price";
+    protected static final String NAME_CURRENCY = "price_currency_code";
+    protected static final String NAME_TITLE = "title";
+    protected static final String NAME_DESCRIPTION = "description";
+    protected static final String NAME_MICROS = "price_amount_micros";
 
     @NonNull
-    private final ItemType itemType;
+    protected final ItemType itemType;
     @NonNull
-    private final String price;
+    protected final String price;
     @NonNull
-    private final String currency;
+    protected final String currency;
     @NonNull
-    private final String title;
+    protected final String title;
     @NonNull
-    private final String description;
-    private final long micros;
+    protected final String description;
+    protected final long micros;
 
     public GoogleSkuDetails(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

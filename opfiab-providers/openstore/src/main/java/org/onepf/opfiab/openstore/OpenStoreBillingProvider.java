@@ -72,7 +72,8 @@ public class OpenStoreBillingProvider extends BaseBillingProvider<TypedSkuResolv
 
     @Nullable
     protected final OpenStoreIntentMaker intentMaker;
-    protected final OpenStoreBillingHelper helper;
+    @NonNull
+    protected final OpenStoreBillingHelper helper = getHelper();
     @Nullable
     private String name;
 
@@ -82,7 +83,11 @@ public class OpenStoreBillingProvider extends BaseBillingProvider<TypedSkuResolv
                                        @Nullable final OpenStoreIntentMaker intentMaker) {
         super(context, skuResolver, purchaseVerifier);
         this.intentMaker = intentMaker;
-        this.helper = new OpenStoreBillingHelper(context, intentMaker);
+    }
+
+    @NonNull
+    protected OpenStoreBillingHelper getHelper() {
+        return new OpenStoreBillingHelper(context, intentMaker);
     }
 
     @NonNull

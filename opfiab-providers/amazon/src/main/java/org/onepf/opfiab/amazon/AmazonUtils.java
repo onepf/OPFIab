@@ -16,9 +16,11 @@
 
 package org.onepf.opfiab.amazon;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.amazon.device.iap.PurchasingService;
 import com.amazon.device.iap.model.Product;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.ProductType;
@@ -30,7 +32,9 @@ import org.json.JSONObject;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
 import org.onepf.opfiab.model.billing.SkuType;
+import org.onepf.opfiab.model.event.billing.Status;
 import org.onepf.opfutils.OPFLog;
+import org.onepf.opfutils.OPFUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -40,6 +44,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static org.onepf.opfiab.model.event.billing.Status.SERVICE_UNAVAILABLE;
+import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
 public final class AmazonUtils {
 
@@ -53,6 +60,20 @@ public final class AmazonUtils {
 
     private AmazonUtils() {
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Tries to guess appropriate error code.
+     *
+     * @return Most suitable status.
+     */
+    public static Status handleFailure(@NonNull final Context context) {
+        // Unfortunately Amazon doesn't report a reason for error
+        if (!PurchasingService.IS_SANDBOX_MODE && !OPFUtils.isConnected(context)) {
+            return SERVICE_UNAVAILABLE;
+        }
+
+        return UNKNOWN_ERROR;
     }
 
     @SuppressWarnings("PMD.PreserveStackTrace")

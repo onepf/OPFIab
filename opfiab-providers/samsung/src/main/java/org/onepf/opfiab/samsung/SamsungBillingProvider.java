@@ -84,16 +84,23 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
     protected final OPFPreferences preferences = new OPFPreferences(context);
     protected final OPFPreferences consumablePurchases = new OPFPreferences(context, NAME);
     @NonNull
-    protected final SamsungBillingHelper helper;
+    protected final BillingMode billingMode;
     @Nullable
     protected SyncedReference<Boolean> syncAuthorisationResult;
+    @NonNull
+    protected final SamsungBillingHelper helper = getHelper();
 
     protected SamsungBillingProvider(@NonNull final Context context,
                                      @NonNull final SamsungSkuResolver skuResolver,
                                      @NonNull final PurchaseVerifier purchaseVerifier,
                                      @NonNull final BillingMode billingMode) {
         super(context, skuResolver, purchaseVerifier);
-        this.helper = new SamsungBillingHelper(context, billingMode);
+        this.billingMode = billingMode;
+    }
+
+    @NonNull
+    public SamsungBillingHelper getHelper() {
+        return new SamsungBillingHelper(context, billingMode);
     }
 
     @Override

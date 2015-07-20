@@ -31,17 +31,17 @@ import org.onepf.opfiab.samsung.model.ItemType;
 import org.onepf.opfutils.OPFLog;
 import org.onepf.opfutils.OPFUtils;
 
-final class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
+public class SamsungBillingHelper extends AidlBillingHelper<IAPConnector> {
 
-    private static final String IAP_PACKAGE = "com.sec.android.iap";
-    private static final String SERVICE_CLASS = "com.sec.android.iap.service.IAPService";
+    protected static final String IAP_PACKAGE = "com.sec.android.iap";
+    protected static final String SERVICE_CLASS = "com.sec.android.iap.service.IAPService";
 
-    private static final String START_DATE = "20130101";
+    protected static final String START_DATE = "20130101";
 
 
-    private final int billingMode;
+    protected final int billingMode;
     @NonNull
-    private final String packageName;
+    protected final String packageName;
 
     public SamsungBillingHelper(@NonNull final Context context,
                                 @NonNull final BillingMode billingMode) {

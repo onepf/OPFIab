@@ -23,11 +23,11 @@ import org.onepf.opfiab.model.JsonModel;
 
 public class OpenBillingModel extends JsonModel {
 
-    private static final String NAME_PRODUCT_ID = "productId";
+    protected static final String NAME_PRODUCT_ID = "productId";
 
 
     @NonNull
-    private final String productId;
+    protected final String productId;
 
     protected OpenBillingModel(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

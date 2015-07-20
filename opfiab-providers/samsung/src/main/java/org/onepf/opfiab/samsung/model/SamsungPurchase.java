@@ -9,11 +9,11 @@ import org.json.JSONException;
  */
 public class SamsungPurchase extends SamsungBillingModel {
 
-    private static final String KEY_VERIFY_URL = "mVerifyUrl";
+    protected static final String KEY_VERIFY_URL = "mVerifyUrl";
 
 
     @NonNull
-    private final String verifyUrl;
+    protected final String verifyUrl;
 
     public SamsungPurchase(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

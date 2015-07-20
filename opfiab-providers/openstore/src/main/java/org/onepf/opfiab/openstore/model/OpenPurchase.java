@@ -23,27 +23,27 @@ import org.json.JSONException;
 
 public class OpenPurchase extends OpenBillingModel {
 
-    private static final String NAME_ORDER_ID = "orderId";
-    private static final String NAME_PACKAGE_NAME = "packageName";
-    private static final String NAME_PURCHASE_TOKEN = "purchaseToken";
-    private static final String NAME_PURCHASE_STATE = "purchaseState";
-    private static final String NAME_PURCHASE_TIME = "purchaseTime";
-    private static final String NAME_DEVELOPER_PAYLOAD = "developerPayload";
-    private static final String NAME_AUTO_RENEWING = "autoRenewing";
+    protected static final String NAME_ORDER_ID = "orderId";
+    protected static final String NAME_PACKAGE_NAME = "packageName";
+    protected static final String NAME_PURCHASE_TOKEN = "purchaseToken";
+    protected static final String NAME_PURCHASE_STATE = "purchaseState";
+    protected static final String NAME_PURCHASE_TIME = "purchaseTime";
+    protected static final String NAME_DEVELOPER_PAYLOAD = "developerPayload";
+    protected static final String NAME_AUTO_RENEWING = "autoRenewing";
 
 
     @NonNull
-    private final String orderId;
+    protected final String orderId;
     @NonNull
-    private final String packageName;
+    protected final String packageName;
     @NonNull
-    private final String purchaseToken;
+    protected final String purchaseToken;
     @NonNull
-    private final PurchaseState purchaseState;
+    protected final PurchaseState purchaseState;
     @Nullable
-    private final String developerPayload;
-    private final long purchaseTime;
-    private final boolean autoRenewing;
+    protected final String developerPayload;
+    protected final long purchaseTime;
+    protected final boolean autoRenewing;
 
 
     public OpenPurchase(@NonNull final String originalJson) throws JSONException {

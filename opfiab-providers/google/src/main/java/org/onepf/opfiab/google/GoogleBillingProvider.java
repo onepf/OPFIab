@@ -80,14 +80,19 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
     /**
      * Helper object to delegate all Google specific calls to.
      */
-    protected final GoogleBillingHelper helper;
+    @NonNull
+    protected final GoogleBillingHelper helper = getHelper();
 
     protected GoogleBillingProvider(
             @NonNull final Context context,
             @NonNull final TypedSkuResolver skuResolver,
             @NonNull final PurchaseVerifier purchaseVerifier) {
         super(context, skuResolver, purchaseVerifier);
-        helper = new GoogleBillingHelper(context);
+    }
+
+    @NonNull
+    protected GoogleBillingHelper getHelper() {
+        return new GoogleBillingHelper(context);
     }
 
     /**
@@ -393,7 +398,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
         @Override
         public GoogleBillingProvider build() {
             if (skuResolver == null) {
-                throw new IllegalStateException("GoogleSkuResolver must be set.");
+                throw new IllegalStateException("TypedSkuResolver must be set.");
             }
             return new GoogleBillingProvider(context, skuResolver,
                     purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier);

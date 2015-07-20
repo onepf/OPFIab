@@ -7,18 +7,18 @@ import org.onepf.opfiab.samsung.SamsungUtils;
 
 import java.util.Date;
 
-abstract class SamsungBillingModel extends SamsungModel {
+public abstract class SamsungBillingModel extends SamsungModel {
 
-    private static final String KEY_PURCHASE_ID = "mPurchaseId";
-    private static final String KEY_PAYMENT_ID = "mPaymentId";
-    private static final String KEY_PURCHASE_DATE = "mPurchaseDate";
+    protected static final String KEY_PURCHASE_ID = "mPurchaseId";
+    protected static final String KEY_PAYMENT_ID = "mPaymentId";
+    protected static final String KEY_PURCHASE_DATE = "mPurchaseDate";
 
     @NonNull
-    private final String purchaseId;
+    protected final String purchaseId;
     @NonNull
-    private final String paymentId;
+    protected final String paymentId;
     @NonNull
-    private final Date purchaseDate;
+    protected final Date purchaseDate;
 
     public SamsungBillingModel(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

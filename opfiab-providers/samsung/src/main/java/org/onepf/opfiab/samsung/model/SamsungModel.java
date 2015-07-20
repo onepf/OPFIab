@@ -5,34 +5,34 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 import org.onepf.opfiab.model.JsonModel;
 
-abstract class SamsungModel extends JsonModel {
+public abstract class SamsungModel extends JsonModel {
 
-    private static final String KEY_ITEM_ID = "mItemId";
-    private static final String KEY_ITEM_NAME = "mItemName";
-    private static final String KEY_PRICE = "mItemPrice";
-    private static final String KEY_PRICE_STRING = "mItemPriceString";
-    private static final String KEY_CURRENCY_UNIT = "mCurrencyUnit";
-    private static final String KEY_ITEM_DESC = "mItemDesc";
-    private static final String KEY_IMAGE_URL = "mItemImageUrl";
-    private static final String KEY_ITEM_DOWNLOAD_URL = "mItemDownloadUrl";
+    protected static final String KEY_ITEM_ID = "mItemId";
+    protected static final String KEY_ITEM_NAME = "mItemName";
+    protected static final String KEY_PRICE = "mItemPrice";
+    protected static final String KEY_PRICE_STRING = "mItemPriceString";
+    protected static final String KEY_CURRENCY_UNIT = "mCurrencyUnit";
+    protected static final String KEY_ITEM_DESC = "mItemDesc";
+    protected static final String KEY_IMAGE_URL = "mItemImageUrl";
+    protected static final String KEY_ITEM_DOWNLOAD_URL = "mItemDownloadUrl";
 
 
     @NonNull
-    private final String itemId;
+    protected final String itemId;
     @NonNull
-    private final String name;
+    protected final String name;
     @NonNull
-    private final Double price;
+    protected final Double price;
     @NonNull
-    private final String priceString;
+    protected final String priceString;
     @NonNull
-    private final String currency;
+    protected final String currency;
     @NonNull
-    private final String description;
+    protected final String description;
     @NonNull
-    private final String imageUrl;
+    protected final String imageUrl;
     @NonNull
-    private final String downloadImageUrl;
+    protected final String downloadImageUrl;
 
     public SamsungModel(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

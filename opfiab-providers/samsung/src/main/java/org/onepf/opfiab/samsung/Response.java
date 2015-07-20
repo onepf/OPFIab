@@ -19,7 +19,7 @@ package org.onepf.opfiab.samsung;
 import android.support.annotation.Nullable;
 
 @SuppressWarnings("MagicNumber")
-enum Response {
+public enum Response {
 
     ERROR_NONE(0),
     PAYMENT_IS_CANCELED(1),

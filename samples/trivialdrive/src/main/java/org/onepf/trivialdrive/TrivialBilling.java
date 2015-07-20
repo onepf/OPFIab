@@ -25,7 +25,6 @@ import org.json.JSONObject;
 import org.onepf.opfiab.amazon.AmazonBillingProvider;
 import org.onepf.opfiab.billing.BillingProvider;
 import org.onepf.opfiab.google.GoogleBillingProvider;
-import org.onepf.opfiab.google.SimpleGooglePurchaseVerifier;
 import org.onepf.opfiab.model.Configuration;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -146,7 +145,7 @@ public final class TrivialBilling {
         skuResolver.add(SKU_SUBSCRIPTION, GOOGLE_SKU_SUBSCRIPTION, SkuType.SUBSCRIPTION);
 
         return new GoogleBillingProvider.Builder(context)
-                .setPurchaseVerifier(new SimpleGooglePurchaseVerifier(GOOGLE_PLAY_KEY))
+                .setPurchaseVerifier(new SimplePublicKeyPurchaseVerifier(GOOGLE_PLAY_KEY))
                 .setSkuResolver(skuResolver)
                 .build();
     }

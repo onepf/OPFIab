@@ -16,19 +16,19 @@ import java.util.Locale;
 
 public class SamsungVerification extends JsonModel {
 
-    private static final String KEY_ITEM_ID = "itemId";
-    private static final String KEY_ITEM_NAME = "itemName";
-    private static final String KEY_ITEM_DESC = "itemDesc";
-    private static final String KEY_PURCHASE_DATE = "purchaseDate";
-    private static final String KEY_PAYMENT_ID = "paymentId";
-    private static final String KEY_PAYMENT_AMOUNT = "paymentAmount";
-    private static final String KEY_STATUS = "status";
-    private static final String KEY_MODE = "mode";
+    protected static final String KEY_ITEM_ID = "itemId";
+    protected static final String KEY_ITEM_NAME = "itemName";
+    protected static final String KEY_ITEM_DESC = "itemDesc";
+    protected static final String KEY_PURCHASE_DATE = "purchaseDate";
+    protected static final String KEY_PAYMENT_ID = "paymentId";
+    protected static final String KEY_PAYMENT_AMOUNT = "paymentAmount";
+    protected static final String KEY_STATUS = "status";
+    protected static final String KEY_MODE = "mode";
 
-    private static final String MODE_TEST = "TEST";
-    private static final String MODE_REAL = "REAL";
+    protected static final String MODE_TEST = "TEST";
+    protected static final String MODE_REAL = "REAL";
 
-    private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
+    protected static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -36,21 +36,21 @@ public class SamsungVerification extends JsonModel {
     };
 
 
-    private final boolean status;
+    protected final boolean status;
     @Nullable
-    private final String itemId;
+    protected final String itemId;
     @Nullable
-    private final String name;
+    protected final String name;
     @Nullable
-    private final String description;
+    protected final String description;
     @Nullable
-    private final Date purchaseDate;
+    protected final Date purchaseDate;
     @Nullable
-    private final String paymentId;
+    protected final String paymentId;
     @Nullable
-    private final String paymentAmount;
+    protected final String paymentAmount;
     @Nullable
-    private final BillingMode mode;
+    protected final BillingMode mode;
 
     @SuppressWarnings("PMD.PreserveStackTrace")
     public SamsungVerification(@NonNull final String originalJson) throws JSONException {

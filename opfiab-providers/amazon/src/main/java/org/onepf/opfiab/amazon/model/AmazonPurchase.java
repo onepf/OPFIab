@@ -30,13 +30,13 @@ import java.util.Date;
 
 public class AmazonPurchase extends AmazonModel {
 
-    private static final String NAME_ITEM_TYPE = "itemType";
-    private static final String NAME_RECEIPT_ID = "receiptId";
-    private static final String NAME_PURCHASE_DATE = "purchaseDate";
-    private static final String NAME_CANCEL_DATE = "endDate";
+    protected static final String NAME_ITEM_TYPE = "itemType";
+    protected static final String NAME_RECEIPT_ID = "receiptId";
+    protected static final String NAME_PURCHASE_DATE = "purchaseDate";
+    protected static final String NAME_CANCEL_DATE = "endDate";
 
     @NonNull
-    private final Receipt receipt;
+    protected final Receipt receipt;
 
     public AmazonPurchase(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

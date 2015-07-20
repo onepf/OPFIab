@@ -26,14 +26,14 @@ import org.json.JSONException;
 
 public class AmazonSkuDetails extends AmazonModel {
 
-    private static final String NAME_ITEM_TYPE = "productType";
-    private static final String NAME_TITLE = "title";
-    private static final String NAME_DESCRIPTION = "description";
-    private static final String NAME_PRICE = "price";
-    private static final String NAME_SMALL_ICON_URL = "smallIconUrl";
+    protected static final String NAME_ITEM_TYPE = "productType";
+    protected static final String NAME_TITLE = "title";
+    protected static final String NAME_DESCRIPTION = "description";
+    protected static final String NAME_PRICE = "price";
+    protected static final String NAME_SMALL_ICON_URL = "smallIconUrl";
 
     @NonNull
-    private final Product product;
+    protected final Product product;
 
     public AmazonSkuDetails(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

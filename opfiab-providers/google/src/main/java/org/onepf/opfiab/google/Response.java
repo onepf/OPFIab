@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 /**
  * All possible responses from Google service.
  */
-enum Response {
+public enum Response {
 
     OK(0),
     USER_CANCELED(1),
@@ -34,7 +34,7 @@ enum Response {
     ITEM_NOT_OWNED(8);
 
     @Nullable
-    static Response fromCode(final int code) {
+    public static Response fromCode(final int code) {
         for (final Response response : values()) {
             if (response.code == code) {
                 return response;

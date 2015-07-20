@@ -7,16 +7,16 @@ import org.onepf.opfiab.samsung.SamsungUtils;
 
 public class SamsungSkuDetails extends SamsungModel {
 
-    private static final String KEY_SUBSCRIPTION_UNIT = "mSubscriptionDurationUnit";
-    private static final String KEY_SUBSCRIPTION_MULTIPLIER = "mSubscriptionDurationMultiplier";
+    protected static final String KEY_SUBSCRIPTION_UNIT = "mSubscriptionDurationUnit";
+    protected static final String KEY_SUBSCRIPTION_MULTIPLIER = "mSubscriptionDurationMultiplier";
 
 
     @NonNull
-    private final ItemType itemType;
+    protected final ItemType itemType;
     @NonNull
-    private final String subscriptionUnit;
+    protected final String subscriptionUnit;
     @NonNull
-    private final String subscriptionMultiplier;
+    protected final String subscriptionMultiplier;
 
     public SamsungSkuDetails(@NonNull final String originalJson) throws JSONException {
         super(originalJson);

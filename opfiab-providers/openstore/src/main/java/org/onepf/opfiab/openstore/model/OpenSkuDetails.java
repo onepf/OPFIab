@@ -22,19 +22,19 @@ import org.json.JSONException;
 
 public class OpenSkuDetails extends OpenBillingModel {
 
-    private static final String NAME_TYPE = "type";
-    private static final String NAME_PRICE = "price";
-    private static final String NAME_TITLE = "title";
-    private static final String NAME_DESCRIPTION = "description";
+    protected static final String NAME_TYPE = "type";
+    protected static final String NAME_PRICE = "price";
+    protected static final String NAME_TITLE = "title";
+    protected static final String NAME_DESCRIPTION = "description";
 
     @NonNull
-    private final ItemType itemType;
+    protected final ItemType itemType;
     @NonNull
-    private final String price;
+    protected final String price;
     @NonNull
-    private final String title;
+    protected final String title;
     @NonNull
-    private final String description;
+    protected final String description;
 
     public OpenSkuDetails(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
