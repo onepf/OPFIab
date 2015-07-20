@@ -43,7 +43,7 @@ final class AmazonBillingHelper implements PurchasingListener {
     /**
      * Timeout to give up on waiting for user data.
      */
-    private static final int USER_DATA_TIMEOUT = 1000;
+    private static final long USER_DATA_TIMEOUT = Long.parseLong("5000");
 
     private static AmazonBillingHelper instance;
 

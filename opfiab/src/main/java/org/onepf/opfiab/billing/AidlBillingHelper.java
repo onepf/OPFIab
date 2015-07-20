@@ -52,11 +52,11 @@ public abstract class AidlBillingHelper<AIDL extends IInterface> implements Serv
     /**
      * Timeout to wait before giving up on connecting to service.
      */
-    private static final long CONNECTION_TIMEOUT = 30000L;
+    private static final long CONNECTION_TIMEOUT = Long.parseLong("30000");
     /**
      * Automatically disconnect from service after this delay since last usage.
      */
-    private static final long DISCONNECT_DELAY = 60000L; // 1 minute
+    private static final long DISCONNECT_DELAY = Long.parseLong("60000");
 
     /**
      * Used to block library thread and wait for service to connect.

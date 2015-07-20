@@ -76,7 +76,7 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
     protected static final String INSTALLER = PACKAGE;
     protected static final String SAMSUNG_BILLING = "com.sec.android.iap.permission.BILLING";
 
-    protected static final long ACCOUNT_TIMEOUT = 5000;
+    protected static final long ACCOUNT_TIMEOUT = Long.parseLong("5000");
     protected static final int BATCH_SIZE = 15;
     protected static final String KEY_LAST_ITEM = NAME + ".last_item";
 
