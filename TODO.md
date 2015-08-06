@@ -12,7 +12,7 @@ Arranged according to priority:
 - [ ] **Introduce percistant storage concept**
     * Add appropriate interfaces
     * Update API 
-    * Update SamsungBillingProvider implementation to make use of persistant storage
+    * Update SamsungBillingProvider implementation to make use of persistent storage
     * Default implementation backed by local database 
     * Separate module with persistent storage backed by Facebook
 
