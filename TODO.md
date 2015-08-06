@@ -27,4 +27,4 @@ Unity plugin
   * Conveys library event to Unity
 * Unity sample  
 
-iOS and WP is out of scop
+iOS and WP is out of scopе.
