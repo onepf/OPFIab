@@ -1,20 +1,20 @@
 Arranged according to priority:
 
 - [ ] Update documentation to reflect all latest changes
-- [ ] General enchancements: #21 #22 #23 #24 #25
-- [ ] Amazon enchancements
+- [ ] General enhancements: #21 #22 #23 #24 #25
+- [ ] Amazon enhancements
     * Subscriptions duration: #20
     * Blocking requst handling: #29
 - [ ] API
     * Rename setup(): #26
-    * Requst data in response: #30
+    * Request data in response: #30
 
 - [ ] **Introduce percistant storage concept**
     * Add appropriate interfaces
     * Update API 
     * Update SamsungBillingProvider implementation to make use of persistant storage
     * Default implementation backed by local database 
-    * Separate module with persistant storage backed by Facebook
+    * Separate module with persistent storage backed by Facebook
 
 Unity plugin
 
