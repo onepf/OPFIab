@@ -4,7 +4,7 @@ Arranged according to priority:
 - [ ] General enhancements: #21 #22 #23 #24 #25
 - [ ] Amazon enhancements
     * Subscriptions duration: #20
-    * Blocking requst handling: #29
+    * Blocking request handling: #29
 - [ ] API
     * Rename setup(): #26
     * Request data in response: #30
