@@ -1,4 +1,6 @@
 # OPFIab
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-OPFIab-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2343)
+
 OPFIab is a next step from [OpenIAB](https://github.com/onepf/OpenIAB). It's an Android library intended to make in-app billing integration easy while supporting multiple billing providers (Appstores).
 
 **This library is still under development and may contain bugs. Any feedback is deeply appreciated.**
