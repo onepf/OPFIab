@@ -1,3 +1,10 @@
+Dear friends
+-------------
+
+Currently our small team doesn't have enough time to support and develop the project. I hope in the nearest future we will continue the work.
+Thank you!
+
+
 # OPFIab
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-OPFIab-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/2343)
 
