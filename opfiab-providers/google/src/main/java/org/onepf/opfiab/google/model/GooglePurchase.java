@@ -35,7 +35,7 @@ public class GooglePurchase extends GoogleModel {
     private static final String NAME_AUTO_RENEWING = "autoRenewing";
 
 
-    @NonNull
+    @Nullable
     private final String orderId;
     @NonNull
     private final String packageName;
@@ -51,7 +51,7 @@ public class GooglePurchase extends GoogleModel {
 
     public GooglePurchase(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
-        this.orderId = jsonObject.getString(NAME_ORDER_ID);
+        this.orderId = jsonObject.optString(NAME_ORDER_ID, null);
         this.packageName = jsonObject.getString(NAME_PACKAGE_NAME);
         this.purchaseToken = jsonObject.getString(NAME_PURCHASE_TOKEN);
         this.developerPayload = jsonObject.optString(NAME_DEVELOPER_PAYLOAD, null);
