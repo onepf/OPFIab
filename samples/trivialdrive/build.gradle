@@ -16,7 +16,7 @@
 
 apply plugin: 'idea'
 apply plugin: 'com.android.application'
-apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle')
+apply from: rootProject.file('opf-commons.gradle')
 
 android {
     defaultConfig {
@@ -51,7 +51,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
     // OPFIab
-    compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'de.greenrobot:eventbus:2.4.1'
     //noinspection GradleDynamicVersion
     compile('org.onepf:opfutils:0.1.+') {
         changing = true

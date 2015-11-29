@@ -88,7 +88,7 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
     @Nullable
     protected SyncedReference<Boolean> syncAuthorisationResult;
     @NonNull
-    protected final SamsungBillingHelper helper = getHelper();
+    protected final SamsungBillingHelper helper;
 
     protected SamsungBillingProvider(@NonNull final Context context,
                                      @NonNull final SamsungSkuResolver skuResolver,
@@ -96,6 +96,7 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
                                      @NonNull final BillingMode billingMode) {
         super(context, skuResolver, purchaseVerifier);
         this.billingMode = billingMode;
+        this.helper = getHelper();
     }
 
     @NonNull

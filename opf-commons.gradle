@@ -1,0 +1,271 @@
+/*
+ * Copyright 2012-2015 One Platform Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Common project properties and configs
+def loadLocalProperties(propertiesFile, localProperties) {
+    def loadedProperties = new Properties()
+    if (propertiesFile.exists()) {
+        loadedProperties.load(propertiesFile.newDataInputStream())
+
+        localProperties << loadedProperties
+    }
+}
+
+def loadLocalProperties() {
+    def localProperties = new HashMap<String, String>()
+
+    def projectLocalPropertiesFile = project.rootProject.file('local.properties')
+    loadLocalProperties(projectLocalPropertiesFile, localProperties)
+
+    def moduleLocalPropertiesFile = project.file('local.properties')
+    loadLocalProperties(moduleLocalPropertiesFile, localProperties)
+
+    return localProperties
+}
+
+allprojects {
+    repositories {
+        //Simplify maven upload
+        maven { url 'https://oss.sonatype.org/content/repositories/releases/' }
+        //Allow snapshots
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        //Third-party dependencies
+        maven { url 'https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/' }
+    }
+
+    configurations.all {
+        //Check for updates every build
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
+    ext {
+        localProperties = loadLocalProperties()
+
+        ext."signing.keyId" = localProperties.get('signing.keyId')
+        ext."signing.secretKeyRingFile" = localProperties.get('signing.secretKeyRingFile')
+        ext."signing.password" = localProperties.get('signing.password')
+
+        pomGroupId = 'org.onepf'
+        pomPackaging = hasProperty('POM_PACKAGING') ? POM_PACKAGING : 'aar'
+        pomLicenseName = 'The Apache Software License, Version 2.0'
+        pomLicenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        pomLicenseDist = 'repo'
+        pomDeveloperName = 'One Platform Foundation'
+        pomDeveloperId = 'onepf'
+
+        pomCheckList = ['RELEASE_REPOSITORY_URL', 'SNAPSHOT_REPOSITORY_URL', 'POM_URL', 'POM_NAME', 'POM_DESCRIPTION',
+                        'POM_SCM_URL', 'POM_SCM_CONNECTION', 'POM_SCM_DEV_CONNECTION', 'POM_ARTIFACT_ID']
+
+        //apk signing
+        storeFilePath = localProperties.get('storeFile')
+        storePassword = localProperties.get('storePassword')
+        keyAlias = localProperties.get('keyAlias')
+        keyPassword = localProperties.get('keyPassword')
+        getOpfSigningConfig = {
+            if (storeFilePath != null && file(storeFilePath).exists() && storePassword != null
+                    && keyAlias != null && keyPassword != null) {
+                return android.signingConfigs.opf
+            }
+            return null
+        }
+        getOpfDebugSigningConfig = {
+            return android.signingConfigs.opfDebug
+        }
+    }
+}
+
+//Common android properties
+android {
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
+
+    signingConfigs {
+        opfDebug {
+            storeFile urlCache.get("https://github.com/onepf/OPF-mvn-repo/raw/master/keystore/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+
+        opf {
+            storeFile project.storeFilePath != null ? file(project.storeFilePath) : null
+            storePassword project.storePassword
+            keyAlias project.keyAlias
+            keyPassword project.keyPassword
+        }
+    }
+
+    sourceSets {
+        androidTest.java.srcDirs += 'src/test/java'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        abortOnError true
+        checkAllWarnings true
+        warningsAsErrors true
+        disable 'AllowBackup', 'ContentDescription', 'InvalidPackage', 'SelectableText', 'SpUsage',
+                'GradleDynamicVersion', 'GoogleAppIndexingWarning'
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    debugProvided 'com.google.code.findbugs:annotations:3.0.0'
+    releaseProvided 'org.onepf.findbugs:annotations:1.0'
+}
+
+
+//Checkstyle and PMD
+apply plugin: 'com.noveogroup.android.check'
+check {
+    abortOnError true
+
+    checkstyle {
+        config resources.text.fromString(urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/config/checkstyle.xml').toURL().text)
+    }
+
+    pmd {
+        config resources.text.fromString(urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/master/config/pmd.xml').toURL().text)
+    }
+}
+
+//Maven upload
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+def isReleaseBuild() {
+    return android.defaultConfig.versionName.contains("SNAPSHOT") == false
+}
+
+def hasNexusCredentials() {
+    return localProperties.containsKey('nexusUsername') && localProperties.containsKey('nexusPassword')
+}
+
+def hasAllArchivesUploadingProperties() {
+    return !pomCheckList.any {
+        return !project.hasProperty(it)
+    }
+}
+
+def checkArchiveUploadingProperties() {
+    pomCheckList.each {
+        if (!project.hasProperty(it)) {
+            throw new IllegalStateException('You must specify ' + it + ' in gradle.properties file')
+        }
+    }
+}
+
+uploadArchives {
+    doFirst {
+        checkArchiveUploadingProperties()
+    }
+}
+
+if (hasNexusCredentials() && hasAllArchivesUploadingProperties()) {
+    afterEvaluate { project ->
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    if (isReleaseBuild()) {
+                        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                    }
+
+                    pom.version = android.defaultConfig.versionName
+                    pom.groupId = pomGroupId
+                    pom.artifactId = POM_ARTIFACT_ID
+
+                    repository(url: RELEASE_REPOSITORY_URL) {
+                        authentication(
+                                userName: localProperties.get('nexusUsername'),
+                                password: localProperties.get('nexusPassword')
+                        )
+                    }
+                    snapshotRepository(url: SNAPSHOT_REPOSITORY_URL) {
+                        authentication(
+                                userName: localProperties.get('nexusUsername'),
+                                password: localProperties.get('nexusPassword')
+                        )
+                    }
+
+                    pom.project {
+                        packaging = pomPackaging
+                        url POM_URL
+                        name POM_NAME
+                        description POM_DESCRIPTION
+
+                        scm {
+                            url POM_SCM_URL
+                            connection POM_SCM_CONNECTION
+                            developerConnection POM_SCM_DEV_CONNECTION
+                        }
+
+                        licenses {
+                            license {
+                                name pomLicenseName
+                                url pomLicenseUrl
+                                distribution pomLicenseDist
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id pomDeveloperId
+                                name pomDeveloperName
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (isReleaseBuild()) {
+            signing {
+                required true
+                sign configurations.archives
+            }
+        }
+
+        task androidJavadocs(type: Javadoc) {
+            source = android.sourceSets.main.java.sourceFiles
+        }
+
+        task androidJavadocsJar(type: Jar) {
+            classifier = 'javadoc'
+            //basename = artifact_id
+            from androidJavadocs.destinationDir
+        }
+
+        task androidSourcesJar(type: Jar) {
+            classifier = 'sources'
+            from android.sourceSets.main.java.sourceFiles
+        }
+
+        artifacts {
+            archives packageReleaseJar
+            archives androidSourcesJar
+            archives androidJavadocsJar
+        }
+    }
+}

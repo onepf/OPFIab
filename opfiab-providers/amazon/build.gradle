@@ -16,7 +16,7 @@
 
 apply plugin: 'idea'
 apply plugin: 'com.android.library'
-apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/gradle-commons/opf-commons.gradle')
+apply from: rootProject.file('opf-commons.gradle')
 
 android {
     defaultConfig {
@@ -24,10 +24,6 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "0.4.0-SNAPSHOT"
-    }
-
-    lintOptions {
-        disable 'GoogleAppIndexingWarning'
     }
 }
 
