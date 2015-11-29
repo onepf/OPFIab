@@ -32,15 +32,19 @@ apply from: urlCache.get('https://raw.githubusercontent.com/onepf/OPF-mvn-repo/g
 android {
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "0.4.0-SNAPSHOT"
+    }
+
+    lintOptions {
+        disable 'GoogleAppIndexingWarning'
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-annotations:22.2.0'
-    provided 'de.greenrobot:eventbus:2.4.0'
+    compile 'com.android.support:support-annotations:23.1.1'
+    provided 'de.greenrobot:eventbus:2.4.1'
     //noinspection GradleDynamicVersion
     provided('org.onepf:opfutils:0.1.+') {
         changing = true

@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId 'org.onepf.opfiab.trivialdrive'
         minSdkVersion 15
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 31
         versionName '0.4.0'
     }
@@ -48,8 +48,8 @@ check {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:recyclerview-v7:22.2.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
     // OPFIab
     compile 'de.greenrobot:eventbus:2.4.0'
     //noinspection GradleDynamicVersion
