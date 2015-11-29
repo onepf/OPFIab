@@ -96,12 +96,7 @@ public class SamsungBillingProvider extends BaseBillingProvider<SamsungSkuResolv
                                      @NonNull final BillingMode billingMode) {
         super(context, skuResolver, purchaseVerifier);
         this.billingMode = billingMode;
-        this.helper = getHelper();
-    }
-
-    @NonNull
-    public SamsungBillingHelper getHelper() {
-        return new SamsungBillingHelper(context, billingMode);
+        this.helper = new SamsungBillingHelper(context, billingMode);
     }
 
     @Override

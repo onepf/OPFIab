@@ -82,7 +82,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
      * Helper object to delegate all Google specific calls to.
      */
     @NonNull
-    protected final GoogleBillingHelper helper;
+    protected final GoogleBillingHelper helper = new GoogleBillingHelper(context);
 
     protected GoogleBillingProvider(
             @NonNull final Context context,
@@ -91,12 +91,6 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             final boolean debugMode) {
         super(context, skuResolver, purchaseVerifier);
         this.debugMode = debugMode;
-        this.helper = getHelper();
-    }
-
-    @NonNull
-    protected GoogleBillingHelper getHelper() {
-        return new GoogleBillingHelper(context);
     }
 
     /**
@@ -404,7 +398,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
     public static class Builder extends BaseBillingProviderBuilder<Builder, TypedSkuResolver,
             PurchaseVerifier> {
 
-        private boolean debugMode = false;
+        private boolean debugMode;
 
         public Builder(@NonNull final Context context) {
             super(context);
