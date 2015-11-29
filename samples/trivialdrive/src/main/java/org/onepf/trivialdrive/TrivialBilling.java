@@ -147,6 +147,7 @@ public final class TrivialBilling {
         return new GoogleBillingProvider.Builder(context)
                 .setPurchaseVerifier(new SimplePublicKeyPurchaseVerifier(GOOGLE_PLAY_KEY))
                 .setSkuResolver(skuResolver)
+                .setDebugMode(true)
                 .build();
     }
 

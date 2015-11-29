@@ -35,7 +35,7 @@ public class GooglePurchase extends GoogleModel {
     protected static final String NAME_AUTO_RENEWING = "autoRenewing";
 
 
-    @NonNull
+    @Nullable
     protected final String orderId;
     @NonNull
     protected final String packageName;
@@ -51,7 +51,7 @@ public class GooglePurchase extends GoogleModel {
 
     public GooglePurchase(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
-        this.orderId = jsonObject.getString(NAME_ORDER_ID);
+        this.orderId = jsonObject.optString(NAME_ORDER_ID, null);
         this.packageName = jsonObject.getString(NAME_PACKAGE_NAME);
         this.purchaseToken = jsonObject.getString(NAME_PURCHASE_TOKEN);
         this.developerPayload = jsonObject.optString(NAME_DEVELOPER_PAYLOAD, null);
@@ -70,9 +70,9 @@ public class GooglePurchase extends GoogleModel {
      * Gets a unique order identifier of the transaction. This identifier corresponds to the
      * Google Wallet Order ID.
      *
-     * @return Unique order ID, can't be null.
+     * @return Unique order ID, can be null for test purchases.
      */
-    @NonNull
+    @Nullable
     public String getOrderId() {
         return orderId;
     }

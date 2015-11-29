@@ -77,17 +77,21 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
     protected static final String PERMISSION_BILLING = "com.android.vending.BILLING";
 
 
+    protected final boolean debugMode;
     /**
      * Helper object to delegate all Google specific calls to.
      */
     @NonNull
-    protected final GoogleBillingHelper helper = getHelper();
+    protected final GoogleBillingHelper helper;
 
     protected GoogleBillingProvider(
             @NonNull final Context context,
             @NonNull final TypedSkuResolver skuResolver,
-            @NonNull final PurchaseVerifier purchaseVerifier) {
+            @NonNull final PurchaseVerifier purchaseVerifier,
+            final boolean debugMode) {
         super(context, skuResolver, purchaseVerifier);
+        this.debugMode = debugMode;
+        this.helper = getHelper();
     }
 
     @NonNull
@@ -158,6 +162,15 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
                 .setCanceled(googlePurchase.getPurchaseState() == PurchaseState.CANCELED)
                 .setSignature(signature)
                 .build();
+    }
+
+    @NonNull
+    protected GooglePurchase newPurchase(@NonNull final String purchaseData) throws JSONException {
+        final GooglePurchase googlePurchase = new GooglePurchase(purchaseData);
+        if (!debugMode && googlePurchase.getOrderId() == null) {
+            throw new JSONException("orderId value is null.");
+        }
+        return googlePurchase;
     }
 
     /**
@@ -314,7 +327,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
         for (int i = 0; i < size; i++) {
             final String data = dataList.get(i);
             try {
-                final GooglePurchase googlePurchase = new GooglePurchase(data);
+                final GooglePurchase googlePurchase = newPurchase(data);
                 final String signature = signatureList.get(i);
                 final Purchase purchase = newPurchase(googlePurchase, signature);
                 inventory.add(purchase);
@@ -377,7 +390,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
 
         final GooglePurchase googlePurchase;
         try {
-            googlePurchase = new GooglePurchase(purchaseData);
+            googlePurchase = newPurchase(purchaseData);
         } catch (JSONException exception) {
             OPFLog.e("Failed to parse purchase data: " + purchaseData, exception);
             postEmptyResponse(request, Status.UNKNOWN_ERROR);
@@ -391,8 +404,16 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
     public static class Builder extends BaseBillingProviderBuilder<Builder, TypedSkuResolver,
             PurchaseVerifier> {
 
+        private boolean debugMode = false;
+
         public Builder(@NonNull final Context context) {
             super(context);
+        }
+
+        @NonNull
+        public Builder setDebugMode(final boolean debugMode) {
+            this.debugMode = debugMode;
+            return this;
         }
 
         @Override
@@ -401,7 +422,8 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
                 throw new IllegalStateException("TypedSkuResolver must be set.");
             }
             return new GoogleBillingProvider(context, skuResolver,
-                    purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier);
+                    purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier,
+                    debugMode);
         }
     }
 }
