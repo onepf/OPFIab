@@ -26,6 +26,7 @@ import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.ProductType;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
 import com.amazon.device.iap.model.Receipt;
+import com.amazon.device.iap.model.UserData;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +50,8 @@ import static org.onepf.opfiab.model.event.billing.Status.SERVICE_UNAVAILABLE;
 import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
 public final class AmazonUtils {
+
+    public static final String ORIGINAL_JSON_USERDATA = "userData";
 
     private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
         @Override
@@ -138,7 +141,7 @@ public final class AmazonUtils {
      * @return Newly constructed purchase object.
      */
     @Nullable
-    public static Purchase convertPurchase(@NonNull final Receipt receipt) {
+    public static Purchase convertPurchase(@NonNull final Receipt receipt, @NonNull final UserData userData) {
         final Purchase.Builder builder = new Purchase.Builder(receipt.getSku());
         final ProductType productType = receipt.getProductType();
         switch (productType) {
@@ -159,7 +162,16 @@ public final class AmazonUtils {
         builder.setCanceled(receipt.isCanceled());
         builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
         builder.setProviderName(AmazonBillingProvider.NAME);
-        builder.setOriginalJson(receipt.toJSON().toString());
+
+        //userdata is needed for purchase verification on RVS server
+        JSONObject originalJson = receipt.toJSON();
+        try {
+            originalJson.put(ORIGINAL_JSON_USERDATA, userData.toJSON());
+        } catch (JSONException e) {
+            OPFLog.e("Can't add Amazon userdata to original JSON: " + userData, e);
+            return null;
+        }
+        builder.setOriginalJson(originalJson.toString());
 
         return builder.build();
     }
@@ -190,7 +202,7 @@ public final class AmazonUtils {
         final List<Receipt> receipts = response.getReceipts();
         final Collection<Purchase> purchases = new ArrayList<>(receipts.size());
         for (final Receipt receipt : receipts) {
-            final Purchase purchase = convertPurchase(receipt);
+            final Purchase purchase = convertPurchase(receipt, response.getUserData());
             if (purchase != null) {
                 purchases.add(purchase);
             }
