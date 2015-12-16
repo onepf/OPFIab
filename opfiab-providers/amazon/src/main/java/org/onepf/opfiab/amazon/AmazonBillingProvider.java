@@ -157,7 +157,7 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 response.getRequestStatus();
         switch (status) {
             case SUCCESSFUL:
-                final Purchase purchase = AmazonUtils.convertPurchase(response.getReceipt());
+                final Purchase purchase = AmazonUtils.convertPurchase(response.getReceipt(), response.getUserData());
                 final Status responseStatus = purchase == null ? UNKNOWN_ERROR : SUCCESS;
                 postResponse(new PurchaseResponse(responseStatus, getName(), purchase));
                 break;

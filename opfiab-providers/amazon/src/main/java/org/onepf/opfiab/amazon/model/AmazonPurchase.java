@@ -20,10 +20,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.amazon.device.iap.internal.model.ReceiptBuilder;
+import com.amazon.device.iap.internal.model.UserDataBuilder;
 import com.amazon.device.iap.model.ProductType;
 import com.amazon.device.iap.model.Receipt;
+import com.amazon.device.iap.model.UserData;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.onepf.opfiab.amazon.AmazonUtils;
 
 import java.util.Date;
@@ -35,8 +38,14 @@ public class AmazonPurchase extends AmazonModel {
     protected static final String NAME_PURCHASE_DATE = "purchaseDate";
     protected static final String NAME_CANCEL_DATE = "endDate";
 
+    private static final String NAME_USERDATA = AmazonUtils.ORIGINAL_JSON_USERDATA;
+    private static final String NAME_USERDATA_USER_ID = "userId";
+    private static final String NAME_USERDATA_MARKETPLACE = "marketplace";
+
     @NonNull
     protected final Receipt receipt;
+
+    private final UserData userData;
 
     public AmazonPurchase(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
@@ -53,6 +62,12 @@ public class AmazonPurchase extends AmazonModel {
             builder.setCancelDate(AmazonUtils.readDate(jsonObject, NAME_CANCEL_DATE));
         }
         this.receipt = new Receipt(builder);
+
+        JSONObject userData = jsonObject.getJSONObject(NAME_USERDATA);
+        this.userData = new UserDataBuilder()
+                .setUserId(userData.getString(NAME_USERDATA_USER_ID))
+                .setMarketplace(userData.getString(NAME_USERDATA_MARKETPLACE))
+        .build();
     }
 
     /**
@@ -101,4 +116,21 @@ public class AmazonPurchase extends AmazonModel {
     public boolean isCanceled() {
         return receipt.isCanceled();
     }
+
+    /**
+     * @see UserData#getUserId()
+     */
+    @Nullable
+    public String getUserId(){
+        return userData.getUserId();
+    }
+
+    /**
+     * @see UserData#getMarketplace()
+     */
+    @Nullable
+    public String getMarketplace(){
+        return userData.getMarketplace();
+    }
+
 }
