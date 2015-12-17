@@ -51,7 +51,8 @@ import static org.onepf.opfiab.model.event.billing.Status.UNKNOWN_ERROR;
 
 public final class AmazonUtils {
 
-    public static final String ORIGINAL_JSON_USERDATA = "userData";
+    // Mirrors com.amazon.device.iap.model.PurchaseResponse.USER_DATA
+    public static final String NAME_USERDATA = "userData";
 
     private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
         @Override
@@ -141,7 +142,8 @@ public final class AmazonUtils {
      * @return Newly constructed purchase object.
      */
     @Nullable
-    public static Purchase convertPurchase(@NonNull final Receipt receipt, @NonNull final UserData userData) {
+    public static Purchase convertPurchase(@NonNull final Receipt receipt,
+                                           @Nullable final UserData userData) {
         final Purchase.Builder builder = new Purchase.Builder(receipt.getSku());
         final ProductType productType = receipt.getProductType();
         switch (productType) {
@@ -163,10 +165,10 @@ public final class AmazonUtils {
         builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
         builder.setProviderName(AmazonBillingProvider.NAME);
 
-        //userdata is needed for purchase verification on RVS server
-        JSONObject originalJson = receipt.toJSON();
+        // Receipt used as a root for originalJson for compatibility purposes
+        final JSONObject originalJson = receipt.toJSON();
         try {
-            originalJson.put(ORIGINAL_JSON_USERDATA, userData.toJSON());
+            originalJson.put(NAME_USERDATA, userData == null ? null : userData.toJSON());
         } catch (JSONException e) {
             OPFLog.e("Can't add Amazon userdata to original JSON: " + userData, e);
             return null;

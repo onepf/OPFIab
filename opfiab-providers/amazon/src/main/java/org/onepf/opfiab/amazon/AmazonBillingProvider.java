@@ -28,6 +28,8 @@ import com.amazon.device.iap.ResponseReceiver;
 import com.amazon.device.iap.model.FulfillmentResult;
 import com.amazon.device.iap.model.ProductDataResponse;
 import com.amazon.device.iap.model.PurchaseUpdatesResponse;
+import com.amazon.device.iap.model.Receipt;
+import com.amazon.device.iap.model.UserData;
 
 import org.onepf.opfiab.billing.BaseBillingProvider;
 import org.onepf.opfiab.billing.BaseBillingProviderBuilder;
@@ -157,7 +159,9 @@ public class AmazonBillingProvider extends BaseBillingProvider<SkuResolver, Purc
                 response.getRequestStatus();
         switch (status) {
             case SUCCESSFUL:
-                final Purchase purchase = AmazonUtils.convertPurchase(response.getReceipt(), response.getUserData());
+                final Receipt receipt = response.getReceipt();
+                final UserData userData = response.getUserData();
+                final Purchase purchase = AmazonUtils.convertPurchase(receipt, userData);
                 final Status responseStatus = purchase == null ? UNKNOWN_ERROR : SUCCESS;
                 postResponse(new PurchaseResponse(responseStatus, getName(), purchase));
                 break;

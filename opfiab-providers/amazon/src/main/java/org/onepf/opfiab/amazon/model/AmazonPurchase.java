@@ -37,15 +37,14 @@ public class AmazonPurchase extends AmazonModel {
     protected static final String NAME_RECEIPT_ID = "receiptId";
     protected static final String NAME_PURCHASE_DATE = "purchaseDate";
     protected static final String NAME_CANCEL_DATE = "endDate";
-
-    private static final String NAME_USERDATA = AmazonUtils.ORIGINAL_JSON_USERDATA;
-    private static final String NAME_USERDATA_USER_ID = "userId";
-    private static final String NAME_USERDATA_MARKETPLACE = "marketplace";
+    protected static final String NAME_USERDATA = "userData";
+    protected static final String NAME_USER_ID = "userId";
+    protected static final String NAME_MARKETPLACE = "marketplace";
 
     @NonNull
     protected final Receipt receipt;
-
-    private final UserData userData;
+    @Nullable
+    protected final UserData userData;
 
     public AmazonPurchase(@NonNull final String originalJson) throws JSONException {
         super(originalJson);
@@ -63,11 +62,15 @@ public class AmazonPurchase extends AmazonModel {
         }
         this.receipt = new Receipt(builder);
 
-        JSONObject userData = jsonObject.getJSONObject(NAME_USERDATA);
-        this.userData = new UserDataBuilder()
-                .setUserId(userData.getString(NAME_USERDATA_USER_ID))
-                .setMarketplace(userData.getString(NAME_USERDATA_MARKETPLACE))
-        .build();
+        final JSONObject userData = jsonObject.optJSONObject(NAME_USERDATA);
+        if (userData == null) {
+            this.userData = null;
+        } else {
+            this.userData = new UserDataBuilder()
+                    .setUserId(userData.getString(NAME_USER_ID))
+                    .setMarketplace(userData.getString(NAME_MARKETPLACE))
+                    .build();
+        }
     }
 
     /**
@@ -121,16 +124,16 @@ public class AmazonPurchase extends AmazonModel {
      * @see UserData#getUserId()
      */
     @Nullable
-    public String getUserId(){
-        return userData.getUserId();
+    public String getUserId() {
+        return userData == null ? null : userData.getUserId();
     }
 
     /**
      * @see UserData#getMarketplace()
      */
     @Nullable
-    public String getMarketplace(){
-        return userData.getMarketplace();
+    public String getMarketplace() {
+        return userData == null ? null : userData.getMarketplace();
     }
 
 }
