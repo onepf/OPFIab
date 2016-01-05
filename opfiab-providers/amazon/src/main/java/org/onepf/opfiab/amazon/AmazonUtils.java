@@ -162,7 +162,9 @@ public final class AmazonUtils {
         }
         builder.setToken(receipt.getReceiptId());
         builder.setCanceled(receipt.isCanceled());
-        builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
+        if (receipt.getPurchaseDate() != null) {
+            builder.setPurchaseTime(receipt.getPurchaseDate().getTime());
+        }
         builder.setProviderName(AmazonBillingProvider.NAME);
 
         // Receipt used as a root for originalJson for compatibility purposes
