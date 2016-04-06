@@ -39,9 +39,11 @@ public abstract class JsonModel implements JsonCompatible {
         try {
             final Constructor<E> constructor = clazz.getConstructor(String.class);
             return constructor.newInstance(model.getOriginalJson());
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException
-                | InstantiationException exception) {
-            OPFLog.e("", exception);
+        } catch (Exception e) {
+            // we can't catch separate exceptions here because ReflectiveOperationException
+            // not available on pre KitKat devices
+            // for more info, see https://code.google.com/p/android/issues/detail?id=153406
+            OPFLog.e("Can't create model class from original json", e);
         }
         return null;
     }
