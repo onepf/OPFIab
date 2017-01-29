@@ -165,10 +165,18 @@ public class TrivialView extends LinearLayout
         sdvSubscription.setSkuDetails(TrivialBilling.getDetails(SKU_SUBSCRIPTION));
     }
 
+    private void updateButtons() {
+        btnDrive.setEnabled(TrivialData.canSpendGas());
+        btnBuyGas.setEnabled(TrivialData.canAddGas());
+        btnBuyPremium.setEnabled(!TrivialBilling.hasPremium());
+        btnBuySubscription.setEnabled(!TrivialBilling.hasValidSubscription());
+    }
+
     public void update() {
         updatePremium();
         updateSubscription();
         updateSkuDetails();
+        updateButtons();
     }
 
     @Override
@@ -182,6 +190,7 @@ public class TrivialView extends LinearLayout
         } else if (v == btnBuySubscription) {
             iabHelper.purchase(SKU_SUBSCRIPTION);
         }
+        updateButtons();
     }
 
     @Override

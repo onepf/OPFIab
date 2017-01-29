@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2012-2015 One Platform Foundation
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,67 +15,65 @@
   -->
 
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:gravity="center">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
 
     <TableRow>
 
-        <ImageView
+        <Button
             android:id="@+id/btn_buy_gas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/btn_buy_gas"/>
+            android:background="@drawable/img_buy_gas" />
 
         <Space
             android:layout_width="@dimen/padding_normal"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <org.onepf.trivialdrive.ui.view.SkuDetailsView
             android:id="@+id/sdv_gas"
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
     </TableRow>
 
-    <TableRow
-        android:paddingTop="@dimen/padding_small">
+    <TableRow android:paddingTop="@dimen/padding_small">
 
-        <ImageView
+        <Button
             android:id="@+id/btn_buy_premium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/btn_buy_premium"/>
+            android:background="@drawable/img_buy_premium" />
 
         <Space
             android:layout_width="@dimen/padding_normal"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <org.onepf.trivialdrive.ui.view.SkuDetailsView
             android:id="@+id/sdv_premium"
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
     </TableRow>
 
-    <TableRow
-        android:paddingTop="@dimen/padding_small">
+    <TableRow android:paddingTop="@dimen/padding_small">
 
-        <ImageView
+        <Button
             android:id="@+id/btn_buy_subscription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/btn_buy_subscription"/>
+            android:background="@drawable/img_buy_subscription" />
 
         <Space
             android:layout_width="@dimen/padding_normal"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <org.onepf.trivialdrive.ui.view.SkuDetailsView
             android:id="@+id/sdv_subscription"
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
     </TableRow>
 
 </TableLayout>
