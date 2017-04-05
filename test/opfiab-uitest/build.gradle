@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId "org.onepf.opfiab.opfiab_uitest"
         minSdkVersion 18
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "0.3.0"
 
@@ -39,7 +39,7 @@ check {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
     // OPFIab
     compile 'de.greenrobot:eventbus:2.4.0'
     //noinspection GradleDynamicVersion
@@ -50,12 +50,12 @@ dependencies {
 //    }
 
     // Testing-only dependencies
-    androidTestCompile 'com.android.support:appcompat-v7:22.2.0'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.1'
-    androidTestCompile 'com.android.support.test:runner:0.2'
-    androidTestCompile 'com.android.support.test:rules:0.2'
+    androidTestCompile 'com.android.support:appcompat-v7:23.1.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'org.mockito:mockito-core:1.10.19'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
-    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.0'
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 }

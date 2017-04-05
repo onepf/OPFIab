@@ -35,6 +35,7 @@ import org.onepf.opfiab.google.model.GooglePurchase;
 import org.onepf.opfiab.google.model.GoogleSkuDetails;
 import org.onepf.opfiab.google.model.ItemType;
 import org.onepf.opfiab.google.model.PurchaseState;
+import org.onepf.opfiab.google.payload.PayloadProvider;
 import org.onepf.opfiab.model.billing.Purchase;
 import org.onepf.opfiab.model.billing.SignedPurchase;
 import org.onepf.opfiab.model.billing.SkuDetails;
@@ -79,6 +80,10 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
 
     protected final boolean debugMode;
     /**
+     * Provider of custom developerPayload
+     */
+    protected final PayloadProvider payloadProvider;
+    /**
      * Helper object to delegate all Google specific calls to.
      */
     @NonNull
@@ -88,9 +93,11 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             @NonNull final Context context,
             @NonNull final TypedSkuResolver skuResolver,
             @NonNull final PurchaseVerifier purchaseVerifier,
+            @NonNull final PayloadProvider payloadProvider,
             final boolean debugMode) {
         super(context, skuResolver, purchaseVerifier);
         this.debugMode = debugMode;
+        this.payloadProvider = payloadProvider;
     }
 
     /**
@@ -346,7 +353,13 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             return;
         }
 
-        final Bundle result = helper.getBuyIntent(sku, itemType);
+         // extract developerPayload if exist
+        String payload = "";
+        if (payloadProvider != null && !TextUtils.isEmpty(payloadProvider.providePayload(sku))) {
+            payload = payloadProvider.providePayload(sku);
+        }
+
+        final Bundle result = helper.getBuyIntent(sku, itemType, payload);
         final Response response = GoogleUtils.getResponse(result);
         final PendingIntent intent = GoogleUtils.getBuyIntent(result);
         if (response != Response.OK || intent == null) {
@@ -399,6 +412,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             PurchaseVerifier> {
 
         private boolean debugMode;
+        private PayloadProvider payloadProvider;
 
         public Builder(@NonNull final Context context) {
             super(context);
@@ -410,6 +424,18 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             return this;
         }
 
+
+        /**
+         * Sets {@link PayloadProvider} to provide developerPayload if it`s need
+         * @param payloadProvider provider of custom developerPayload
+         * @return instance of {@link PayloadProvider}
+         */
+        @NonNull
+        public Builder setPayloadProvider(final PayloadProvider payloadProvider) {
+            this.payloadProvider = payloadProvider;
+            return this;
+        }
+
         @Override
         public GoogleBillingProvider build() {
             if (skuResolver == null) {
@@ -417,6 +443,7 @@ public class GoogleBillingProvider extends BaseBillingProvider<TypedSkuResolver,
             }
             return new GoogleBillingProvider(context, skuResolver,
                     purchaseVerifier == null ? PurchaseVerifier.DEFAULT : purchaseVerifier,
+                    payloadProvider,
                     debugMode);
         }
     }
