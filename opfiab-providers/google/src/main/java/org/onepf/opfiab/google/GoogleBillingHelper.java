@@ -100,15 +100,15 @@ public class GoogleBillingHelper extends AidlBillingHelper<IInAppBillingService>
      * @return Bundle containing purchase intent. Can be null.
      */
     @Nullable
-    public Bundle getBuyIntent(@NonNull final String sku, @NonNull final ItemType itemType) {
-        OPFLog.logMethod(sku, itemType);
+    public Bundle getBuyIntent(@NonNull final String sku, @NonNull final ItemType itemType, @NonNull String payload) {
+        OPFLog.logMethod(sku, itemType, payload);
         final IInAppBillingService service = getService();
         if (service == null) {
             return null;
         }
         try {
             final String type = itemType.toString();
-            final Bundle result = service.getBuyIntent(API, packageName, sku, type, "");
+            final Bundle result = service.getBuyIntent(API, packageName, sku, type, payload);
             final Response response = GoogleUtils.getResponse(result);
             OPFLog.d("Response: %s. Result: %s", response, OPFUtils.toString(result));
             return result;
